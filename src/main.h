@@ -645,6 +645,21 @@ public:
     const CTxOut& GetOutputFor(const CTxIn& input, const MapPrevTx& inputs) const;
 };
 
+/** wrapper for CTxOut that provides a more compact serialization */
+class CTxOutCompressor
+{
+private:
+    CTxOut &txout;
+public:
+    CTxOutCompressor(CTxOut &txoutIn) : txout(txoutIn) { }
+
+    IMPLEMENT_SERIALIZE(
+        READWRITE(VARINT(txout.nValue));
+        CScriptCompressor cscript(REF(txout.scriptPubKey));
+        READWRITE(cscript);
+    )
+};
+
 /** Count ECDSA signature operations the old-fashioned (pre-0.6) way
     @return number of sigops this transaction's outputs will produce when spent
     @see CTransaction::FetchInputs
