@@ -52,6 +52,7 @@ uint256 nBestInvalidTrust = 0;
 uint256 hashBestChain = 0;
 CBlockIndex* pindexBest = NULL;
 int64_t nTimeBestReceived = 0;
+bool fImporting = false;
 bool fHaveGUI = false;
 
 struct COrphanBlock {
@@ -2650,7 +2651,6 @@ bool LoadExternalBlockFile(FILE* fileIn)
 
     int nLoaded = 0;
     {
-        LOCK(cs_main);
         try {
             CAutoFile blkdat(fileIn, SER_DISK, CLIENT_VERSION);
             unsigned int nPos = 0;
@@ -2689,6 +2689,7 @@ bool LoadExternalBlockFile(FILE* fileIn)
                 {
                     CBlock block;
                     blkdat >> block;
+                    LOCK(cs_main);
                     if (ProcessBlock(NULL,&block))
                     {
                         nLoaded++;
@@ -2705,6 +2706,56 @@ bool LoadExternalBlockFile(FILE* fileIn)
     LogPrintf("Loaded %i blocks from external file in %dms\n", nLoaded, GetTimeMillis() - nStart);
     return nLoaded > 0;
 }
+
+struct CImportingNow
+{
+    CImportingNow() {
+        assert(fImporting == false);
+        fImporting = true;
+    }
+
+    ~CImportingNow() {
+        assert(fImporting == true);
+        fImporting = false;
+    }
+};
+
+void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
+{
+    RenameThread("blackcoin-loadblk");
+
+    CImportingNow imp;
+
+    // -loadblock=
+    uiInterface.InitMessage(_("Starting block import..."));
+    BOOST_FOREACH(boost::filesystem::path &path, vImportFiles) {
+        FILE *file = fopen(path.string().c_str(), "rb");
+        if (file)
+            LoadExternalBlockFile(file);
+    }
+
+    // hardcoded $DATADIR/bootstrap.dat
+    filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
+    if (filesystem::exists(pathBootstrap)) {
+        uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
+
+        FILE *file = fopen(pathBootstrap.string().c_str(), "rb");
+        if (file) {
+            filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
+            LoadExternalBlockFile(file);
+            RenameOver(pathBootstrap, pathBootstrapOld);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -2987,7 +3038,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
         // Ask the first connected node for block updates
         static int nAskedForBlocks = 0;
-        if (!pfrom->fClient && !pfrom->fOneShot &&
+        if (!pfrom->fClient && !pfrom->fOneShot && !fImporting &&
             (pfrom->nStartingHeight > (nBestHeight - 144)) &&
             (pfrom->nVersion < NOBLKS_VERSION_START ||
              pfrom->nVersion >= NOBLKS_VERSION_END) &&
@@ -3136,9 +3187,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             bool fAlreadyHave = AlreadyHave(txdb, inv);
             LogPrint("net", "  got inventory: %s  %s\n", inv.ToString(), fAlreadyHave ? "have" : "new");
 
-            if (!fAlreadyHave)
-                pfrom->AskFor(inv);
-            else if (inv.type == MSG_BLOCK && mapOrphanBlocks.count(inv.hash)) {
+            if (!fAlreadyHave) {
+                if (!fImporting)
+                    pfrom->AskFor(inv);
+            } else if (inv.type == MSG_BLOCK && mapOrphanBlocks.count(inv.hash)) {
                 PushGetBlocks(pfrom, pindexBest, GetOrphanRoot(inv.hash));
             } else if (nInv == nLastBlock) {
                 // In case we are on a very long side-chain, it is possible that we already have

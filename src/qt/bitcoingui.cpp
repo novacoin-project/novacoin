@@ -543,7 +543,7 @@ void BitcoinGUI::setNumConnections(int count)
 void BitcoinGUI::setNumBlocks(int count)
 {
     // don't show / hide progress bar and its label if we have no connection to the network
-    if (!clientModel || clientModel->getNumConnections() == 0)
+    if (!clientModel || (clientModel->getNumConnections() == 0 && !clientModel->isImporting()))
     {
         statusBar()->setVisible(false);
 
@@ -598,7 +598,7 @@ void BitcoinGUI::setNumBlocks(int count)
             timeBehindText = tr("%1 and %2").arg(tr("%n year(s)", "", years)).arg(tr("%n week(s)","", remainder/WEEK_IN_SECONDS));
         }
 
-        progressBarLabel->setText(tr("Synchronizing with network..."));
+        progressBarLabel->setText(tr(clientModel->isImporting() ? "Importing blocks..." : "Synchronizing with network..."));
         progressBarLabel->setVisible(true);
         progressBar->setFormat(tr("%1 behind").arg(timeBehindText));
         progressBar->setMaximum(totalSecs);

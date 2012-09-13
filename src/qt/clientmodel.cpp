@@ -124,6 +124,11 @@ bool ClientModel::inInitialBlockDownload() const
     return IsInitialBlockDownload();
 }
 
+bool ClientModel::isImporting() const
+{
+    return fImporting;
+}
+
 QString ClientModel::getStatusBarWarnings() const
 {
     return QString::fromStdString(GetWarnings("statusbar"));
