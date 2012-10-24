@@ -43,6 +43,7 @@ public:
 
     QString formatFullVersion() const;
     QString formatBuildDate() const;
+    bool isReleaseVersion() const;
     QString clientName() const;
     QString formatClientStartupTime() const;
 
@@ -61,6 +62,7 @@ private:
 signals:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count, int countOfPeers);
+    void alertsChanged(const QString &warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);
 
     //! Asynchronous error notification
