@@ -12,7 +12,6 @@
 #include "bitcoinrpc.h"
 #include "db.h"
 
-#undef printf
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/v6_only.hpp>
@@ -25,8 +24,6 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
 #include <list>
-
-#define printf OutputDebugStringF
 
 using namespace std;
 using namespace boost;
