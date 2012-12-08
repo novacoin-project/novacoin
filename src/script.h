@@ -38,6 +38,7 @@ enum
 enum
 {
     SCRIPT_VERIFY_NONE      = 0,
+    SCRIPT_VERIFY_NOCACHE   = (1U << 0),
 };
 
 // Mandatory script verification flags that all new blocks must comply with for
