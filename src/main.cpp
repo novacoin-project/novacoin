@@ -549,7 +549,7 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
-int64_t CTransaction::GetMinFee(unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes) const
+int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes)
 {
     // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
@@ -560,7 +560,7 @@ int64_t CTransaction::GetMinFee(unsigned int nBlockSize, enum GetMinFee_mode mod
     // To limit dust spam, require MIN_TX_FEE/MIN_RELAY_TX_FEE if any output is less than 0.01
     if (nMinFee < nBaseFee)
     {
-        BOOST_FOREACH(const CTxOut& txout, vout)
+        BOOST_FOREACH(const CTxOut& txout, tx.vout)
             if (txout.nValue < CENT)
                 nMinFee = nBaseFee;
     }
@@ -659,7 +659,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
         unsigned int nSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
 
         // Don't accept it if it can't get into a block
-        int64_t txMinFee = tx.GetMinFee(1000, GMF_RELAY, nSize);
+        int64_t txMinFee = GetMinFee(tx, 1000, GMF_RELAY, nSize);
         if (fLimitFree && nFees < txMinFee)
             return error("AcceptToMemoryPool : not enough fees %s, %"PRId64" < %"PRId64,
                          hash.ToString().c_str(),
@@ -1400,8 +1400,9 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
                 return DoS(100, error("ConnectInputs() : %s nTxFee < 0", GetHash().ToString().c_str()));
 
             // enforce transaction fees for every block
-            if (nTxFee < GetMinFee())
-                return fBlock? DoS(100, error("ConnectInputs() : %s not paying required fee=%s, paid=%s", GetHash().ToString().c_str(), FormatMoney(GetMinFee()).c_str(), FormatMoney(nTxFee).c_str())) : false;
+            int64_t nRequiredFee = GetMinFee(*this);
+            if (nTxFee < nRequiredFee)
+                return fBlock? DoS(100, error("ConnectInputs() : %s not paying required fee=%s, paid=%s", GetHash().ToString().c_str(), FormatMoney(nRequiredFee).c_str(), FormatMoney(nTxFee).c_str())) : false;
 
             nFees += nTxFee;
             if (!MoneyRange(nFees))
