@@ -622,7 +622,7 @@ int64_t CTransaction::GetMinFee(unsigned int nBlockSize, enum GetMinFee_mode mod
 }
 
 
-bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
+bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
                         bool* pfMissingInputs)
 {
     AssertLockHeld(cs_main);
@@ -703,7 +703,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
 
         // Don't accept it if it can't get into a block
         int64_t txMinFee = tx.GetMinFee(1000, GMF_RELAY, nSize);
-        if (nFees < txMinFee)
+        if (fLimitFree && nFees < txMinFee)
             return error("AcceptToMemoryPool : not enough fees %s, %"PRId64" < %"PRId64,
                          hash.ToString().c_str(),
                          nFees, txMinFee);
@@ -711,26 +711,24 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
         // Continuously rate-limit free transactions
         // This mitigates 'penny-flooding' -- sending thousands of free transactions just to
         // be annoying or make others' transactions take longer to confirm.
-        if (nFees < MIN_RELAY_TX_FEE)
+        if (fLimitFree && nFees < MIN_RELAY_TX_FEE)
         {
-            static CCriticalSection cs;
             static double dFreeCount;
             static int64_t nLastTime;
             int64_t nNow = GetTime();
 
-            {
-                LOCK(pool.cs);
-                // Use an exponentially decaying ~10-minute window:
-                dFreeCount *= pow(1.0 - 1.0/600.0, (double)(nNow - nLastTime));
-                nLastTime = nNow;
-                // -limitfreerelay unit is thousand-bytes-per-minute
-                // At default rate it would take over a month to fill 1GB
-                if (dFreeCount > GetArg("-limitfreerelay", 15)*10*1000 && !IsFromMe(tx))
-                    return error("AcceptToMemoryPool : free transaction rejected by rate limiter");
-                if (fDebug)
-                    printf("Rate limit dFreeCount: %g => %g\n", dFreeCount, dFreeCount+nSize);
-                dFreeCount += nSize;
-            }
+            LOCK(pool.cs);
+
+            // Use an exponentially decaying ~10-minute window:
+            dFreeCount *= pow(1.0 - 1.0/600.0, (double)(nNow - nLastTime));
+            nLastTime = nNow;
+            // -limitfreerelay unit is thousand-bytes-per-minute
+            // At default rate it would take over a month to fill 1GB
+            if (dFreeCount > GetArg("-limitfreerelay", 15)*10*1000)
+                return error("AcceptToMemoryPool : free transaction rejected by rate limiter");
+            if (fDebug)
+                printf("Rate limit dFreeCount: %g => %g\n", dFreeCount, dFreeCount+nSize);
+            dFreeCount += nSize;
         }
 
         // Check against previous transactions
@@ -872,9 +870,9 @@ int CMerkleTx::GetBlocksToMaturity() const
 }
 
 
-bool CMerkleTx::AcceptToMemoryPool()
+bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree)
 {
-    return ::AcceptToMemoryPool(mempool, *this, NULL);
+    return ::AcceptToMemoryPool(mempool, *this, fLimitFree, NULL);
 }
 
 
@@ -890,10 +888,10 @@ bool CWalletTx::AcceptWalletTransaction(CTxDB& txdb)
             {
                 uint256 hash = tx.GetHash();
                 if (!mempool.exists(hash) && !txdb.ContainsTx(hash))
-                    tx.AcceptToMemoryPool();
+                    tx.AcceptToMemoryPool(false);
             }
         }
-        return AcceptToMemoryPool();
+        return AcceptToMemoryPool(false);
     }
     return false;
 }
@@ -1707,7 +1705,7 @@ bool static Reorganize(CTxDB& txdb, CBlockIndex* pindexNew)
 
     // Resurrect memory transactions that were in the disconnected branch
     BOOST_FOREACH(CTransaction& tx, vResurrect)
-        AcceptToMemoryPool(mempool, tx, NULL);
+        AcceptToMemoryPool(mempool, tx, false, NULL);
 
     // Delete redundant memory transactions that are in the connected branch
     BOOST_FOREACH(CTransaction& tx, vDelete) {
@@ -3253,7 +3251,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         pfrom->AddInventoryKnown(inv);
 
         bool fMissingInputs = false;
-        if (AcceptToMemoryPool(mempool, tx, &fMissingInputs))
+        if (AcceptToMemoryPool(mempool, tx, true, &fMissingInputs))
         {
             RelayTransaction(tx, inv.hash);
             mapAlreadyAskedFor.erase(inv);
@@ -3274,7 +3272,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     CTransaction& orphanTx = mapOrphanTransactions[orphanTxHash];
                     bool fMissingInputs2 = false;
 
-                    if (AcceptToMemoryPool(mempool, orphanTx, &fMissingInputs2))
+                    if (AcceptToMemoryPool(mempool, orphanTx, true, &fMissingInputs2))
                     {
                         printf("   accepted orphan tx %s\n", orphanTxHash.ToString().substr(0,10).c_str());
                         RelayTransaction(orphanTx, orphanTxHash);
@@ -3284,9 +3282,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     }
                     else if (!fMissingInputs2)
                     {
-                        // invalid orphan
+                        // invalid or too-little-fee orphan
                         vEraseQueue.push_back(orphanTxHash);
-                        printf("   removed invalid orphan tx %s\n", orphanTxHash.ToString().substr(0,10).c_str());
+                        printf("   removed orphan tx %s\n", orphanTxHash.ToString().substr(0,10).c_str());
                     }
                 }
             }
