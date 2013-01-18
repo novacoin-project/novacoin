@@ -738,6 +738,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
     // If updated, erase old tx from wallet
     if (ptxOld)
         EraseFromWallets(ptxOld->GetHash());
+    SyncWithWallets(tx, NULL, true);
 
     printf("AcceptToMemoryPool : accepted %s (poolsz %"PRIszu")\n",
            hash.ToString().substr(0,10).c_str(),
@@ -3287,7 +3288,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         bool fMissingInputs = false;
         if (AcceptToMemoryPool(mempool, tx, &fMissingInputs))
         {
-            SyncWithWallets(tx, NULL, true);
             RelayTransaction(tx, inv.hash);
             mapAlreadyAskedFor.erase(inv);
             vWorkQueue.push_back(inv.hash);
@@ -3308,7 +3308,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     if (AcceptToMemoryPool(mempool, orphanTx, &fMissingInputs2))
                     {
                         printf("   accepted orphan tx %s\n", orphanTxHash.ToString().substr(0,10).c_str());
-                        SyncWithWallets(tx, NULL, true);
                         RelayTransaction(orphanTx, orphanTxHash);
                         mapAlreadyAskedFor.erase(CInv(MSG_TX, orphanTxHash));
                         vWorkQueue.push_back(orphanTxHash);
