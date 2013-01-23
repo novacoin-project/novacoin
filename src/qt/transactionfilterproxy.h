@@ -8,6 +8,7 @@
 class TransactionFilterProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
+
 public:
     explicit TransactionFilterProxy(QObject *parent = 0);
 
@@ -35,6 +36,7 @@ public:
     void setShowInactive(bool showInactive);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex & source_parent) const;
 
@@ -46,11 +48,6 @@ private:
     qint64 minAmount;
     int limitRows;
     bool showInactive;
-
-signals:
-
-public slots:
-
 };
 
 #endif // TRANSACTIONFILTERPROXY_H
