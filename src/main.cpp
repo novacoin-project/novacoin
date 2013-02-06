@@ -1500,7 +1500,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
         if (txdb.ReadTxIndex(hashTx, txindexOld)) {
             BOOST_FOREACH(CDiskTxPos &pos, txindexOld.vSpent)
                 if (pos.IsNull())
-                    return false;
+                    return DoS(100, error("ConnectBlock() : tried to overwrite transaction"));
         }
 
         nSigOps += GetLegacySigOpCount(tx);
