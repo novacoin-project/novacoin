@@ -66,6 +66,7 @@ QDateTime ClientModel::getLastBlockDate() const
         return QDateTime::fromTime_t(1393221600); // Genesis block's time
 }
 
+
 void ClientModel::updateTimer()
 {
     // Get required lock upfront. This avoids the GUI from getting stuck on
