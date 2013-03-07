@@ -42,7 +42,7 @@ CNode* FindNode(const CNetAddr& ip);
 CNode* FindNode(const std::string& addrName);
 CNode* FindNode(const CService& ip);
 CNode* ConnectNode(CAddress addrConnect, const char *strDest = NULL);
-void MapPort();
+void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
 bool BindListenPort(const CService &bindAddr, std::string& strError=REF(std::string()));
 void StartNode(void* parg);
@@ -102,22 +102,11 @@ public:
 /** Thread types */
 enum threadId
 {
-    THREAD_SOCKETHANDLER,
-    THREAD_OPENCONNECTIONS,
-    THREAD_MESSAGEHANDLER,
-    THREAD_RPCLISTENER,
-    THREAD_UPNP,
-    THREAD_DNSSEED,
-    THREAD_ADDEDCONNECTIONS,
-    THREAD_DUMPADDRESS,
-    THREAD_RPCHANDLER,
     THREAD_STAKE_MINER,
-
     THREAD_MAX
 };
 
 extern bool fDiscover;
-extern bool fUseUPnP;
 extern uint64_t nLocalServices;
 extern uint64_t nLocalHostNonce;
 extern CAddress addrSeenByPeer;
