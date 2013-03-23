@@ -190,6 +190,9 @@ private slots:
 
     void updateWeight();
     void updateStakingIcon();
+
+    /** called by a timer to check if fRequestShutdown has been set **/
+    void detectShutdown();
 };
 
 #endif
