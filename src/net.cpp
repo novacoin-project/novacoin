@@ -1703,9 +1703,6 @@ void static Discover(boost::thread_group& threadGroup)
 
 void StartNode(boost::thread_group& threadGroup)
 {
-    // Make this thread recognisable as the startup thread
-    RenameThread("blackcoin-start");
-
     if (semOutbound == NULL) {
         // initialize semaphore
         int nMaxOutbound = min(MAX_OUTBOUND_CONNECTIONS, (int)GetArg("-maxconnections", 125));
