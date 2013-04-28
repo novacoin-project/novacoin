@@ -2661,7 +2661,7 @@ string GetWarnings(string strFor)
     string strStatusBar;
     string strRPC;
 
-    if (GetBoolArg("-testsafemode"))
+    if (GetBoolArg("-testsafemode", false))
         strRPC = "test";
 
     if (!CLIENT_VERSION_IS_RELEASE)
@@ -3332,7 +3332,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         uint256 hashReply;
         vRecv >> hashReply;
 
-        if (!GetBoolArg("-allowreceivebyip"))
+        if (!GetBoolArg("-allowreceivebyip", false))
         {
             pfrom->PushMessage("reply", hashReply, (int)2, string(""));
             return true;
