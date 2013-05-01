@@ -552,7 +552,7 @@ public:
     bool HasCanonicalPushes() const;
 
     void SetDestination(const CTxDestination& address);
-    void SetMultisig(int nRequired, const std::vector<CKey>& keys);
+    void SetMultisig(int nRequired, const std::vector<CPubKey>& keys);
 
     std::string ToString(bool fShort=false) const
     {
@@ -618,7 +618,7 @@ protected:
     // form).
     bool IsToKeyID(CKeyID &hash) const;
     bool IsToScriptID(CScriptID &hash) const;
-    bool IsToPubKey(std::vector<unsigned char> &pubkey) const;
+    bool IsToPubKey(CPubKey &pubkey) const;
 
     bool Compress(std::vector<unsigned char> &out) const;
     unsigned int GetSpecialSize(unsigned int nSize) const;
