@@ -302,6 +302,9 @@ int main(int argc, char *argv[])
         }
         else
         {
+            threadGroup.interrupt_all();
+            threadGroup.join_all();
+            Shutdown();
             return 1;
         }
     } catch (std::exception& e) {
