@@ -23,6 +23,10 @@
 #include <QSplashScreen>
 #include <QLibraryInfo>
 
+#ifdef Q_OS_MAC
+#include "macdockiconhandler.h"
+#endif
+
 #if defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)
 #define _BITCOIN_QT_PLUGINS_INCLUDED
 #define __INSURE__
@@ -215,6 +219,13 @@ int main(int argc, char *argv[])
         help.showOrPrint();
         return 1;
     }
+
+#ifdef Q_OS_MAC
+    // on mac, also change the icon now because it would look strange to have a testnet splash (green) and a std app icon (orange)
+    if(GetBoolArg("-testnet")) {
+        MacDockIconHandler::instance()->setIcon(QIcon(":icons/bitcoin_testnet"));
+    }
+#endif
 
     QSplashScreen splash(QPixmap(":/images/splash"), 0);
     if (GetBoolArg("-splash", true) && !GetBoolArg("-min"))
