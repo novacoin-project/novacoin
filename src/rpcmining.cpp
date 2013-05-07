@@ -3,6 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "chainparams.h"
 #include "main.h"
 #include "db.h"
 #include "txdb.h"
@@ -55,7 +56,7 @@ Value getmininginfo(const Array& params, bool fHelp)
     obj.push_back(Pair("stakeweight", weight));
 
     obj.push_back(Pair("stakeinterest",    (uint64_t)COIN_YEAR_REWARD));
-    obj.push_back(Pair("testnet",       fTestNet));
+    obj.push_back(Pair("testnet",       TestNet()));
     return obj;
 }
 
