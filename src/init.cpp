@@ -93,7 +93,8 @@ void Shutdown()
     StopNode();
     {
         LOCK(cs_main);
-        pwalletMain->SetBestChain(CBlockLocator(pindexBest));
+        if (pwalletMain)
+            pwalletMain->SetBestChain(CBlockLocator(pindexBest));
     }
     bitdb.Flush(true);
     boost::filesystem::remove(GetPidFile());
