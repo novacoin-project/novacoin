@@ -108,6 +108,7 @@ OBJS= \
     obj/key.o \
     obj/db.o \
     obj/init.o \
+    obj/bitcoind.o \
     obj/keystore.o \
     obj/miner.o \
     obj/main.o \
