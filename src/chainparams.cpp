@@ -9,6 +9,10 @@
 #include "main.h"
 #include "util.h"
 
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
+
 struct SeedSpec6 {
     uint8_t addr[16];
     uint16_t port;
@@ -84,9 +88,9 @@ public:
         vSeeds.push_back(CDNSSeedData("archon.darkfox.id.au", "foxy.seeds.darkfox.id.au"));
         vSeeds.push_back(CDNSSeedData("6.syllabear.us.to", "bcseed.syllabear.us.to"));
 
-        base58Prefixes[PUBKEY_ADDRESS] = 25;
-        base58Prefixes[SCRIPT_ADDRESS] = 85;
-        base58Prefixes[SECRET_KEY] = 153;
+        base58Prefixes[PUBKEY_ADDRESS] = list_of(25);
+        base58Prefixes[SCRIPT_ADDRESS] = list_of(85);
+        base58Prefixes[SECRET_KEY] =     list_of(153);
 
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
     }
@@ -133,9 +137,9 @@ public:
         vFixedSeeds.clear();
         vSeeds.clear();
 
-        base58Prefixes[PUBKEY_ADDRESS] = 111;
-        base58Prefixes[SCRIPT_ADDRESS] = 196;
-        base58Prefixes[SECRET_KEY] = 239;
+        base58Prefixes[PUBKEY_ADDRESS] = list_of(111);
+        base58Prefixes[SCRIPT_ADDRESS] = list_of(196);
+        base58Prefixes[SECRET_KEY]     = list_of(239);
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
 
@@ -165,10 +169,6 @@ public:
         assert(hashGenesisBlock == uint256("0x523dda6d336047722cbaf1c5dce622298af791bac21b33bf6e2d5048b2a13e3d"));
 
         vSeeds.clear();  // Regtest mode doesn't have any DNS seeds.
-
-        base58Prefixes[PUBKEY_ADDRESS] = 0;
-        base58Prefixes[SCRIPT_ADDRESS] = 5;
-        base58Prefixes[SECRET_KEY] = 128;
     }
 
     virtual bool RequireRPCPassword() const { return false; }
