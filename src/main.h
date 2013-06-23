@@ -441,7 +441,7 @@ unsigned int GetP2SHSigOpCount(const CTransaction& tx, const MapPrevTx& mapInput
 /** Check for standard transaction types
     @return True if all outputs (scriptPubKeys) use only standard transaction forms
 */
-bool IsStandardTx(const CTransaction& tx);
+bool IsStandardTx(const CTransaction& tx, std::string& reason);
 
 bool IsFinalTx(const CTransaction &tx, int nBlockHeight = 0, int64_t nBlockTime = 0);
 
