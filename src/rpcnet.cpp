@@ -70,6 +70,8 @@ Value getpeerinfo(const Array& params, bool fHelp)
         Object obj;
 
         obj.push_back(Pair("addr", stats.addrName));
+        if (!(stats.addrLocal.empty()))
+            obj.push_back(Pair("addrlocal", stats.addrLocal));
         obj.push_back(Pair("services", strprintf("%08"PRIx64, stats.nServices)));
         obj.push_back(Pair("lastsend", (int64_t)stats.nLastSend));
         obj.push_back(Pair("lastrecv", (int64_t)stats.nLastRecv));

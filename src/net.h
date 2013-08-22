@@ -145,6 +145,7 @@ public:
     int nMisbehavior;
     double dPingTime;
     double dPingWait;
+    std::string addrLocal;
 };
 
 
