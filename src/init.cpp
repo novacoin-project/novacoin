@@ -728,7 +728,7 @@ bool AppInit2(boost::thread_group& threadGroup)
         RandAddSeedPerfmon();
 
         CPubKey newDefaultKey;
-        if (pwalletMain->GetKeyFromPool(newDefaultKey, false)) {
+        if (pwalletMain->GetKeyFromPool(newDefaultKey)) {
             pwalletMain->SetDefaultKey(newDefaultKey);
             if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultKey.GetID(), ""))
                 strErrors << _("Cannot write default address") << "\n";
