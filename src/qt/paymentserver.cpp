@@ -158,3 +158,8 @@ void PaymentServer::handleURIConnection()
     else
         emit receivedURI(message);
 }
+
+void PaymentServer::setOptionsModel(OptionsModel *optionsModel)
+{
+    this->optionsModel = optionsModel;
+}
