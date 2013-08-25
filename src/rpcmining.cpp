@@ -20,12 +20,18 @@ static CReserveKey* pMiningKey = NULL;
 
 void InitRPCMining()
 {
+    if (!pwalletMain)
+        return;
+
     // getwork/getblocktemplate mining rewards paid here:
     pMiningKey = new CReserveKey(pwalletMain);
 }
 
 void ShutdownRPCMining()
 {
+    if (!pMiningKey)
+        return;
+
     delete pMiningKey; pMiningKey = NULL;
 }
 
@@ -47,7 +53,8 @@ Value getmininginfo(const Array& params, bool fHelp)
             "Returns an object containing mining-related information.");
 
     uint64_t nWeight = 0;
-    pwalletMain->GetStakeWeight(nWeight);
+    if (pwalletMain)
+        pwalletMain->GetStakeWeight(nWeight);
 
     Object obj, diff, weight;
     obj.push_back(Pair("blocks",        (int)nBestHeight));
@@ -83,7 +90,8 @@ Value getstakinginfo(const Array& params, bool fHelp)
             "Returns an object containing staking-related information.");
 
     uint64_t nWeight = 0;
-    pwalletMain->GetStakeWeight(nWeight);
+    if (pwalletMain)
+        pwalletMain->GetStakeWeight(nWeight);
 
     uint64_t nNetworkWeight = GetPoSKernelPS();
     bool staking = nLastCoinStakeSearchInterval && nWeight;
@@ -234,6 +242,7 @@ Value getworkex(const Array& params, bool fHelp)
 
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 
+        assert(pwalletMain != NULL);
         return CheckWork(pblock, *pwalletMain, *pMiningKey);
     }
 }
@@ -349,6 +358,7 @@ Value getwork(const Array& params, bool fHelp)
         pblock->vtx[0].vin[0].scriptSig = mapNewBlock[pdata->hashMerkleRoot].second;
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 
+        assert(pwalletMain != NULL);
         return CheckWork(pblock, *pwalletMain, *pMiningKey);
     }
 }
