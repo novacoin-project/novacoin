@@ -418,6 +418,12 @@ bool CKey::Load(CPrivKey &privkey, CPubKey &vchPubKey, bool fSkipCheck=false) {
     fCompressed = vchPubKey.IsCompressed();
     fValid = true;
 
+    if (fSkipCheck)
+        return true;
+
+    if (GetPubKey() != vchPubKey)
+        return false;
+
     return true;
 }
 
