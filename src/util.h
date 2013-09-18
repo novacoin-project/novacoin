@@ -142,6 +142,7 @@ void RandAddSeedPerfmon();
 
 // Print to debug.log if -debug=category switch is given OR category is NULL.
 int ATTR_WARN_PRINTF(2,3) LogPrint(const char* category, const char* pszFormat, ...);
+#define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
 
 /*
   Rationale for the real_strprintf / strprintf construction:
@@ -160,14 +161,6 @@ std::string real_strprintf(const std::string &format, int dummy, ...);
 std::string vstrprintf(const char *format, va_list ap);
 
 bool ATTR_WARN_PRINTF(1,2) error(const char *format, ...);
-
-/* Redefine printf so that it directs output to debug.log
- *
- * Do this *after* defining the other printf-like functions, because otherwise the
- * __attribute__((format(printf,X,Y))) gets expanded to __attribute__((format(OutputDebugStringF,X,Y)))
- * which confuses gcc.
- */
-#define printf(...) LogPrint(NULL, __VA_ARGS__)
 
 void PrintException(std::exception* pex, const char* pszThread);
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
@@ -544,7 +537,7 @@ template <typename Callable> void LoopForever(const char* name,  Callable func, 
 {
     std::string s = strprintf("blackcoin-%s", name);
     RenameThread(s.c_str());
-    printf("%s thread start\n", name);
+    LogPrintf("%s thread start\n", name);
     try
     {
         while (1)
@@ -555,7 +548,7 @@ template <typename Callable> void LoopForever(const char* name,  Callable func, 
     }
     catch (boost::thread_interrupted)
     {
-        printf("%s thread stop\n", name);
+        LogPrintf("%s thread stop\n", name);
         throw;
     }
     catch (std::exception& e) {
@@ -572,13 +565,13 @@ template <typename Callable> void TraceThread(const char* name,  Callable func)
     RenameThread(s.c_str());
     try
     {
-        printf("%s thread start\n", name);
+        LogPrintf("%s thread start\n", name);
         func();
-        printf("%s thread exit\n", name);
+        LogPrintf("%s thread exit\n", name);
     }
     catch (boost::thread_interrupted)
     {
-        printf("%s thread interrupt\n", name);
+        LogPrintf("%s thread interrupt\n", name);
         throw;
     }
     catch (std::exception& e) {
