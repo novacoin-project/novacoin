@@ -104,12 +104,12 @@ static void handleRunawayException(std::exception *e)
 #if QT_VERSION < 0x050000
 void DebugMessageHandler(QtMsgType type, const char * msg)
 {
-    OutputDebugStringF("Bitcoin-Qt: %s\n", msg);
+    LogPrint("qt", "Bitcoin-Qt: %s\n", msg);
 }
 #else
 void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
 {
-    OutputDebugStringF("Bitcoin-Qt: %s\n", qPrintable(msg));
+    LogPrint("qt", "Bitcoin-Qt: %s\n", qPrintable(msg));
 }
 #endif
 

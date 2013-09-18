@@ -14,8 +14,6 @@
 #include <boost/variant/get.hpp>
 #include <boost/algorithm/string.hpp>
 
-#define printf OutputDebugStringF
-
 using namespace json_spirit;
 using namespace std;
 
