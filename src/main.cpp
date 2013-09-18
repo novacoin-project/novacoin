@@ -580,8 +580,10 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     unsigned int nNewBlockSize = nBlockSize + nBytes;
     int64_t nMinFee = (1 + (int64_t)nBytes / 1000) * nBaseFee;
 
-    // To limit dust spam, require MIN_TX_FEE/MIN_RELAY_TX_FEE if any output is less than 0.01
-    if (nMinFee < nBaseFee)
+    // This code can be removed after enough miners have upgraded to version 0.9.
+    // Until then, be safe when sending and require a fee if any output
+    // is less than CENT:
+    if (nMinFee < nBaseFee && mode == GMF_SEND)
     {
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
             if (txout.nValue < CENT)
