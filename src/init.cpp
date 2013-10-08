@@ -185,8 +185,19 @@ std::string HelpMessage()
         strUsage += "  -daemon                " + _("Run in the background as a daemon and accept commands") + "\n";
 #endif
     strUsage += "  -testnet               " + _("Use the test network") + "\n";
-    strUsage += "  -debug                 " + _("Output extra debugging information. Implies all other -debug* options") + "\n";
-    strUsage += "  -debugnet              " + _("Output extra network debugging information") + "\n";
+    strUsage += "  -debug=<category>      " + _("Output debugging information (default: 0, supplying <category> is optional)") + "\n";
+    strUsage +=                               _("If <category> is not supplied, output all debugging information.") + "\n";
+    strUsage +=                               _("<category> can be:");
+    strUsage +=                                 " addrman, alert, db, lock, rand, rpc, selectcoins, mempool, net,"; // Don't translate these and qt below
+    strUsage +=                                 " coinage, coinstake, creation, stakemodifier";
+    if (fHaveGUI)
+    {
+        strUsage += ", qt.\n";
+    }
+    else
+    {
+        strUsage += ".\n";
+    }
     strUsage += "  -logtimestamps         " + _("Prepend debug output with timestamp") + "\n";
     strUsage += "  -shrinkdebugfile       " + _("Shrink debug.log file on client startup (default: 1 when no -debug)") + "\n";
     strUsage += "  -printtoconsole        " + _("Send trace/debug info to console instead of debug.log file") + "\n";
@@ -352,13 +363,15 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // ********************************************************* Step 3: parameter-to-internal-flags
 
-    if (mapMultiArgs.count("-debug")) fDebug = true;
+    fDebug = !mapMultiArgs["-debug"].empty();
+    // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
+    const vector<string>& categories = mapMultiArgs["-debug"];
+    if (GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), string("0")) != categories.end())
+        fDebug = false;
 
-    // -debug implies fDebug*
-    if (fDebug)
-        fDebugNet = true;
-    else
-        fDebugNet = GetBoolArg("-debugnet");
+    // Check for -debugnet (deprecated)
+    if (GetBoolArg("-debugnet", false))
+        InitWarning(_("Warning: Deprecated argument -debugnet ignored, use -debug=net"));
 
     if (fDaemon)
         fServer = true;
