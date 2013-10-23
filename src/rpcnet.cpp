@@ -120,13 +120,13 @@ Value addnode(const Array& params, bool fHelp)
     if (strCommand == "add")
     {
         if (it != vAddedNodes.end())
-            throw JSONRPCError(-23, "Error: Node already added");
+            throw JSONRPCError(RPC_CLIENT_NODE_ALREADY_ADDED, "Error: Node already added");
         vAddedNodes.push_back(strNode);
     }
     else if(strCommand == "remove")
     {
         if (it == vAddedNodes.end())
-            throw JSONRPCError(-24, "Error: Node has not been added.");
+            throw JSONRPCError(RPC_CLIENT_NODE_NOT_ADDED, "Error: Node has not been added.");
         vAddedNodes.erase(it);
     }
 
@@ -163,7 +163,7 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
                 break;
             }
         if (laddedNodes.size() == 0)
-            throw JSONRPCError(-24, "Error: Node has not been added.");
+            throw JSONRPCError(RPC_CLIENT_NODE_NOT_ADDED, "Error: Node has not been added.");
     }
 
     if (!fDns)
