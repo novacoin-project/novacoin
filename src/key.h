@@ -205,7 +205,8 @@ public:
     }
 
     friend bool operator==(const CKey &a, const CKey &b) {
-        return a.fCompressed == b.fCompressed && memcmp(&a.vch[0], &b.vch[0], 32);
+        return a.fCompressed == b.fCompressed && a.size() == b.size() &&
+               memcmp(&a.vch[0], &b.vch[0], a.size()) == 0;
     }
 
     // Initialize using begin and end iterators to byte data.
