@@ -66,7 +66,9 @@ OBJS= \
     obj/key.o \
     obj/db.o \
     obj/init.o \
-    obj/bitcoind.o \
+    obj/rpcclient.o \
+    obj/rpcprotocol.o \
+    obj/rpcserver.o \
     obj/keystore.o \
     obj/core.o \
     obj/main.o \
