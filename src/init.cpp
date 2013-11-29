@@ -7,12 +7,15 @@
 #include "main.h"
 #include "chainparams.h"
 #include "txdb.h"
-#include "walletdb.h"
 #include "rpcserver.h"
 #include "net.h"
 #include "util.h"
 #include "ui_interface.h"
 #include "checkpoints.h"
+#ifdef ENABLE_WALLET
+#include "wallet.h"
+#include "walletdb.h"
+#endif
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -29,7 +32,9 @@
 using namespace std;
 using namespace boost;
 
+#ifdef ENABLE_WALLET
 CWallet* pwalletMain = NULL;
+#endif
 CClientUIInterface uiInterface;
 bool fConfChange;
 bool fMinimizeCoinAge;
@@ -90,21 +95,29 @@ void Shutdown()
     RenameThread("blackcoin-shutoff");
     nTransactionsUpdated++;
     StopRPCThreads();
+#ifdef ENABLE_WALLET
     ShutdownRPCMining();
     if (pwalletMain)
         bitdb.Flush(false);
+#endif
     StopNode();
     {
         LOCK(cs_main);
+#ifdef ENABLE_WALLET
         if (pwalletMain)
             pwalletMain->SetBestChain(CBlockLocator(pindexBest));
+#endif
     }
+#ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(true);
+#endif
     boost::filesystem::remove(GetPidFile());
     UnregisterAllWallets();
+#ifdef ENABLE_WALLET
     delete pwalletMain;
     pwalletMain = NULL;
+#endif
     LogPrintf("Shutdown : done\n");
 }
 
@@ -397,7 +410,9 @@ bool AppInit2(boost::thread_group& threadGroup)
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
     fPrintToDebugger = GetBoolArg("-printtodebugger", false);
     fLogTimestamps = GetBoolArg("-logtimestamps", false);
+#ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
+#endif
 
     if (mapArgs.count("-timeout"))
     {
@@ -430,12 +445,13 @@ bool AppInit2(boost::thread_group& threadGroup)
         return InitError(_("Initialization sanity check failed. BlackCoin is shutting down."));
 
     std::string strDataDir = GetDataDir().string();
+#ifdef ENABLE_WALLET
     std::string strWalletFileName = GetArg("-wallet", "wallet.dat");
 
     // strWalletFileName must be a plain filename without a directory
     if (strWalletFileName != boost::filesystem::basename(strWalletFileName) + boost::filesystem::extension(strWalletFileName))
         return InitError(strprintf(_("Wallet %s resides outside data directory %s."), strWalletFileName, strDataDir));
-
+#endif
     // Make sure only a single Bitcoin process is using the data directory.
     boost::filesystem::path pathLockFile = GetDataDir() / ".lock";
     FILE* file = fopen(pathLockFile.string().c_str(), "a"); // empty lock file; created if it doesn't exist.
@@ -461,7 +477,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     int64_t nStart;
 
     // ********************************************************* Step 5: verify database integrity
-
+#ifdef ENABLE_WALLET
     if (!fDisableWallet) {
         uiInterface.InitMessage(_("Verifying database integrity..."));
 
@@ -507,7 +523,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                 return InitError(_("wallet.dat corrupt, salvage failed"));
         }
     } // (!fDisableWallet)
-
+#endif // ENABLE_WALLET
     // ********************************************************* Step 6: network initialization
 
     RegisterNodeSignals(GetNodeSignals());
@@ -620,14 +636,6 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // ********************************************************* Step 7: load blockchain
 
-    if (!bitdb.Open(GetDataDir()))
-    {
-        string msg = strprintf(_("Error initializing database environment %s!"
-                                 " To recover, BACKUP THAT DIRECTORY, then remove"
-                                 " everything from it except for wallet.dat."), strDataDir);
-        return InitError(msg);
-    }
-
     if (GetBoolArg("-loadblockindextest", false))
     {
         CTxDB txdb("r");
@@ -682,7 +690,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     }
 
     // ********************************************************* Step 8: load wallet
-
+#ifdef ENABLE_WALLET
     if (fDisableWallet) {
         pwalletMain = NULL;
         LogPrintf("Wallet disabled!\n");
@@ -774,7 +782,9 @@ bool AppInit2(boost::thread_group& threadGroup)
             nWalletDBUpdated++;
         }
     } // (!fDisableWallet)
-
+#else // ENABLE_WALLET
+    LogPrintf("No wallet compiled in!\n");
+#endif // !ENABLE_WALLET
     // ********************************************************* Step 9: import blocks
 
     if (mapArgs.count("-loadblock"))
@@ -830,27 +840,33 @@ bool AppInit2(boost::thread_group& threadGroup)
     //// debug print
     LogPrintf("mapBlockIndex.size() = %"PRIszu"\n",   mapBlockIndex.size());
     LogPrintf("nBestHeight = %d\n",                   nBestHeight);
+#ifdef ENABLE_WALLET
     LogPrintf("setKeyPool.size() = %"PRIszu"\n",      pwalletMain ? pwalletMain->setKeyPool.size() : 0);
     LogPrintf("mapWallet.size() = %"PRIszu"\n",       pwalletMain ? pwalletMain->mapWallet.size() : 0);
     LogPrintf("mapAddressBook.size() = %"PRIszu"\n",  pwalletMain ? pwalletMain->mapAddressBook.size() : 0);
+#endif
 
     StartNode(threadGroup);
-
+#ifdef ENABLE_WALLET
     // InitRPCMining is needed here so getwork/getblocktemplate in the GUI debug console works properly.
     InitRPCMining();
+#endif
     if (fServer)
         StartRPCThreads();
 
+#ifdef ENABLE_WALLET
     // Mine proof-of-stake blocks in the background
     if (!GetBoolArg("-staking", true))
         LogPrintf("Staking disabled\n");
     else if (pwalletMain)
         threadGroup.create_thread(boost::bind(&ThreadStakeMiner, pwalletMain));
+#endif
 
     // ********************************************************* Step 12: finished
 
     uiInterface.InitMessage(_("Done loading"));
 
+#ifdef ENABLE_WALLET
     if (pwalletMain) {
         // Add wallet transactions that aren't already in a block to mapTransactions
         pwalletMain->ReacceptWalletTransactions();
@@ -858,6 +874,7 @@ bool AppInit2(boost::thread_group& threadGroup)
         // Run a thread to flush wallet periodically
         threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
     }
+#endif
 
     return !fRequestShutdown;
 }

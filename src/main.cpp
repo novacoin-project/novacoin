@@ -2310,6 +2310,7 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     return true;
 }
 
+#ifdef ENABLE_WALLET
 // novacoin: attempt to generate suitable proof-of-stake
 bool CBlock::SignBlock(CWallet& wallet, int64_t nFees)
 {
@@ -2363,6 +2364,7 @@ bool CBlock::SignBlock(CWallet& wallet, int64_t nFees)
 
     return false;
 }
+#endif
 
 bool CBlock::CheckBlockSignature() const
 {

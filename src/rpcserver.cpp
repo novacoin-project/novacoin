@@ -9,9 +9,12 @@
 #include "init.h"
 #include "util.h"
 #include "sync.h"
-#include "ui_interface.h"
 #include "base58.h"
 #include "db.h"
+#include "ui_interface.h"
+#ifdef ENABLE_WALLET
+#include "wallet.h"
+#endif
 
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
@@ -150,8 +153,10 @@ string CRPCTable::help(string strCommand) const
             continue;
         if (strCommand != "" && strMethod != strCommand)
             continue;
+#ifdef ENABLE_WALLET
         if (pcmd->reqWallet && !pwalletMain)
             continue;
+#endif
 
         try
         {
@@ -225,7 +230,21 @@ static const CRPCCommand vRPCCommands[] =
     { "getnettotals",           &getnettotals,           true,      true,      false },
     { "getdifficulty",          &getdifficulty,          true,      false,     false },
     { "getinfo",                &getinfo,                true,      false,     false },
-    { "getsubsidy",             &getsubsidy,             true,      false,     false },
+    { "getrawmempool",          &getrawmempool,          true,      false,     false },
+    { "getblock",               &getblock,               false,     false,     false },
+    { "getblockbynumber",       &getblockbynumber,       false,     false,     false },
+    { "getblockhash",           &getblockhash,           false,     false,     false },
+    { "settxfee",               &settxfee,               false,     false,     true },
+    { "getrawtransaction",      &getrawtransaction,      false,     false,     false },
+    { "createrawtransaction",   &createrawtransaction,   false,     false,     false },
+    { "decoderawtransaction",   &decoderawtransaction,   false,     false,     false },
+    { "decodescript",           &decodescript,           false,     false,     false },
+    { "signrawtransaction",     &signrawtransaction,     false,     false,     false },
+    { "sendrawtransaction",     &sendrawtransaction,     false,     false,     false },
+    { "getcheckpoint",          &getcheckpoint,          true,      false,     false },
+    { "sendalert",              &sendalert,              false,     false,     false },
+
+#ifdef ENABLE_WALLET
     { "getmininginfo",          &getmininginfo,          true,      false,     false },
     { "getstakinginfo",         &getstakinginfo,         true,      false,     false },
     { "getnewaddress",          &getnewaddress,          true,      false,     true },
@@ -253,10 +272,6 @@ static const CRPCCommand vRPCCommands[] =
     { "sendmany",               &sendmany,               false,     false,     true },
     { "addmultisigaddress",     &addmultisigaddress,     false,     false,     true },
     { "addredeemscript",        &addredeemscript,        false,     false,     true },
-    { "getrawmempool",          &getrawmempool,          true,      false,     false },
-    { "getblock",               &getblock,               false,     false,     false },
-    { "getblockbynumber",       &getblockbynumber,       false,     false,     false },
-    { "getblockhash",           &getblockhash,           false,     false,     false },
     { "gettransaction",         &gettransaction,         false,     false,     true },
     { "listtransactions",       &listtransactions,       false,     false,     true },
     { "listaddressgroupings",   &listaddressgroupings,   false,     false,     true },
@@ -265,28 +280,21 @@ static const CRPCCommand vRPCCommands[] =
     { "getwork",                &getwork,                true,      false,     true },
     { "getworkex",              &getworkex,              true,      false,     true },
     { "listaccounts",           &listaccounts,           false,     false,     true },
-    { "settxfee",               &settxfee,               false,     false,     true },
     { "getblocktemplate",       &getblocktemplate,       true,      false,     false },
     { "submitblock",            &submitblock,            false,     false,     false },
     { "listsinceblock",         &listsinceblock,         false,     false,     true },
     { "dumpprivkey",            &dumpprivkey,            false,     false,     true },
     { "dumpwallet",             &dumpwallet,             true,      false,     true },
-    { "importwallet",           &importwallet,           false,     false,     true },
     { "importprivkey",          &importprivkey,          false,     false,     true },
+    { "importwallet",           &importwallet,           false,     false,     true },
     { "listunspent",            &listunspent,            false,     false,     true },
-    { "getrawtransaction",      &getrawtransaction,      false,     false,     false },
-    { "createrawtransaction",   &createrawtransaction,   false,     false,     false },
-    { "decoderawtransaction",   &decoderawtransaction,   false,     false,     false },
-    { "decodescript",           &decodescript,           false,     false,     false },
-    { "signrawtransaction",     &signrawtransaction,     false,     false,     false },
-    { "sendrawtransaction",     &sendrawtransaction,     false,     false,     false },
-    { "getcheckpoint",          &getcheckpoint,          true,      false,     false },
+    { "getsubsidy",             &getsubsidy,             true,      false,     false },
     { "reservebalance",         &reservebalance,         false,     true,      true },
     { "checkwallet",            &checkwallet,            false,     true,      true },
     { "repairwallet",           &repairwallet,           false,     true,      true },
     { "resendtx",               &resendtx,               false,     true,      true },
     { "makekeypair",            &makekeypair,            false,     true,      false },
-    { "sendalert",              &sendalert,              false,     false,     false },
+#endif
 };
 
 CRPCTable::CRPCTable()
@@ -787,8 +795,10 @@ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_s
     const CRPCCommand *pcmd = tableRPC[strMethod];
     if (!pcmd)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
+#ifdef ENABLE_WALLET
     if (pcmd->reqWallet && !pwalletMain)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
+#endif
 
     // Observe safe mode
     string strWarning = GetWarnings("rpc");
@@ -803,6 +813,7 @@ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_s
         {
             if (pcmd->threadSafe)
                 result = pcmd->actor(params, false);
+#ifdef ENABLE_WALLET
             else if (!pwalletMain) {
                 LOCK(cs_main);
                 result = pcmd->actor(params, false);
@@ -810,6 +821,12 @@ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_s
                 LOCK2(cs_main, pwalletMain->cs_wallet);
                 result = pcmd->actor(params, false);
             }
+#else // ENABLE_WALLET
+            else {
+                LOCK(cs_main);
+                result = pcmd->actor(params, false);
+            }
+#endif // !ENABLE_WALLET
         }
         return result;
     }
