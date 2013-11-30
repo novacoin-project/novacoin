@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 
+#include "crypter.h"
 #include "main.h"
 #include "key.h"
 #include "keystore.h"
