@@ -21,6 +21,10 @@
 using namespace std;
 using namespace boost;
 
+#if defined(NDEBUG)
+# error "BlackCoin cannot be compiled without assertions."
+#endif
+
 //
 // Global state
 //
