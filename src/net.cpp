@@ -1643,7 +1643,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     return true;
 }
 
-void static Discover()
+void static Discover(boost::thread_group& threadGroup)
 {
     if (!fDiscover)
         return;
@@ -1694,7 +1694,7 @@ void static Discover()
 
     // Don't use external IPv4 discovery, when -onlynet="IPv6"
     if (!IsLimited(NET_IPV4))
-        boost::thread(boost::bind(&TraceThread<void (*)()>, "ext-ip", &ThreadGetMyExternalIP));
+        threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "ext-ip", &ThreadGetMyExternalIP));
 }
 
 void StartNode(boost::thread_group& threadGroup)
@@ -1711,7 +1711,7 @@ void StartNode(boost::thread_group& threadGroup)
     if (pnodeLocalHost == NULL)
         pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress(CService("127.0.0.1", 0), nLocalServices));
 
-    Discover();
+    Discover(threadGroup);
 
     //
     // Start threads
