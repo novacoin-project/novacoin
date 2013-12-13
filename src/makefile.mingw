@@ -65,6 +65,7 @@ OBJS= \
     obj/rpcclient.o \
     obj/rpcprotocol.o \
     obj/rpcserver.o \
+    obj/rpcmisc.o \
     obj/rpcnet.o \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
