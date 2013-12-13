@@ -2,6 +2,7 @@
 
 #include "bitcoinunits.h"
 #include "init.h"
+#include "wallet.h"
 #include "walletdb.h"
 #include "guiutil.h"
 

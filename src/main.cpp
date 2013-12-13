@@ -66,11 +66,6 @@ CScript COINBASE_FLAGS;
 
 const string strMessageMagic = "BlackCoin Signed Message:\n";
 
-// Settings
-int64_t nTransactionFee = MIN_TX_FEE;
-int64_t nReserveBalance = 0;
-int64_t nMinimumInputValue = 0;
-
 extern enum Checkpoints::CPMode CheckpointsMode;
 
 //////////////////////////////////////////////////////////////////////////////

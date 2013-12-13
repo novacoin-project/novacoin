@@ -20,8 +20,13 @@
 #include "ui_interface.h"
 #include "util.h"
 
+// Settings
+extern int64_t nTransactionFee;
+extern int64_t nReserveBalance;
+extern int64_t nMinimumInputValue;
 extern bool fWalletUnlockStakingOnly;
 extern bool fConfChange;
+
 class CAccountingEntry;
 class CCoinControl;
 class CWalletTx;

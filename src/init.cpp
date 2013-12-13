@@ -421,6 +421,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             nConnectTimeout = nNewTimeout;
     }
 
+#ifdef ENABLE_WALLET
     if (mapArgs.count("-paytxfee"))
     {
         if (!ParseMoney(mapArgs["-paytxfee"], nTransactionFee))
@@ -428,15 +429,18 @@ bool AppInit2(boost::thread_group& threadGroup)
         if (nTransactionFee > 0.25 * COIN)
             InitWarning(_("Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction."));
     }
+#endif
 
     fConfChange = GetBoolArg("-confchange", false);
     fMinimizeCoinAge = GetBoolArg("-minimizecoinage", false);
 
+#ifdef ENABLE_WALLET
     if (mapArgs.count("-mininput"))
     {
         if (!ParseMoney(mapArgs["-mininput"], nMinimumInputValue))
             return InitError(strprintf(_("Invalid amount for -mininput=<amount>: '%s'"), mapArgs["-mininput"]));
     }
+#endif
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
@@ -616,6 +620,7 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
     }
 
+#ifdef ENABLE_WALLET
     if (mapArgs.count("-reservebalance")) // ppcoin: reserve balance amount
     {
         if (!ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
@@ -624,6 +629,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             return false;
         }
     }
+#endif
 
     if (mapArgs.count("-checkpointkey")) // ppcoin: checkpoint master priv key
     {

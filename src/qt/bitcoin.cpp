@@ -12,6 +12,7 @@
 #include "guiconstants.h"
 #include "init.h"
 #include "util.h"
+#include "wallet.h"
 #include "ui_interface.h"
 #include "paymentserver.h"
 #ifdef Q_OS_MAC
