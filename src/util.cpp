@@ -66,7 +66,7 @@ map<string, string> mapArgs;
 map<string, vector<string> > mapMultiArgs;
 bool fDebug = false;
 bool fPrintToConsole = false;
-bool fPrintToDebugger = false;
+bool fPrintToDebugLog = true;
 bool fDaemon = false;
 bool fServer = false;
 bool fCommandLine = false;
@@ -254,7 +254,7 @@ int LogPrintStr(const std::string &str)
         // print to console
         ret = fwrite(str.data(), 1, str.size(), stdout);
     }
-    else if (!fPrintToDebugger)
+    else if (fPrintToDebugLog)
     {
         static bool fStartedNewLine = true;
         boost::call_once(&DebugPrintInit, debugPrintInitFlag);
@@ -283,29 +283,6 @@ int LogPrintStr(const std::string &str)
         ret = fwrite(str.data(), 1, str.size(), fileout);
     }
 
-#ifdef WIN32
-    if (fPrintToDebugger)
-    {
-        // accumulate and output a line at a time
-        static std::string buffer;
-
-        boost::mutex::scoped_lock scoped_lock(*mutexDebugLog);
-
-        va_list arg_ptr;
-        va_start(arg_ptr, pszFormat);
-        buffer += vstrprintf(pszFormat, arg_ptr);
-        va_end(arg_ptr);
-
-        int line_start = 0, line_end;
-        while((line_end = buffer.find('\n', line_start)) != -1)
-        {
-            OutputDebugStringA(buffer.substr(line_start, line_end - line_start).c_str());
-            line_start = line_end + 1;
-            ret += line_end-line_start;
-        }
-        buffer.erase(0, line_start);
-    }
-#endif
     return ret;
 }
 

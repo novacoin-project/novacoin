@@ -226,9 +226,6 @@ std::string HelpMessage()
     strUsage += "  -printtoconsole        " + _("Send trace/debug info to console instead of debug.log file") + "\n";
     strUsage += "  -regtest               " + _("Enter regression test mode, which uses a special chain in which blocks can be "
                                                 "solved instantly. This is intended for regression testing tools and app development.") + "\n";
-#ifdef WIN32
-    strUsage += "  -printtodebugger       " + _("Send trace/debug info to debugger") + "\n";
-#endif
     strUsage += "  -rpcuser=<user>        " + _("Username for JSON-RPC connections") + "\n";
     strUsage += "  -rpcpassword=<pw>      " + _("Password for JSON-RPC connections") + "\n";
     strUsage += "  -rpcport=<port>        " + _("Listen for JSON-RPC connections on <port> (default: 15715 or testnet: 25715)") + "\n";
@@ -409,7 +406,6 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (!fHaveGUI)
         fServer = true;
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
-    fPrintToDebugger = GetBoolArg("-printtodebugger", false);
     fLogTimestamps = GetBoolArg("-logtimestamps", false);
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
