@@ -7,8 +7,8 @@
 
 #include "db.h"
 #include "base58.h"
+#include "keychain.h"
 
-class CKeyPool;
 class CAccount;
 class CAccountingEntry;
 
@@ -30,10 +30,14 @@ public:
     int nVersion;
     int64 nCreateTime; // 0 means unknown
 
+    unsigned int nAccountID;
+    CNodeMeta hdNodeMeta;
+
     CKeyMetadata()
     {
         SetNull();
     }
+
     CKeyMetadata(int64 nCreateTime_)
     {
         nVersion = CKeyMetadata::CURRENT_VERSION;
@@ -45,6 +49,7 @@ public:
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nCreateTime);
+        READWRITE(hdNodeMeta);
     )
 
     void SetNull()
@@ -53,7 +58,6 @@ public:
         nCreateTime = 0;
     }
 };
-
 
 /** Access to the wallet database (wallet.dat) */
 class CWalletDB : public CDB
@@ -139,27 +143,46 @@ public:
         return Write(std::string("orderposnext"), nOrderPosNext);
     }
 
-    bool WriteDefaultKey(const CPubKey& vchPubKey)
+    bool WriteRootKey(const CPubKey& vchPubKey)
     {
         nWalletDBUpdated++;
-        return Write(std::string("defaultkey"), vchPubKey.Raw());
+        return Write(std::string("rootkey"), vchPubKey.Raw());
     }
 
-    bool ReadPool(int64 nPool, CKeyPool& keypool)
-    {
-        return Read(std::make_pair(std::string("pool"), nPool), keypool);
-    }
-
-    bool WritePool(int64 nPool, const CKeyPool& keypool)
+    bool WritePublicRootKey(const CPubKey& vchPubKey)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("pool"), nPool), keypool);
+        return Write(std::string("publicroot"), vchPubKey.Raw());
     }
 
-    bool ErasePool(int64 nPool)
+    bool WriteMiningRootKey(const CPubKey& vchPubKey)
     {
         nWalletDBUpdated++;
-        return Erase(std::make_pair(std::string("pool"), nPool));
+        return Write(std::string("miningroot"), vchPubKey.Raw());
+    }
+
+    bool WriteChangeRootKey(const CPubKey& vchPubKey)
+    {
+        nWalletDBUpdated++;
+        return Write(std::string("changeroot"), vchPubKey.Raw());
+    }
+
+    bool WriteDefaultPublicKey(const CPubKey& vchPubKey)
+    {
+        nWalletDBUpdated++;
+        return Write(std::string("defaultpublic"), vchPubKey.Raw());
+    }
+
+    bool WriteDefaultMiningKey(const CPubKey& vchPubKey)
+    {
+        nWalletDBUpdated++;
+        return Write(std::string("defaultmining"), vchPubKey.Raw());
+    }
+
+    bool WriteDefaultChangeKey(const CPubKey& vchPubKey)
+    {
+        nWalletDBUpdated++;
+        return Write(std::string("defaultchange"), vchPubKey.Raw());
     }
 
     // Settings are no longer stored in wallet.dat; these are

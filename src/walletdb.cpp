@@ -375,25 +375,33 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
                 (keyMeta.nCreateTime < pwallet->nTimeFirstKey))
                 pwallet->nTimeFirstKey = keyMeta.nCreateTime;
         }
-        else if (strType == "defaultkey")
+        else if (strType == "rootkey")
         {
-            ssValue >> pwallet->vchDefaultKey;
+            ssValue >> pwallet->vchRootKey;
         }
-        else if (strType == "pool")
+        else if (strType == "publicroot")
         {
-            int64 nIndex;
-            ssKey >> nIndex;
-            CKeyPool keypool;
-            ssValue >> keypool;
-            pwallet->setKeyPool.insert(nIndex);
-
-            // If no metadata exists yet, create a default with the pool key's
-            // creation time. Note that this may be overwritten by actually
-            // stored metadata for that key later, which is fine.
-            CKeyID keyid = keypool.vchPubKey.GetID();
-            if (pwallet->mapKeyMetadata.count(keyid) == 0)
-                pwallet->mapKeyMetadata[keyid] = CKeyMetadata(keypool.nTime);
-
+            ssValue >> pwallet->vchPublicRootKey;
+        }
+        else if (strType == "miningroot")
+        {
+            ssValue >> pwallet->vchMiningRootKey;
+        }
+        else if (strType == "changeroot")
+        {
+            ssValue >> pwallet->vchChangeRootKey;
+        }
+        else if (strType == "defaultpublic")
+        {
+            ssValue >> pwallet->vchDefaultPublicKey;
+        }
+        else if (strType == "defaultmining")
+        {
+            ssValue >> pwallet->vchDefaultMiningKey;
+        }
+        else if (strType == "defaultchange")
+        {
+            ssValue >> pwallet->vchDefaultChangeKey;
         }
         else if (strType == "version")
         {
@@ -432,7 +440,16 @@ static bool IsKeyType(string strType)
 
 DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
 {
-    pwallet->vchDefaultKey = CPubKey();
+    pwallet->vchRootKey = CPubKey();
+
+    pwallet->vchPublicRootKey = CPubKey();
+    pwallet->vchMiningRootKey = CPubKey();
+    pwallet->vchChangeRootKey = CPubKey();
+
+    pwallet->vchDefaultPublicKey = CPubKey();
+    pwallet->vchDefaultMiningKey = CPubKey();
+    pwallet->vchDefaultChangeKey = CPubKey();
+
     CWalletScanState wss;
     bool fNoncriticalErrors = false;
     DBErrors result = DB_LOAD_OK;

@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2013 The NovaCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_MAIN_H
@@ -18,12 +19,10 @@ class CWallet;
 class CBlock;
 class CBlockIndex;
 class CKeyItem;
-class CReserveKey;
 class COutPoint;
 
 class CAddress;
 class CInv;
-class CRequestTracker;
 class CNode;
 
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
@@ -94,7 +93,6 @@ extern unsigned int nDerivationMethodIndex;
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64 nMinDiskSpace = 52428800;
 
-class CReserveKey;
 class CTxDB;
 class CTxIndex;
 

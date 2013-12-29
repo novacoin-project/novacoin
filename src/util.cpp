@@ -3,6 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "key.h"
 #include "util.h"
 #include "sync.h"
 #include "strlcpy.h"
@@ -433,7 +434,6 @@ bool ParseMoney(const char* pszIn, int64& nRet)
     return true;
 }
 
-
 static const signed char phexdigit[256] =
 { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
@@ -464,8 +464,10 @@ bool IsHex(const string& str)
 
 vector<unsigned char> ParseHex(const char* psz)
 {
+
     // convert hex dump to vector
     vector<unsigned char> vch;
+
     while (true)
     {
         while (isspace(*psz))
@@ -486,6 +488,31 @@ vector<unsigned char> ParseHex(const char* psz)
 vector<unsigned char> ParseHex(const string& str)
 {
     return ParseHex(str.c_str());
+}
+
+void ParseHex(std::vector<unsigned char, secure_allocator<unsigned char> >& vch, const char* psz)
+{
+    // convert hex dump to vector
+    while (true)
+    {
+        while (isspace(*psz))
+            psz++;
+        signed char c = phexdigit[(unsigned char)*psz++];
+        if (c == (signed char)-1)
+            break;
+        unsigned char n = (c << 4);
+        c = phexdigit[(unsigned char)*psz++];
+        if (c == (signed char)-1)
+            break;
+        n |= c;
+        vch.push_back(n);
+    }
+    return;
+}
+
+void ParseHex(std::vector<unsigned char, secure_allocator<unsigned char> >& vch, const string& str)
+{
+    ParseHex(vch, str.c_str());
 }
 
 static void InterpretNegativeSetting(string name, map<string, string>& mapSettingsRet)

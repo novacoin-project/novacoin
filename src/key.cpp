@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <map>
+#include <string>
 
 #include <openssl/ecdsa.h>
 #include <openssl/obj_mac.h>
@@ -244,6 +245,20 @@ CSecret CKey::GetSecret(bool &fCompressed) const
     return vchRet;
 }
 
+CSecret CKey::GetSecret() const
+{
+    CSecret vchRet;
+    vchRet.resize(32);
+    const BIGNUM *bn = EC_KEY_get0_private_key(pkey);
+    int nBytes = BN_num_bytes(bn);
+    if (bn == NULL)
+        throw key_error("CKey::GetSecret() : EC_KEY_get0_private_key failed");
+    int n=BN_bn2bin(bn,&vchRet[32 - nBytes]);
+    if (n != nBytes)
+        throw key_error("CKey::GetSecret(): BN_bn2bin failed");
+    return vchRet;
+}
+
 CPrivKey CKey::GetPrivKey() const
 {
     int nSize = i2d_ECPrivateKey(pkey, NULL);
@@ -407,4 +422,113 @@ bool CKey::IsValid()
     CKey key2;
     key2.SetSecret(secret, fCompr);
     return GetPubKey() == key2.GetPubKey();
+}
+
+// Init CPoint object with vector contents
+void CPoint::setPublicKey(const std::vector<unsigned char>& vchPublicKey)
+{
+    std::string err;
+
+    EC_POINT* rval;
+
+    BIGNUM* bn = BN_bin2bn(&vchPublicKey[0], vchPublicKey.size(), NULL);
+    if (!bn) {
+        err = "BN_bin2bn failed.";
+        goto finish;
+    }
+
+    rval = EC_POINT_bn2point(group, bn, point, ctx);
+    if (!rval) {
+        err = "EC_POINT_bn2point failed.";
+        goto finish;
+    }
+
+finish:
+    if (bn) BN_clear_free(bn);
+
+    if (!err.empty()) {
+        throw std::runtime_error(std::string("CPoint::setPublicKey() :  - ") + err);
+    }
+}
+
+// Get public key
+std::vector<unsigned char> CPoint::getPublicKey() const
+{
+    std::vector<unsigned char> bytes(33);
+
+    std::string err;
+
+    BIGNUM* rval;
+
+    BIGNUM* bn = BN_new();
+    if (!bn) {
+        err = "BN_new failed.";
+        goto finish;
+    }
+
+    rval = EC_POINT_point2bn(group, point, POINT_CONVERSION_COMPRESSED, bn, ctx);
+    if (!rval) {
+        err = "EC_POINT_point2bn failed.";
+        goto finish;
+    }
+
+    assert(BN_num_bytes(bn) == 33);
+    BN_bn2bin(bn, &bytes[0]);
+
+finish:
+    if (bn) BN_clear_free(bn);
+
+    if (!err.empty()) {
+        throw std::runtime_error(std::string("CPoint::getPublicKey() : - ") + err);
+    }
+
+    return bytes;
+}
+
+// Computes n*G + K where K is this and G is the group generator
+void CPoint::generator_mul(const std::vector<unsigned char>& n)
+{
+    BIGNUM* bn = BN_bin2bn(&n[0], n.size(), NULL);
+    if (!bn) throw std::runtime_error("CPoint::generator_mul()  - BN_bin2bn failed.");
+
+    int rval = EC_POINT_mul(group, point, bn, point, BN_value_one(), ctx);
+    BN_clear_free(bn);
+
+    if (rval == 0) throw std::runtime_error("CPoint::generator_mul() - EC_POINT_mul failed.");
+}
+
+// Create new ECDSA point
+void CPoint::init()
+{
+    std::string err;
+
+    group = NULL;
+    point = NULL;
+    ctx   = NULL;
+
+    group = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    if (!group) {
+        err = "EC_KEY_new_by_curve_name failed.";
+        goto finish;
+    }
+
+    point = EC_POINT_new(group);
+    if (!point) {
+        err = "EC_POINT_new failed.";
+        goto finish;
+    }
+
+    ctx = BN_CTX_new();
+    if (!ctx) {
+        err = "BN_CTX_new failed.";
+        goto finish;
+    }
+
+    return;
+
+finish:
+    if (group) EC_GROUP_free(group);
+    if (point) EC_POINT_free(point);
+
+    throw std::runtime_error(std::string("CPoint::init() :  - ") + err);
 }

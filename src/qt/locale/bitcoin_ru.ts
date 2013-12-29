@@ -2799,14 +2799,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation type="obsolete">Политика синхронизированных меток (по умолчанию: strict)</translation>
     </message>
     <message>
-        <source>Use pooled pubkeys for the last coinstake output (default: 0)</source>
-        <translation type="obsolete">Использовать для coinstake транзакций ключи из пула (по умолчанию: 0)</translation>
-    </message>
-    <message>
-        <source>Which key derivation method to use by default (default: sha512)</source>
-        <translation type="obsolete">Выбор функции для создания ключа шифрования (по умолчанию: sha512)</translation>
-    </message>
-    <message>
         <location line="+12"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Неверный адрес -tor: &apos;%s&apos;</translation>
@@ -3160,11 +3152,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="-38"/>
         <source>Cannot downgrade wallet</source>
         <translation>Не удаётся понизить версию бумажника</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cannot initialize keypool</source>
-        <translation>Не удаётся инициализировать массив ключей</translation>
     </message>
     <message>
         <location line="+3"/>

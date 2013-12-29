@@ -26,6 +26,7 @@ typedef int pid_t; /* define for Windows compatibility */
 
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
+#include <openssl/hmac.h>
 
 #include "netbase.h" // for AddTimeData
 
@@ -194,8 +195,13 @@ void ParseString(const std::string& str, char c, std::vector<std::string>& v);
 std::string FormatMoney(int64 n, bool fPlus=false);
 bool ParseMoney(const std::string& str, int64& nRet);
 bool ParseMoney(const char* pszIn, int64& nRet);
+
 std::vector<unsigned char> ParseHex(const char* psz);
 std::vector<unsigned char> ParseHex(const std::string& str);
+
+void ParseHex(std::vector<unsigned char, secure_allocator<unsigned char> >& vch, const char* psz);
+void ParseHex(std::vector<unsigned char, secure_allocator<unsigned char> >& vch, const std::string& str);
+
 bool IsHex(const std::string& str);
 std::vector<unsigned char> DecodeBase64(const char* p, bool* pfInvalid = NULL);
 std::string DecodeBase64(const std::string& str);

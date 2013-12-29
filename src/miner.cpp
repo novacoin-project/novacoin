@@ -124,8 +124,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
 
     if (!fProofOfStake)
     {
-        CReserveKey reservekey(pwallet);
-        txNew.vout[0].scriptPubKey.SetDestination(reservekey.GetReservedKey().GetID());
+        txNew.vout[0].scriptPubKey.SetDestination(pwallet->vchDefaultMiningKey.GetID());
     }
     else
         txNew.vout[0].SetEmpty();
@@ -458,7 +457,7 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
 }
 
 
-bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
+bool CheckWork(CBlock* pblock, CWallet& wallet)
 {
     uint256 hashBlock = pblock->GetHash();
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
@@ -479,9 +478,6 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
             return error("CheckWork() : generated block is stale");
-
-        // Remove key from key pool
-        reservekey.KeepKey();
 
         // Track how many getdata requests this block gets
         {

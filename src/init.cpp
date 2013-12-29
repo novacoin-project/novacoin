@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2013 The NovaCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "txdb.h"
@@ -10,7 +11,8 @@
 #include "util.h"
 #include "ui_interface.h"
 #include "checkpoints.h"
-#include "zerocoin/ZeroTest.h"
+#include "keychain.h"
+
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -250,8 +252,6 @@ std::string HelpMessage()
         "  -bind=<addr>           " + _("Bind to given address. Use [host]:port notation for IPv6") + "\n" +
         "  -dnsseed               " + _("Find peers using DNS lookup (default: 1)") + "\n" +
         "  -cppolicy              " + _("Sync checkpoints policy (default: strict)") + "\n" +
-        "  -stakepooledkeys       " + _("Use pooled pubkeys for the last coinstake output (default: 0)") + "\n" +
-        "  -derivationmethod      " + _("Which key derivation method to use by default (default: sha512)") + "\n" +
         "  -banscore=<n>          " + _("Threshold for disconnecting misbehaving peers (default: 100)") + "\n" +
         "  -bantime=<n>           " + _("Number of seconds to keep misbehaving peers from reconnecting (default: 86400)") + "\n" +
         "  -maxreceivebuffer=<n>  " + _("Maximum per-connection receive buffer, <n>*1000 bytes (default: 5000)") + "\n" +
@@ -289,7 +289,6 @@ std::string HelpMessage()
         "  -blocknotify=<cmd>     " + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
         "  -walletnotify=<cmd>    " + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n" +
         "  -upgradewallet         " + _("Upgrade wallet to latest format") + "\n" +
-        "  -keypool=<n>           " + _("Set key pool size to <n> (default: 100)") + "\n" +
         "  -rescan                " + _("Rescan the block chain for missing wallet transactions") + "\n" +
         "  -salvagewallet         " + _("Attempt to recover private keys from a corrupt wallet.dat") + "\n" +
         "  -checkblocks=<n>       " + _("How many blocks to check at startup (default: 2500, 0 = all)") + "\n" +
@@ -749,16 +748,6 @@ bool AppInit2()
         return false;
     }
 
-    // ********************************************************* Testing Zerocoin
-
-
-    if (GetBoolArg("-zerotest", false))
-    {
-        printf("\n=== ZeroCoin tests start ===\n");
-        Test_RunAllTests();
-        printf("=== ZeroCoin tests end ===\n\n");
-    }
-
     // ********************************************************* Step 8: load wallet
 
     uiInterface.InitMessage(_("Loading wallet..."));
@@ -807,15 +796,36 @@ bool AppInit2()
 
     if (fFirstRun)
     {
-        // Create new keyUser and set as default key
-        RandAddSeedPerfmon();
+        // Create root key
+        CPubKey newRootKey = pwalletMain->GenerateRootKey();
+        pwalletMain->SetRootKey(newRootKey);
 
-        CPubKey newDefaultKey;
-        if (!pwalletMain->GetKeyFromPool(newDefaultKey, false))
-            strErrors << _("Cannot initialize keypool") << "\n";
-        pwalletMain->SetDefaultKey(newDefaultKey);
-        if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultKey.GetID(), ""))
+        CSecret vchSecret;
+
+        if (!pwalletMain->GetSecret(newRootKey.GetID(), vchSecret))
+            strErrors << _("Cannot get root key") << "\n";
+
+        // Init "public" keys chain
+        CPubKey DefaultPublicKeyRoot = pwalletMain->GetKeyChild(newRootKey.GetID(), true);
+        CPubKey newDefaultPublicKey = pwalletMain->GetKeyChild(DefaultPublicKeyRoot.GetID());
+
+        pwalletMain->SetPublicRootKey(DefaultPublicKeyRoot);
+        pwalletMain->SetDefaultPublicKey(newDefaultPublicKey);
+
+        if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultPublicKey.GetID(), ""))
             strErrors << _("Cannot write default address") << "\n";
+
+        // Init "mining" keys chain
+        CPubKey DefaultMiningKeyRoot = pwalletMain->GetKeyChild(newRootKey.GetID(), true);
+        CPubKey newDefaultMiningKey = pwalletMain->GetKeyChild(DefaultMiningKeyRoot.GetID());
+        pwalletMain->SetDefaultMiningKey(newDefaultMiningKey);
+        pwalletMain->SetMiningRootKey(DefaultMiningKeyRoot);
+
+        // Init "change" keys chain
+        CPubKey DefaultChangeKeyRoot = pwalletMain->GetKeyChild(newRootKey.GetID(), true);
+        CPubKey newDefaultChangeKey = pwalletMain->GetKeyChild(DefaultChangeKeyRoot.GetID());
+        pwalletMain->SetDefaultChangeKey(newDefaultChangeKey);
+        pwalletMain->SetChangeRootKey(DefaultChangeKeyRoot);
     }
 
     printf("%s", strErrors.str().c_str());
@@ -894,7 +904,6 @@ bool AppInit2()
     //// debug print
     printf("mapBlockIndex.size() = %"PRIszu"\n",   mapBlockIndex.size());
     printf("nBestHeight = %d\n",            nBestHeight);
-    printf("setKeyPool.size() = %"PRIszu"\n",      pwalletMain->setKeyPool.size());
     printf("mapWallet.size() = %"PRIszu"\n",       pwalletMain->mapWallet.size());
     printf("mapAddressBook.size() = %"PRIszu"\n",  pwalletMain->mapAddressBook.size());
 

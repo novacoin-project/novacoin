@@ -1,5 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2013 The NovaCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,6 +9,7 @@
 #include "bitcoinrpc.h"
 #include "init.h"
 #include "base58.h"
+#include "keychain.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -84,8 +86,6 @@ Value getinfo(const Array& params, bool fHelp)
     obj.push_back(Pair("ip",            addrSeenByPeer.ToStringIP()));
     obj.push_back(Pair("difficulty",    (double)GetDifficulty()));
     obj.push_back(Pair("testnet",       fTestNet));
-    obj.push_back(Pair("keypoololdest", (boost::int64_t)pwalletMain->GetOldestKeyPoolTime()));
-    obj.push_back(Pair("keypoolsize",   (int)pwalletMain->GetKeyPoolSize()));
     obj.push_back(Pair("paytxfee",      ValueFromAmount(nTransactionFee)));
     obj.push_back(Pair("mininput",      ValueFromAmount(nMinimumInputValue)));
     if (pwalletMain->IsCrypted())
@@ -102,24 +102,30 @@ Value getnewpubkey(const Array& params, bool fHelp)
             "getnewpubkey [account]\n"
             "Returns new public key for coinbase generation.");
 
+    EnsureWalletIsUnlocked();
+
     // Parse the account first so we don't generate a key if there's an error
     string strAccount;
     if (params.size() > 0)
         strAccount = AccountFromValue(params[0]);
 
-    if (!pwalletMain->IsLocked())
-        pwalletMain->TopUpKeyPool();
-
     // Generate a new key that is added to wallet
-    CPubKey newKey;
-    if (!pwalletMain->GetKeyFromPool(newKey, false))
-        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-    CKeyID keyID = newKey.GetID();
+    {
+        LOCK2(cs_main, pwalletMain->cs_wallet);
+        pwalletMain->MarkDirty();
 
-    pwalletMain->SetAddressBookName(keyID, strAccount);
-    vector<unsigned char> vchPubKey = newKey.Raw();
+        CPubKey newKey = pwalletMain->GetKeyChild(pwalletMain->vchPublicRootKey.GetID());
+        CKeyID keyID = newKey.GetID();
 
-    return HexStr(vchPubKey.begin(), vchPubKey.end());
+        pwalletMain->SetAddressBookName(keyID, strAccount);
+
+        pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
+        pwalletMain->ReacceptWalletTransactions();
+
+        vector<unsigned char> vchPubKey = newKey.Raw();
+
+        return HexStr(vchPubKey.begin(), vchPubKey.end());
+    }
 }
 
 
@@ -132,18 +138,15 @@ Value getnewaddress(const Array& params, bool fHelp)
             "If [account] is specified (recommended), it is added to the address book "
             "so payments received with the address will be credited to [account].");
 
+    EnsureWalletIsUnlocked();
+
     // Parse the account first so we don't generate a key if there's an error
     string strAccount;
     if (params.size() > 0)
         strAccount = AccountFromValue(params[0]);
 
-    if (!pwalletMain->IsLocked())
-        pwalletMain->TopUpKeyPool();
-
     // Generate a new key that is added to wallet
-    CPubKey newKey;
-    if (!pwalletMain->GetKeyFromPool(newKey, false))
-        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+    CPubKey newKey = pwalletMain->GetKeyChild(pwalletMain->vchPublicRootKey.GetID());
     CKeyID keyID = newKey.GetID();
 
     pwalletMain->SetAddressBookName(keyID, strAccount);
@@ -152,8 +155,177 @@ Value getnewaddress(const Array& params, bool fHelp)
 }
 
 
+Value getchildof(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0 || params.size() > 3)
+        throw runtime_error(
+            "getchildof <novacoinaddress> [private=false] [account]\n"
+            "Returns a new NovaCoin address for receiving payments. Uses <novacoinaddress> as a parent for deterministic generation. "
+            "If [private] is set to true then private key will be used as entropy source, otherwise the public key will be chosen. "
+            "If [account] is specified (recommended), it is added to the address book "
+            "so payments received with the address will be credited to [account].");
+
+    EnsureWalletIsUnlocked();
+
+    CBitcoinAddress address(params[0].get_str());
+
+    bool isPrivate = false;
+
+    if (params.size() > 1)
+        isPrivate = params[1].get_bool();
+
+    if (!address.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
+
+    // Parse the account first so we don't generate a key if there's an error
+    string strAccount;
+    if (params.size() > 2)
+        strAccount = AccountFromValue(params[2]);
+
+    CScript scriptPubKey;
+    scriptPubKey.SetDestination(address.Get());
+    if (!IsMine(*pwalletMain, scriptPubKey))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Not a local NovaCoin address");
+
+    CKeyID parentID;
+    address.GetKeyID(parentID);
+
+    CPubKey newKey = pwalletMain->GetKeyChild(parentID, isPrivate);
+    CKeyID keyID = newKey.GetID();
+
+    pwalletMain->SetAddressBookName(keyID, strAccount);
+
+    return CBitcoinAddress(keyID).ToString();
+}
+
+Value listchild(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0 || params.size() > 1)
+        throw runtime_error(
+            "listchild <novacoinaddress> \n"
+            "Returns a list of <novacoinaddress> child addresses. ");
+
+    CBitcoinAddress address(params[0].get_str());
+
+    if (!address.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
+
+    CScript scriptPubKey;
+    scriptPubKey.SetDestination(address.Get());
+    if (!IsMine(*pwalletMain, scriptPubKey))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Not a local NovaCoin address");
+
+    CKeyID parentID;
+    address.GetKeyID(parentID);
+
+    std::list<CKeyID> childList;
+    pwalletMain->ListChild(parentID, childList);
+
+    Array result;
+
+    BOOST_FOREACH(CKeyID keyID, childList)
+        result.push_back(CBitcoinAddress(keyID).ToString());
+
+    return result;
+}
+
+Value listroot(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 0)
+        throw runtime_error(
+            "listroot \n"
+            "Returns a list of root addresses available. ");
+
+    std::list<CKeyID> childList;
+    pwalletMain->ListChild(CKeyID(ROOT_PARENT), childList);
+
+    Array result;
+
+    BOOST_FOREACH(CKeyID keyID, childList)
+        result.push_back(CBitcoinAddress(keyID).ToString());
+
+    return result;
+}
+
+Value listrandom(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 0)
+        throw runtime_error(
+            "listrandom \n"
+            "Returns a list of randomly generated addresses. ");
+
+    std::list<CKeyID> childList;
+    pwalletMain->ListChild(CKeyID(RAND_PARENT), childList);
+
+    Array result;
+
+    BOOST_FOREACH(CKeyID keyID, childList)
+        result.push_back(CBitcoinAddress(keyID).ToString());
+
+    return result;
+}
+
+Value listorphan(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 0)
+        throw runtime_error(
+            "listorphan \n"
+            "Returns a list of orphaned addresses. ");
+
+    std::list<CKeyID> orphanList;
+    pwalletMain->ListOrphan(orphanList);
+
+    Array result;
+
+    BOOST_FOREACH(CKeyID keyID, orphanList)
+        result.push_back(CBitcoinAddress(keyID).ToString());
+
+    return result;
+}
+
+
+Value createroot(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw runtime_error(
+            "createroot [passphrase]\n"
+            "Creates a new key tree root.\n  "
+            "If [passphrase] is specified, it is used instead of random bytes set "
+            "as initialization parameter for master key derivation.");
+
+    EnsureWalletIsUnlocked();
+    CKDSeed seed;
+
+    SecureString strKeySeed;
+    strKeySeed.reserve(100);
+
+    if (params.size())
+        strKeySeed = params[0].get_str().c_str();
+
+    seed.setSeed(strKeySeed);
+
+    CKeyID keyid = seed.getMasterID();
+
+    CNodeMeta hdMeta;
+    hdMeta.nDerivationMethod = seed.getDerivationMethod();
+    hdMeta.nDepth = 0;
+    hdMeta.nSequence = 0;
+    hdMeta.vchChainCode = seed.getMasterChainCode();
+    hdMeta.parentKeyID = CKeyID(ROOT_PARENT);
+
+    pwalletMain->mapKeyMetadata[keyid].hdNodeMeta = hdMeta;
+
+    if (!pwalletMain->AddKey(seed.getMasterKey()))
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
+
+    return CBitcoinAddress(seed.getMasterID()).ToString();
+}
+
+
 CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
 {
+    EnsureWalletIsUnlocked();
+
     CWalletDB walletdb(pwalletMain->strWalletFile);
 
     CAccount account;
@@ -180,9 +352,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
     // Generate a new key
     if (!account.vchPubKey.IsValid() || bForceNew || bKeyUsed)
     {
-        if (!pwalletMain->GetKeyFromPool(account.vchPubKey, false))
-            throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-
+        account.vchPubKey = pwalletMain->GetKeyChild(pwalletMain->vchPublicRootKey.GetID());
         pwalletMain->SetAddressBookName(account.vchPubKey.GetID(), strAccount);
         walletdb.WriteAccount(strAccount, account);
     }
@@ -742,16 +912,15 @@ Value sendmany(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
     // Send
-    CReserveKey keyChange(pwalletMain);
     int64 nFeeRequired = 0;
-    bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired);
+    bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, nFeeRequired);
     if (!fCreated)
     {
         if (totalAmount + nFeeRequired > pwalletMain->GetBalance())
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
         throw JSONRPCError(RPC_WALLET_ERROR, "Transaction creation failed");
     }
-    if (!pwalletMain->CommitTransaction(wtx, keyChange))
+    if (!pwalletMain->CommitTransaction(wtx))
         throw JSONRPCError(RPC_WALLET_ERROR, "Transaction commit failed");
 
     return wtx.GetHash().GetHex();
@@ -1330,41 +1499,6 @@ Value backupwallet(const Array& params, bool fHelp)
     return Value::null;
 }
 
-
-Value keypoolrefill(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 1)
-        throw runtime_error(
-            "keypoolrefill [new-size]\n"
-            "Fills the keypool."
-            + HelpRequiringPassphrase());
-
-    unsigned int nSize = max(GetArg("-keypool", 100), 0LL);
-    if (params.size() > 0) {
-        if (params[0].get_int() < 0)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid size");
-        nSize = (unsigned int) params[0].get_int();
-    }
-
-    EnsureWalletIsUnlocked();
-
-    pwalletMain->TopUpKeyPool(nSize);
-
-    if (pwalletMain->GetKeyPoolSize() < nSize)
-        throw JSONRPCError(RPC_WALLET_ERROR, "Error refreshing keypool.");
-
-    return Value::null;
-}
-
-
-void ThreadTopUpKeyPool(void* parg)
-{
-    // Make this thread recognisable as the key-topping-up thread
-    RenameThread("bitcoin-key-top");
-
-    pwalletMain->TopUpKeyPool();
-}
-
 void ThreadCleanWalletPassphrase(void* parg)
 {
     // Make this thread recognisable as the wallet relocking thread
@@ -1440,7 +1574,6 @@ Value walletpassphrase(const Array& params, bool fHelp)
             "walletpassphrase <passphrase> <timeout>\n"
             "Stores the wallet decryption key in memory for <timeout> seconds.");
 
-    NewThread(ThreadTopUpKeyPool, NULL);
     int64* pnSleepTime = new int64(params[1].get_int64());
     NewThread(ThreadCleanWalletPassphrase, pnSleepTime);
 
@@ -1539,7 +1672,7 @@ Value encryptwallet(const Array& params, bool fHelp)
     // slack space in .dat files; that is bad if the old data is
     // unencrypted private keys. So:
     StartShutdown();
-    return "wallet encrypted; NovaCoin server stopping, restart to run with encrypted wallet.  The keypool has been flushed, you need to make a new backup.";
+    return "wallet encrypted; NovaCoin server stopping, restart to run with encrypted wallet.";
 }
 
 class DescribeAddressVisitor : public boost::static_visitor<Object>
@@ -1595,56 +1728,63 @@ Value validateaddress(const Array& params, bool fHelp)
         CTxDestination dest = address.Get();
         string currentAddress = address.ToString();
         ret.push_back(Pair("address", currentAddress));
+
         bool fMine = IsMine(*pwalletMain, dest);
         ret.push_back(Pair("ismine", fMine));
+
         if (fMine) {
             Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
             ret.insert(ret.end(), detail.begin(), detail.end());
+
+            CKeyID addrID;
+            address.GetKeyID(addrID);
+            CNodeMeta addrMeta = pwalletMain->mapKeyMetadata[addrID].hdNodeMeta;
+
+            bool isChainRoot = addrMeta.parentKeyID == CKeyID(ROOT_PARENT);
+            bool isInChain = addrMeta.parentKeyID != CKeyID(RAND_PARENT);
+
+            if (isInChain)
+            {
+                Object nodeMeta;
+                string strGenerator;
+
+                if (isChainRoot)
+                {
+                    strGenerator = "random";
+                    nodeMeta.push_back(Pair( "parent", Value() ));
+                }
+                else
+                {
+                    strGenerator = isP(addrMeta.nSequence) ? "private" : "public";
+                    nodeMeta.push_back(Pair( "parent", CBitcoinAddress(addrMeta.parentKeyID).ToString() ));
+                }
+
+                nodeMeta.push_back(Pair( "depth", (int64_t)addrMeta.nDepth ));
+                nodeMeta.push_back(Pair( "sequence", (int64_t)addrMeta.nSequence ));
+                nodeMeta.push_back(Pair( "code", HexStr(addrMeta.vchChainCode) ));
+                nodeMeta.push_back(Pair( "method", (int64_t)addrMeta.nDerivationMethod ));
+                nodeMeta.push_back(Pair( "generator", strGenerator ));
+
+                ret.push_back(Pair("nodemeta", nodeMeta));
+            }
+            else
+            {
+                Object nodeMeta;
+
+                nodeMeta.push_back(Pair( "parent", Value() ));
+                nodeMeta.push_back(Pair( "generator", "random" ));
+
+                ret.push_back(Pair("nodemeta", nodeMeta));
+            }
+
         }
+
         if (pwalletMain->mapAddressBook.count(dest))
             ret.push_back(Pair("account", pwalletMain->mapAddressBook[dest]));
     }
     return ret;
 }
 
-Value validatepubkey(const Array& params, bool fHelp)
-{
-    if (fHelp || !params.size() || params.size() > 2)
-        throw runtime_error(
-            "validatepubkey <novacoinpubkey>\n"
-            "Return information about <novacoinpubkey>.");
-
-    std::vector<unsigned char> vchPubKey = ParseHex(params[0].get_str());
-    CPubKey pubKey(vchPubKey);
-
-    bool isValid = pubKey.IsValid();
-    bool isCompressed = pubKey.IsCompressed();
-    CKeyID keyID = pubKey.GetID();
-
-    CBitcoinAddress address;
-    address.Set(keyID);
-
-    Object ret;
-    ret.push_back(Pair("isvalid", isValid));
-    if (isValid)
-    {
-        CTxDestination dest = address.Get();
-        string currentAddress = address.ToString();
-        ret.push_back(Pair("address", currentAddress));
-        bool fMine = IsMine(*pwalletMain, dest);
-        ret.push_back(Pair("ismine", fMine));
-        ret.push_back(Pair("iscompressed", isCompressed));
-        if (fMine) {
-            Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
-            ret.insert(ret.end(), detail.begin(), detail.end());
-        }
-        if (pwalletMain->mapAddressBook.count(dest))
-            ret.push_back(Pair("account", pwalletMain->mapAddressBook[dest]));
-    }
-    return ret;
-}
-
-// ppcoin: reserve balance from being staked for network protection
 Value reservebalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
@@ -1686,7 +1826,6 @@ Value reservebalance(const Array& params, bool fHelp)
 }
 
 
-// ppcoin: check wallet integrity
 Value checkwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -1708,8 +1847,23 @@ Value checkwallet(const Array& params, bool fHelp)
     return result;
 }
 
+Value rescan(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 0)
+        throw runtime_error(
+            "rescan\n"
+            "Rescan the block chain for missing wallet transactions.\n");
 
-// ppcoin: repair wallet
+    {
+        LOCK2(cs_main, pwalletMain->cs_wallet);
+
+        pwalletMain->MarkDirty();
+        pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
+        pwalletMain->ReacceptWalletTransactions();
+    }
+    return Value();
+}
+
 Value repairwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -1731,7 +1885,6 @@ Value repairwallet(const Array& params, bool fHelp)
     return result;
 }
 
-// NovaCoin: resend unconfirmed wallet transactions
 Value resendtx(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -1745,7 +1898,6 @@ Value resendtx(const Array& params, bool fHelp)
     return Value::null;
 }
 
-// ppcoin: make a public-private key pair
 Value makekeypair(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -1757,7 +1909,7 @@ Value makekeypair(const Array& params, bool fHelp)
     string strPrefix = "";
     if (params.size() > 0)
         strPrefix = params[0].get_str();
- 
+
     CKey key;
     key.MakeNewKey(false);
 

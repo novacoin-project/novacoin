@@ -1,4 +1,5 @@
 // Copyright (c) 2009-2012 Bitcoin Developers
+// Copyright (c) 2013 The NovaCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,6 +10,7 @@
 #include "bitcoinrpc.h"
 #include "ui_interface.h"
 #include "base58.h"
+#include "keychain.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
@@ -121,7 +123,7 @@ Value importprivkey(const Array& params, bool fHelp)
     bool fGood = vchSecret.SetString(strSecret);
 
     if (!fGood) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key");
-    if (fWalletUnlockMintOnly) // ppcoin: no importprivkey in mint-only mode
+    if (fWalletUnlockMintOnly)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for minting only.");
 
     CKey key;
@@ -143,6 +145,45 @@ Value importprivkey(const Array& params, bool fHelp)
     }
 
     return Value::null;
+}
+
+Value importnode(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw runtime_error(
+            "importnode <novacoinprivkey> [label]\n"
+            "Adds a node (as returned by dumpnode) to your wallet.");
+
+    string strNode = params[0].get_str();
+    string strLabel = "";
+    if (params.size() > 1)
+        strLabel = params[1].get_str();
+
+    CPrivChain node(strNode);
+
+    if (!node.isValid()) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Node is invalid");
+
+    if (fWalletUnlockMintOnly)
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for minting only.");
+
+    CKey key = node.getKey();
+    CKeyID keyid;
+
+    CKeyID vchAddress = key.GetPubKey().GetID();
+    {
+        LOCK2(cs_main, pwalletMain->cs_wallet);
+
+        pwalletMain->MarkDirty();
+        pwalletMain->SetAddressBookName(vchAddress, strLabel);
+
+        if (!pwalletMain->AddNode(node, keyid))
+            throw JSONRPCError(RPC_WALLET_ERROR, "Error adding node to wallet");
+
+        pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
+        pwalletMain->ReacceptWalletTransactions();
+    }
+
+    return CBitcoinAddress(keyid).ToString();
 }
 
 Value importwallet(const Array& params, bool fHelp)
@@ -171,25 +212,44 @@ Value importwallet(const Array& params, bool fHelp)
 
         std::vector<std::string> vstr;
         boost::split(vstr, line, boost::is_any_of(" "));
+
         if (vstr.size() < 2)
             continue;
-        CBitcoinSecret vchSecret;
-        if (!vchSecret.SetString(vstr[0]))
-            continue;
 
-        bool fCompressed;
         CKey key;
-        CSecret secret = vchSecret.GetSecret(fCompressed);
-        key.SetSecret(secret, fCompressed);
-        CKeyID keyid = key.GetPubKey().GetID();
+        CKeyID keyid;
+        CNodeMeta nodeMeta;
+        CBitcoinSecret vchSecret;
+
+        CPrivChain node(vstr[0]);
+
+        bool isNode = pwalletMain->ExtractMeta(node, nodeMeta);
+
+        if (!isNode)
+        {
+            if (!vchSecret.SetString(vstr[0]))
+                continue;
+
+            bool fCompressed;
+            CSecret secret = vchSecret.GetSecret(fCompressed);
+            key.SetSecret(secret, fCompressed);
+            keyid = key.GetPubKey().GetID();
+        }
+        else
+        {
+            keyid = node.getKeyID();
+            key = node.getKey();
+        }
 
         if (pwalletMain->HaveKey(keyid)) {
             printf("Skipping import of %s (key already present)\n", CBitcoinAddress(keyid).ToString().c_str());
             continue;
         }
+
         int64 nTime = DecodeDumpTime(vstr[1]);
         std::string strLabel;
         bool fLabel = true;
+
         for (unsigned int nStr = 2; nStr < vstr.size(); nStr++) {
             if (boost::algorithm::starts_with(vstr[nStr], "#"))
                 break;
@@ -202,16 +262,26 @@ Value importwallet(const Array& params, bool fHelp)
                 fLabel = true;
             }
         }
-        printf("Importing %s...\n", CBitcoinAddress(keyid).ToString().c_str());
+
+        printf("Importing %s %s...\n", (isNode ? "node" : "random address"), CBitcoinAddress(keyid).ToString().c_str());
+
+
+        pwalletMain->mapKeyMetadata[keyid].nCreateTime = nTime;
+
+        if (isNode)
+            pwalletMain->mapKeyMetadata[keyid].hdNodeMeta = nodeMeta;
+
         if (!pwalletMain->AddKey(key)) {
             fGood = false;
             continue;
         }
-        pwalletMain->mapKeyMetadata[keyid].nCreateTime = nTime;
+
         if (fLabel)
             pwalletMain->SetAddressBookName(keyid, strLabel);
+
         nTimeBegin = std::min(nTimeBegin, nTime);
     }
+
     file.close();
 
     CBlockIndex *pindex = pindexBest;
@@ -243,7 +313,7 @@ Value dumpprivkey(const Array& params, bool fHelp)
     CBitcoinAddress address;
     if (!address.SetString(strAddress))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
-    if (fWalletUnlockMintOnly) // ppcoin: no dumpprivkey in mint-only mode
+    if (fWalletUnlockMintOnly) // no dumpprivkey in mint-only mode
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for minting only.");
     CKeyID keyID;
     if (!address.GetKeyID(keyID))
@@ -255,6 +325,34 @@ Value dumpprivkey(const Array& params, bool fHelp)
     return CBitcoinSecret(vchSecret, fCompressed).ToString();
 }
 
+Value dumpnode(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "dumpnode <novacoinaddress>\n"
+            "Reveals the serialized metadata corresponding to <novacoinaddress> node.");
+
+    EnsureWalletIsUnlocked();
+
+    string strAddress = params[0].get_str();
+    CBitcoinAddress address;
+    if (!address.SetString(strAddress))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
+    if (fWalletUnlockMintOnly)
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for minting only.");
+    CKeyID keyID;
+    if (!address.GetKeyID(keyID))
+        throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to a key");
+
+    CPrivChain node;
+
+    if (!pwalletMain->GetNode(keyID, node))
+        throw JSONRPCError(RPC_WALLET_ERROR, "Private key for address " + strAddress + " is not found");
+
+    return node.ToString();
+}
+
+
 Value dumpwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
@@ -264,6 +362,9 @@ Value dumpwallet(const Array& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
+    if (fWalletUnlockMintOnly) // no dump in mint-only mode
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for minting only.");
+
     ofstream file;
     file.open(params[0].get_str().c_str());
     if (!file.is_open())
@@ -271,11 +372,7 @@ Value dumpwallet(const Array& params, bool fHelp)
 
     std::map<CKeyID, int64> mapKeyBirth;
 
-    std::set<CKeyID> setKeyPool;
-
     pwalletMain->GetKeyBirthTimes(mapKeyBirth);
-
-    pwalletMain->GetAllReserveKeys(setKeyPool);
 
     // sort time/key pairs
     std::vector<std::pair<int64, CKeyID> > vKeyBirth;
@@ -299,15 +396,30 @@ Value dumpwallet(const Array& params, bool fHelp)
 
         CKey key;
         if (pwalletMain->GetKey(keyid, key)) {
-            if (pwalletMain->mapAddressBook.count(keyid)) {
-                CSecret secret = key.GetSecret(IsCompressed);
-                file << strprintf("%s %s label=%s # addr=%s\n", CBitcoinSecret(secret, IsCompressed).ToString().c_str(), strTime.c_str(), EncodeDumpString(pwalletMain->mapAddressBook[keyid]).c_str(), strAddr.c_str());
-            } else if (setKeyPool.count(keyid)) {
-                CSecret secret = key.GetSecret(IsCompressed);
-                file << strprintf("%s %s reserve=1 # addr=%s\n", CBitcoinSecret(secret, IsCompressed).ToString().c_str(), strTime.c_str(), strAddr.c_str());
-            } else {
-                CSecret secret = key.GetSecret(IsCompressed);
-                file << strprintf("%s %s change=1 # addr=%s\n", CBitcoinSecret(secret, IsCompressed).ToString().c_str(), strTime.c_str(), strAddr.c_str());
+            CNodeMeta meta = pwalletMain->mapKeyMetadata[keyid].hdNodeMeta;
+            CSecret secret = key.GetSecret(IsCompressed);
+
+            if (meta.parentKeyID == CKeyID(RAND_PARENT)) {
+                if (pwalletMain->mapAddressBook.count(keyid)) {
+                    file << strprintf("%s %s label=%s # addr=%s\n", CBitcoinSecret(secret, IsCompressed).ToString().c_str(), strTime.c_str(), EncodeDumpString(pwalletMain->mapAddressBook[keyid]).c_str(), strAddr.c_str());
+                } else {
+                    file << strprintf("%s %s # addr=%s\n", CBitcoinSecret(secret, IsCompressed).ToString().c_str(), strTime.c_str(), strAddr.c_str());
+                }
+            }
+            else
+            {
+                CPrivChain node(secret, meta.vchChainCode, meta.parentKeyID.getvch(), meta.nSequence, meta.nDepth, meta.nDerivationMethod);
+
+                if (pwalletMain->mapAddressBook.count(keyid)) {
+                    file << strprintf("%s %s label=%s # addr=%s\n", 
+                        node.ToString().c_str(),
+                        strTime.c_str(),
+                        EncodeDumpString(pwalletMain->mapAddressBook[keyid]).c_str(), 
+                        strAddr.c_str()
+                    );
+                } else {
+                    file << strprintf("%s %s # addr=%s\n", node.ToString().c_str(), strTime.c_str(), strAddr.c_str());
+                }
             }
         }
     }

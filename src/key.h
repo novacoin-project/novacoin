@@ -132,6 +132,7 @@ public:
     void MakeNewKey(bool fCompressed);
     bool SetPrivKey(const CPrivKey& vchPrivKey);
     bool SetSecret(const CSecret& vchSecret, bool fCompressed = false);
+    CSecret GetSecret() const;
     CSecret GetSecret(bool &fCompressed) const;
     CPrivKey GetPrivKey() const;
     bool SetPubKey(const CPubKey& vchPubKey);
@@ -157,6 +158,85 @@ public:
     bool VerifyCompact(uint256 hash, const std::vector<unsigned char>& vchSig);
 
     bool IsValid();
+};
+
+// ECDSA point class, used for public keys derivation.
+class CPoint
+{
+public:
+    CPoint()
+    {
+        init();
+    }
+
+    // Construct a new CPoint object as a copy of supplied one.
+    CPoint(const CPoint& source)
+    {
+        init();
+        if (!EC_GROUP_copy(group, source.group)) throw std::runtime_error("CPoint::CPoint(const CPoint&) - EC_GROUP_copy failed.");
+        if (!EC_POINT_copy(point, source.point)) throw std::runtime_error("CPoint::CPoint(const CPoint&) - EC_POINT_copy failed.");
+    }
+
+    // Construct a new CPoint object and init it with the supplied public key bytes.
+    CPoint(const std::vector<unsigned char>& vchPublicKey)
+    {
+        init();
+        this->setPublicKey(vchPublicKey);
+    }
+
+    ~CPoint()
+    {
+        if (point) EC_POINT_free(point);
+        if (group) EC_GROUP_free(group);
+        if (ctx)   BN_CTX_free(ctx);
+    }
+
+    CPoint& operator=(const CPoint& rhs)
+    {
+        if (!EC_GROUP_copy(group, rhs.group)) throw std::runtime_error("CPoint::operator= - EC_GROUP_copy failed.");
+        if (!EC_POINT_copy(point, rhs.point)) throw std::runtime_error("CPoint::operator= - EC_POINT_copy failed.");
+    }
+
+
+    CPoint& operator+=(const CPoint& rhs)
+    {
+        if (!EC_POINT_add(group, point, point, rhs.point, ctx)) {
+            throw std::runtime_error("CPoint::operator+= - EC_POINT_add failed.");
+        }
+    }
+
+    CPoint& operator*=(const std::vector<unsigned char>& rhs)
+    {
+        BIGNUM* bn = BN_bin2bn(&rhs[0], rhs.size(), NULL);
+        if (!bn) {
+            throw std::runtime_error("CPoint::operator*=  - BN_bin2bn failed.");
+        }
+
+        int rval = EC_POINT_mul(group, point, NULL, point, bn, ctx);
+        BN_clear_free(bn);
+
+        if (rval == 0) {
+            throw std::runtime_error("CPoint::operator*=  - EC_POINT_mul failed.");
+        }
+    }
+
+    const CPoint operator+(const CPoint& rhs) const { return CPoint(*this) += rhs; }
+    const CPoint operator*(const std::vector<unsigned char>& rhs) const { return CPoint(*this) *= rhs; }
+
+    // Computes n*G + K where K is this and G is the group generator
+    void generator_mul(const std::vector<unsigned char>& n);
+    bool is_at_infinity() const { return EC_POINT_is_at_infinity(group, point); }
+
+    void setPublicKey(const std::vector<unsigned char>& vch);
+    std::vector<unsigned char> getPublicKey() const;
+
+protected:
+    void init();
+
+private:
+    EC_GROUP* group;
+    EC_POINT* point;
+    BN_CTX*   ctx;
 };
 
 #endif

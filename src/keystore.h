@@ -34,6 +34,15 @@ public:
     virtual bool HaveCScript(const CScriptID &hash) const =0;
     virtual bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const =0;
 
+    virtual bool GetSecret(const CKeyID &address, CSecret& vchSecret) const
+    {
+        CKey key;
+        if (!GetKey(address, key))
+            return false;
+        vchSecret = key.GetSecret();
+        return true;
+    }
+
     virtual bool GetSecret(const CKeyID &address, CSecret& vchSecret, bool &fCompressed) const
     {
         CKey key;

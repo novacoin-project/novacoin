@@ -11,6 +11,7 @@
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
+#include "keychain.h"
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -54,6 +55,171 @@ CPubKey CWallet::GenerateNewKey()
     if (!AddKey(key))
         throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
     return key.GetPubKey();
+}
+
+CPubKey CWallet::GenerateRootKey()
+{
+    CKDSeed seed;
+    seed.setSeed();
+
+    CKeyID keyid = seed.getMasterID();
+
+    int64 nCreationTime = GetTime();
+    nTimeFirstKey = nCreationTime;
+
+    // Fill the root key metadata
+    CNodeMeta hdMeta;
+    hdMeta.nDerivationMethod = seed.getDerivationMethod();
+    hdMeta.nDepth = 0;
+    hdMeta.nSequence = 0;
+    hdMeta.vchChainCode = seed.getMasterChainCode();
+    hdMeta.parentKeyID = CKeyID(ROOT_PARENT);
+
+    mapKeyMetadata[keyid] = CKeyMetadata(nCreationTime);
+    mapKeyMetadata[keyid].hdNodeMeta = hdMeta;
+
+    if (!AddKey(seed.getMasterKey()))
+        throw std::runtime_error("CWallet::GenerateRootKey() : AddKey failed");
+
+    return seed.getMasterPubKey();
+}
+
+CPubKey CWallet::GetKeyChild(const CKeyID& parentID, bool isPrivate)
+{
+    if (mapKeyMetadata.find(parentID) == mapKeyMetadata.end())
+        throw std::runtime_error("CWallet::GetKeyChild() : Unable to find a metadata record");
+
+    CSecret vchSecret;
+    CNodeMeta parentMeta = mapKeyMetadata[parentID].hdNodeMeta;
+
+    if (!GetSecret(parentID, vchSecret))
+        throw std::runtime_error("CWallet::GetKeyChild() : Unable to get parent key secret");
+
+    unsigned int nSequence = isPrivate ? P(0) : 0;
+
+    bool fFound = false;
+    {
+        LOCK(cs_wallet);
+
+        BOOST_FOREACH(const PAIRTYPE(CKeyID, CKeyMetadata)& item, mapKeyMetadata)
+        {
+            if (item.second.hdNodeMeta.parentKeyID != parentID)
+                continue;
+
+            if (isPrivate && !isP(item.second.hdNodeMeta.nSequence))
+                continue;
+
+            if (!isPrivate && isP(item.second.hdNodeMeta.nSequence))
+                continue;
+
+            if (item.second.hdNodeMeta.nSequence > nSequence)
+                nSequence = item.second.hdNodeMeta.nSequence;
+
+            fFound = true;
+        }
+
+        if (fFound)
+            nSequence++;
+
+        CPrivChain Mn(vchSecret, parentMeta.vchChainCode, parentMeta.parentKeyID.getvch(), parentMeta.nSequence, parentMeta.nDepth, parentMeta.nDerivationMethod);
+        CPrivChain MnChild = Mn.getChild(nSequence);
+
+        if (!MnChild.isValid() || HaveKey(MnChild.getKeyID()))
+            throw std::runtime_error("CWallet::GetKeyChild() : Invalid or already existent child key.");
+
+        int64 nCreationTime = GetTime();
+
+        // Fill root key meta
+        CKeyID childID = MnChild.getKeyID();
+
+        CNodeMeta hdMeta;
+        hdMeta.nDerivationMethod = MnChild.getDerivationMethod();
+        hdMeta.nDepth = MnChild.getDepth();
+        hdMeta.nSequence = MnChild.getSequence();
+        hdMeta.vchChainCode = MnChild.getChainCode();
+        hdMeta.parentKeyID = parentID;
+
+        mapKeyMetadata[childID] = CKeyMetadata(nCreationTime);
+        mapKeyMetadata[childID].hdNodeMeta = hdMeta;
+
+        if (!AddKey(MnChild.getKey()))
+            throw std::runtime_error("CWallet::GetKeyChild() : AddKey failed");
+
+        return MnChild.getPubKey();
+
+    }
+}
+
+bool CWallet::ExtractMeta(const CPrivChain& node, CNodeMeta& hdMeta)
+{
+    if (!node.isValid()) return false;
+
+    hdMeta.nDerivationMethod = node.getDerivationMethod();
+    hdMeta.nDepth = node.getDepth();
+    hdMeta.nSequence = node.getSequence();
+    hdMeta.vchChainCode = node.getChainCode();
+    hdMeta.parentKeyID = node.getParentID();
+
+    return true;
+}
+
+bool CWallet::AddNode(const CPrivChain& node, CKeyID& nodeid)
+{
+    CNodeMeta meta;
+
+    if (!ExtractMeta(node, meta))
+        throw std::runtime_error("CWallet::AddNode() : Unable to extract node metadata");
+
+    int64 nCreationTime = GetTime();
+    nodeid = node.getKeyID();
+    {
+        LOCK(cs_wallet);
+
+        mapKeyMetadata[nodeid] = CKeyMetadata(nCreationTime);
+        mapKeyMetadata[nodeid].hdNodeMeta = meta;
+
+        if (!AddKey(node.getKey()))
+            throw std::runtime_error("CWallet::AddNode() : AddKey failed");
+
+        return true;
+    }
+}
+
+bool CWallet::GetNode(const CKeyID& keyid, CPrivChain& node)
+{
+    if (mapKeyMetadata.find(keyid) == mapKeyMetadata.end())
+        throw std::runtime_error("CWallet::GetNode() : Unable to find a metadata record");
+
+    CSecret vchSecret;
+    CNodeMeta meta = mapKeyMetadata[keyid].hdNodeMeta;
+
+    if (!GetSecret(keyid, vchSecret))
+        throw std::runtime_error("CWallet::GetNode() : Unable to get a node secret");
+
+    node = CPrivChain(vchSecret, meta.vchChainCode, meta.parentKeyID.getvch(), meta.nSequence, meta.nDepth, meta.nDerivationMethod);
+
+    return true;
+}
+
+void CWallet::ListChild(const CKeyID& parentID, std::list<CKeyID>& childList)
+{
+    BOOST_FOREACH(const PAIRTYPE(CKeyID, CKeyMetadata)& item, mapKeyMetadata)
+    {
+        if (item.second.hdNodeMeta.parentKeyID == parentID)
+            childList.push_back(item.first);
+    }
+
+}
+
+void CWallet::ListOrphan(std::list<CKeyID>& orphanList)
+{
+    BOOST_FOREACH(const PAIRTYPE(CKeyID, CKeyMetadata)& item, mapKeyMetadata)
+    {
+        if (item.second.hdNodeMeta.parentKeyID == CKeyID(ROOT_PARENT) || item.second.hdNodeMeta.parentKeyID == CKeyID(RAND_PARENT))
+            continue;
+        if (mapKeyMetadata.find(item.second.hdNodeMeta.parentKeyID) == mapKeyMetadata.end())
+            orphanList.push_back(item.first);
+    }
 }
 
 bool CWallet::AddKey(const CKey& key)
@@ -305,9 +471,6 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
         }
 
         Lock();
-        Unlock(strWalletPassphrase);
-        NewKeyPool();
-        Lock();
 
         // Need to completely rewrite the wallet file; if we don't, bdb might keep
         // bits of the unencrypted private key in slack space in the database file.
@@ -484,19 +647,33 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
                 return false;
 #ifndef QT_GUI
         // If default receiving address gets used, replace it with a new one
-        CScript scriptDefaultKey;
-        scriptDefaultKey.SetDestination(vchDefaultKey.GetID());
+        CScript scriptDefaultPublicKey, scriptDefaultMiningKey, scriptDefaultChangeKey;
+
+        scriptDefaultPublicKey.SetDestination(vchDefaultPublicKey.GetID());
+        scriptDefaultMiningKey.SetDestination(vchDefaultMiningKey.GetID());
+        scriptDefaultChangeKey.SetDestination(vchDefaultChangeKey.GetID());
+
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
-            if (txout.scriptPubKey == scriptDefaultKey)
+            if (txout.scriptPubKey == scriptDefaultPublicKey)
             {
-                CPubKey newDefaultKey;
-                if (GetKeyFromPool(newDefaultKey, false))
-                {
-                    SetDefaultKey(newDefaultKey);
-                    SetAddressBookName(vchDefaultKey.GetID(), "");
-                }
+                CPubKey newDefaultPublicKey = GetKeyChild(vchPublicRootKey.GetID());
+                SetDefaultPublicKey(newDefaultPublicKey);
+                SetAddressBookName(vchDefaultPublicKey.GetID(), "");
             }
+
+            if (txout.scriptPubKey == scriptDefaultMiningKey)
+            {
+                CPubKey newDefaultMiningKey = GetKeyChild(vchMiningRootKey.GetID());
+                SetDefaultMiningKey(newDefaultMiningKey);
+            }
+
+            if (txout.scriptPubKey == scriptDefaultChangeKey)
+            {
+                CPubKey newDefaultChangeKey = GetKeyChild(vchChangeRootKey.GetID());
+                SetDefaultChangeKey(newDefaultChangeKey);
+            }
+
         }
 #endif
         // since AddToWallet is called directly for self-originating transactions, check for consumption of own coins
@@ -1249,7 +1426,7 @@ bool CWallet::SelectCoins(int64 nTargetValue, unsigned int nSpendTime, set<pair<
             SelectCoinsMinConf(nTargetValue, nSpendTime, 0, 1, vCoins, setCoinsRet, nValueRet));
 }
 
-bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl* coinControl)
+bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, int64& nFeeRet, const CCoinControl* coinControl)
 {
     int64 nValue = 0;
     BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
@@ -1313,7 +1490,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 if (nChange > 0)
                 {
                     // Fill a vout to ourself
-                    // TODO: pass in scriptChange instead of reservekey so
+                    // TODO: pass in scriptChange instead of public key so
                     // change transaction isn't always pay-to-bitcoin-address
                     CScript scriptChange;
 
@@ -1331,18 +1508,19 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                         //  rediscover unknown transactions that were written with keys of ours to recover
                         //  post-backup change.
 
-                        // Reserve a new key pair from key pool
-                        CPubKey vchPubKey = reservekey.GetReservedKey();
+                        {
+                            LOCK(cs_wallet);
+                            scriptChange.SetDestination(vchDefaultChangeKey.GetID());
 
-                        scriptChange.SetDestination(vchPubKey.GetID());
+                            CPubKey newDefaultChangeKey = GetKeyChild(vchChangeRootKey.GetID());
+                            SetDefaultChangeKey(newDefaultChangeKey);
+                        }
                     }
 
                     // Insert change txn at random position:
                     vector<CTxOut>::iterator position = wtxNew.vout.begin()+GetRandInt(wtxNew.vout.size());
                     wtxNew.vout.insert(position, CTxOut(nChange, scriptChange));
                 }
-                else
-                    reservekey.ReturnKey();
 
                 // Fill vin
                 BOOST_FOREACH(const PAIRTYPE(const CWalletTx*,unsigned int)& coin, setCoins)
@@ -1381,11 +1559,11 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
     return true;
 }
 
-bool CWallet::CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl* coinControl)
+bool CWallet::CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, int64& nFeeRet, const CCoinControl* coinControl)
 {
     vector< pair<CScript, int64> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, nValue));
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, coinControl);
+    return CreateTransaction(vecSend, wtxNew, nFeeRet, coinControl);
 }
 
 // NovaCoin: get current stake weight
@@ -1627,19 +1805,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         // Set output amount
         if (txNew.vout.size() == 3)
         {
-            // Should we use keys from pool for the last coinstake output?
-            if (fStakeUsePooledKeys)
-            {
-                CReserveKey reservekey((CWallet*) &keystore);
-
-                // Replace current key with the new one
-                txNew.vout[2].SetNull();
-                txNew.vout[2].scriptPubKey << reservekey.GetReservedKey() << OP_CHECKSIG;
-
-                // Remove key from pool
-                reservekey.KeepKey();
-            }
-
             txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 / CENT) * CENT;
             txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
         }
@@ -1679,7 +1844,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
 
 // Call after CreateTransaction unless you want to abort
-bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
+bool CWallet::CommitTransaction(CWalletTx& wtxNew)
 {
     {
         LOCK2(cs_main, cs_wallet);
@@ -1689,9 +1854,6 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
             // duration of this scope.  This is the only place where this optimization
             // maybe makes sense; please don't do it anywhere else.
             CWalletDB* pwalletdb = fFileBacked ? new CWalletDB(strWalletFile,"r") : NULL;
-
-            // Take key pair from key pool so it won't be used again
-            reservekey.KeepKey();
 
             // Add tx to wallet, because if it has change it's also ours,
             // otherwise just for transaction history.
@@ -1732,7 +1894,6 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
 
 string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee)
 {
-    CReserveKey reservekey(this);
     int64 nFeeRequired;
 
     if (IsLocked())
@@ -1747,7 +1908,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew,
         printf("SendMoney() : %s", strError.c_str());
         return strError;
     }
-    if (!CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired))
+    if (!CreateTransaction(scriptPubKey, nValue, wtxNew, nFeeRequired))
     {
         string strError;
         if (nValue + nFeeRequired > GetBalance())
@@ -1761,7 +1922,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew,
     if (fAskFee && !uiInterface.ThreadSafeAskFee(nFeeRequired, _("Sending...")))
         return "ABORTED";
 
-    if (!CommitTransaction(wtxNew, reservekey))
+    if (!CommitTransaction(wtxNew))
         return _("Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
 
     return "";
@@ -1793,20 +1954,11 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
         return DB_LOAD_OK;
     fFirstRunRet = false;
     DBErrors nLoadWalletRet = CWalletDB(strWalletFile,"cr+").LoadWallet(this);
-    if (nLoadWalletRet == DB_NEED_REWRITE)
-    {
-        if (CDB::Rewrite(strWalletFile, "\x04pool"))
-        {
-            setKeyPool.clear();
-            // Note: can't top-up keypool here, because wallet is locked.
-            // User will be prompted to unlock wallet the next operation
-            // the requires a new key.
-        }
-    }
 
     if (nLoadWalletRet != DB_LOAD_OK)
         return nLoadWalletRet;
-    fFirstRunRet = !vchDefaultKey.IsValid();
+
+    fFirstRunRet = !vchRootKey.IsValid();
 
     NewThread(ThreadFlushWalletDB, &strWalletFile);
     return DB_LOAD_OK;
@@ -1866,14 +2018,80 @@ bool CWallet::GetTransaction(const uint256 &hashTx, CWalletTx& wtx)
     return false;
 }
 
-bool CWallet::SetDefaultKey(const CPubKey &vchPubKey)
+bool CWallet::SetRootKey(const CPubKey &vchPubKey)
 {
     if (fFileBacked)
     {
-        if (!CWalletDB(strWalletFile).WriteDefaultKey(vchPubKey))
+        if (!CWalletDB(strWalletFile).WriteRootKey(vchPubKey))
             return false;
     }
-    vchDefaultKey = vchPubKey;
+    vchDefaultPublicKey = vchPubKey;
+    return true;
+}
+
+bool CWallet::SetPublicRootKey(const CPubKey &vchPubKey)
+{
+    if (fFileBacked)
+    {
+        if (!CWalletDB(strWalletFile).WritePublicRootKey(vchPubKey))
+            return false;
+    }
+    vchPublicRootKey = vchPubKey;
+    return true;
+}
+
+bool CWallet::SetMiningRootKey(const CPubKey &vchPubKey)
+{
+    if (fFileBacked)
+    {
+        if (!CWalletDB(strWalletFile).WriteMiningRootKey(vchPubKey))
+            return false;
+    }
+    vchMiningRootKey = vchPubKey;
+    return true;
+}
+
+bool CWallet::SetChangeRootKey(const CPubKey &vchPubKey)
+{
+    if (fFileBacked)
+    {
+        if (!CWalletDB(strWalletFile).WriteChangeRootKey(vchPubKey))
+            return false;
+    }
+    vchChangeRootKey = vchPubKey;
+    return true;
+}
+
+bool CWallet::SetDefaultPublicKey(const CPubKey &vchPubKey)
+{
+    if (fFileBacked)
+    {
+        if (!CWalletDB(strWalletFile).WriteDefaultPublicKey(vchPubKey))
+            return false;
+    }
+    vchDefaultPublicKey = vchPubKey;
+    return true;
+}
+
+bool CWallet::SetDefaultMiningKey(const CPubKey &vchPubKey)
+{
+    if (fFileBacked)
+    {
+        if (!CWalletDB(strWalletFile).WriteDefaultMiningKey(vchPubKey))
+            return false;
+    }
+    vchDefaultMiningKey = vchPubKey;
+    return true;
+}
+
+bool CWallet::SetDefaultChangeKey(const CPubKey &vchPubKey)
+{
+    if (fFileBacked)
+    {
+        if (!CWalletDB(strWalletFile).WriteDefaultChangeKey(vchPubKey))
+            return false;
+    }
+    vchDefaultChangeKey = vchPubKey;
     return true;
 }
 
@@ -1883,166 +2101,6 @@ bool GetWalletFile(CWallet* pwallet, string &strWalletFileOut)
         return false;
     strWalletFileOut = pwallet->strWalletFile;
     return true;
-}
-
-//
-// Mark old keypool keys as used,
-// and generate all new keys
-//
-bool CWallet::NewKeyPool()
-{
-    {
-        LOCK(cs_wallet);
-        CWalletDB walletdb(strWalletFile);
-        BOOST_FOREACH(int64 nIndex, setKeyPool)
-            walletdb.ErasePool(nIndex);
-        setKeyPool.clear();
-
-        if (IsLocked())
-            return false;
-
-        int64 nKeys = max(GetArg("-keypool", 100), (int64)0);
-        for (int i = 0; i < nKeys; i++)
-        {
-            int64 nIndex = i+1;
-            walletdb.WritePool(nIndex, CKeyPool(GenerateNewKey()));
-            setKeyPool.insert(nIndex);
-        }
-        printf("CWallet::NewKeyPool wrote %"PRI64d" new keys\n", nKeys);
-    }
-    return true;
-}
-
-bool CWallet::TopUpKeyPool(unsigned int nSize)
-{
-    {
-        LOCK(cs_wallet);
-
-        if (IsLocked())
-            return false;
-
-        CWalletDB walletdb(strWalletFile);
-
-        // Top up key pool
-        unsigned int nTargetSize;
-        if (nSize > 0)
-            nTargetSize = nSize;
-        else
-            nTargetSize = max(GetArg("-keypool", 100), 0LL);
-
-        while (setKeyPool.size() < (nTargetSize + 1))
-        {
-            int64 nEnd = 1;
-            if (!setKeyPool.empty())
-                nEnd = *(--setKeyPool.end()) + 1;
-            if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey())))
-                throw runtime_error("TopUpKeyPool() : writing generated key failed");
-            setKeyPool.insert(nEnd);
-            printf("keypool added key %"PRI64d", size=%"PRIszu"\n", nEnd, setKeyPool.size());
-        }
-    }
-    return true;
-}
-
-void CWallet::ReserveKeyFromKeyPool(int64& nIndex, CKeyPool& keypool)
-{
-    nIndex = -1;
-    keypool.vchPubKey = CPubKey();
-    {
-        LOCK(cs_wallet);
-
-        if (!IsLocked())
-            TopUpKeyPool();
-
-        // Get the oldest key
-        if(setKeyPool.empty())
-            return;
-
-        CWalletDB walletdb(strWalletFile);
-
-        nIndex = *(setKeyPool.begin());
-        setKeyPool.erase(setKeyPool.begin());
-        if (!walletdb.ReadPool(nIndex, keypool))
-            throw runtime_error("ReserveKeyFromKeyPool() : read failed");
-        if (!HaveKey(keypool.vchPubKey.GetID()))
-            throw runtime_error("ReserveKeyFromKeyPool() : unknown key in key pool");
-        assert(keypool.vchPubKey.IsValid());
-        if (fDebug && GetBoolArg("-printkeypool"))
-            printf("keypool reserve %"PRI64d"\n", nIndex);
-    }
-}
-
-int64 CWallet::AddReserveKey(const CKeyPool& keypool)
-{
-    {
-        LOCK2(cs_main, cs_wallet);
-        CWalletDB walletdb(strWalletFile);
-
-        int64 nIndex = 1 + *(--setKeyPool.end());
-        if (!walletdb.WritePool(nIndex, keypool))
-            throw runtime_error("AddReserveKey() : writing added key failed");
-        setKeyPool.insert(nIndex);
-        return nIndex;
-    }
-    return -1;
-}
-
-void CWallet::KeepKey(int64 nIndex)
-{
-    // Remove from key pool
-    if (fFileBacked)
-    {
-        CWalletDB walletdb(strWalletFile);
-        walletdb.ErasePool(nIndex);
-    }
-    if(fDebug)
-        printf("keypool keep %"PRI64d"\n", nIndex);
-}
-
-void CWallet::ReturnKey(int64 nIndex)
-{
-    // Return to key pool
-    {
-        LOCK(cs_wallet);
-        setKeyPool.insert(nIndex);
-    }
-    if(fDebug)
-        printf("keypool return %"PRI64d"\n", nIndex);
-}
-
-bool CWallet::GetKeyFromPool(CPubKey& result, bool fAllowReuse)
-{
-    int64 nIndex = 0;
-    CKeyPool keypool;
-    {
-        LOCK(cs_wallet);
-        ReserveKeyFromKeyPool(nIndex, keypool);
-        if (nIndex == -1)
-        {
-            if (fAllowReuse && vchDefaultKey.IsValid())
-            {
-                result = vchDefaultKey;
-                return true;
-            }
-            if (IsLocked()) return false;
-            result = GenerateNewKey();
-            return true;
-        }
-        KeepKey(nIndex);
-        result = keypool.vchPubKey;
-    }
-    return true;
-}
-
-int64 CWallet::GetOldestKeyPoolTime()
-{
-    int64 nIndex = 0;
-    CKeyPool keypool;
-    ReserveKeyFromKeyPool(nIndex, keypool);
-    if (nIndex == -1)
-        return GetTime();
-    ReturnKey(nIndex);
-    return keypool.nTime;
 }
 
 std::map<CTxDestination, int64> CWallet::GetAddressBalances()
@@ -2237,60 +2295,6 @@ void CWallet::DisableTransaction(const CTransaction &tx)
                 prev.WriteToDisk();
             }
         }
-    }
-}
-
-CPubKey CReserveKey::GetReservedKey()
-{
-    if (nIndex == -1)
-    {
-        CKeyPool keypool;
-        pwallet->ReserveKeyFromKeyPool(nIndex, keypool);
-        if (nIndex != -1)
-            vchPubKey = keypool.vchPubKey;
-        else
-        {
-            printf("CReserveKey::GetReservedKey(): Warning: Using default key instead of a new key, top up your keypool!");
-            vchPubKey = pwallet->vchDefaultKey;
-        }
-    }
-    assert(vchPubKey.IsValid());
-    return vchPubKey;
-}
-
-void CReserveKey::KeepKey()
-{
-    if (nIndex != -1)
-        pwallet->KeepKey(nIndex);
-    nIndex = -1;
-    vchPubKey = CPubKey();
-}
-
-void CReserveKey::ReturnKey()
-{
-    if (nIndex != -1)
-        pwallet->ReturnKey(nIndex);
-    nIndex = -1;
-    vchPubKey = CPubKey();
-}
-
-void CWallet::GetAllReserveKeys(set<CKeyID>& setAddress) const
-{
-    setAddress.clear();
-
-    CWalletDB walletdb(strWalletFile);
-
-    LOCK2(cs_main, cs_wallet);
-    BOOST_FOREACH(const int64& id, setKeyPool)
-    {
-        CKeyPool keypool;
-        if (!walletdb.ReadPool(id, keypool))
-            throw runtime_error("GetAllReserveKeyHashes() : read failed");
-        assert(keypool.vchPubKey.IsValid());
-        CKeyID keyID = keypool.vchPubKey.GetID();
-        if (!HaveKey(keyID))
-            throw runtime_error("GetAllReserveKeyHashes() : unknown key in key pool");
-        setAddress.insert(keyID);
     }
 }
 

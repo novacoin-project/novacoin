@@ -4,6 +4,7 @@
 
 #include "wallet.h"
 #include "base58.h"
+#include "keychain.h"
 
 #include <QFont>
 #include <QColor>
@@ -334,7 +335,11 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
             return QString();
         }
         CPubKey newKey;
-        if(!wallet->GetKeyFromPool(newKey, true))
+        try
+        {
+            newKey = wallet->GetKeyChild(wallet->vchPublicRootKey.GetID());
+        }
+        catch(keychain_error e)
         {
             editStatus = KEY_GENERATION_FAILURE;
             return QString();
