@@ -329,7 +329,7 @@ CPubChain CPubChain::getChild(unsigned int pnSequence) const
     // N7. Store K(n), R(n), i and continue.
 
     std::vector<unsigned char> extended = vchPublicKey;
-    extended.push_back(pnSequence  >> 24);
+    extended.push_back(pnSequence >> 24);
     extended.push_back((pnSequence >> 16) & 0xff);
     extended.push_back((pnSequence >>  8) & 0xff);
     extended.push_back(pnSequence & 0xff);
@@ -398,10 +398,29 @@ CPrivChain::CPrivChain(const std::string& sSource)
     if (vchTemp.empty() || vchTemp.size() != 96)
         return;
 
-    nVersion          = ((unsigned short) vchTemp[ 0] << 8)  | (unsigned short) vchTemp[ 1];
-    nDerivationMethod = ((unsigned short) vchTemp[ 2] << 8)  | (unsigned short) vchTemp[ 3];
-    nDepth            = ((unsigned int)   vchTemp[ 4] << 24) | ((unsigned int)  vchTemp[ 5] << 16) | ((unsigned int)vchTemp[ 6] << 8) | ((unsigned int)vchTemp[ 7]);
-    nSequence         = ((unsigned int)   vchTemp[ 8] << 24) | ((unsigned int)  vchTemp[ 9] << 16) | ((unsigned int)vchTemp[10] << 8) | ((unsigned int)vchTemp[11]);
+    nVersion = vchTemp[0] & 0xff;
+    nVersion <<= 8;
+    nVersion |= vchTemp[1] & 0xff;
+
+    nDerivationMethod = vchTemp[2] & 0xff;
+    nDerivationMethod <<= 8;
+    nDerivationMethod |= vchTemp[3] & 0xff;
+
+    nDepth = vchTemp[4] & 0xff;
+    nDepth <<= 8;
+    nDepth |= vchTemp[5] & 0xff;
+    nDepth <<= 8;
+    nDepth |= vchTemp[6] & 0xff;
+    nDepth <<= 8;
+    nDepth |= vchTemp[7] & 0xff;
+
+    nSequence = vchTemp[8]  & 0xff;
+    nSequence <<= 8;
+    nSequence |= vchTemp[9]  & 0xff;
+    nSequence <<= 8;
+    nSequence |= vchTemp[10] & 0xff;
+    nSequence <<= 8;
+    nSequence |= vchTemp[11] & 0xff;
 
     vchChainCode.assign(vchTemp.begin()  + 12, vchTemp.begin() + 44);
     vchPrivateKey.assign(vchTemp.begin() + 44, vchTemp.begin() + 76);
@@ -432,6 +451,7 @@ CPrivChain::CPrivChain(const CSecret& pvchKey, const std::vector<unsigned char>&
     }
 
     nDepth = pnDepth;
+    nSequence = pnSequence;
     vchChainCode = pvchChainCode;
     vchParentHash = pvchParentHash;
     nDerivationMethod = pnDerivationMethod;
@@ -525,7 +545,7 @@ CPrivChain CPrivChain::getChild(unsigned int pnSequence) const
     //
     // Private key is computed as Ki = ( L(i) + K(i-1) ) % CURVE_ORDER
 
-    extended.push_back(pnSequence  >> 24);
+    extended.push_back(pnSequence >> 24);
     extended.push_back((pnSequence >> 16) & 0xff);
     extended.push_back((pnSequence >>  8) & 0xff);
     extended.push_back(pnSequence & 0xff);
@@ -583,21 +603,21 @@ std::string CPrivChain::ToString() const
     std::vector<unsigned char> vchTmp;
     unsigned short nVersion = CPrivChain::getVersion();
 
-    vchTmp.push_back(((unsigned int) nVersion          >> 8) & 0xff);
-    vchTmp.push_back( (unsigned int) nVersion                & 0xff);
+    vchTmp.push_back((nVersion >> 8) & 0xff);
+    vchTmp.push_back(nVersion & 0xff);
 
-    vchTmp.push_back(((unsigned int) nDerivationMethod >> 8) & 0xff);
-    vchTmp.push_back( (unsigned int) nDerivationMethod       & 0xff);
+    vchTmp.push_back((nDerivationMethod >> 8) & 0xff);
+    vchTmp.push_back(nDerivationMethod & 0xff);
 
-    vchTmp.push_back( (unsigned int) nDepth   >> 24);
-    vchTmp.push_back(((unsigned int) nDepth   >> 16) & 0xff);
-    vchTmp.push_back(((unsigned int) nDepth   >> 8 ) & 0xff);
-    vchTmp.push_back( (unsigned int) nDepth          & 0xff);
+    vchTmp.push_back(nDepth >> 24);
+    vchTmp.push_back((nDepth >> 16) & 0xff);
+    vchTmp.push_back((nDepth >> 8) & 0xff);
+    vchTmp.push_back(nDepth & 0xff);
 
-    vchTmp.push_back( (unsigned int) nSequence >> 24);
-    vchTmp.push_back(((unsigned int) nSequence >> 16) & 0xff);
-    vchTmp.push_back(((unsigned int) nSequence >> 8 ) & 0xff);
-    vchTmp.push_back( (unsigned int) nSequence & 0xff);
+    vchTmp.push_back(nSequence >> 24);
+    vchTmp.push_back((nSequence >> 16) & 0xff);
+    vchTmp.push_back((nSequence >> 8 ) & 0xff);
+    vchTmp.push_back(nSequence & 0xff);
 
     vchTmp.insert(vchTmp.end(), vchChainCode.begin(), vchChainCode.end());
     vchTmp.insert(vchTmp.end(), vchPrivateKey.begin(), vchPrivateKey.end());

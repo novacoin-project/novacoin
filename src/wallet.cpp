@@ -95,11 +95,12 @@ CPubKey CWallet::GetKeyChild(const CKeyID& parentID, bool isPrivate)
     if (!GetSecret(parentID, vchSecret))
         throw std::runtime_error("CWallet::GetKeyChild() : Unable to get parent key secret");
 
-    unsigned int nSequence = isPrivate ? P(0) : 0;
 
     bool fFound = false;
     {
         LOCK(cs_wallet);
+
+        unsigned int nSequence = isPrivate ? P(0) : 0;
 
         BOOST_FOREACH(const PAIRTYPE(CKeyID, CKeyMetadata)& item, mapKeyMetadata)
         {
@@ -112,7 +113,7 @@ CPubKey CWallet::GetKeyChild(const CKeyID& parentID, bool isPrivate)
             if (!isPrivate && isP(item.second.hdNodeMeta.nSequence))
                 continue;
 
-            if (item.second.hdNodeMeta.nSequence > nSequence)
+            if (item.second.hdNodeMeta.nSequence >= nSequence)
                 nSequence = item.second.hdNodeMeta.nSequence;
 
             fFound = true;
@@ -124,8 +125,11 @@ CPubKey CWallet::GetKeyChild(const CKeyID& parentID, bool isPrivate)
         CPrivChain Mn(vchSecret, parentMeta.vchChainCode, parentMeta.parentKeyID.getvch(), parentMeta.nSequence, parentMeta.nDepth, parentMeta.nDerivationMethod);
         CPrivChain MnChild = Mn.getChild(nSequence);
 
-        if (!MnChild.isValid() || HaveKey(MnChild.getKeyID()))
-            throw std::runtime_error("CWallet::GetKeyChild() : Invalid or already existent child key.");
+        if (!MnChild.isValid())
+            throw std::runtime_error("CWallet::GetKeyChild() : Invalid child key.");
+
+        if (HaveKey(MnChild.getKeyID()))
+            throw std::runtime_error("CWallet::GetKeyChild() : Already existent child key.");
 
         int64 nCreationTime = GetTime();
 
