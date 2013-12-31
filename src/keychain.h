@@ -194,7 +194,7 @@ private:
 class CPrivChain : public CBaseChain
 {
 public:
-    static unsigned short getVersion() { return !fTestNet ? CURRENT_VERSION : CURRENT_VERSION_TEST; }
+    static unsigned short getVersion() { return !fTestNet ? 0xBADE : 0xE22F; }
 
     // Constructors
     CPrivChain() { }
@@ -238,8 +238,6 @@ private:
     // Check secret consistency and derive new key if successful
     bool derivateSecret(const CSecret pvchSecret, const std::vector<unsigned char> pvchLeft32, CSecret& pvchChildSecret) const;
 
-    static const unsigned short CURRENT_VERSION = 0xBADE;
-    static const unsigned short CURRENT_VERSION_TEST = 0xE22F;
 };
 
 #endif

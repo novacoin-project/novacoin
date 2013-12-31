@@ -33,6 +33,7 @@ CClientUIInterface uiInterface;
 std::string strWalletFileName;
 unsigned int nNodeLifespan;
 unsigned int nDerivationMethodIndex;
+bool fUseFastIndex;
 enum Checkpoints::CPMode CheckpointsMode;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -359,7 +360,7 @@ bool AppInit2()
     // ********************************************************* Step 2: parameter interactions
 
     nNodeLifespan = GetArg("-addrlifespan", 7);
-    fStakeUsePooledKeys = GetBoolArg("-stakepooledkeys", false);
+    fUseFastIndex = GetBoolArg("-fastindex", true);
 
     CheckpointsMode = Checkpoints::STRICT;
     std::string strCpMode = GetArg("-cppolicy", "strict");
@@ -373,8 +374,7 @@ bool AppInit2()
     if(strCpMode == "permissive")
         CheckpointsMode = Checkpoints::PERMISSIVE;
 
-    if(GetArg("-derivationmethod", "sha512") == "scrypt+sha512")
-        nDerivationMethodIndex = 1;
+    nDerivationMethodIndex = 0;
 
     fTestNet = GetBoolArg("-testnet");
     if (fTestNet) {
