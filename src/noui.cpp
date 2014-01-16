@@ -22,7 +22,7 @@ static bool noui_ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCa
 
 static void noui_InitMessage(const std::string &message)
 {
-    LogPrintf("init message: %s\n", message.c_str());
+    LogPrintf("init message: %s\n", message);
 }
 
 void noui_connect()

@@ -157,7 +157,7 @@ bool LookupNumeric(const char *pszName, CService& addr, int portDefault)
 
 bool static Socks4(const CService &addrDest, SOCKET& hSocket)
 {
-    LogPrintf("SOCKS4 connecting %s\n", addrDest.ToString().c_str());
+    LogPrintf("SOCKS4 connecting %s\n", addrDest.ToString());
     if (!addrDest.IsIPv4())
     {
         closesocket(hSocket);
@@ -195,13 +195,13 @@ bool static Socks4(const CService &addrDest, SOCKET& hSocket)
             LogPrintf("ERROR: Proxy returned error %d\n", pchRet[1]);
         return false;
     }
-    LogPrintf("SOCKS4 connected %s\n", addrDest.ToString().c_str());
+    LogPrintf("SOCKS4 connected %s\n", addrDest.ToString());
     return true;
 }
 
 bool static Socks5(string strDest, int port, SOCKET& hSocket)
 {
-    LogPrintf("SOCKS5 connecting %s\n", strDest.c_str());
+    LogPrintf("SOCKS5 connecting %s\n", strDest);
     if (strDest.size() > 255)
     {
         closesocket(hSocket);
@@ -300,7 +300,7 @@ bool static Socks5(string strDest, int port, SOCKET& hSocket)
         closesocket(hSocket);
         return error("Error reading from proxy");
     }
-    LogPrintf("SOCKS5 connected %s\n", strDest.c_str());
+    LogPrintf("SOCKS5 connected %s\n", strDest);
     return true;
 }
 
@@ -311,7 +311,7 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
     struct sockaddr_storage sockaddr;
     socklen_t len = sizeof(sockaddr);
     if (!addrConnect.GetSockAddr((struct sockaddr*)&sockaddr, &len)) {
-        LogPrintf("Cannot connect to %s: unsupported network\n", addrConnect.ToString().c_str());
+        LogPrintf("Cannot connect to %s: unsupported network\n", addrConnect.ToString());
         return false;
     }
 

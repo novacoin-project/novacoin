@@ -65,13 +65,13 @@ std::string CUnsignedAlert::ToString() const
         nExpiration,
         nID,
         nCancel,
-        strSetCancel.c_str(),
+        strSetCancel,
         nMinVer,
         nMaxVer,
-        strSetSubVer.c_str(),
+        strSetSubVer,
         nPriority,
-        strComment.c_str(),
-        strStatusBar.c_str());
+        strComment,
+        strStatusBar);
 }
 
 void CAlert::SetNull()
