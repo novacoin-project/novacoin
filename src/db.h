@@ -17,10 +17,8 @@ class CAddress;
 class CAddrMan;
 class CBlockLocator;
 class CDiskBlockIndex;
-class CDiskTxPos;
 class CMasterKey;
 class COutPoint;
-class CTxIndex;
 class CWallet;
 class CWalletTx;
 
@@ -37,7 +35,6 @@ private:
     bool fDbEnvInit;
     bool fMockDb;
     boost::filesystem::path pathEnv;
-    std::string strPath;
 
     void EnvShutdown();
 
@@ -310,6 +307,54 @@ public:
 
     bool static Rewrite(const std::string& strFile, const char* pszSkip = NULL);
 };
+
+
+
+
+
+
+
+/** Access to the transaction database (coins.dat) */
+class CCoinsDB : public CDB
+{
+public:
+    CCoinsDB(const char* pszMode="r+") : CDB("coins.dat", pszMode) { }
+private:
+    CCoinsDB(const CCoinsDB&);
+    void operator=(const CCoinsDB&);
+public:
+    bool ReadCoins(uint256 hash, CCoins &coins);
+    bool WriteCoins(uint256 hash, const CCoins& coins);
+    bool HaveCoins(uint256 hash);
+    bool ReadHashBestChain(uint256& hashBestChain);
+    bool WriteHashBestChain(uint256 hashBestChain);
+};
+
+/** Access to the block database (chain.dat) */
+class CChainDB : public CDB
+{
+public:
+    CChainDB(const char* pszMode="r+") : CDB("chain.dat", pszMode) { }
+private:
+    CChainDB(const CChainDB&);
+    void operator=(const CChainDB&);
+public:
+    bool WriteBlockIndex(const CDiskBlockIndex& blockindex);
+    bool ReadBestInvalidTrust(CBigNum& bnBestInvalidTrust);
+    bool WriteBestInvalidTrust(CBigNum bnBestInvalidTrust);
+    bool ReadBlockFileInfo(int nFile, CBlockFileInfo &fileinfo);
+    bool WriteBlockFileInfo(int nFile, const CBlockFileInfo &fileinfo);
+    bool ReadLastBlockFile(int &nFile);
+    bool WriteLastBlockFile(int nFile);
+    bool ReadSyncCheckpoint(uint256& hashCheckpoint);
+    bool WriteSyncCheckpoint(uint256 hashCheckpoint);
+    bool ReadCheckpointPubKey(std::string& strPubKey);
+    bool WriteCheckpointPubKey(const std::string& strPubKey);
+    bool LoadBlockIndexGuts();
+};
+
+
+bool LoadBlockIndex(CCoinsDB &coinsdb, CChainDB &chaindb);
 
 
 /** Access to the (IP) address database (peers.dat) */

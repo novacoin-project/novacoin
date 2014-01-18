@@ -60,6 +60,7 @@ OBJS= \
     obj/crypter.o \
     obj/key.o \
     obj/db.o \
+    obj/leveldb.o \
     obj/init.o \
     obj/irc.o \
     obj/keystore.o \
@@ -101,7 +102,6 @@ all: novacoind.exe
 LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
-OBJS += obj/txdb-leveldb.o
 leveldb/libleveldb.a:
 	cd leveldb; make; cd ..
 obj/txdb-leveldb.o: leveldb/libleveldb.lib

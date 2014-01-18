@@ -4,10 +4,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "db.h"
-#include "net.h"
+#include "kernel.h"
+#include "checkpoints.h"
 #include "util.h"
 #include "main.h"
-#include "ui_interface.h"
+#include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
@@ -20,6 +21,8 @@ using namespace boost;
 
 
 unsigned int nWalletDBUpdated;
+
+
 
 //
 // CDB
@@ -37,13 +40,11 @@ void CDBEnv::EnvShutdown()
     if (ret != 0)
         printf("EnvShutdown exception: %s (%d)\n", DbEnv::strerror(ret), ret);
     if (!fMockDb)
-        DbEnv(0).remove(strPath.c_str(), 0);
+        DbEnv(0).remove(GetDataDir().string().c_str(), 0);
 }
 
 CDBEnv::CDBEnv() : dbenv(DB_CXX_NO_EXCEPTIONS)
 {
-    fDbEnvInit = false;
-    fMockDb = false;
 }
 
 CDBEnv::~CDBEnv()
@@ -66,7 +67,6 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
 
     pathEnv = pathEnv_;
     filesystem::path pathDataDir = pathEnv;
-    strPath = pathDataDir.string();
     filesystem::path pathLogDir = pathDataDir / "database";
     filesystem::create_directory(pathLogDir);
     filesystem::path pathErrorFile = pathDataDir / "db.log";
@@ -81,11 +81,7 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     dbenv.set_cachesize(nDbCache / 1024, (nDbCache % 1024)*1048576, 1);
     dbenv.set_lg_bsize(1048576);
     dbenv.set_lg_max(10485760);
-
-    // Bugfix: Bump lk_max_locks default to 537000, to safely handle reorgs with up to 5 blocks reversed
-    // dbenv.set_lk_max_locks(10000);
-    dbenv.set_lk_max_locks(537000);
-
+    dbenv.set_lk_max_locks(10000);
     dbenv.set_lk_max_objects(10000);
     dbenv.set_errfile(fopen(pathErrorFile.string().c_str(), "a")); /// debug
     dbenv.set_flags(DB_AUTO_COMMIT, 1);
@@ -93,7 +89,7 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
 #ifdef DB_LOG_AUTO_REMOVE
     dbenv.log_set_config(DB_LOG_AUTO_REMOVE, 1);
 #endif
-    int ret = dbenv.open(strPath.c_str(),
+    int ret = dbenv.open(pathDataDir.string().c_str(),
                      DB_CREATE     |
                      DB_INIT_LOCK  |
                      DB_INIT_LOG   |
@@ -108,7 +104,6 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
 
     fDbEnvInit = true;
     fMockDb = false;
-
     return true;
 }
 
@@ -255,7 +250,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
 
             ret = pdb->open(NULL,      // Txn pointer
                             fMockDb ? NULL : pszFile,   // Filename
-                            "main",    // Logical db name
+                            fMockDb ? pszFile : "main", // Logical db name
                             DB_BTREE,  // Database type
                             nFlags,    // Flags
                             0);
@@ -284,7 +279,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
 
 static bool IsChainFile(std::string strFile)
 {
-    if (strFile == "blkindex.dat")
+    if (strFile == "coins.dat" || strFile == "chain.dat")
         return true;
 
     return false;
@@ -481,6 +476,300 @@ void CDBEnv::Flush(bool fShutdown)
 }
 
 
+
+
+
+
+//
+// CChainDB and CCoinsDB
+//
+
+bool CCoinsDB::HaveCoins(uint256 hash) {
+    assert(!fClient);
+    return Exists(make_pair('c', hash));
+}
+
+bool CCoinsDB::ReadCoins(uint256 hash, CCoins &coins) {
+    assert(!fClient);
+    return Read(make_pair('c', hash), coins);
+}
+
+bool CCoinsDB::WriteCoins(uint256 hash, const CCoins &coins) {
+    assert(!fClient);
+    if (coins.IsPruned())
+        return Erase(make_pair('c', hash));
+    else
+        return Write(make_pair('c', hash), coins);
+}
+
+bool CChainDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
+{
+    return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
+}
+
+bool CCoinsDB::ReadHashBestChain(uint256& hashBestChain)
+{
+    return Read('B', hashBestChain);
+}
+
+bool CCoinsDB::WriteHashBestChain(uint256 hashBestChain)
+{
+    return Write('B', hashBestChain);
+}
+
+bool CChainDB::ReadBestInvalidTrust(CBigNum& bnBestInvalidTrust)
+{
+    return Read('I', bnBestInvalidTrust);
+}
+
+bool CChainDB::WriteBestInvalidTrust(CBigNum bnBestInvalidTrust)
+{
+    return Write('I', bnBestInvalidTrust);
+}
+
+bool CChainDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo &info) {
+    return Write(make_pair('f', nFile), info);
+}
+
+bool CChainDB::ReadBlockFileInfo(int nFile, CBlockFileInfo &info) {
+    return Read(make_pair('f', nFile), info);
+}
+
+bool CChainDB::WriteLastBlockFile(int nFile) {
+    return Write('l', nFile);
+}
+
+bool CChainDB::ReadLastBlockFile(int &nFile) {
+    return Read('l', nFile);
+}
+
+bool CChainDB::ReadSyncCheckpoint(uint256& hashCheckpoint)
+{
+    return Read('H', hashCheckpoint);
+}
+
+bool CChainDB::WriteSyncCheckpoint(uint256 hashCheckpoint)
+{
+    return Write('H', hashCheckpoint);
+}
+
+bool CChainDB::ReadCheckpointPubKey(string& strPubKey)
+{
+    return Read('K', strPubKey);
+}
+
+bool CChainDB::WriteCheckpointPubKey(const string& strPubKey)
+{
+    return Write('K', strPubKey);
+}
+
+CBlockIndex static * InsertBlockIndex(uint256 hash)
+{
+    if (hash == 0)
+        return NULL;
+
+    // Return existing
+    map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
+    if (mi != mapBlockIndex.end())
+        return (*mi).second;
+
+    // Create new
+    CBlockIndex* pindexNew = new CBlockIndex();
+    if (!pindexNew)
+        throw runtime_error("LoadBlockIndex() : new CBlockIndex failed");
+    mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
+    pindexNew->phashBlock = &((*mi).first);
+
+    return pindexNew;
+}
+
+bool LoadBlockIndex(CCoinsDB &coindb, CChainDB &chaindb)
+{
+    if (!chaindb.LoadBlockIndexGuts())
+        return false;
+
+    if (fRequestShutdown)
+        return true;
+
+    // Calculate nChainTrust
+    vector<pair<int, CBlockIndex*> > vSortedByHeight;
+    vSortedByHeight.reserve(mapBlockIndex.size());
+    BOOST_FOREACH(const PAIRTYPE(uint256, CBlockIndex*)& item, mapBlockIndex)
+    {
+        CBlockIndex* pindex = item.second;
+        vSortedByHeight.push_back(make_pair(pindex->nHeight, pindex));
+    }
+    sort(vSortedByHeight.begin(), vSortedByHeight.end());
+    BOOST_FOREACH(const PAIRTYPE(int, CBlockIndex*)& item, vSortedByHeight)
+    {
+        CBlockIndex* pindex = item.second;
+        pindex->nChainTrust = (pindex->pprev ? pindex->pprev->nChainTrust : 0) + pindex->GetBlockTrust();
+        // NovaCoin: calculate stake modifier checksum
+        pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
+        if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
+            return error("CTxDB::LoadBlockIndex() : Failed stake modifier checkpoint height=%d, modifier=0x%016"PRI64x, pindex->nHeight, pindex->nStakeModifier);
+    }
+
+    // Load block file info
+    chaindb.ReadLastBlockFile(nLastBlockFile);
+    printf("LoadBlockIndex(): last block file = %i\n", nLastBlockFile);
+    if (chaindb.ReadBlockFileInfo(nLastBlockFile, infoLastBlockFile))
+        printf("LoadBlockIndex(): last block file: %s\n", infoLastBlockFile.ToString().c_str());
+ 
+    // Load hashBestChain pointer to end of best chain
+    if (!coindb.ReadHashBestChain(hashBestChain))
+    {
+        if (pindexGenesisBlock == NULL)
+            return true;
+        return error("CTxDB::LoadBlockIndex() : hashBestChain not loaded");
+    }
+    std::map<uint256, CBlockIndex*>::iterator it = mapBlockIndex.find(hashBestChain);
+    if (it == mapBlockIndex.end()) {
+        return error("CTxDB::LoadBlockIndex() : hashBestChain not found in the block index");
+    } else {
+        // set 'next' pointers in best chain
+        CBlockIndex *pindex = it->second;
+        while(pindex != NULL && pindex->pprev != NULL) {
+             CBlockIndex *pindexPrev = pindex->pprev;
+             pindexPrev->pnext = pindex;
+             pindex = pindexPrev;
+        }
+        pindexBest = it->second;
+        nBestHeight = pindexBest->nHeight;
+        nBestChainTrust = pindexBest->nChainTrust;
+    }
+    printf("LoadBlockIndex(): hashBestChain=%s  height=%d date=%s\n",
+        hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
+        DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
+
+    // Load sync-checkpoint
+    if (!chaindb.ReadSyncCheckpoint(Checkpoints::hashSyncCheckpoint))
+        return error("CTxDB::LoadBlockIndex() : hashSyncCheckpoint not loaded");
+    printf("LoadBlockIndex(): synchronized checkpoint %s\n", Checkpoints::hashSyncCheckpoint.ToString().c_str());
+
+    // Load bnBestInvalidTrust, OK if it doesn't exist
+    CBigNum bnBestInvalidTrust;
+    chaindb.ReadBestInvalidTrust(bnBestInvalidTrust);
+    nBestInvalidTrust = bnBestInvalidTrust.getuint256();
+
+    // Verify blocks in the best chain
+    int nCheckLevel = GetArg("-checklevel", 1);
+    int nCheckDepth = GetArg( "-checkblocks", 2500);
+    if (nCheckDepth == 0)
+        nCheckDepth = 1000000000; // suffices until the year 19000
+    if (nCheckDepth > nBestHeight)
+        nCheckDepth = nBestHeight;
+    printf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
+    CBlockIndex* pindexFork = NULL;
+    for (CBlockIndex* pindex = pindexBest; pindex && pindex->pprev; pindex = pindex->pprev)
+    {
+        if (fRequestShutdown || pindex->nHeight < nBestHeight-nCheckDepth)
+            break;
+        CBlock block;
+        if (!block.ReadFromDisk(pindex))
+            return error("LoadBlockIndex() : block.ReadFromDisk failed");
+        // check level 1: verify block validity
+        if (nCheckLevel>0 && !block.CheckBlock())
+        {
+            printf("LoadBlockIndex() : *** found bad block at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str());
+            pindexFork = pindex->pprev;
+        }
+        // TODO: stronger verifications
+    }
+    if (pindexFork && !fRequestShutdown)
+    {
+        // TODO: reorg back
+        return error("LoadBlockIndex(): chain database corrupted");
+    }
+
+    return true;
+}
+
+
+
+bool CChainDB::LoadBlockIndexGuts()
+{
+    // Get database cursor
+    Dbc* pcursor = GetCursor();
+    if (!pcursor)
+        return false;
+
+    // Load mapBlockIndex
+    unsigned int fFlags = DB_SET_RANGE;
+    while (true)
+    {
+        // Read next record
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+        if (fFlags == DB_SET_RANGE)
+            ssKey << make_pair('b', uint256(0));
+        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        fFlags = DB_NEXT;
+        if (ret == DB_NOTFOUND)
+            break;
+        else if (ret != 0)
+            return false;
+
+        // Unserialize
+
+        try {
+        char chType;
+        ssKey >> chType;
+        if (chType == 'b' && !fRequestShutdown)
+        {
+            CDiskBlockIndex diskindex;
+            ssValue >> diskindex;
+
+            uint256 blockHash = diskindex.GetBlockHash();
+
+            // Construct block index object
+            CBlockIndex* pindexNew = InsertBlockIndex(blockHash);
+            pindexNew->pprev          = InsertBlockIndex(diskindex.hashPrev);
+            pindexNew->nHeight        = diskindex.nHeight;
+            pindexNew->pos            = diskindex.pos;
+            pindexNew->nUndoPos       = diskindex.nUndoPos;
+            pindexNew->nMint          = diskindex.nMint;
+            pindexNew->nMoneySupply   = diskindex.nMoneySupply;
+            pindexNew->nFlags         = diskindex.nFlags;
+            pindexNew->nStakeModifier = diskindex.nStakeModifier;
+            pindexNew->prevoutStake   = diskindex.prevoutStake;
+            pindexNew->nStakeTime     = diskindex.nStakeTime;
+            pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
+            pindexNew->nVersion       = diskindex.nVersion;
+            pindexNew->hashMerkleRoot = diskindex.hashMerkleRoot;
+            pindexNew->nTime          = diskindex.nTime;
+            pindexNew->nBits          = diskindex.nBits;
+            pindexNew->nNonce         = diskindex.nNonce;
+
+            // Watch for genesis block
+            if (pindexGenesisBlock == NULL && blockHash == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet))
+                pindexGenesisBlock = pindexNew;
+
+            if (!pindexNew->CheckIndex())
+                return error("LoadBlockIndex() : CheckIndex failed at %d", pindexNew->nHeight);
+
+            // Build setStakeSeen
+            if (pindexNew->IsProofOfStake())
+                setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+        }
+        else
+        {
+            break; // if shutdown requested or finished loading block index
+        }
+        }    // try
+        catch (std::exception &e) {
+            return error("%s() : deserialize error", __PRETTY_FUNCTION__);
+        }
+    }
+    pcursor->close();
+
+    return true;
+}
+
+
+
+
+
 //
 // CAddrDB
 //
@@ -563,21 +852,19 @@ bool CAddrDB::Read(CAddrMan& addr)
     if (hashIn != hashTmp)
         return error("CAddrman::Read() : checksum mismatch; data corrupted");
 
+    // de-serialize address data
     unsigned char pchMsgTmp[4];
     try {
-        // de-serialize file header (pchMessageStart magic number) and
         ssPeers >> FLATDATA(pchMsgTmp);
-
-        // verify the network matches ours
-        if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
-            return error("CAddrman::Read() : invalid network magic number");
-
-        // de-serialize address data into one CAddrMan object
         ssPeers >> addr;
     }
     catch (std::exception &e) {
         return error("CAddrman::Read() : I/O error or stream data corrupted");
     }
+
+    // finally, verify the network matches ours
+    if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
+        return error("CAddrman::Read() : invalid network magic number");
 
     return true;
 }
