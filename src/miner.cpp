@@ -166,9 +166,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
     int64 nFees = 0;
     {
         LOCK2(cs_main, mempool.cs);
-        CCoinsDB coinsdb("r");
-        CCoinsViewDB viewdb(coinsdb);
-        CCoinsViewCache view(viewdb);
+        CCoinsViewCache view(*pcoinsTip, true);
 
         // Priority order to process transactions
         list<COrphan> vOrphan; // list memory doesn't move

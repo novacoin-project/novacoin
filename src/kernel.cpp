@@ -345,8 +345,7 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
 
     CTransaction txPrev;
     CCoins coins;
-    CCoinsDB coindb("r");
-    CCoinsViewDB view(coindb);
+    CCoinsViewCache &view = *pcoinsTip;
 
     if (!view.GetCoins(txin.prevout.hash, coins))
         return tx.DoS(1, error("CheckProofOfStake() : INFO: read coins for txPrev failed"));  // previous transaction not in main chain, may occur during initial download

@@ -637,8 +637,8 @@ public:
     bool CheckTransaction() const;
 
     // Try to accept this transaction into the memory pool
-    bool AcceptToMemoryPool(CCoinsDB& coinsdb, bool fCheckInputs=true, bool* pfMissingInputs=NULL);
-    bool GetCoinAge(CCoinsView& inputs, uint64& nCoinAge) const;  // Get transaction coin age
+    bool AcceptToMemoryPool(bool fCheckInputs=true, bool* pfMissingInputs=NULL);
+    bool GetCoinAge(uint64& nCoinAge) const;  // Get transaction coin age
 protected:
     static CTxOut GetOutputFor(const CTxIn& input, CCoinsView& mapInputs);
 };
@@ -1103,8 +1103,7 @@ public:
     int GetDepthInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet); }
     bool IsInMainChain() const { return GetDepthInMainChain() > 0; }
     int GetBlocksToMaturity() const;
-    bool AcceptToMemoryPool(CCoinsDB& txdb, bool fCheckInputs=true);
-    bool AcceptToMemoryPool();
+    bool AcceptToMemoryPool(bool fCheckInputs=true);
 };
 
 
@@ -1933,8 +1932,7 @@ public:
     std::map<uint256, CTransaction> mapTx;
     std::map<COutPoint, CInPoint> mapNextTx;
 
-    bool accept(CCoinsDB& coinsdb, CTransaction &tx,
-                bool fCheckInputs, bool* pfMissingInputs);
+    bool accept(CTransaction &tx, bool fCheckInputs, bool* pfMissingInputs);
     bool addUnchecked(const uint256& hash, CTransaction &tx);
     bool remove(CTransaction &tx);
     void clear();
@@ -1979,6 +1977,7 @@ public:
 
     // Modify the currently active block index
     virtual bool SetBestBlock(CBlockIndex *pindex);
+    virtual bool BatchWrite(const std::map<uint256, CCoins> &mapCoins, CBlockIndex *pindex);
 };
 
 /** CCoinsView backed by another CCoinsView */
@@ -1995,21 +1994,7 @@ public:
     CBlockIndex *GetBestBlock();
     bool SetBestBlock(CBlockIndex *pindex);
     void SetBackend(CCoinsView &viewIn);
-};
-
-
-/** CCoinsView backed by a CCoinsDB */
-class CCoinsViewDB : public CCoinsView
-{
-protected:
-    CCoinsDB &db;
-public:
-    CCoinsViewDB(CCoinsDB &dbIn);
-    bool GetCoins(uint256 txid, CCoins &coins);
-    bool SetCoins(uint256 txid, const CCoins &coins);
-    bool HaveCoins(uint256 txid);
-    CBlockIndex *GetBestBlock();
-    bool SetBestBlock(CBlockIndex *pindex);
+    bool BatchWrite(const std::map<uint256, CCoins> &mapCoins, CBlockIndex *pindex);
 };
 
 /** CCoinsView that adds a memory cache for transactions to another CCoinsView */
@@ -2026,7 +2011,9 @@ public:
     bool HaveCoins(uint256 txid);
     CBlockIndex *GetBestBlock();
     bool SetBestBlock(CBlockIndex *pindex);
+    bool BatchWrite(const std::map<uint256, CCoins> &mapCoins, CBlockIndex *pindex);
     bool Flush();
+    unsigned int GetCacheSize();
 };
 
 /** CCoinsView that brings transactions from a memorypool into view.
@@ -2041,5 +2028,7 @@ public:
     bool GetCoins(uint256 txid, CCoins &coins);
     bool HaveCoins(uint256 txid);
 };
+
+extern CCoinsViewCache *pcoinsTip;
 
 #endif

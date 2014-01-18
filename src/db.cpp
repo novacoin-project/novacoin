@@ -4,10 +4,10 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "db.h"
-#include "kernel.h"
-#include "checkpoints.h"
 #include "util.h"
 #include "main.h"
+#include "kernel.h"
+#include "checkpoints.h"
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -81,8 +81,8 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     dbenv.set_cachesize(nDbCache / 1024, (nDbCache % 1024)*1048576, 1);
     dbenv.set_lg_bsize(1048576);
     dbenv.set_lg_max(10485760);
-    dbenv.set_lk_max_locks(10000);
-    dbenv.set_lk_max_objects(10000);
+    dbenv.set_lk_max_locks(40000);
+    dbenv.set_lk_max_objects(40000);
     dbenv.set_errfile(fopen(pathErrorFile.string().c_str(), "a")); /// debug
     dbenv.set_flags(DB_AUTO_COMMIT, 1);
     dbenv.set_flags(DB_TXN_WRITE_NOSYNC, 1);
@@ -285,14 +285,10 @@ static bool IsChainFile(std::string strFile)
     return false;
 }
 
-void CDB::Close()
+void CDB::Flush()
 {
-    if (!pdb)
-        return;
     if (activeTxn)
-        activeTxn->abort();
-    activeTxn = NULL;
-    pdb = NULL;
+        return;
 
     // Flush database activity from memory pool to disk log
     unsigned int nMinutes = 0;
@@ -304,6 +300,18 @@ void CDB::Close()
         nMinutes = 5;
 
     bitdb.dbenv.txn_checkpoint(nMinutes ? GetArg("-dblogsize", 100)*1024 : 0, nMinutes, 0);
+}
+
+void CDB::Close()
+{
+    if (!pdb)
+        return;
+    if (activeTxn)
+        activeTxn->abort();
+    activeTxn = NULL;
+    pdb = NULL;
+
+    Flush();
 
     {
         LOCK(bitdb.cs_db);
@@ -531,18 +539,6 @@ bool CChainDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo &info) {
     return Write(make_pair('f', nFile), info);
 }
 
-bool CChainDB::ReadBlockFileInfo(int nFile, CBlockFileInfo &info) {
-    return Read(make_pair('f', nFile), info);
-}
-
-bool CChainDB::WriteLastBlockFile(int nFile) {
-    return Write('l', nFile);
-}
-
-bool CChainDB::ReadLastBlockFile(int &nFile) {
-    return Read('l', nFile);
-}
-
 bool CChainDB::ReadSyncCheckpoint(uint256& hashCheckpoint)
 {
     return Read('H', hashCheckpoint);
@@ -561,6 +557,55 @@ bool CChainDB::ReadCheckpointPubKey(string& strPubKey)
 bool CChainDB::WriteCheckpointPubKey(const string& strPubKey)
 {
     return Write('K', strPubKey);
+}
+
+
+bool CChainDB::ReadBlockFileInfo(int nFile, CBlockFileInfo &info) {
+    return Read(make_pair('f', nFile), info);
+}
+
+bool CChainDB::WriteLastBlockFile(int nFile) {
+    return Write('l', nFile);
+}
+
+bool CChainDB::ReadLastBlockFile(int &nFile) {
+    return Read('l', nFile);
+}
+
+CCoinsViewDB::CCoinsViewDB() : db("cr+") {}
+bool CCoinsViewDB::GetCoins(uint256 txid, CCoins &coins) { return db.ReadCoins(txid, coins); }
+bool CCoinsViewDB::SetCoins(uint256 txid, const CCoins &coins) { return db.WriteCoins(txid, coins); }
+bool CCoinsViewDB::HaveCoins(uint256 txid) { return db.HaveCoins(txid); }
+CBlockIndex *CCoinsViewDB::GetBestBlock() {
+    uint256 hashBestChain;
+    if (!db.ReadHashBestChain(hashBestChain))
+        return NULL;
+    std::map<uint256, CBlockIndex*>::iterator it = mapBlockIndex.find(hashBestChain);
+    if (it == mapBlockIndex.end())
+        return NULL;
+    return it->second;
+}
+bool CCoinsViewDB::SetBestBlock(CBlockIndex *pindex) { return db.WriteHashBestChain(pindex->GetBlockHash()); }
+bool CCoinsViewDB::BatchWrite(const std::map<uint256, CCoins> &mapCoins, CBlockIndex *pindex) {
+    printf("Committing %u changed transactions to coin database...\n", (unsigned int)mapCoins.size());
+
+    if (!db.TxnBegin())
+        return false;
+    bool fOk = true;
+    for (std::map<uint256, CCoins>::const_iterator it = mapCoins.begin(); it != mapCoins.end(); it++) {
+        fOk = db.WriteCoins(it->first, it->second);
+        if (!fOk)
+            break;
+    }
+    if (fOk)
+        fOk = db.WriteHashBestChain(pindex->GetBlockHash());
+
+    if (!fOk)
+        db.TxnAbort();
+    else
+        fOk = db.TxnCommit();
+
+    return fOk;
 }
 
 CBlockIndex static * InsertBlockIndex(uint256 hash)
@@ -583,7 +628,7 @@ CBlockIndex static * InsertBlockIndex(uint256 hash)
     return pindexNew;
 }
 
-bool LoadBlockIndex(CCoinsDB &coindb, CChainDB &chaindb)
+bool LoadBlockIndex(CChainDB &chaindb)
 {
     if (!chaindb.LoadBlockIndexGuts())
         return false;
@@ -604,7 +649,8 @@ bool LoadBlockIndex(CCoinsDB &coindb, CChainDB &chaindb)
     {
         CBlockIndex* pindex = item.second;
         pindex->nChainTrust = (pindex->pprev ? pindex->pprev->nChainTrust : 0) + pindex->GetBlockTrust();
-        // NovaCoin: calculate stake modifier checksum
+
+        // Calculate stake modifier checksum
         pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
         if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
             return error("CTxDB::LoadBlockIndex() : Failed stake modifier checkpoint height=%d, modifier=0x%016"PRI64x, pindex->nHeight, pindex->nStakeModifier);
@@ -617,26 +663,23 @@ bool LoadBlockIndex(CCoinsDB &coindb, CChainDB &chaindb)
         printf("LoadBlockIndex(): last block file: %s\n", infoLastBlockFile.ToString().c_str());
  
     // Load hashBestChain pointer to end of best chain
-    if (!coindb.ReadHashBestChain(hashBestChain))
+    pindexBest = pcoinsTip->GetBestBlock();
+    if (pindexBest == NULL)
     {
         if (pindexGenesisBlock == NULL)
             return true;
         return error("CTxDB::LoadBlockIndex() : hashBestChain not loaded");
     }
-    std::map<uint256, CBlockIndex*>::iterator it = mapBlockIndex.find(hashBestChain);
-    if (it == mapBlockIndex.end()) {
-        return error("CTxDB::LoadBlockIndex() : hashBestChain not found in the block index");
-    } else {
-        // set 'next' pointers in best chain
-        CBlockIndex *pindex = it->second;
-        while(pindex != NULL && pindex->pprev != NULL) {
-             CBlockIndex *pindexPrev = pindex->pprev;
-             pindexPrev->pnext = pindex;
-             pindex = pindexPrev;
-        }
-        pindexBest = it->second;
-        nBestHeight = pindexBest->nHeight;
-        nBestChainTrust = pindexBest->nChainTrust;
+    hashBestChain = pindexBest->GetBlockHash();
+    nBestHeight = pindexBest->nHeight;
+    nBestChainTrust = pindexBest->nChainTrust;
+
+    // set 'next' pointers in best chain
+    CBlockIndex *pindex = pindexBest;
+    while(pindex != NULL && pindex->pprev != NULL) {
+         CBlockIndex *pindexPrev = pindex->pprev;
+         pindexPrev->pnext = pindex;
+         pindex = pindexPrev;
     }
     printf("LoadBlockIndex(): hashBestChain=%s  height=%d date=%s\n",
         hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
@@ -829,8 +872,6 @@ bool CAddrDB::Read(CAddrMan& addr)
     // use file size to size memory buffer
     int fileSize = GetFilesize(filein);
     int dataSize = fileSize - sizeof(uint256);
-    //Don't try to resize to a negative number if file is small
-    if ( dataSize < 0 ) dataSize = 0;
     vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
