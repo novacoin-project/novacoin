@@ -1342,10 +1342,8 @@ bool CTransaction::UpdateCoins(CCoinsView &inputs, CTxUndo &txundo, int nHeight,
             CCoins coins;
             if (!inputs.GetCoins(txin.prevout.hash, coins))
                 return error("UpdateCoins() : cannot find prevtx");
-
             if (coins.nTime > nTimeStamp)
                 return error("UpdateCoins() : timestamp violation");
-
             CTxInUndo undo;
             if (!coins.Spend(txin.prevout, undo))
                 return error("UpdateCoins() : cannot spend input");
@@ -1479,8 +1477,6 @@ bool CTransaction::CheckInputs(CCoinsView &inputs, enum CheckSig_mode csmode, bo
                 }
             }
         }
-
-
     }
 
     return true;
