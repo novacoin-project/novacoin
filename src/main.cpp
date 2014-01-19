@@ -1790,7 +1790,7 @@ bool CBlock::SetBestChain(CBlockIndex* pindexNew)
 
         // Queue memory transactions to resurrect
         BOOST_FOREACH(const CTransaction& tx, block.vtx)
-            if (!tx.IsCoinBase())
+            if (!tx.IsCoinBase() && !tx.IsCoinStake())
                 vResurrect.push_back(tx);
     }
 
