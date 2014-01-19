@@ -1364,7 +1364,7 @@ bool CTransaction::UpdateCoins(CCoinsView &inputs, CTxUndo &txundo, int nHeight,
 
 bool CTransaction::HaveInputs(CCoinsView &inputs) const
 {
-    if (!IsCoinBase()) { 
+    if (!IsCoinBase()) {
         // first check whether information about the prevout hash is available
         for (unsigned int i = 0; i < vin.size(); i++) {
             const COutPoint &prevout = vin[i].prevout;

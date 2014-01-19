@@ -306,13 +306,16 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
 
+/*
+ * We need to call UpdateCoins using actual block timestamp, so don't perform this here.
+ *
             CTxUndo txundo;
             if (!tx.UpdateCoins(viewTemp, txundo, pindexPrev->nHeight+1, pblock->nTime))
                 continue;
 
             // push changes from the second layer cache to the first one
             viewTemp.Flush();
-
+*/
             // Added
             pblock->vtx.push_back(tx);
             nBlockSize += nTxSize;
