@@ -381,7 +381,7 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
     }
     ++nExtraNonce;
 
-    unsigned int nHeight = pindexPrev->nHeight+1; // Height first in coinbase required for block.version=2
+    unsigned int nHeight = pindexPrev->nHeight+1; // Height first in coinbase required
     pblock->vtx[0].vin[0].scriptSig = (CScript() << nHeight << CBigNum(nExtraNonce)) + COINBASE_FLAGS;
     assert(pblock->vtx[0].vin[0].scriptSig.size() <= 100);
 
@@ -564,7 +564,5 @@ void StakeMiner(CWallet *pwallet)
         }
         else
             Sleep(nMinerSleep);
-
-        continue;
     }
 }

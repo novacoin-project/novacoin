@@ -15,7 +15,7 @@
 
 using namespace std;
 extern int nStakeMaxAge;
-
+extern unsigned int nTransactionsUpdated;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1438,27 +1438,6 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
         return false;
 
     vector<const CWalletTx*> vwtxPrev;
-
-/*
- * TODO: performance comparison
-
-    static set<pair<const CWalletTx*,unsigned int> > setCoins;
-    static uint256 hashPrevBlock;
-    static int64 nValueIn = 0;
-
-    // Cache outputs unless best block changed
-    if (hashPrevBlock != pindexBest->GetBlockHash())
-    {
-        if (!SelectCoinsSimple(nBalance - nReserveBalance, GetAdjustedTime(), nCoinbaseMaturity * 10, setCoins, nValueIn))
-            return false;
-
-        if (setCoins.empty())
-            return false;
-
-        hashPrevBlock == pindexBest->GetBlockHash();
-    }
-*/
-
     set<pair<const CWalletTx*,unsigned int> > setCoins;
     int64 nValueIn = 0;
 
@@ -1508,7 +1487,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // The following combine threshold is important to security
     // Should not be adjusted if you don't understand the consequences
     int64 nCombineThreshold = GetProofOfWorkReward(GetLastBlockIndex(pindexBest, false)->nBits) / 3;
-
+    CBlockIndex* pindexPrev = pindexBest;
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
 
@@ -1531,27 +1510,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         return false;
 
     vector<const CWalletTx*> vwtxPrev;
-
-/*
- * TODO: performance comparison
-
-    static set<pair<const CWalletTx*,unsigned int> > setCoins;
-    static uint256 hashPrevBlock;
-    static int64 nValueIn = 0;
-
-    // Cache outputs unless best block changed
-    if (hashPrevBlock != pindexBest->GetBlockHash())
-    {
-        if (!SelectCoinsSimple(nBalance - nReserveBalance, txNew.nTime, nCoinbaseMaturity * 10, setCoins, nValueIn))
-            return false;
-
-        if (setCoins.empty())
-            return false;
-
-        hashPrevBlock == pindexBest->GetBlockHash();
-    }
-*/
-
     set<pair<const CWalletTx*,unsigned int> > setCoins;
     int64 nValueIn = 0;
 
@@ -1600,7 +1558,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
 
         bool fKernelFound = false;
-        for (unsigned int n=0; n<min(nSearchInterval,(int64)nMaxStakeSearchInterval) && !fKernelFound && !fShutdown; n++)
+        for (unsigned int n=0; n<min(nSearchInterval,(int64)nMaxStakeSearchInterval) && !fKernelFound && !fShutdown && pindexPrev == pindexBest; n++)
         {
             // Search backward in time from the given txNew timestamp 
             // Search nSearchInterval seconds back up to nMaxStakeSearchInterval
