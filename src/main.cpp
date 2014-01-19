@@ -1578,7 +1578,10 @@ bool CBlock::DisconnectBlock(CBlockIndex *pindex, CCoinsView &view)
                     if (undo.nHeight == 0)
                         return error("DisconnectBlock() : undo data doesn't contain tx metadata? database corrupted");
                     coins.fCoinBase = undo.fCoinBase;
+                    coins.fCoinStake = undo.fCoinStake;
                     coins.nHeight = undo.nHeight;
+                    coins.nTime = undo.nTime;
+                    coins.nBlockTime = undo.nBlockTime;
                     coins.nVersion = undo.nVersion;
                 } else {
                     if (undo.nHeight != 0)
