@@ -220,6 +220,23 @@ bool CCoinsViewCache::GetCoins(uint256 txid, CCoins &coins) {
     return false;
 }
 
+// Select coins from read-only cache or database
+bool CCoinsViewCache::GetCoinsReadOnly(uint256 txid, CCoins &coins) {
+    if (cacheCoins.count(txid)) {
+        coins = cacheCoins[txid]; // get from cache
+        return true;
+    }
+    if (cacheCoinsReadOnly.count(txid)) {
+        coins = cacheCoinsReadOnly[txid]; // get from read-only cache
+        return true;
+    }
+    if (base->GetCoins(txid, coins)) {
+        cacheCoinsReadOnly[txid] = coins; // save to read-only cache
+        return true;
+    }
+    return false;
+}
+
 bool CCoinsViewCache::SetCoins(uint256 txid, const CCoins &coins) {
     cacheCoins[txid] = coins;
     return true;
@@ -248,6 +265,8 @@ bool CCoinsViewCache::BatchWrite(const std::map<uint256, CCoins> &mapCoins, CBlo
 }
 
 bool CCoinsViewCache::Flush() {
+    cacheCoinsReadOnly.clear(); // purge read-only cache
+
     bool fOk = base->BatchWrite(cacheCoins, pindexTip);
     if (fOk)
         cacheCoins.clear();

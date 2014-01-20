@@ -2009,10 +2009,12 @@ class CCoinsViewCache : public CCoinsViewBacked
 protected:
     CBlockIndex *pindexTip;
     std::map<uint256,CCoins> cacheCoins;
+    std::map<uint256,CCoins> cacheCoinsReadOnly;
 
 public:
     CCoinsViewCache(CCoinsView &baseIn, bool fDummy = false);
     bool GetCoins(uint256 txid, CCoins &coins);
+    bool GetCoinsReadOnly(uint256 txid, CCoins &coins);
     bool SetCoins(uint256 txid, const CCoins &coins);
     bool HaveCoins(uint256 txid);
     CBlockIndex *GetBestBlock();

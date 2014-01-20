@@ -270,7 +270,7 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
 //   quantities so as to generate blocks faster, degrading the system back into
 //   a proof-of-work situation.
 //
-bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned int nTxPrevOffset, const CTransaction& txPrev, const COutPoint& prevout, unsigned int nTimeTx, uint256& hashProofOfStake, uint256& targetProofOfStake, bool& fFatal, bool fPrintProofOfStake)
+bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned int nTxPrevOffset, const CTransaction& txPrev, const COutPoint& prevout, unsigned int nTimeTx, uint256& hashProofOfStake, uint256& targetProofOfStake, bool& fFatal, bool fMiner, bool fPrintProofOfStake)
 {
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
     {
@@ -324,7 +324,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
     if (CBigNum(hashProofOfStake) > bnCoinDayWeight * bnTargetPerCoinDay)
     {
         fFatal = true;
-        return error("CheckStakeKernelHash() : proof-of-stake for block %s not meeting target", hashBlockFrom.ToString().c_str());
+        return !fMiner? error("CheckStakeKernelHash() : proof-of-stake not meeting target") : false;
     }
 
     if (fDebug && !fPrintProofOfStake)
@@ -343,7 +343,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hashProofOfStake, uint256& targetProofOfStake, bool& fFatal)
+bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hashProofOfStake, uint256& targetProofOfStake, bool& fFatal, bool fMiner)
 {
     if (!tx.IsCoinStake())
     {
@@ -360,7 +360,7 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
     CCoins coins;
     CCoinsViewCache &view = *pcoinsTip;
 
-    if (!view.GetCoins(txin.prevout.hash, coins))
+    if (!view.GetCoinsReadOnly(txin.prevout.hash, coins))
         return fDebug? error("CheckProofOfStake() : INFO: read coins for txPrev failed") : false;  // previous transaction not in main chain, may occur during initial download
 
     CBlockIndex* pindex = FindBlockByHeight(coins.nHeight);
@@ -387,7 +387,7 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
         return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
     }
 
-    if (!CheckStakeKernelHash(nBits, block, nTxPos, txPrev, txin.prevout, tx.nTime, hashProofOfStake, targetProofOfStake, fFatal, fDebug))
+    if (!CheckStakeKernelHash(nBits, block, nTxPos, txPrev, txin.prevout, tx.nTime, hashProofOfStake, targetProofOfStake, fFatal, fMiner, fDebug))
     {
         if (fFatal)
             return false;
