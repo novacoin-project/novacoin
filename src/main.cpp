@@ -1552,6 +1552,10 @@ bool CBlock::DisconnectBlock(CBlockIndex *pindex, CCoinsView &view)
         const CTransaction &tx = vtx[i];
         uint256 hash = tx.GetHash();
 
+        // don't check coinbase coins for proof-of-stake block
+        if(IsProofOfStake() && tx.IsCoinBase())
+            continue;
+
         // check that all outputs are available
         CCoins outs;
         if (!view.GetCoins(hash, outs))
@@ -1682,6 +1686,10 @@ bool CBlock::ConnectBlock(CBlockIndex* pindex, CCoinsView &view, bool fJustCheck
         {
             nValueOut += tx.GetValueOut();
         }
+
+        // don't create coinbase coins for proof-of-stake block
+        if(IsProofOfStake() && tx.IsCoinBase())
+            continue;
 
         CTxUndo txundo;
         if (!tx.UpdateCoins(view, txundo, pindex->nHeight, pindex->nTime))
