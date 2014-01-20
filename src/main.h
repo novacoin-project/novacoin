@@ -1396,8 +1396,14 @@ public:
     // Generate proof-of-stake block signature
     bool SignBlock(CWallet& keystore);
 
-    // Validate header signature
-    bool CheckBlockSignature(bool fProofOfStake) const;
+    // Get generator key
+    bool GetGenerator(CKey& GeneratorKey) const;
+
+    // Validate proof-of-stake block signature
+    bool CheckSignature(bool& fFatal, uint256& hashProofOfStake) const;
+
+    // Legacy proof-of-work signature
+    bool CheckLegacySignature() const;
 };
 
 
