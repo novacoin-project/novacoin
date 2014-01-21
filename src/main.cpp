@@ -2443,16 +2443,16 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         bool fFatal = false;
         uint256 hashProofOfStake;
 
-        // Verify proof-of-stake hash target and signatures
+        // Verify proof-of-stake script, hash target and signature
         if (!pblock->CheckSignature(fFatal, hashProofOfStake))
         {
             if (fFatal)
             {
-                // Invalid blockhash/coinstake signature or no generator defined, nothing to do here
+                // Invalid coinstake script, blockhash signature or no generator defined, nothing to do here
                 // This also may occur when supplied proof-of-stake doesn't satisfy required target
                 if (pfrom)
                     pfrom->Misbehaving(100);
-                return error("ProcessBlock() : invalid signature in proof-of-stake block %s", hash.ToString().c_str());
+                return error("ProcessBlock() : invalid signatures found in proof-of-stake block %s", hash.ToString().c_str());
             }
             else
             {

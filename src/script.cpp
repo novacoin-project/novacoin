@@ -1762,6 +1762,7 @@ bool VerifySignature(const CCoins& txFrom, const CTransaction& txTo, unsigned in
     const CTxIn& txin = txTo.vin[nIn];
     if (txin.prevout.n >= txFrom.vout.size())
         return false;
+
     const CTxOut& txout = txFrom.vout[txin.prevout.n];
 
     return VerifyScript(txin.scriptSig, txout.scriptPubKey, txTo, nIn, fValidatePayToScriptHash, fStrictEncodings, nHashType);
