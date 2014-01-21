@@ -313,9 +313,12 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             if (!tx.UpdateCoins(viewTemp, txundo, pindexPrev->nHeight+1, pblock->nTime))
                 continue;
 
+*/
+
             // push changes from the second layer cache to the first one
             viewTemp.Flush();
-*/
+            uint256 hash = tx.GetHash();
+
             // Added
             pblock->vtx.push_back(tx);
             nBlockSize += nTxSize;
@@ -330,7 +333,6 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             }
 
             // Add transactions that depend on this one to the priority queue
-            uint256 hash = tx.GetHash();
             if (mapDependers.count(hash))
             {
                 BOOST_FOREACH(COrphan* porphan, mapDependers[hash])

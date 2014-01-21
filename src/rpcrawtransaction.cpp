@@ -550,7 +550,7 @@ Value sendrawtransaction(const Array& params, bool fHelp)
         // Not in block, but already in the memory pool; will drop
         // through to re-relay it.
     } else {
-        SyncWithWallets(tx, NULL, true);
+        SyncWithWallets(hashTx, tx, NULL, true);
     }
     RelayTransaction(tx, hashTx);
 
