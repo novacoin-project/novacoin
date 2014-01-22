@@ -58,6 +58,7 @@ uint256 nBestInvalidTrust = 0;
 uint256 hashBestChain = 0;
 CBlockIndex* pindexBest = NULL;
 int64 nTimeBestReceived = 0;
+set<CBlockIndex*, CBlockIndexTrustComparator> setBlockIndexValid; // may contain all CBlockIndex*'s that have validness >=BLOCK_VALID_TRANSACTIONS, and must contain those who aren't failed
 
 CMedianFilter<int> cPeerBlockCounts(5, 0); // Amount of blocks that other nodes claim to have
 
@@ -1320,6 +1321,61 @@ void static InvalidChainFound(CBlockIndex* pindexNew)
       DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 }
 
+void static InvalidBlockFound(CBlockIndex *pindex) {
+    pindex->nStatus |= BLOCK_FAILED_VALID;
+    CChainDB().WriteBlockIndex(CDiskBlockIndex(pindex));
+    setBlockIndexValid.erase(pindex);
+    InvalidChainFound(pindex);
+    if (pindex->pnext)
+        ConnectBestBlock(); // reorganise away from the failed block
+}
+
+bool ConnectBestBlock() {
+    do {
+        CBlockIndex *pindexNewBest;
+
+        {
+            std::set<CBlockIndex*,CBlockIndexTrustComparator>::reverse_iterator it = setBlockIndexValid.rbegin();
+            if (it == setBlockIndexValid.rend())
+                return true;
+            pindexNewBest = *it;
+        }
+
+        if (pindexNewBest == pindexBest)
+            return true; // nothing to do
+
+        // check ancestry
+        CBlockIndex *pindexTest = pindexNewBest;
+        std::vector<CBlockIndex*> vAttach;
+        do {
+            if (pindexTest->nStatus & BLOCK_FAILED_MASK) {
+                // mark descendants failed
+                CChainDB chaindb;
+                CBlockIndex *pindexFailed = pindexNewBest;
+                while (pindexTest != pindexFailed) {
+                    pindexFailed->nStatus |= BLOCK_FAILED_CHILD;
+                    setBlockIndexValid.erase(pindexFailed);
+                    chaindb.WriteBlockIndex(CDiskBlockIndex(pindexFailed));
+                    pindexFailed = pindexFailed->pprev;
+                }
+                InvalidChainFound(pindexNewBest);
+                break;
+            }
+
+            if (pindexBest == NULL || pindexTest->nChainTrust > pindexBest->nChainTrust)
+                vAttach.push_back(pindexTest);
+
+            if (pindexTest->pprev == NULL || pindexTest->pnext != NULL) {
+                reverse(vAttach.begin(), vAttach.end());
+                BOOST_FOREACH(CBlockIndex *pindexSwitch, vAttach)
+                    if (!SetBestChain(pindexSwitch))
+                        return false;
+                return true;
+            }
+            pindexTest = pindexTest->pprev;
+        } while(true);
+    } while(true);
+}
 
 void CBlock::UpdateTime(const CBlockIndex* pindexPrev)
 {
@@ -1720,24 +1776,29 @@ bool CBlock::ConnectBlock(CBlockIndex* pindex, CCoinsViewCache &view, bool fJust
     if (fJustCheck)
         return true;
 
-    CChainDB chaindb;
-    CDiskBlockPos pos;
-
     // Write undo information to disk
-    if (pindex->GetUndoPos().IsNull())
+    if (pindex->GetUndoPos().IsNull() || (pindex->nStatus & BLOCK_VALID_MASK) < BLOCK_VALID_SCRIPTS)
     {
-        if (!FindUndoPos(chaindb, pindex->pos.nFile, pos, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 8))
-            return error("ConnectBlock() : FindUndoPos failed");
-        if (!blockundo.WriteToDisk(pos))
-            return error("ConnectBlock() : CBlockUndo::WriteToDisk failed");
+        CChainDB chaindb;
 
-        // update nUndoPos in block index
-        pindex->nUndoPos = pos.nPos + 1;
+        if (pindex->GetUndoPos().IsNull()) {
+            CDiskBlockPos pos;
+            if (!FindUndoPos(chaindb, pindex->nFile, pos, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 8))
+                return error("ConnectBlock() : FindUndoPos failed");
+            if (!blockundo.WriteToDisk(pos))
+                return error("ConnectBlock() : CBlockUndo::WriteToDisk failed");
+
+            // update nUndoPos in block index
+            pindex->nUndoPos = pos.nPos;
+            pindex->nStatus |= BLOCK_HAVE_UNDO;
+        }
+
+        pindex->nStatus = (pindex->nStatus & ~BLOCK_VALID_MASK) | BLOCK_VALID_SCRIPTS;
+
+        CDiskBlockIndex blockindex(pindex);
+        if (!chaindb.WriteBlockIndex(blockindex))
+            return error("ConnectBlock() : WriteBlockIndex failed");
     }
-
-    CDiskBlockIndex blockindex(pindex);
-    if (!chaindb.WriteBlockIndex(blockindex))
-        return error("ConnectBlock() : WriteBlockIndex failed");
 
     // add this block to the view's blockchain
     if (!view.SetBestBlock(pindex))
@@ -1754,13 +1815,13 @@ bool CBlock::ConnectBlock(CBlockIndex* pindex, CCoinsViewCache &view, bool fJust
     return true;
 }
 
-bool CBlock::SetBestChain(CBlockIndex* pindexNew)
+bool SetBestChain(CBlockIndex* pindexNew)
 {
     CCoinsViewCache &view = *pcoinsTip;
 
     // special case for attaching the genesis block
     // note that no ConnectBlock is called, so its coinbase output is non-spendable
-    if (pindexGenesisBlock == NULL && pindexNew->GetBlockHash() == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet))
+    if (pindexGenesisBlock == NULL && pindexNew->GetBlockHash() == hashGenesisBlock)
     {
         view.SetBestBlock(pindexNew);
         if (!view.Flush())
@@ -1825,24 +1886,19 @@ bool CBlock::SetBestChain(CBlockIndex* pindexNew)
     vector<CTransaction> vDelete;
     BOOST_FOREACH(CBlockIndex *pindex, vConnect) {
         CBlock block;
-        CBlock *pblock;
-        if (pindex == pindexNew) // connecting *this block
-            pblock = this;
-        else { // other block; read it from disk
-            if (!block.ReadFromDisk(pindex))
-                return error("SetBestBlock() : ReadFromDisk for connect failed");
-            pblock = &block;
-        }
+        if (!block.ReadFromDisk(pindex))
+            return error("SetBestBlock() : ReadFromDisk for connect failed");
         CCoinsViewCache viewTemp(view, true);
-        if (!pblock->ConnectBlock(pindex, viewTemp)) {
+        if (!block.ConnectBlock(pindex, viewTemp)) {
             InvalidChainFound(pindexNew);
+            InvalidBlockFound(pindex);
             return error("SetBestBlock() : ConnectBlock %s failed", pindex->GetBlockHash().ToString().substr(0,20).c_str());
         }
         if (!viewTemp.Flush())
             return error("SetBestBlock() : Cache flush failed after connect");
 
         // Queue memory transactions to delete
-        BOOST_FOREACH(const CTransaction& tx, pblock->vtx)
+        BOOST_FOREACH(const CTransaction& tx, block.vtx)
             vDelete.push_back(tx);
     }
 
@@ -1891,10 +1947,8 @@ bool CBlock::SetBestChain(CBlockIndex* pindexNew)
 
     uint256 nBestBlockTrust = pindexBest->nHeight != 0 ? (pindexBest->nChainTrust - pindexBest->pprev->nChainTrust) : pindexBest->nChainTrust;
 
-    printf("SetBestChain: new best=%s  height=%d  trust=%s  blocktrust=%"PRI64d"  date=%s\n",
-      hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
-      CBigNum(nBestChainTrust).ToString().c_str(),
-      nBestBlockTrust.Get64(),
+    printf("SetBestChain: new best=%s  height=%d  trust=%s blocktrust=%s  tx=%lu  date=%s\n",
+      hashBestChain.ToString().substr(0,20).c_str(), nBestHeight, CBigNum(nBestChainTrust).ToString().c_str(), CBigNum(nBestBlockTrust).ToString().c_str(), (unsigned long)pindexNew->nChainTx,
       DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 
     // Check the version of the last 100 blocks to see if we need to upgrade:
@@ -2008,9 +2062,13 @@ bool CBlock::AddToBlockIndex(const CDiskBlockPos &pos)
         pindexNew->pprev = (*miPrev).second;
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
     }
+    pindexNew->nTx = vtx.size();
     pindexNew->nChainTrust = (pindexNew->pprev ? pindexNew->pprev->nChainTrust : 0) + pindexNew->GetBlockTrust();
-    pindexNew->pos = pos;
+    pindexNew->nChainTx = (pindexNew->pprev ? pindexNew->pprev->nChainTx : 0) + pindexNew->nTx;
+    pindexNew->nFile = pos.nFile;
+    pindexNew->nDataPos = pos.nPos;
     pindexNew->nUndoPos = 0;
+    pindexNew->nStatus = BLOCK_VALID_TRANSACTIONS | BLOCK_HAVE_DATA;
 
     // Compute stake entropy bit for stake modifier
     if (!pindexNew->SetStakeEntropyBit(GetStakeEntropyBit(pindexNew->nTime)))
@@ -2034,6 +2092,8 @@ bool CBlock::AddToBlockIndex(const CDiskBlockPos &pos)
     if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
         return error("AddToBlockIndex() : Rejected by stake modifier checkpoint height=%d, modifier=0x%016"PRI64x, pindexNew->nHeight, nStakeModifier);
 
+    setBlockIndexValid.insert(pindexNew);
+
     CChainDB chaindb;
     if (!chaindb.TxnBegin())
         return false;
@@ -2041,8 +2101,8 @@ bool CBlock::AddToBlockIndex(const CDiskBlockPos &pos)
     if (!chaindb.TxnCommit())
         return false;
 
-    // New best
-    if (!SetBestChain(pindexNew))
+    // New best?
+    if (!ConnectBestBlock())
         return false;
 
     if (pindexNew == pindexBest)
