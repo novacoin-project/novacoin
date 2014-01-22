@@ -381,6 +381,13 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
 
     const CTxOut& txout = txPrev.vout[txin.prevout.n];
 
+    // Check transaction consistency
+    if (txin.prevout.n >= txPrev.vout.size())
+    {
+        fFatal = true;
+        return error("CheckProofOfStake() : invalid prevout found in coinstake %s", tx.GetHash().ToString().c_str());
+    }
+
     // Verify script
     if (!VerifyScript(txin.scriptSig, txout.scriptPubKey, tx, 0, true, false, 0))
     {
