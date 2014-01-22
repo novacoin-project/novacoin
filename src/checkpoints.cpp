@@ -135,14 +135,13 @@ namespace Checkpoints
 
     bool WriteSyncCheckpoint(const uint256& hashCheckpoint)
     {
-        CChainDB chaindb;
-        chaindb.TxnBegin();
-        if (!chaindb.WriteSyncCheckpoint(hashCheckpoint))
+        pblocktree->TxnBegin();
+        if (!pblocktree->WriteSyncCheckpoint(hashCheckpoint))
         {
-            chaindb.TxnAbort();
+            pblocktree->TxnAbort();
             return error("WriteSyncCheckpoint(): failed to write to db sync checkpoint %s", hashCheckpoint.ToString().c_str());
         }
-        if (!chaindb.TxnCommit())
+        if (!pblocktree->TxnCommit())
             return error("WriteSyncCheckpoint(): failed to commit to db sync checkpoint %s", hashCheckpoint.ToString().c_str());
 
         Checkpoints::hashSyncCheckpoint = hashCheckpoint;
@@ -161,7 +160,6 @@ namespace Checkpoints
                 return false;
             }
 
-            CChainDB chaindb;
             CBlockIndex* pindexCheckpoint = mapBlockIndex[hashPendingCheckpoint];
             if (!pindexCheckpoint->IsInMainChain())
             {
@@ -252,7 +250,6 @@ namespace Checkpoints
         {
             // checkpoint block accepted but not yet in main chain
             printf("ResetSyncCheckpoint: SetBestChain to hardened checkpoint %s\n", hash.ToString().c_str());
-            CChainDB chaindb;
             CBlock block;
             if (!block.ReadFromDisk(mapBlockIndex[hash]))
                 return error("ResetSyncCheckpoint: ReadFromDisk failed for hardened checkpoint %s", hash.ToString().c_str());
@@ -411,7 +408,6 @@ bool CSyncCheckpoint::ProcessSyncCheckpoint(CNode* pfrom)
     if (!Checkpoints::ValidateSyncCheckpoint(hashCheckpoint))
         return false;
 
-    CChainDB chaindb;
     CBlockIndex* pindexCheckpoint = mapBlockIndex[hashCheckpoint];
     if (!pindexCheckpoint->IsInMainChain())
     {

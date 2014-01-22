@@ -349,13 +349,13 @@ public:
 
 
 /** Access to the block database (chain.dat) */
-class CChainDB : public CDB
+class CBlockTreeDB : public CDB
 {
 public:
-    CChainDB(const char* pszMode="r+") : CDB("chain.dat", pszMode) { }
+    CBlockTreeDB(const char* pszMode="r+") : CDB("blktree.dat", pszMode) { }
 private:
-    CChainDB(const CChainDB&);
-    void operator=(const CChainDB&);
+    CBlockTreeDB(const CBlockTreeDB&);
+    void operator=(const CBlockTreeDB&);
 public:
     bool WriteBlockIndex(const CDiskBlockIndex& blockindex);
     bool ReadBestInvalidTrust(CBigNum& bnBestInvalidTrust);
@@ -372,7 +372,7 @@ public:
 };
 
 
-bool LoadBlockIndex(CChainDB &chaindb);
+bool LoadBlockIndexDB();
 
 
 /** Access to the (IP) address database (peers.dat) */
