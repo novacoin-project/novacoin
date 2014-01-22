@@ -1821,7 +1821,7 @@ bool SetBestChain(CBlockIndex* pindexNew)
 
     // special case for attaching the genesis block
     // note that no ConnectBlock is called, so its coinbase output is non-spendable
-    if (pindexGenesisBlock == NULL && pindexNew->GetBlockHash() == hashGenesisBlock)
+    if (pindexGenesisBlock == NULL && pindexNew->GetBlockHash() == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet))
     {
         view.SetBestBlock(pindexNew);
         if (!view.Flush())
