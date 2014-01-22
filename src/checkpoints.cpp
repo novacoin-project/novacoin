@@ -7,7 +7,7 @@
 
 #include "checkpoints.h"
 
-#include "db.h"
+#include "txdb.h"
 #include "main.h"
 #include "uint256.h"
 
@@ -135,14 +135,14 @@ namespace Checkpoints
 
     bool WriteSyncCheckpoint(const uint256& hashCheckpoint)
     {
-        pblocktree->TxnBegin();
-        if (!pblocktree->WriteSyncCheckpoint(hashCheckpoint))
         {
-            pblocktree->TxnAbort();
-            return error("WriteSyncCheckpoint(): failed to write to db sync checkpoint %s", hashCheckpoint.ToString().c_str());
+            LOCK(Checkpoints::cs_hashSyncCheckpoint);
+
+            if (!pblocktree->WriteSyncCheckpoint(hashCheckpoint))
+            {
+                return error("WriteSyncCheckpoint(): failed to write to db sync checkpoint %s", hashCheckpoint.ToString().c_str());
+            }
         }
-        if (!pblocktree->TxnCommit())
-            return error("WriteSyncCheckpoint(): failed to commit to db sync checkpoint %s", hashCheckpoint.ToString().c_str());
 
         Checkpoints::hashSyncCheckpoint = hashCheckpoint;
         return true;
