@@ -370,6 +370,8 @@ Value gettxout(const Array& params, bool fHelp)
     ret.push_back(Pair("version", coins.nVersion));
     ret.push_back(Pair("coinbase", coins.fCoinBase));
     ret.push_back(Pair("coinstake", coins.fCoinStake));
+    ret.push_back(Pair("time", (boost::int64_t)coins.nTime));
+    ret.push_back(Pair("blocktime", (boost::int64_t)coins.nBlockTime));
 
     return ret;
 }
