@@ -237,14 +237,15 @@ Value stop(const Array& params, bool fHelp)
 static const CRPCCommand vRPCCommands[] =
 { //  name                      function                 safemd  unlocked
   //  ------------------------  -----------------------  ------  --------
-    { "help",                   &help,                   true,   true },
-    { "stop",                   &stop,                   true,   true },
+    { "help",                   &help,                   true,   true  },
+    { "stop",                   &stop,                   true,   true  },
     { "getbestblockhash",       &getbestblockhash,       true,   false },
     { "getblockcount",          &getblockcount,          true,   false },
     { "getconnectioncount",     &getconnectioncount,     true,   false },
     { "getpeerinfo",            &getpeerinfo,            true,   false },
     { "getdifficulty",          &getdifficulty,          true,   false },
     { "getinfo",                &getinfo,                true,   false },
+    { "sendalert",              &sendalert,              false,  false },
     { "getmininginfo",          &getmininginfo,          true,   false },
     { "getnewaddress",          &getnewaddress,          true,   false },
     { "getnewpubkey",           &getnewpubkey,           true,   false },
@@ -275,6 +276,7 @@ static const CRPCCommand vRPCCommands[] =
     { "getblock",               &getblock,               false,  false },
     { "getblockbynumber",       &getblockbynumber,       false,  false },
     { "getblockhash",           &getblockhash,           false,  false },
+    { "getcheckpoint",          &getcheckpoint,          true,   false },
     { "gettransaction",         &gettransaction,         false,  false },
     { "listtransactions",       &listtransactions,       false,  false },
     { "listaddressgroupings",   &listaddressgroupings,   false,  false },
@@ -287,24 +289,24 @@ static const CRPCCommand vRPCCommands[] =
     { "getblocktemplate",       &getblocktemplate,       true,   false },
     { "submitblock",            &submitblock,            false,  false },
     { "listsinceblock",         &listsinceblock,         false,  false },
+    { "checkwallet",            &checkwallet,            false,  true  },
+    { "repairwallet",           &repairwallet,           false,  true  },
     { "dumpprivkey",            &dumpprivkey,            false,  false },
     { "dumpwallet",             &dumpwallet,             true,   false },
     { "importwallet",           &importwallet,           false,  false },
     { "importprivkey",          &importprivkey,          false,  false },
+    { "reservebalance",         &reservebalance,         false,  true  },
     { "listunspent",            &listunspent,            false,  false },
+    { "resendtx",               &resendtx,               false,  true  },
     { "getrawtransaction",      &getrawtransaction,      false,  false },
     { "createrawtransaction",   &createrawtransaction,   false,  false },
     { "decoderawtransaction",   &decoderawtransaction,   false,  false },
     { "decodescript",           &decodescript,           false,  false },
     { "signrawtransaction",     &signrawtransaction,     false,  false },
     { "sendrawtransaction",     &sendrawtransaction,     false,  false },
-    { "getcheckpoint",          &getcheckpoint,          true,   false },
-    { "reservebalance",         &reservebalance,         false,  true},
-    { "checkwallet",            &checkwallet,            false,  true},
-    { "repairwallet",           &repairwallet,           false,  true},
-    { "resendtx",               &resendtx,               false,  true},
-    { "makekeypair",            &makekeypair,            false,  true},
-    { "sendalert",              &sendalert,              false,  false},
+    { "gettxoutsetinfo",        &gettxoutsetinfo,        true,   false },
+    { "gettxout",               &gettxout,               true,   false },
+    { "makekeypair",            &makekeypair,            false,  true  },
 };
 
 CRPCTable::CRPCTable()
@@ -1227,6 +1229,8 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "createrawtransaction"   && n > 1) ConvertTo<Object>(params[1]);
     if (strMethod == "signrawtransaction"     && n > 1) ConvertTo<Array>(params[1], true);
     if (strMethod == "signrawtransaction"     && n > 2) ConvertTo<Array>(params[2], true);
+    if (strMethod == "gettxout"               && n > 1) ConvertTo<boost::int64_t>(params[1]);
+    if (strMethod == "gettxout"               && n > 2) ConvertTo<bool>(params[2]);
     if (strMethod == "keypoolrefill"          && n > 0) ConvertTo<boost::int64_t>(params[0]);
 
     return params;
