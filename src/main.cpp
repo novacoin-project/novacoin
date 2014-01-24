@@ -1675,6 +1675,9 @@ bool CBlock::DisconnectBlock(CBlockIndex *pindex, CCoinsViewCache &view)
                     return error("DisconnectBlock() : cannot restore coin inputs");
             }
         }
+
+        // clean up wallet after disconnecting coinstake
+        SyncWithWallets(vtx[i].GetHash(), vtx[i], this, true, false);
     }
 
     // move best block pointer to prevout block
@@ -1870,12 +1873,12 @@ bool SetBestChain(CBlockIndex* pindexNew)
     BOOST_FOREACH(CBlockIndex* pindex, vDisconnect) {
         CBlock block;
         if (!block.ReadFromDisk(pindex))
-            return error("SetBestBlock() : ReadFromDisk for disconnect failed");
+            return error("SetBestChain() : ReadFromDisk for disconnect failed");
         CCoinsViewCache viewTemp(view, true);
         if (!block.DisconnectBlock(pindex, viewTemp))
-            return error("SetBestBlock() : DisconnectBlock %s failed", pindex->GetBlockHash().ToString().substr(0,20).c_str());
+            return error("SetBestChain() : DisconnectBlock %s failed", pindex->GetBlockHash().ToString().substr(0,20).c_str());
         if (!viewTemp.Flush())
-            return error("SetBestBlock() : Cache flush failed after disconnect");
+            return error("SetBestChain() : Cache flush failed after disconnect");
 
         // Queue memory transactions to resurrect
         BOOST_FOREACH(const CTransaction& tx, block.vtx)
@@ -1888,15 +1891,15 @@ bool SetBestChain(CBlockIndex* pindexNew)
     BOOST_FOREACH(CBlockIndex *pindex, vConnect) {
         CBlock block;
         if (!block.ReadFromDisk(pindex))
-            return error("SetBestBlock() : ReadFromDisk for connect failed");
+            return error("SetBestChain() : ReadFromDisk for connect failed");
         CCoinsViewCache viewTemp(view, true);
         if (!block.ConnectBlock(pindex, viewTemp)) {
             InvalidChainFound(pindexNew);
             InvalidBlockFound(pindex);
-            return error("SetBestBlock() : ConnectBlock %s failed", pindex->GetBlockHash().ToString().substr(0,20).c_str());
+            return error("SetBestChain() : ConnectBlock %s failed", pindex->GetBlockHash().ToString().substr(0,20).c_str());
         }
         if (!viewTemp.Flush())
-            return error("SetBestBlock() : Cache flush failed after connect");
+            return error("SetBestChain() : Cache flush failed after connect");
 
         // Queue memory transactions to delete
         BOOST_FOREACH(const CTransaction& tx, block.vtx)
