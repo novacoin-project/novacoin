@@ -446,7 +446,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
                 }
                 else
                     printf("AddToWallet() : found %s in block %s not in index\n",
-                           wtxIn.GetHash().ToString().substr(0,10).c_str(),
+                           hash.ToString().substr(0,10).c_str(),
                            wtxIn.hashBlock.ToString().c_str());
             }
         }
@@ -475,7 +475,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
         }
 
         //// debug print
-        printf("AddToWallet %s  %s%s\n", wtxIn.GetHash().ToString().substr(0,10).c_str(), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
+        printf("AddToWallet %s  %s%s\n", hash.ToString().substr(0,10).c_str(), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
 
         // Write to disk
         if (fInsertedNew || fUpdated)
@@ -509,7 +509,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
 
         if ( !strCmd.empty())
         {
-            boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
+            boost::replace_all(strCmd, "%s", hash.GetHex());
             boost::thread t(runCommand, strCmd); // thread runs free
         }
 
@@ -2239,6 +2239,7 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool
 
         for (unsigned int n=0; n < pcoin->vout.size(); n++)
         {
+            bool fUpdated = false;
             if (IsMine(pcoin->vout[n]))
             {
                 if (pcoin->IsSpent(n) && coins.IsAvailable(n))
@@ -2249,6 +2250,7 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool
                     nBalanceInQuestion += pcoin->vout[n].nValue;
                     if (!fCheckOnly)
                     {
+                        fUpdated = true;
                         pcoin->MarkUnspent(n);
                         pcoin->WriteToDisk();
                     }
@@ -2261,22 +2263,26 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool
                     nBalanceInQuestion += pcoin->vout[n].nValue;
                     if (!fCheckOnly)
                     {
+                        fUpdated = true;
                         pcoin->MarkSpent(n);
                         pcoin->WriteToDisk();
                     }
                 }
 
-                NotifyTransactionChanged(this, hash, CT_UPDATED);
+                if (fUpdated)
+                    NotifyTransactionChanged(this, hash, CT_UPDATED);
             }
         }
 
         if((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetDepthInMainChain() == 0)
         {
-            printf("FixSpentCoins %s orphaned generation tx %s\n", fCheckOnly ? "found" : "removed", hash.ToString().c_str());
             if (!fCheckOnly)
             {
                 EraseFromWallet(hash);
+                NotifyTransactionChanged(this, hash, CT_DELETED);
             }
+
+            printf("FixSpentCoins %s orphaned generation tx %s\n", fCheckOnly ? "found" : "removed", hash.ToString().c_str());
         }
     }
 }

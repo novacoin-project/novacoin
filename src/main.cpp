@@ -1677,7 +1677,7 @@ bool CBlock::DisconnectBlock(CBlockIndex *pindex, CCoinsViewCache &view)
         }
 
         // clean up wallet after disconnecting coinstake
-        SyncWithWallets(vtx[i].GetHash(), vtx[i], this, true, false);
+        SyncWithWallets(vtx[i].GetHash(), vtx[i], this, false, false);
     }
 
     // move best block pointer to prevout block
