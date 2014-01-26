@@ -1289,7 +1289,7 @@ Value gettransaction(const Array& params, bool fHelp)
     {
         CTransaction tx;
         uint256 hashBlock = 0;
-        if (GetTransaction(hash, tx, hashBlock))
+        if (GetTransaction(hash, tx, hashBlock, true))
         {
             TxToJSON(tx, 0, entry);
             if (hashBlock == 0)
@@ -1644,7 +1644,7 @@ Value validatepubkey(const Array& params, bool fHelp)
     return ret;
 }
 
-// ppcoin: reserve balance from being staked for network protection
+// reserve balance from being staked for network protection
 Value reservebalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
@@ -1686,7 +1686,7 @@ Value reservebalance(const Array& params, bool fHelp)
 }
 
 
-// ppcoin: check wallet integrity
+// check wallet integrity
 Value checkwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -1709,7 +1709,7 @@ Value checkwallet(const Array& params, bool fHelp)
 }
 
 
-// ppcoin: repair wallet
+// repair wallet
 Value repairwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -1731,7 +1731,7 @@ Value repairwallet(const Array& params, bool fHelp)
     return result;
 }
 
-// NovaCoin: resend unconfirmed wallet transactions
+// resend unconfirmed wallet transactions
 Value resendtx(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -1745,7 +1745,7 @@ Value resendtx(const Array& params, bool fHelp)
     return Value::null;
 }
 
-// ppcoin: make a public-private key pair
+// make a public-private key pair
 Value makekeypair(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -1757,7 +1757,7 @@ Value makekeypair(const Array& params, bool fHelp)
     string strPrefix = "";
     if (params.size() > 0)
         strPrefix = params[0].get_str();
- 
+
     CKey key;
     key.MakeNewKey(false);
 

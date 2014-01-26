@@ -5,7 +5,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "kernel.h"
-#include "txdb.h"
+#include "db.h"
 
 using namespace std;
 
@@ -18,11 +18,7 @@ typedef std::map<int, unsigned int> MapModifierCheckpoints;
 static std::map<int, unsigned int> mapStakeModifierCheckpoints =
     boost::assign::map_list_of
         ( 0, 0x0e00670bu )
-        ( 9690, 0x97dcdafau )
-        ( 12661, 0x5d84115du )
-        ( 37092, 0xd230afccu )
-        ( 44200, 0x05370164u )
-        ( 65000, 0xc8e7be6au )
+        ( 68600, 0x73a8cc4cu )
     ;
 
 // Hard checkpoints of stake modifiers to ensure they are deterministic (testNet)
@@ -274,14 +270,20 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
 //   quantities so as to generate blocks faster, degrading the system back into
 //   a proof-of-work situation.
 //
-bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned int nTxPrevOffset, const CTransaction& txPrev, const COutPoint& prevout, unsigned int nTimeTx, uint256& hashProofOfStake, uint256& targetProofOfStake, bool fPrintProofOfStake)
+bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned int nTxPrevOffset, const CTransaction& txPrev, const COutPoint& prevout, unsigned int nTimeTx, uint256& hashProofOfStake, uint256& targetProofOfStake, bool& fFatal, bool fMiner, bool fPrintProofOfStake)
 {
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
+    {
+        fFatal = true;
         return error("CheckStakeKernelHash() : nTime violation");
+    }
 
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
     if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
+    {
+        fFatal = true;
         return error("CheckStakeKernelHash() : min age violation");
+    }
 
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
@@ -304,6 +306,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
 
     ss << nTimeBlockFrom << nTxPrevOffset << txPrev.nTime << prevout.n << nTimeTx;
     hashProofOfStake = Hash(ss.begin(), ss.end());
+
     if (fPrintProofOfStake)
     {
         printf("CheckStakeKernelHash() : using modifier 0x%016"PRI64x" at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
@@ -319,7 +322,11 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
 
     // Now check if proof-of-stake hash meets target protocol
     if (CBigNum(hashProofOfStake) > bnCoinDayWeight * bnTargetPerCoinDay)
-        return false;
+    {
+        fFatal = true;
+        return !fMiner? error("CheckStakeKernelHash() : proof-of-stake not meeting target") : false;
+    }
+
     if (fDebug && !fPrintProofOfStake)
     {
         printf("CheckStakeKernelHash() : using modifier 0x%016"PRI64x" at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
@@ -336,32 +343,65 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hashProofOfStake, uint256& targetProofOfStake)
+bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hashProofOfStake, uint256& targetProofOfStake, bool& fFatal, bool fMiner)
 {
     if (!tx.IsCoinStake())
+    {
+        fFatal = true;
         return error("CheckProofOfStake() : called on non-coinstake %s", tx.GetHash().ToString().c_str());
+    }
 
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
     const CTxIn& txin = tx.vin[0];
+    unsigned nTxPos;
 
-    // First try finding the previous transaction in database
-    CTxDB txdb("r");
     CTransaction txPrev;
-    CTxIndex txindex;
-    if (!txPrev.ReadFromDisk(txdb, txin.prevout, txindex))
-        return tx.DoS(1, error("CheckProofOfStake() : INFO: read txPrev failed"));  // previous transaction not in main chain, may occur during initial download
+    CCoins coins;
+    CCoinsViewCache &view = *pcoinsTip;
 
-    // Verify signature
-    if (!VerifySignature(txPrev, tx, 0, true, 0))
-        return tx.DoS(100, error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str()));
+    if (!view.GetCoinsReadOnly(txin.prevout.hash, coins))
+        return fDebug? error("CheckProofOfStake() : INFO: read coins for txPrev failed") : false;  // previous transaction not in main chain, may occur during initial download
 
-    // Read block header
+    CBlockIndex* pindex = FindBlockByHeight(coins.nHeight);
+
+    // Read block and scan it to find txPrev
     CBlock block;
-    if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
+    if (block.ReadFromDisk(pindex)) {
+        nTxPos = GetSerializeSize(CBlock(), SER_DISK, CLIENT_VERSION) - (2 * GetSizeOfCompactSize(0)) + GetSizeOfCompactSize(block.vtx.size());
+        BOOST_FOREACH(const CTransaction &tx, block.vtx) {
+            if (tx.GetHash() == txin.prevout.hash) {
+                txPrev = tx;
+                break;
+            }
+            nTxPos += tx.GetSerializeSize(SER_DISK, CLIENT_VERSION);
+        }
+    }
+    else
         return fDebug? error("CheckProofOfStake() : read block failed") : false; // unable to read block of previous transaction
 
-    if (!CheckStakeKernelHash(nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, txPrev, txin.prevout, tx.nTime, hashProofOfStake, targetProofOfStake, fDebug))
-        return tx.DoS(1, error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s", tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str())); // may occur during initial download or if behind on block chain sync
+    const CTxOut& txout = txPrev.vout[txin.prevout.n];
+
+    // Check transaction consistency
+    if (txin.prevout.n >= txPrev.vout.size())
+    {
+        fFatal = true;
+        return error("CheckProofOfStake() : invalid prevout found in coinstake %s", tx.GetHash().ToString().c_str());
+    }
+
+    // Verify script
+    if (!VerifyScript(txin.scriptSig, txout.scriptPubKey, tx, 0, true, false, 0))
+    {
+        fFatal = true;
+        return error("CheckProofOfStake() : VerifyScript failed on coinstake %s", tx.GetHash().ToString().c_str());
+    }
+
+    if (!CheckStakeKernelHash(nBits, block, nTxPos, txPrev, txin.prevout, tx.nTime, hashProofOfStake, targetProofOfStake, fFatal, fMiner, fDebug))
+    {
+        if (fFatal)
+            return false;
+        // may occur during initial download or if behind on block chain sync
+        return fDebug? error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s", tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str()) : false;
+    }
 
     return true;
 }

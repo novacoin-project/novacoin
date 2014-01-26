@@ -17,10 +17,8 @@ class CAddress;
 class CAddrMan;
 class CBlockLocator;
 class CDiskBlockIndex;
-class CDiskTxPos;
 class CMasterKey;
 class COutPoint;
-class CTxIndex;
 class CWallet;
 class CWalletTx;
 
@@ -37,7 +35,6 @@ private:
     bool fDbEnvInit;
     bool fMockDb;
     boost::filesystem::path pathEnv;
-    std::string strPath;
 
     void EnvShutdown();
 
@@ -105,6 +102,7 @@ protected:
     explicit CDB(const char* pszFile, const char* pszMode="r+");
     ~CDB() { Close(); }
 public:
+    void Flush();
     void Close();
 private:
     CDB(const CDB&);
@@ -310,7 +308,6 @@ public:
 
     bool static Rewrite(const std::string& strFile, const char* pszSkip = NULL);
 };
-
 
 /** Access to the (IP) address database (peers.dat) */
 class CAddrDB

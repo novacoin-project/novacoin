@@ -60,6 +60,8 @@ void StartShutdown()
 #endif
 }
 
+static CCoinsViewDB *pcoinsdbview;
+
 void Shutdown(void* parg)
 {
     static CCriticalSection cs_Shutdown;
@@ -82,9 +84,15 @@ void Shutdown(void* parg)
     {
         fShutdown = true;
         nTransactionsUpdated++;
-//        CTxDB().Close();
         bitdb.Flush(false);
         StopNode();
+        {
+            LOCK(cs_main);
+            pcoinsTip->Flush();
+            pblocktree->Flush();
+            delete pcoinsTip;
+            delete pcoinsdbview;
+        }
         bitdb.Flush(true);
         boost::filesystem::remove(GetPidFile());
         UnregisterWallet(pwalletMain);
@@ -696,20 +704,15 @@ bool AppInit2()
         return InitError(msg);
     }
 
-    if (GetBoolArg("-loadblockindextest"))
-    {
-        CTxDB txdb("r");
-        txdb.LoadBlockIndex();
-        PrintBlockTree();
-        return false;
-    }
-
     uiInterface.InitMessage(_("Loading block index..."));
     printf("Loading block index...\n");
     nStart = GetTimeMillis();
+    pblocktree = new CBlockTreeDB();
+    pcoinsdbview = new CCoinsViewDB();
+    pcoinsTip = new CCoinsViewCache(*pcoinsdbview);
+
     if (!LoadBlockIndex())
         return InitError(_("Error loading blkindex.dat"));
-
 
     // as LoadBlockIndex can take several minutes, it's possible the user
     // requested to kill bitcoin-qt during the last operation. If so, exit.
@@ -844,6 +847,11 @@ bool AppInit2()
     }
 
     // ********************************************************* Step 9: import blocks
+
+    // scan for better chains in the block chain database, that are not yet connected in the active best chain
+    uiInterface.InitMessage(_("Importing blocks from block database..."));
+    if (!ConnectBestBlock())
+        strErrors << "Failed to connect best block";
 
     if (mapArgs.count("-loadblock"))
     {

@@ -4,10 +4,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "db.h"
-#include "net.h"
 #include "util.h"
 #include "main.h"
-#include "ui_interface.h"
+#include "kernel.h"
+#include "checkpoints.h"
+#include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
@@ -39,13 +40,11 @@ void CDBEnv::EnvShutdown()
     if (ret != 0)
         printf("EnvShutdown exception: %s (%d)\n", DbEnv::strerror(ret), ret);
     if (!fMockDb)
-        DbEnv(0).remove(strPath.c_str(), 0);
+        DbEnv(0).remove(GetDataDir().string().c_str(), 0);
 }
 
 CDBEnv::CDBEnv() : dbenv(DB_CXX_NO_EXCEPTIONS)
 {
-    fDbEnvInit = false;
-    fMockDb = false;
 }
 
 CDBEnv::~CDBEnv()
@@ -68,7 +67,6 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
 
     pathEnv = pathEnv_;
     filesystem::path pathDataDir = pathEnv;
-    strPath = pathDataDir.string();
     filesystem::path pathLogDir = pathDataDir / "database";
     filesystem::create_directory(pathLogDir);
     filesystem::path pathErrorFile = pathDataDir / "db.log";
@@ -83,19 +81,15 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     dbenv.set_cachesize(nDbCache / 1024, (nDbCache % 1024)*1048576, 1);
     dbenv.set_lg_bsize(1048576);
     dbenv.set_lg_max(10485760);
-
-    // Bugfix: Bump lk_max_locks default to 537000, to safely handle reorgs with up to 5 blocks reversed
-    // dbenv.set_lk_max_locks(10000);
-    dbenv.set_lk_max_locks(537000);
-
-    dbenv.set_lk_max_objects(10000);
+    dbenv.set_lk_max_locks(40000);
+    dbenv.set_lk_max_objects(40000);
     dbenv.set_errfile(fopen(pathErrorFile.string().c_str(), "a")); /// debug
     dbenv.set_flags(DB_AUTO_COMMIT, 1);
     dbenv.set_flags(DB_TXN_WRITE_NOSYNC, 1);
 #ifdef DB_LOG_AUTO_REMOVE
     dbenv.log_set_config(DB_LOG_AUTO_REMOVE, 1);
 #endif
-    int ret = dbenv.open(strPath.c_str(),
+    int ret = dbenv.open(pathDataDir.string().c_str(),
                      DB_CREATE     |
                      DB_INIT_LOCK  |
                      DB_INIT_LOG   |
@@ -110,7 +104,6 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
 
     fDbEnvInit = true;
     fMockDb = false;
-
     return true;
 }
 
@@ -257,7 +250,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
 
             ret = pdb->open(NULL,      // Txn pointer
                             fMockDb ? NULL : pszFile,   // Filename
-                            "main",    // Logical db name
+                            fMockDb ? pszFile : "main", // Logical db name
                             DB_BTREE,  // Database type
                             nFlags,    // Flags
                             0);
@@ -286,20 +279,16 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
 
 static bool IsChainFile(std::string strFile)
 {
-    if (strFile == "blkindex.dat")
+    if (strFile == "coins.dat" || strFile == "blktree.dat")
         return true;
 
     return false;
 }
 
-void CDB::Close()
+void CDB::Flush()
 {
-    if (!pdb)
-        return;
     if (activeTxn)
-        activeTxn->abort();
-    activeTxn = NULL;
-    pdb = NULL;
+        return;
 
     // Flush database activity from memory pool to disk log
     unsigned int nMinutes = 0;
@@ -311,6 +300,18 @@ void CDB::Close()
         nMinutes = 5;
 
     bitdb.dbenv.txn_checkpoint(nMinutes ? GetArg("-dblogsize", 100)*1024 : 0, nMinutes, 0);
+}
+
+void CDB::Close()
+{
+    if (!pdb)
+        return;
+    if (activeTxn)
+        activeTxn->abort();
+    activeTxn = NULL;
+    pdb = NULL;
+
+    Flush();
 
     {
         LOCK(bitdb.cs_db);
@@ -542,8 +543,6 @@ bool CAddrDB::Read(CAddrMan& addr)
     // use file size to size memory buffer
     int fileSize = GetFilesize(filein);
     int dataSize = fileSize - sizeof(uint256);
-    //Don't try to resize to a negative number if file is small
-    if ( dataSize < 0 ) dataSize = 0;
     vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
@@ -565,21 +564,19 @@ bool CAddrDB::Read(CAddrMan& addr)
     if (hashIn != hashTmp)
         return error("CAddrman::Read() : checksum mismatch; data corrupted");
 
+    // de-serialize address data
     unsigned char pchMsgTmp[4];
     try {
-        // de-serialize file header (pchMessageStart magic number) and
         ssPeers >> FLATDATA(pchMsgTmp);
-
-        // verify the network matches ours
-        if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
-            return error("CAddrman::Read() : invalid network magic number");
-
-        // de-serialize address data into one CAddrMan object
         ssPeers >> addr;
     }
     catch (std::exception &e) {
         return error("CAddrman::Read() : I/O error or stream data corrupted");
     }
+
+    // finally, verify the network matches ours
+    if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
+        return error("CAddrman::Read() : invalid network magic number");
 
     return true;
 }
