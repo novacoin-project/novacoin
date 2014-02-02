@@ -911,23 +911,26 @@ void CWalletTx::RelayWalletTransaction()
     }
 }
 
-void CWallet::ResendWalletTransactions()
+void CWallet::ResendWalletTransactions(bool fForce)
 {
-    // Do this infrequently and randomly to avoid giving away
-    // that these are our transactions.
-    static int64 nNextTime;
-    if (GetTime() < nNextTime)
-        return;
-    bool fFirst = (nNextTime == 0);
-    nNextTime = GetTime() + GetRand(30 * 60);
-    if (fFirst)
-        return;
+    if (!fForce)
+    {
+        // Do this infrequently and randomly to avoid giving away
+        // that these are our transactions.
+        static int64 nNextTime;
+        if (GetTime() < nNextTime)
+            return;
+        bool fFirst = (nNextTime == 0);
+        nNextTime = GetTime() + GetRand(30 * 60);
+        if (fFirst)
+            return;
 
-    // Only do it if there's been a new block since last time
-    static int64 nLastTime;
-    if (nTimeBestReceived < nLastTime)
-        return;
-    nLastTime = GetTime();
+        // Only do it if there's been a new block since last time
+        static int64 nLastTime;
+        if (nTimeBestReceived < nLastTime)
+            return;
+        nLastTime = GetTime();
+    }
 
     // Rebroadcast any of our txes that aren't in a block yet
     printf("ResendWalletTransactions()\n");
