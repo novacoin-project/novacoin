@@ -9,10 +9,7 @@
 using namespace std;
 
 void static BatchWriteCoins(CLevelDBBatch &batch, const uint256 &hash, const CCoins &coins) {
-    if (coins.IsPruned())
-        batch.Erase(make_pair('c', hash));
-    else
-        batch.Write(make_pair('c', hash), coins);
+    batch.Write(make_pair('c', hash), coins);
 }
 
 void static BatchWriteHashBestChain(CLevelDBBatch &batch, const uint256 &hash) {
@@ -134,11 +131,15 @@ bool CCoinsViewDB::GetStats(CCoinsStats &stats) {
                 ssValue >> coins;
                 uint256 txhash;
                 ssKey >> txhash;
-
-                stats.nTransactions++;
-                BOOST_FOREACH(const CTxOut &out, coins.vout) {
-                    if (!out.IsNull())
-                        stats.nTransactionOutputs++;
+                if (!coins.IsPruned()) {
+                    stats.nTransactions++;
+                    BOOST_FOREACH(const CTxOut &out, coins.vout) {
+                        if (!out.IsNull())
+                            stats.nTransactionOutputs++;
+                    }
+                }
+                else {
+                    stats.nPrunedTransactions++;
                 }
                 stats.nSerializedSize += 32 + slValue.size();
             }

@@ -320,7 +320,8 @@ Value gettxoutsetinfo(const Array& params, bool fHelp)
     CCoinsStats stats;
     if (pcoinsTip->GetStats(stats)) {
         ret.push_back(Pair("bestblock", pcoinsTip->GetBestBlock()->GetBlockHash().GetHex()));
-        ret.push_back(Pair("transactions", (boost::int64_t)stats.nTransactions));
+        ret.push_back(Pair("availabletx", (boost::int64_t)stats.nTransactions));
+        ret.push_back(Pair("prunedtx", (boost::int64_t)stats.nPrunedTransactions));
         ret.push_back(Pair("txouts", (boost::int64_t)stats.nTransactionOutputs));
         ret.push_back(Pair("bytes_serialized", (boost::int64_t)stats.nSerializedSize));
     }
