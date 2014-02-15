@@ -34,6 +34,8 @@ unsigned int nDerivationMethodIndex;
 unsigned int nMinerSleep;
 bool fUseFastIndex;
 bool fUseFastStakeMiner;
+bool fConfChange;
+bool fEnforceCanonical;
 enum Checkpoints::CPMode CheckpointsMode;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -298,6 +300,8 @@ std::string HelpMessage()
         "  -blocknotify=<cmd>     " + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
         "  -walletnotify=<cmd>    " + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n" +
         "  -upgradewallet         " + _("Upgrade wallet to latest format") + "\n" +
+        "  -confchange            " + _("Require a confirmations for change (default: 0)") + "\n" +
+        "  -enforcecanonical      " + _("Enforce transaction scripts to use canonical PUSH operators (default: 1)") + "\n" +
         "  -keypool=<n>           " + _("Set key pool size to <n> (default: 100)") + "\n" +
         "  -rescan                " + _("Rescan the block chain for missing wallet transactions") + "\n" +
         "  -salvagewallet         " + _("Attempt to recover private keys from a corrupt wallet.dat") + "\n" +
@@ -476,6 +480,9 @@ bool AppInit2()
         if (nTransactionFee > 0.25 * COIN)
             InitWarning(_("Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction."));
     }
+
+    fConfChange = GetBoolArg("-confchange", false);
+    fEnforceCanonical = GetBoolArg("-enforcecanonical", true);
 
     if (mapArgs.count("-mininput"))
     {

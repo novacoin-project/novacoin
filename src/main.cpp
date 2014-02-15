@@ -399,25 +399,38 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 
 bool CTransaction::IsStandard() const
 {
-    if (nVersion > CTransaction::CURRENT_VERSION)
+    if (nVersion > CTransaction::CURRENT_VERSION) {
         return false;
+    }
 
     BOOST_FOREACH(const CTxIn& txin, vin)
     {
         // Biggest 'standard' txin is a 3-signature 3-of-3 CHECKMULTISIG
         // pay-to-script-hash, which is 3 ~80-byte signatures, 3
         // ~65-byte public keys, plus a few script ops.
-        if (txin.scriptSig.size() > 500)
+        if (txin.scriptSig.size() > 500) {
             return false;
-        if (!txin.scriptSig.IsPushOnly())
+        }
+        if (!txin.scriptSig.IsPushOnly()) {
             return false;
+        }
+        if (fEnforceCanonical && !txin.scriptSig.HasCanonicalPushes()) {
+            return false;
+        }
     }
+
     BOOST_FOREACH(const CTxOut& txout, vout) {
-        if (!::IsStandard(txout.scriptPubKey))
+        if (!::IsStandard(txout.scriptPubKey)) {
             return false;
-        if (txout.nValue == 0)
+        }
+        if (txout.nValue == 0) {
             return false;
+        }
+        if (fEnforceCanonical && !txout.scriptPubKey.HasCanonicalPushes()) {
+            return false;
+        }
     }
+
     return true;
 }
 

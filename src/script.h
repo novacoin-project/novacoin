@@ -538,6 +538,8 @@ public:
         return true;
     }
 
+    // Called by CTransaction::IsStandard.
+    bool HasCanonicalPushes() const;
 
     void SetDestination(const CTxDestination& address);
     void SetMultisig(int nRequired, const std::vector<CKey>& keys);
