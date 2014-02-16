@@ -38,7 +38,7 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
     entry.push_back(Pair("confirmations", confirms));
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
         entry.push_back(Pair("generated", true));
-    if (confirms)
+    if (confirms > 0)
     {
         entry.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
         entry.push_back(Pair("blockindex", wtx.nIndex));
@@ -1025,7 +1025,13 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
             Object entry;
             entry.push_back(Pair("account", strSentAccount));
             entry.push_back(Pair("address", CBitcoinAddress(s.first).ToString()));
-            entry.push_back(Pair("category", "send"));
+
+            if (wtx.GetDepthInMainChain() < 0) {
+                entry.push_back(Pair("category", "conflicted"));
+            } else {
+                entry.push_back(Pair("category", "send"));
+            }
+
             entry.push_back(Pair("amount", ValueFromAmount(-s.second)));
             entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
             if (fLong)
@@ -1056,8 +1062,13 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                     else
                         entry.push_back(Pair("category", "generate"));
                 }
-                else
-                    entry.push_back(Pair("category", "receive"));
+                else {
+                    if (wtx.GetDepthInMainChain() < 0) {
+                        entry.push_back(Pair("category", "conflicted"));
+                    } else {
+                        entry.push_back(Pair("category", "receive"));
+                    }
+                }
                 entry.push_back(Pair("amount", ValueFromAmount(r.second)));
                 if (fLong)
                     WalletTxToJSON(wtx, entry);
@@ -1288,6 +1299,11 @@ Value gettransaction(const Array& params, bool fHelp)
         Array details;
         ListTransactions(pwalletMain->mapWallet[hash], "*", 0, false, details);
         entry.push_back(Pair("details", details));
+
+        CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+        ssTx << wtx;
+        string strHex = HexStr(ssTx.begin(), ssTx.end());
+        entry.push_back(Pair("hex", strHex));
     }
     else
     {

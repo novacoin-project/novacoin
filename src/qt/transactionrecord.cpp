@@ -175,29 +175,27 @@ void TransactionRecord::updateStatus(const CWalletTx &wtx)
 
     if (!wtx.IsFinal())
     {
-        if (wtx.nLockTime < LOCKTIME_THRESHOLD)
-        {
+        if (wtx.nLockTime < LOCKTIME_THRESHOLD) {
             status.status = TransactionStatus::OpenUntilBlock;
             status.open_for = nBestHeight - wtx.nLockTime;
         }
-        else
-        {
+        else {
             status.status = TransactionStatus::OpenUntilDate;
             status.open_for = wtx.nLockTime;
         }
     }
     else
     {
-        if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
-        {
+        if (status.depth < 0) {
+            status.status = TransactionStatus::Conflicted;
+        }
+        else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0) {
             status.status = TransactionStatus::Offline;
         }
-        else if (status.depth < NumConfirmations)
-        {
+        else if (status.depth < NumConfirmations) {
             status.status = TransactionStatus::Unconfirmed;
         }
-        else
-        {
+        else {
             status.status = TransactionStatus::HaveConfirmations;
         }
     }

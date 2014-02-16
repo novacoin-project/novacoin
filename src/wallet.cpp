@@ -1022,23 +1022,32 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
         {
             const CWalletTx* pcoin = &(*it).second;
 
-            if (!pcoin->IsFinal())
+            if (!pcoin->IsFinal()) {
                 continue;
+            }
 
-            if (fOnlyConfirmed && !pcoin->IsTrusted())
+            if (fOnlyConfirmed && !pcoin->IsTrusted()) {
                 continue;
+            }
 
-            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0) {
                 continue;
+            }
 
-            if(pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
+            int nDepth = pcoin->GetDepthInMainChain();
+            if (nDepth < 0) {
                 continue;
+            }
 
-            for (unsigned int i = 0; i < pcoin->vout.size(); i++)
+            if(pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0) {
+                continue;
+            }
+
+            for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 if (!(pcoin->IsSpent(i)) && IsMine(pcoin->vout[i]) && pcoin->vout[i].nValue >= nMinimumInputValue &&
                 (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
-                    vCoins.push_back(COutput(pcoin, i, pcoin->GetDepthInMainChain()));
-
+                    vCoins.push_back(COutput(pcoin, i, nDepth));
+            }
         }
     }
 }
@@ -1046,7 +1055,6 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
 void CWallet::AvailableCoinsMinConf(vector<COutput>& vCoins, int nConf) const
 {
     vCoins.clear();
-
     {
         LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
