@@ -82,6 +82,12 @@ private:
     // the maximum wallet format version: memory-only variable that specifies to what version this wallet may be upgraded
     int nWalletMaxVersion;
 
+    // Used to detect and report conflicted transactions:
+    typedef std::multimap<COutPoint, uint256> TxConflicts;
+    TxConflicts mapTxConflicts;
+    void AddToConflicts(const uint256& wtxhash);
+    void SyncMetaData(std::pair<TxConflicts::iterator, TxConflicts::iterator>);
+
 public:
     mutable CCriticalSection cs_wallet;
 
@@ -172,7 +178,7 @@ public:
     TxItems OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount = "");
 
     void MarkDirty();
-    bool AddToWallet(const CWalletTx& wtxIn);
+    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet=false);
     bool AddToWalletIfInvolvingMe(const uint256 &hash, const CTransaction& tx, const CBlock* pblock, bool fUpdate = false, bool fFindBlock = false);
     bool EraseFromWallet(uint256 hash);
     void WalletUpdateSpent(const CTransaction& prevout, bool fBlock = false);
@@ -311,6 +317,9 @@ public:
 
     // get the current wallet format (the oldest client version guaranteed to understand this wallet)
     int GetVersion() { return nWalletVersion; }
+
+    // get wallet transactions that conflict with given transaction (spend same outputs)
+    std::set<uint256> GetConflicts(const uint256& txid) const;
 
     void FixSpentCoins(int& nMismatchSpent, int64& nBalanceInQuestion, bool fCheckOnly = false);
     void DisableTransaction(const CTransaction &tx);
@@ -702,6 +711,8 @@ public:
 
     bool AcceptWalletTransaction(bool fCheckInputs=true);
     void RelayWalletTransaction();
+
+    std::set<uint256> GetConflicts() const;
 };
 
 
