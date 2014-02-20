@@ -465,6 +465,11 @@ public:
         return SerializeHash(*this);
     }
 
+    uint256 GetMetaHash() const
+    {
+        return SignatureHash(CScript(), *this, 0, SIGHASH_ALL);
+    }
+
     bool IsFinal(int nBlockHeight=0, int64 nBlockTime=0) const
     {
         // Time based nLockTime implemented in 0.1.6

@@ -45,7 +45,9 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
         entry.push_back(Pair("blocktime", (boost::int64_t)(mapBlockIndex[wtx.hashBlock]->nTime)));
     }
     uint256 hash = wtx.GetHash();
+    uint256 metahash = wtx.GetMetaHash();
     entry.push_back(Pair("txid", hash.GetHex()));
+    entry.push_back(Pair("metahash", metahash.GetHex()));
     Array conflicts;
     BOOST_FOREACH(const uint256& conflict, wtx.GetConflicts())
         conflicts.push_back(conflict.GetHex());
