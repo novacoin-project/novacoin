@@ -44,6 +44,9 @@ enum
 
 // Mandatory script verification flags that all new blocks must comply with for
 // them to be valid. (but old blocks may not comply with)
+//
+// Failing one of these tests may trigger a DoS ban - see ConnectInputs() for
+// details.
 static const unsigned int MANDATORY_SCRIPT_VERIFY_FLAGS = SCRIPT_VERIFY_NONE;
 
 // Standard script verification flags that standard transactions will comply
@@ -51,6 +54,9 @@ static const unsigned int MANDATORY_SCRIPT_VERIFY_FLAGS = SCRIPT_VERIFY_NONE;
 // blocks and we must accept those blocks.
 static const unsigned int STANDARD_SCRIPT_VERIFY_FLAGS = MANDATORY_SCRIPT_VERIFY_FLAGS |
                                                          SCRIPT_VERIFY_NULLDUMMY;
+
+// For convenience, standard but not mandatory verify flags.
+static const unsigned int STANDARD_NOT_MANDATORY_VERIFY_FLAGS = STANDARD_SCRIPT_VERIFY_FLAGS & ~MANDATORY_SCRIPT_VERIFY_FLAGS;
 
 enum txnouttype
 {

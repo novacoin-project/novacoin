@@ -1375,6 +1375,23 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
                 // Verify signature
                 if (!VerifySignature(txPrev, *this, i, flags, 0))
                 {
+                    if (flags & STANDARD_NOT_MANDATORY_VERIFY_FLAGS) {
+                        // Check whether the failure was caused by a
+                        // non-mandatory script verification check, such as
+                        // non-null dummy arguments;
+                        // if so, don't trigger DoS protection to
+                        // avoid splitting the network between upgraded and
+                        // non-upgraded nodes.
+                        if (VerifySignature(txPrev, *this, i, flags & ~STANDARD_NOT_MANDATORY_VERIFY_FLAGS, 0))
+                            return error("ConnectInputs() : %s non-mandatory VerifySignature failed", GetHash().ToString().c_str());
+                    }
+                    // Failures of other flags indicate a transaction that is
+                    // invalid in new blocks, e.g. a invalid P2SH. We DoS ban
+                    // such nodes as they are not following the protocol. That
+                    // said during an upgrade careful thought should be taken
+                    // as to the correct behavior - we may want to continue
+                    // peering with non-upgraded nodes even after a soft-fork
+                    // super-majority vote has passed.
                     return DoS(100,error("ConnectInputs() : %s VerifySignature failed", GetHash().ToString().c_str()));
                 }
             }
