@@ -2777,6 +2777,28 @@ bool CBlock::CheckLegacySignature() const
     return false;
 }
 
+// entropy bit for stake modifier if chosen by modifier
+unsigned int CBlock::GetStakeEntropyBit(unsigned int nTime) const
+{
+    // Protocol switch at novacoin block #9689
+    if (nTime >= ENTROPY_SWITCH_TIME || fTestNet)
+    {
+        // Take last bit of block hash as entropy bit
+        unsigned int nEntropyBit = ((GetHash().Get64()) & 1llu);
+        if (fDebug && GetBoolArg("-printstakemodifier"))
+            printf("GetStakeEntropyBit: nTime=%u hashBlock=%s nEntropyBit=%u\n", nTime, GetHash().ToString().c_str(), nEntropyBit);
+        return nEntropyBit;
+    }
+    // Before novacoin block #9689 - old protocol
+    uint160 hashSig = Hash160(vchBlockSig);
+    if (fDebug && GetBoolArg("-printstakemodifier"))
+        printf("GetStakeEntropyBit: hashSig=%s", hashSig.ToString().c_str());
+    hashSig >>= 159; // take the first bit of the hash
+    if (fDebug && GetBoolArg("-printstakemodifier"))
+        printf(" entropybit=%"PRI64d"\n", hashSig.Get64());
+    return hashSig.Get64();
+}
+
 bool CheckDiskSpace(uint64 nAdditionalBytes)
 {
     uint64 nFreeBytesAvailable = filesystem::space(GetDataDir()).available;

@@ -1296,29 +1296,9 @@ public:
 
     void UpdateTime(const CBlockIndex* pindexPrev);
 
-    // ppcoin: entropy bit for stake modifier if chosen by modifier
-    unsigned int GetStakeEntropyBit(unsigned int nTime) const
-    {
-        // Protocol switch to support p2pool at novacoin block #9689
-        if (nTime >= ENTROPY_SWITCH_TIME || fTestNet)
-        {
-            // Take last bit of block hash as entropy bit
-            unsigned int nEntropyBit = ((GetHash().Get64()) & 1llu);
-            if (fDebug && GetBoolArg("-printstakemodifier"))
-                printf("GetStakeEntropyBit: nTime=%u hashBlock=%s nEntropyBit=%u\n", nTime, GetHash().ToString().c_str(), nEntropyBit);
-            return nEntropyBit;
-        }
-        // Before novacoin block #9689 - old protocol
-        uint160 hashSig = Hash160(vchBlockSig);
-        if (fDebug && GetBoolArg("-printstakemodifier"))
-            printf("GetStakeEntropyBit: hashSig=%s", hashSig.ToString().c_str());
-        hashSig >>= 159; // take the first bit of the hash
-        if (fDebug && GetBoolArg("-printstakemodifier"))
-            printf(" entropybit=%"PRI64d"\n", hashSig.Get64());
-        return hashSig.Get64();
-    }
+    unsigned int GetStakeEntropyBit(unsigned int nTime) const;
 
-    // ppcoin: two types of block: proof-of-work or proof-of-stake
+    // two types of block: proof-of-work or proof-of-stake
     bool IsProofOfStake() const
     {
         return (vtx.size() > 1 && vtx[1].IsCoinStake());
@@ -1334,7 +1314,7 @@ public:
         return IsProofOfStake()? std::make_pair(vtx[1].vin[0].prevout, vtx[1].nTime) : std::make_pair(COutPoint(), (unsigned int)0);
     }
 
-    // ppcoin: get max transaction timestamp
+    // get max transaction timestamp
     int64 GetMaxTransactionTime() const
     {
         int64 maxTransactionTime = 0;
