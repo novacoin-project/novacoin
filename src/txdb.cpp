@@ -98,6 +98,16 @@ bool CBlockTreeDB::WriteCheckpointPubKey(const string& strPubKey)
     return Write('K', strPubKey);
 }
 
+bool CBlockTreeDB::ReadModifierUpgradeTime(unsigned int& nUpgradeTime)
+{
+    return Read('M', nUpgradeTime);
+}
+
+bool CBlockTreeDB::WriteModifierUpgradeTime(const unsigned int& nUpgradeTime)
+{
+    return Write('M', nUpgradeTime);
+}
+
 bool CBlockTreeDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo &info) {
     return Write(make_pair('f', nFile), info);
 }

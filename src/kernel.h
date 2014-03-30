@@ -6,6 +6,12 @@
 
 #include "main.h"
 
+// ChainDB upgrade time
+extern unsigned int nModifierUpgradeTime;
+
+// Whether a given block is subject to new modifier protocol
+bool IsFixedModifierInterval(unsigned int nTimeBlock);
+
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
 extern unsigned int nModifierInterval;
 
@@ -14,7 +20,7 @@ extern unsigned int nModifierInterval;
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
 // Compute the hash modifier for proof-of-stake
-bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModifier, bool& fGeneratedStakeModifier);
+bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64& nStakeModifier, bool& fGeneratedStakeModifier);
 
 // Check whether stake kernel meets hash target
 // Sets hashProofOfStake and targetProofOfStake on success return
