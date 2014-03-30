@@ -2960,7 +2960,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="-27"/>
-        <source>How many blocks to check at startup (default: 2500, 0 = all)</source>
+        <source>How many blocks to check at startup (default: 288, 0 = all)</source>
         <translation>How many blocks to check at startup (default: 2500, 0 = all)</translation>
     </message>
     <message>
