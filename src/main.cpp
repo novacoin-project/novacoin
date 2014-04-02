@@ -419,16 +419,27 @@ bool CTransaction::IsStandard() const
         }
     }
 
+    unsigned int nDataOut = 0;
+    txnouttype whichType;
     BOOST_FOREACH(const CTxOut& txout, vout) {
-        if (!::IsStandard(txout.scriptPubKey)) {
+        if (!::IsStandard(txout.scriptPubKey, whichType)) {
             return false;
         }
-        if (txout.nValue == 0) {
-            return false;
+        if (whichType == TX_NULL_DATA)
+            nDataOut++;
+        else {
+            if (txout.nValue == 0) {
+                return false;
+            }
+            if (fEnforceCanonical && !txout.scriptPubKey.HasCanonicalPushes()) {
+                return false;
+            }
         }
-        if (fEnforceCanonical && !txout.scriptPubKey.HasCanonicalPushes()) {
-            return false;
-        }
+    }
+
+    // only one OP_RETURN txout is permitted
+    if (nDataOut > 1) {
+        return false;
     }
 
     return true;
@@ -2111,7 +2122,7 @@ bool CBlock::AddToBlockIndex(const CDiskBlockPos &pos)
     // Compute stake modifier
     uint64 nStakeModifier = 0;
     bool fGeneratedStakeModifier = false;
-    if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
+    if (!ComputeNextStakeModifier(pindexNew, nStakeModifier, fGeneratedStakeModifier))
         return error("AddToBlockIndex() : ComputeNextStakeModifier() failed");
     pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
     pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
@@ -2766,6 +2777,28 @@ bool CBlock::CheckLegacySignature() const
     return false;
 }
 
+// entropy bit for stake modifier if chosen by modifier
+unsigned int CBlock::GetStakeEntropyBit(unsigned int nTime) const
+{
+    // Protocol switch at novacoin block #9689
+    if (nTime >= ENTROPY_SWITCH_TIME || fTestNet)
+    {
+        // Take last bit of block hash as entropy bit
+        unsigned int nEntropyBit = ((GetHash().Get64()) & 1llu);
+        if (fDebug && GetBoolArg("-printstakemodifier"))
+            printf("GetStakeEntropyBit: nTime=%u hashBlock=%s nEntropyBit=%u\n", nTime, GetHash().ToString().c_str(), nEntropyBit);
+        return nEntropyBit;
+    }
+    // Before novacoin block #9689 - old protocol
+    uint160 hashSig = Hash160(vchBlockSig);
+    if (fDebug && GetBoolArg("-printstakemodifier"))
+        printf("GetStakeEntropyBit: hashSig=%s", hashSig.ToString().c_str());
+    hashSig >>= 159; // take the first bit of the hash
+    if (fDebug && GetBoolArg("-printstakemodifier"))
+        printf(" entropybit=%"PRI64d"\n", hashSig.Get64());
+    return hashSig.Get64();
+}
+
 bool CheckDiskSpace(uint64 nAdditionalBytes)
 {
     uint64 nFreeBytesAvailable = filesystem::space(GetDataDir()).available;
@@ -2912,7 +2945,7 @@ bool static LoadBlockIndexDB()
 
     // Verify blocks in the best chain
     int nCheckLevel = GetArg("-checklevel", 1);
-    int nCheckDepth = GetArg( "-checkblocks", 2500);
+    int nCheckDepth = GetArg( "-checkblocks", 288);
     if (nCheckDepth == 0)
         nCheckDepth = 1000000000; // suffices until the year 19000
     if (nCheckDepth > nBestHeight)
@@ -3039,6 +3072,11 @@ bool LoadBlockIndex(bool fAllowNew)
         // initialize synchronized checkpoint
         if (!Checkpoints::WriteSyncCheckpoint((!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet)))
             return error("LoadBlockIndex() : failed to init sync checkpoint");
+
+        // upgrade time set to zero if txdb initialized
+        if (!pblocktree->WriteModifierUpgradeTime(0))
+            return error("LoadBlockIndex() : failed to init upgrade info");
+        printf(" Upgrade Info: blocktreedb initialization\n");
     }
 
     string strPubKey = "";
@@ -3054,6 +3092,22 @@ bool LoadBlockIndex(bool fAllowNew)
 
         if ((!fTestNet) && !Checkpoints::ResetSyncCheckpoint())
             return error("LoadBlockIndex() : failed to reset sync-checkpoint");
+    }
+
+    // upgrade time set to zero if blocktreedb initialized
+    if (pblocktree->ReadModifierUpgradeTime(nModifierUpgradeTime))
+    {
+        if (nModifierUpgradeTime)
+            printf(" Upgrade Info: blocktreedb upgrade detected at timestamp %d\n", nModifierUpgradeTime);
+        else
+            printf(" Upgrade Info: no blocktreedb upgrade detected.\n");
+    }
+    else
+    {
+        nModifierUpgradeTime = GetTime();
+        printf(" Upgrade Info: upgrading blocktreedb at timestamp %u\n", nModifierUpgradeTime);
+        if (!pblocktree->WriteModifierUpgradeTime(nModifierUpgradeTime))
+            return error("LoadBlockIndex() : failed to write upgrade info");
     }
 
     return true;
@@ -3231,6 +3285,14 @@ string GetWarnings(string strFor)
     {
         nPriority = 100;
         strStatusBar = _("WARNING: Checkpoint is too old. Wait for block chain to download, or notify developers.");
+    }
+
+    // if detected unmet upgrade requirement enter safe mode
+    // Note: Modifier upgrade requires blockchain redownload if past protocol switch
+    if (IsFixedModifierInterval(nModifierUpgradeTime + 60*60*24)) // 1 day margin
+    {
+        nPriority = 5000;
+        strStatusBar = strRPC = "WARNING: Blockchain redownload required approaching or past v.0.4.4.7b6 upgrade deadline.";
     }
 
     // ppcoin: if detected invalid checkpoint enter safe mode
