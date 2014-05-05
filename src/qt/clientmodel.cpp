@@ -15,7 +15,7 @@ static const int64_t nClientStartupTime = GetTime();
 
 ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
     QObject(parent), optionsModel(optionsModel),
-    cachedNumBlocks(0), cachedNumBlocksOfPeers(0), numBlocksAtStartup(-1), pollTimer(0)
+    cachedNumBlocks(0), numBlocksAtStartup(-1), pollTimer(0)
 {
     pollTimer = new QTimer(this);
     pollTimer->setInterval(MODEL_UPDATE_DELAY);
@@ -78,15 +78,12 @@ void ClientModel::updateTimer()
     // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
     // Periodically check and update with a timer.
     int newNumBlocks = getNumBlocks();
-    int newNumBlocksOfPeers = getNumBlocksOfPeers();
 
-    if(cachedNumBlocks != newNumBlocks || cachedNumBlocksOfPeers != newNumBlocksOfPeers)
+    if(cachedNumBlocks != newNumBlocks)
     {
         cachedNumBlocks = newNumBlocks;
-        cachedNumBlocksOfPeers = newNumBlocksOfPeers;
 
-        // ensure we return the maximum of newNumBlocksOfPeers and newNumBlocks to not create weird displays in the GUI
-        emit numBlocksChanged(newNumBlocks, std::max(newNumBlocksOfPeers, newNumBlocks));
+        emit numBlocksChanged(newNumBlocks);
     }
 
     emit bytesChanged(getTotalBytesRecv(), getTotalBytesSent());
@@ -122,11 +119,6 @@ bool ClientModel::isTestNet() const
 bool ClientModel::inInitialBlockDownload() const
 {
     return IsInitialBlockDownload();
-}
-
-int ClientModel::getNumBlocksOfPeers() const
-{
-    return GetNumBlocksOfPeers();
 }
 
 QString ClientModel::getStatusBarWarnings() const
