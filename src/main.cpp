@@ -673,9 +673,17 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
         if (!tx.AreInputsStandard(mapInputs) && !fTestNet)
             return error("AcceptToMemoryPool : nonstandard transaction input");
 
-        // Note: if you modify this code to accept non-standard transactions, then
-        // you should add code here to check that the transaction does a
-        // reasonable number of ECDSA signature verifications.
+        // Check that the transaction doesn't have an excessive number of
+        // sigops, making it impossible to mine. Since the coinbase transaction
+        // itself can contain sigops MAX_TX_SIGOPS is less than
+        // MAX_BLOCK_SIGOPS; we still consider this an invalid rather than
+        // merely non-standard transaction.
+        unsigned int nSigOps = GetLegacySigOpCount(tx);
+        nSigOps += GetP2SHSigOpCount(tx, mapInputs);
+        if (nSigOps > MAX_TX_SIGOPS)
+            return tx.DoS(0,
+                          error("AcceptToMemoryPool : too many sigops %s, %d > %d",
+                                hash.ToString().c_str(), nSigOps, MAX_TX_SIGOPS));
 
         int64_t nFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
         unsigned int nSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
