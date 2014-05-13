@@ -1016,12 +1016,6 @@ static string FormatException(exception* pex, const char* pszThread)
             "UNKNOWN EXCEPTION       \n%s in %s       \n", pszModule, pszThread);
 }
 
-void LogException(exception* pex, const char* pszThread)
-{
-    string message = FormatException(pex, pszThread);
-    printf("\n%s", message.c_str());
-}
-
 void PrintException(exception* pex, const char* pszThread)
 {
     string message = FormatException(pex, pszThread);
