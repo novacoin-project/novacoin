@@ -380,6 +380,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="minimizeCoinAge">
+         <property name="toolTip">
+          <string>Whether to select the coin outputs randomly or with minimal coin age.</string>
+         </property>
+         <property name="text">
+          <string>Minimize weight consumption (experimental)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_Display">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
