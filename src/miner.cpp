@@ -278,8 +278,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[0].nTime))
                 continue;
 
-            // Simplify transaction fee - allow free = false
-            int64 nMinFee = tx.GetMinFee(nBlockSize, false, GMF_BLOCK);
+            int64 nMinFee = tx.GetMinFee(nBlockSize, true, GMF_BLOCK, nTxSize);
 
             // Skip free transactions if we're past the minimum block size:
             if (fSortedByFee && (dFeePerKb < nMinTxFee) && (nBlockSize + nTxSize >= nBlockMinSize))
