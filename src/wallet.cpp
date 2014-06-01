@@ -1474,7 +1474,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     }
 
                     // sub-cent change is moved to fee
-                    if (nChange > 0 && nChange < MIN_TXOUT_AMOUNT)
+                    if (nChange > 0 && nChange < CENT)
                     {
                         nFeeRet += nChange;
                         nChange = 0;
@@ -1535,6 +1535,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 int64 nPayFee = nTransactionFee * (1 + (int64)nBytes / 1000);
                 bool fAllowFree = CTransaction::AllowFree(dPriority);
 
+                // Disable free transactions until 1 July 2014
                 if (!fTestNet && wtxNew.nTime < FEE_SWITCH_TIME)
                 {
                     fAllowFree = false;
@@ -1851,9 +1852,9 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             return error("CreateCoinStake : exceeded coinstake size limit");
 
         // Check enough fee is paid
-        if (nMinFee < txNew.GetMinFee() - MIN_TX_FEE)
+        if (nMinFee < txNew.GetMinFee(1, false, GMF_BLOCK, nBytes, CENT) - CENT)
         {
-            nMinFee = txNew.GetMinFee() - MIN_TX_FEE;
+            nMinFee = txNew.GetMinFee(1, false, GMF_BLOCK, nBytes, CENT) - CENT;
             continue; // try signing again
         }
         else

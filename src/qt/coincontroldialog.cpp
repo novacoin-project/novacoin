@@ -489,6 +489,13 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
 
         // Min Fee
         bool fAllowFree = CTransaction::AllowFree(dPriority);
+
+        // Disable free transactions until 1 July 2014
+        if (!fTestNet && txDummy.nTime < FEE_SWITCH_TIME)
+        {
+            fAllowFree = false;
+        }
+
         int64 nMinFee = txDummy.GetMinFee(1, fAllowFree, GMF_SEND, nBytes);
 
         nPayFee = max(nFee, nMinFee);

@@ -633,15 +633,23 @@ bool CTransaction::CheckTransaction() const
 }
 
 int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
-                              enum GetMinFee_mode mode, unsigned int nBytes) const
+                              enum GetMinFee_mode mode, unsigned int nBytes, int64 nMinTxFee, int64 nMinRelayTxFee) const
 {
-    // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE
-    int64 nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
+    // Minimum fee in main network is 0.01 until 1 July 2014
+    if(!fTestNet && nTime < FEE_SWITCH_TIME)
+    {
+        nMinTxFee = nMinRelayTxFee = CENT;
+    }
+
+    // Base fee is either nMinTxFee or nMinRelayTxFee
+    int64 nBaseFee = (mode == GMF_RELAY) ? nMinRelayTxFee : nMinTxFee;
 
     unsigned int nNewBlockSize = nBlockSize + nBytes;
     int64 nMinFee = (1 + (int64)nBytes / 1000) * nBaseFee;
 
-    if (fAllowFree && nTime > FEE_SWITCH_TIME)
+    // Free transactions on main network are 
+    //    not allowed until 1 July 2014
+    if (fAllowFree && (nTime > FEE_SWITCH_TIME || fTestNet))
     {
         if (nBlockSize == 1)
         {
@@ -1550,11 +1558,13 @@ bool CTransaction::CheckInputs(CCoinsViewCache &inputs, enum CheckSig_mode csmod
             if (!GetCoinAge(nCoinAge))
                 return error("CheckInputs() : %s unable to get coin age for coinstake", GetHash().ToString().substr(0,10).c_str());
 
-            int64 nStakeReward = GetValueOut() - nValueIn;
-            int64 nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, pblock->nBits, nTime) - GetMinFee() + MIN_TX_FEE;
+            unsigned int nTxSize = (nTime > STAKEFEE_SWITCH_TIME) ? GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) : 0;
 
-            if (nStakeReward > nCalculatedStakeReward)
-                return DoS(100, error("CheckInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nStakeReward, nCalculatedStakeReward));
+            int64 nReward = GetValueOut() - nValueIn;
+            int64 nCalculatedReward = GetProofOfStakeReward(nCoinAge, pblock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize, CENT) + CENT;
+
+            if (nReward > nCalculatedReward)
+                return DoS(100, error("CheckInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nReward, nCalculatedReward));
         }
         else
         {
@@ -1577,7 +1587,7 @@ bool CTransaction::CheckInputs(CCoinsViewCache &inputs, enum CheckSig_mode csmod
         // Skip ECDSA signature verification when connecting blocks
         // before the last blockchain checkpoint. This is safe because block merkle hashes are
         // still computed and checked, and any change will be caught at the next checkpoint.
-        if (csmode == CS_ALWAYS || 
+        if (csmode == CS_ALWAYS ||
             (csmode == CS_AFTER_CHECKPOINT && inputs.GetBestBlock()->nHeight >= Checkpoints::GetTotalBlocksEstimate())) {
             for (unsigned int i = 0; i < vin.size(); i++) {
                 const COutPoint &prevout = vin[i].prevout;
