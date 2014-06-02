@@ -635,10 +635,16 @@ bool CTransaction::CheckTransaction() const
 int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
                               enum GetMinFee_mode mode, unsigned int nBytes, int64 nMinTxFee, int64 nMinRelayTxFee) const
 {
-    // Minimum fee in main network is 0.01 until 1 July 2014
-    if(!fTestNet && nTime < FEE_SWITCH_TIME)
+
+    // Use new fees approach if we are on test network or 
+    //    switch date has been reached
+    bool fNewApproach = fTestNet || nTime > FEE_SWITCH_TIME;
+
+    if(!fNewApproach)
     {
-        nMinTxFee = nMinRelayTxFee = CENT;
+        // Enforce 0.01 as minimum fee for old approach
+        nMinTxFee = CENT;
+        nMinRelayTxFee = CENT;
     }
 
     // Base fee is either nMinTxFee or nMinRelayTxFee
@@ -647,27 +653,34 @@ int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
     unsigned int nNewBlockSize = nBlockSize + nBytes;
     int64 nMinFee = (1 + (int64)nBytes / 1000) * nBaseFee;
 
-    // Free transactions on main network are 
-    //    not allowed until 1 July 2014
-    if (fAllowFree && (nTime > FEE_SWITCH_TIME || fTestNet))
+    if (fNewApproach)
     {
-        if (nBlockSize == 1)
+        if (fAllowFree)
         {
-            // Transactions under 5K are free
-            if (nBytes < 5000)
-                nMinFee = 0;
+            if (nBlockSize == 1)
+            {
+                // Transactions under 1K are free
+                if (nBytes < 1000)
+                    nMinFee = 0;
+            }
+            else
+            {
+                // Free transaction area
+                if (nNewBlockSize < 27000)
+                    nMinFee = 0;
+            }
         }
-        else
-        {
-            // Free transaction area
-            if (nNewBlockSize < 27000)
-                nMinFee = 0;
-        }
-    }
 
-    // To limit dust spam, require MIN_TX_FEE/MIN_RELAY_TX_FEE if any output is less than 0.01
-    if (nMinFee < nBaseFee)
+        // To limit dust spam, require additional MIN_TX_FEE/MIN_RELAY_TX_FEE for 
+        //    each output which is less than 0.01
+        BOOST_FOREACH(const CTxOut& txout, vout)
+            if (txout.nValue < CENT)
+                nMinFee += nBaseFee;
+    }
+    else if (nMinFee < nBaseFee)
     {
+        // To limit dust spam, require MIN_TX_FEE/MIN_RELAY_TX_FEE if 
+        //    any output is less than 0.01
         BOOST_FOREACH(const CTxOut& txout, vout)
             if (txout.nValue < CENT)
                 nMinFee = nBaseFee;
@@ -1558,8 +1571,7 @@ bool CTransaction::CheckInputs(CCoinsViewCache &inputs, enum CheckSig_mode csmod
             if (!GetCoinAge(nCoinAge))
                 return error("CheckInputs() : %s unable to get coin age for coinstake", GetHash().ToString().substr(0,10).c_str());
 
-            unsigned int nTxSize = (nTime > STAKEFEE_SWITCH_TIME) ? GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) : 0;
-
+            unsigned int nTxSize = (nTime > STAKEFEE_SWITCH_TIME || fTestNet) ? GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) : 0;
             int64 nReward = GetValueOut() - nValueIn;
             int64 nCalculatedReward = GetProofOfStakeReward(nCoinAge, pblock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize, CENT) + CENT;
 
