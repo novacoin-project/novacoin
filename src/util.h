@@ -63,7 +63,6 @@ static const int64 CENT = 10000;
 void LogStackTrace();
 #endif
 
-
 /* Format characters for (s)size_t and ptrdiff_t */
 #if defined(_MSC_VER) || defined(__MSVCRT__)
   /* (s)size_t and ptrdiff_t have the same size specifier in MSVC:
