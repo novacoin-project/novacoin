@@ -115,6 +115,7 @@ OBJS= \
     obj/rpcnet.o \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
+    obj/timedata.o \
     obj/script.o \
     obj/sync.o \
     obj/util.o \

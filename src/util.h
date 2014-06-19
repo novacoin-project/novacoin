@@ -6,14 +6,13 @@
 #ifndef BITCOIN_UTIL_H
 #define BITCOIN_UTIL_H
 
-#include "uint256.h"
-
 #ifndef WIN32
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
 
+#include "serialize.h"
 #include "tinyformat.h"
 
 #include <map>
@@ -28,9 +27,9 @@
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-#include "netbase.h" // for AddTimeData
-
 #include <stdint.h>
+
+class uint256;
 
 static const int64_t COIN = 100000000;
 static const int64_t CENT = 1000000;
@@ -205,11 +204,8 @@ uint64_t GetRand(uint64_t nMax);
 uint256 GetRandHash();
 int64_t GetTime();
 void SetMockTime(int64_t nMockTimeIn);
-int64_t GetAdjustedTime();
-int64_t GetTimeOffset();
 std::string FormatFullVersion();
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments);
-void AddTimeData(const CNetAddr& ip, int64_t nTime);
 void runCommand(std::string strCommand);
 
 
