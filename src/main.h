@@ -579,7 +579,7 @@ public:
         return dPriority > COIN * 144 / 250;
     }
 
-    int64 GetMinFee(unsigned int nBlockSize=1, bool fAllowFree=false, enum GetMinFee_mode mode=GMF_BLOCK, unsigned int nBytes = 0, int64 nMinTxFee = MIN_TX_FEE, int64 nMinRelayTxFee = MIN_RELAY_TX_FEE) const;
+    int64 GetMinFee(unsigned int nBlockSize=1, bool fAllowFree=false, enum GetMinFee_mode mode=GMF_BLOCK, unsigned int nBytes = 0) const;
 
     friend bool operator==(const CTransaction& a, const CTransaction& b)
     {

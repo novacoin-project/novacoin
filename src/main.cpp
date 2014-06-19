@@ -632,17 +632,17 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
-int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
-                              enum GetMinFee_mode mode, unsigned int nBytes, int64 nMinTxFee, int64 nMinRelayTxFee) const
+int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree, enum GetMinFee_mode mode, unsigned int nBytes) const
 {
-
     // Use new fees approach if we are on test network or 
     //    switch date has been reached
     bool fNewApproach = fTestNet || nTime > FEE_SWITCH_TIME;
 
-    if(!fNewApproach)
+    int64 nMinTxFee = MIN_TX_FEE, nMinRelayTxFee = MIN_RELAY_TX_FEE;
+
+    if(!fNewApproach || IsCoinStake())
     {
-        // Enforce 0.01 as minimum fee for old approach
+        // Enforce 0.01 as minimum fee for old approach or coinstake
         nMinTxFee = CENT;
         nMinRelayTxFee = CENT;
     }
@@ -672,9 +672,12 @@ int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
         }
 
         // To limit dust spam, require additional MIN_TX_FEE/MIN_RELAY_TX_FEE for 
-        //    each output which is less than 0.01
+        //    each non empty output which is less than 0.01
+        //
+        // It's safe to ignore empty outputs here, because these inputs are allowed
+        //     only for coinbase and coinstake transactions.
         BOOST_FOREACH(const CTxOut& txout, vout)
-            if (txout.nValue < CENT)
+            if (txout.nValue < CENT && !txout.IsEmpty())
                 nMinFee += nBaseFee;
     }
     else if (nMinFee < nBaseFee)
@@ -696,6 +699,7 @@ int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
 
     if (!MoneyRange(nMinFee))
         nMinFee = MAX_MONEY;
+
     return nMinFee;
 }
 
@@ -1571,9 +1575,10 @@ bool CTransaction::CheckInputs(CCoinsViewCache &inputs, enum CheckSig_mode csmod
             if (!GetCoinAge(nCoinAge))
                 return error("CheckInputs() : %s unable to get coin age for coinstake", GetHash().ToString().substr(0,10).c_str());
 
-            unsigned int nTxSize = (nTime > VALIDATION_SWITCH_TIME || fTestNet) ? GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) : 0;
+            bool fProtocol048 = fTestNet || VALIDATION_SWITCH_TIME < nTime;
+            unsigned int nTxSize = fProtocol048 ? GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) : 0;
             int64 nReward = GetValueOut() - nValueIn;
-            int64 nCalculatedReward = GetProofOfStakeReward(nCoinAge, pblock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize, CENT) + CENT;
+            int64 nCalculatedReward = GetProofOfStakeReward(nCoinAge, pblock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize) + CENT;
 
             if (nReward > nCalculatedReward)
                 return DoS(100, error("CheckInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nReward, nCalculatedReward));
@@ -1774,6 +1779,8 @@ bool CBlock::ConnectBlock(CBlockIndex* pindex, CCoinsViewCache &view, bool fJust
     // initial block download.
     bool fEnforceBIP30 = true;
 
+    bool fProtocol048 = fTestNet || VALIDATION_SWITCH_TIME < nTime;
+
     if (fEnforceBIP30) {
         for (unsigned int i=0; i<vtx.size(); i++) {
             uint256 hash = GetTxHash(i);
@@ -1841,7 +1848,7 @@ bool CBlock::ConnectBlock(CBlockIndex* pindex, CCoinsViewCache &view, bool fJust
 
     if (IsProofOfWork())
     {
-        int64 nBlockReward = GetProofOfWorkReward(nBits, VALIDATION_SWITCH_TIME < nTime ? nFees : 0);
+        int64 nBlockReward = GetProofOfWorkReward(nBits, fProtocol048 ? nFees : 0);
 
         // Check coinbase reward
         if (vtx[0].GetValueOut() > nBlockReward)
@@ -2305,6 +2312,8 @@ bool CBlock::CheckBlockHeader(bool fCheckPoW, bool fCheckSig) const
 
 bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) const
 {
+    bool fProtocol048 = fTestNet || VALIDATION_SWITCH_TIME < nTime;
+
     // These are checks that are independent of context
     // that can be verified before saving an orphan block.
 
@@ -2319,9 +2328,19 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
     if (!vtx[0].IsCoinBase())
         return DoS(100, error("CheckBlock() : first tx is not coinbase"));
 
+    if (!vtx[0].CheckTransaction())
+        return DoS(100, error("CheckBlock() : CheckTransaction failed for coinbase"));
+
     // Check coinbase timestamp
     if (GetBlockTime() > FutureDrift((int64)vtx[0].nTime))
         return DoS(50, error("CheckBlock() : coinbase timestamp is too early"));
+
+    if (!fProtocol048)
+    {
+        // Check coinbase timestamp
+        if (GetBlockTime() < (int64)vtx[0].nTime)
+            return DoS(100, error("CheckBlock() : coinbase timestamp violation"));
+    }
 
     if (IsProofOfStake())
     {
@@ -2334,27 +2353,43 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
             return DoS(100, error("CheckBlock() : second tx is not coinstake"));
 
         // Check coinstake timestamp
-        if (!CheckCoinStakeTimestamp(GetBlockTime(), (int64)vtx[1].nTime))
+        if (GetBlockTime() != (int64)vtx[1].nTime)
             return DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=%"PRI64d" nTimeTx=%u", GetBlockTime(), vtx[1].nTime));
+
+        if (!vtx[1].CheckTransaction())
+            return DoS(100, error("CheckBlock() : CheckTransaction failed for coinstake"));
+
+        if (fProtocol048)
+        {
+            if (nNonce != 0)
+                return DoS(100, error("CheckBlock() : non-zero nonce in proof-of-stake block"));
+        }
+    }
+    else
+    {
+        if (GetBlockTime() < PastDrift((int64)vtx[0].nTime))
+            return DoS(50, error("CheckBlock() : coinbase timestamp is too late"));
     }
 
-    // Check transactions
-    for (unsigned int i = 0; i < vtx.size(); i++)
+    // Check user transactions
+    for (unsigned int i = 2; i < vtx.size(); i++)
     {
         const CTransaction& tx = vtx[i];
 
         // check transaction timestamp
         if (GetBlockTime() < (int64)tx.nTime)
-            return DoS(50, error("CheckBlock() : block timestamp earlier than transaction timestamp"));
+            return DoS(50, error("CheckBlock() : block timestamp earlier than transaction timestamp (vtx[%d])", i));
 
-        if (i != 0 && tx.IsCoinBase())
-            return DoS(100, error("CheckBlock() : coinbase in wrong position"));
+        // coinbase is allowed only for vtx[0]
+        if (tx.IsCoinBase())
+            return DoS(100, error("CheckBlock() : coinbase in wrong position (vtx[%d])", i));
 
-        if (i != 1 && tx.IsCoinStake())
-            return DoS(100, error("CheckBlock() : coinstake in wrong position"));
+        // coinstake is allowed only for vtx[1]
+        if (tx.IsCoinStake())
+            return DoS(100, error("CheckBlock() : coinstake in wrong position (vtx[%d])", i));
 
         if (!tx.CheckTransaction())
-            return DoS(tx.nDoS, error("CheckBlock() : CheckTransaction failed"));
+            return DoS(tx.nDoS, error("CheckBlock() : CheckTransaction failed (vtx[%d])", i));
     }
 
 
