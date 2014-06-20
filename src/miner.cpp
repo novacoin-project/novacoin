@@ -15,9 +15,6 @@ using namespace std;
 // BitcoinMiner
 //
 
-string strMintMessage = "Info: Mining suspended due to locked wallet.";
-string strMintWarning;
-
 extern unsigned int nMinerSleep;
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
@@ -533,7 +530,6 @@ void StakeMiner(CWallet *pwallet)
 
         while (pwallet->IsLocked())
         {
-            strMintWarning = strMintMessage;
             Sleep(1000);
             if (fShutdown)
                 return;
@@ -545,8 +541,6 @@ void StakeMiner(CWallet *pwallet)
             if (fShutdown)
                 return;
         }
-
-        strMintWarning = "";
 
         //
         // Create new block
@@ -561,7 +555,6 @@ void StakeMiner(CWallet *pwallet)
         // Trying to sign a block
         if (pblock->SignBlock(*pwallet))
         {
-            strMintWarning = _("Stake generation: new block found!");
             SetThreadPriority(THREAD_PRIORITY_NORMAL);
             CheckStake(pblock.get(), *pwallet);
             SetThreadPriority(THREAD_PRIORITY_LOWEST);
