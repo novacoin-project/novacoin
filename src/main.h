@@ -5,6 +5,7 @@
 #ifndef BITCOIN_MAIN_H
 #define BITCOIN_MAIN_H
 
+#include "timestamps.h"
 #include "bignum.h"
 #include "sync.h"
 #include "net.h"
@@ -38,20 +39,13 @@ static const unsigned int BLOCKFILE_CHUNK_SIZE = 0x1000000; // 16 MiB
 static const unsigned int UNDOFILE_CHUNK_SIZE = 0x100000; // 1 MiB
 static const unsigned int MEMPOOL_HEIGHT = 0x7FFFFFFF;
 
-static const int64 MIN_TX_FEE = CENT;
-static const int64 MIN_RELAY_TX_FEE = CENT;
+static const int64 MIN_TX_FEE = CENT / 10;
+static const int64 MIN_RELAY_TX_FEE = CENT / 50;
+
 static const int64 MAX_MONEY = 2000000000 * COIN;
 static const int64 MAX_MINT_PROOF_OF_WORK = 100 * COIN;
 static const int64 MAX_MINT_PROOF_OF_STAKE = 1 * COIN;
-static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
-
-static const unsigned int ENTROPY_SWITCH_TIME = 1362791041; // Sat, 09 Mar 2013 01:04:01 GMT
-static const unsigned int STAKE_SWITCH_TIME = 1371686400; // Thu, 20 Jun 2013 00:00:00 GMT
-static const unsigned int TARGETS_SWITCH_TIME = 1374278400; // Sat, 20 Jul 2013 00:00:00 GMT
-static const unsigned int CHAINCHECKS_SWITCH_TIME = 1379635200; // Fri, 20 Sep 2013 00:00:00 GMT
-static const unsigned int STAKECURVE_SWITCH_TIME = 1382227200; // Sun, 20 Oct 2013 00:00:00 GMT
-static const unsigned int OUTPUT_SWITCH_TIME = 1398916800; // Thu, 01 May 2014 04:00:00 GMT
-
+static const int64 MIN_TXOUT_AMOUNT = CENT / 100;
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
@@ -130,7 +124,7 @@ bool LoadExternalBlockFile(FILE* fileIn);
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
-int64 GetProofOfWorkReward(unsigned int nBits);
+int64 GetProofOfWorkReward(unsigned int nBits, int64 nFees=0);
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly=false);
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
 unsigned int ComputeMinStake(unsigned int nBase, int64 nTime, unsigned int nBlockTime);
@@ -1465,6 +1459,7 @@ public:
     bool AddToBlockIndex(const CDiskBlockPos &pos);
 
     // Context-independent validity checks
+    bool CheckBlockHeader(bool fCheckPoW=true, bool fCheckSig=false) const;
     bool CheckBlock(bool fCheckPOW=true, bool fCheckMerkleRoot=true, bool fCheckSig=false) const;
 
     // Store block on disk

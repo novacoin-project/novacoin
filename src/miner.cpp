@@ -15,9 +15,6 @@ using namespace std;
 // BitcoinMiner
 //
 
-string strMintMessage = "Info: Mining suspended due to locked wallet.";
-string strMintWarning;
-
 extern unsigned int nMinerSleep;
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
@@ -278,8 +275,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[0].nTime))
                 continue;
 
-            // Simplify transaction fee - allow free = false
-            int64 nMinFee = tx.GetMinFee(nBlockSize, false, GMF_BLOCK);
+            int64 nMinFee = tx.GetMinFee(nBlockSize, true, GMF_BLOCK, nTxSize);
 
             // Skip free transactions if we're past the minimum block size:
             if (fSortedByFee && (dFeePerKb < nMinTxFee) && (nBlockSize + nTxSize >= nBlockMinSize))
@@ -357,7 +353,10 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
         if (!fProofOfStake)
-            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits);
+        {
+            bool fProtocol048 = fTestNet || VALIDATION_SWITCH_TIME < pblock->nTime;
+            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits, fProtocol048 ? nFees : 0);
+        }
 
         // Fill in header
         pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
@@ -531,7 +530,6 @@ void StakeMiner(CWallet *pwallet)
 
         while (pwallet->IsLocked())
         {
-            strMintWarning = strMintMessage;
             Sleep(1000);
             if (fShutdown)
                 return;
@@ -543,8 +541,6 @@ void StakeMiner(CWallet *pwallet)
             if (fShutdown)
                 return;
         }
-
-        strMintWarning = "";
 
         //
         // Create new block
@@ -559,7 +555,6 @@ void StakeMiner(CWallet *pwallet)
         // Trying to sign a block
         if (pblock->SignBlock(*pwallet))
         {
-            strMintWarning = _("Stake generation: new block found!");
             SetThreadPriority(THREAD_PRIORITY_NORMAL);
             CheckStake(pblock.get(), *pwallet);
             SetThreadPriority(THREAD_PRIORITY_LOWEST);

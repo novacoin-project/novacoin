@@ -397,6 +397,110 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Сделать резервную копию бумажника</translation>
     </message>
     <message>
+        <location line="+4"/>
+        <source>&amp;Dump Wallet...</source>
+        <translation>&amp;Выгрузка ключей...</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Dump Wallet</source>
+        <translation>Выгрузка ключей</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Import Wallet</source>
+        <translation>Импорт ключей</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Dump failed</source>
+        <translation>Ошибка выгрузки</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Import failed</source>
+        <translation>Ошибка импорта</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>All keys from:
+ %1,
+ were imported into your wallet.</source>
+        <translation>Все ключи из файла
+ %1,
+ были успешно импортированы.</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>An error happened while trying to save the keys to your location.
+Keys were not saved.</source>
+        <translation>Произошла ошибка при попытке выгрузки ключей в указанный файл.
+Ключи не сохранены.</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Dump successful</source>
+        <translation>Выгрузка завершена</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Import successful</source>
+        <translation>Импорт завершен</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Warning</source>
+        <translation>Предупреждение</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Information</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Keys were saved to this file:
+%2</source>
+        <translation>Ключи сохранены в 
+%2</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>An error happened while trying to import the keys.
+Some or all keys from:
+ %1,
+ were not imported into your wallet.</source>
+        <translation>При попытке импорта ключей произошла ошибка.
+Некоторые, либо все ключи из
+ %1,
+ не были импортированы.</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Wallet dump (*.txt)</source>
+        <translation>Файл с ключами (*.txt)</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&amp;Import Wallet...</source>
+        <translation>&amp;Импорт ключей...</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Dump keys to a text file</source>
+        <translation>Выгрузить ключи в текстовый файл</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Import keys into a wallet</source>
+        <translation>Импортировать ключи из текстового файла</translation>
+    </message>
+    <message>
         <location line="+2"/>
         <source>&amp;Change Passphrase...</source>
         <translation>&amp;Изменить пароль</translation>
@@ -586,6 +690,70 @@ This product includes software developed by the OpenSSL Project for use in the O
         <location line="+10"/>
         <source>Last received block was generated %1.</source>
         <translation>Последний полученный блок был сгенерирован %1.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Wallet is offline</source>
+        <translation>Бумажник не в сети</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Wallet is locked</source>
+        <translation>Бумажник заблокирован</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Blockchain download is in progress</source>
+        <translation>Загрузка цепочки блоков ещё не завершена</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Stake miner is active
+Your current stake weight is %1
+Network weight is %2</source>
+        <translation>Proof-of-Stake майнер активен
+Текущий вес %1
+Текущий вес сети %2</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>No suitable inputs were found</source>
+        <translation>Нет подходящих транзакций</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Unlo&amp;ck wallet</source>
+        <translation>Разб&amp;локировать кошелек</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Unlock wallet</source>
+        <translation>Разблокировать кошелек</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Lock wallet</source>
+        <translation>Заблокировать кошелек</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>&amp;Lock wallet</source>
+        <translation>&amp;Заблокировать кошелек</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Unlo&amp;ck wallet for mining</source>
+        <translation>Ра&amp;зблокировать для майнинга</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Unlock wallet for mining</source>
+        <translation>Разблокировать для майнинга</translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <source>&amp;Wallet security</source>
+        <translation>&amp;Безопасность</translation>
     </message>
     <message>
         <location line="+59"/>
@@ -889,6 +1057,11 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+340"/>
         <source>Priority</source>
         <translation>Приоритет</translation>
+    </message>
+    <message>
+        <location line="+344"/>
+        <source>Weight</source>
+        <translation>Вес</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2601,7 +2774,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <source>Specify wallet file (within data directory)</source>
-        <translation type="obsolete">Указать файл кошелька (в пределах DATA директории)</translation>
+        <translation>Указать файл кошелька (в пределах DATA директории)</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2705,8 +2878,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+23"/>
-        <source>Find peers using DNS lookup (default: 0)</source>
-        <translation type="unfinished">Искать узлы с помощью DNS (по умолчанию: 1) {0)?}</translation>
+        <source>Find peers using DNS lookup (default: 1)</source>
+        <translation>Искать узлы с помощью DNS (по умолчанию: 1)</translation>
+    </message>
+    <message>
+        <source>Sync checkpoints policy (default: strict)</source>
+        <translation>Политика синхронизированных меток (по умолчанию: strict)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2791,14 +2968,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+2"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Не удалось начать прослушивание на порту. Используйте -listen=0 если вас это устраивает.</translation>
-    </message>
-    <message>
-        <source>Find peers using DNS lookup (default: 1)</source>
-        <translation type="obsolete">Искать узлы с помощью DNS (по умолчанию: 1)</translation>
-    </message>
-    <message>
-        <source>Sync checkpoints policy (default: strict)</source>
-        <translation type="obsolete">Политика синхронизированных меток (по умолчанию: strict)</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2960,6 +3129,21 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+119"/>
         <source>Upgrade wallet to latest format</source>
         <translation>Обновить бумажник до последнего формата</translation>
+    </message>
+    <message>
+        <location line="+120"/>
+        <source>Require a confirmations for change (default: 0)</source>
+        <translation>Требовать подтверждения для сдачи (по умолчанию: 0)</translation>
+    </message>
+    <message>
+        <location line="+121"/>
+        <source>Enforce transaction scripts to use canonical PUSH operators (default: 1)</source>
+        <translation>Требовать от скриптов использования стандартных PUSH операторов (по умолчанию: 1)</translation>
+    </message>
+    <message>
+        <location line="+123"/>
+        <source>Clear list of wallet transactions (diagnostic tool; implies -rescan)</source>
+        <translation>Очистить список транзакций (диагностический инструмент; включает -rescan)</translation>
     </message>
     <message>
         <location line="-16"/>
@@ -3144,6 +3328,11 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="-2"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Комиссия на килобайт, добавляемая к вашим транзакциям</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>When creating transactions, ignore inputs with value less than this (default: %s)</source>
+        <translation>При создании транзакций игнорировать входы с суммой ниже указанной (по умолчанию: %s)</translation>
     </message>
     <message>
         <location line="+19"/>
