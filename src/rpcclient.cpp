@@ -3,6 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <set>
 #include "rpcclient.h"
 
 #include "rpcprotocol.h"
@@ -93,88 +94,112 @@ Object CallRPC(const string& strMethod, const Array& params)
     return reply;
 }
 
-template<typename T>
-void ConvertTo(Value& value, bool fAllowNull=false)
+class CRPCConvertParam
 {
-    if (fAllowNull && value.type() == null_type)
-        return;
-    if (value.type() == str_type)
-    {
-        // reinterpret string as unquoted json value
-        Value value2;
-        string strJSON = value.get_str();
-        if (!read_string(strJSON, value2))
-            throw runtime_error(string("Error parsing JSON:")+strJSON);
-        ConvertTo<T>(value2, fAllowNull);
-        value = value2;
+public:
+    std::string methodName;            // method whose params want conversion
+    int paramIdx;                      // 0-based idx of param to convert
+};
+
+static const CRPCConvertParam vRPCConvertParams[] =
+{
+    { "stop", 0 },
+    { "getaddednodeinfo", 0 },
+    { "sendtoaddress", 1 },
+    { "settxfee", 0 },
+    { "getreceivedbyaddress", 1 },
+    { "getreceivedbyaccount", 1 },
+    { "listreceivedbyaddress", 0 },
+    { "listreceivedbyaddress", 1 },
+    { "listreceivedbyaccount", 0 },
+    { "listreceivedbyaccount", 1 },
+    { "getbalance", 1 },
+    { "getblock", 1 },
+    { "getblockbynumber", 0 },
+    { "getblockbynumber", 1 },
+    { "getblockhash", 0 },
+    { "move", 2 },
+    { "move", 3 },
+    { "sendfrom", 2 },
+    { "sendfrom", 3 },
+    { "listtransactions", 1 },
+    { "listtransactions", 2 },
+    { "listaccounts", 0 },
+    { "walletpassphrase", 1 },
+    { "walletpassphrase", 2 },
+    { "getblocktemplate", 0 },
+    { "listsinceblock", 1 },
+    { "sendalert", 2 },
+    { "sendalert", 3 },
+    { "sendalert", 4 },
+    { "sendalert", 5 },
+    { "sendalert", 6 },
+    { "sendmany", 1 },
+    { "sendmany", 2 },
+    { "reservebalance", 0 },
+    { "reservebalance", 1 },
+    { "addmultisigaddress", 0 },
+    { "addmultisigaddress", 1 },
+    { "listunspent", 0 },
+    { "listunspent", 1 },
+    { "listunspent", 2 },
+    { "getrawtransaction", 1 },
+    { "createrawtransaction", 0 },
+    { "createrawtransaction", 1 },
+    { "signrawtransaction", 1 },
+    { "signrawtransaction", 2 },
+    { "keypoolrefill", 0 },
+    { "importprivkey", 2 },
+};
+
+class CRPCConvertTable
+{
+private:
+    std::set<std::pair<std::string, int> > members;
+
+public:
+    CRPCConvertTable();
+
+    bool convert(const std::string& method, int idx) {
+        return (members.count(std::make_pair(method, idx)) > 0);
     }
-    else
-    {
-        value = value.get_value<T>();
+};
+
+CRPCConvertTable::CRPCConvertTable()
+{
+    const unsigned int n_elem =
+        (sizeof(vRPCConvertParams) / sizeof(vRPCConvertParams[0]));
+
+    for (unsigned int i = 0; i < n_elem; i++) {
+        members.insert(std::make_pair(vRPCConvertParams[i].methodName,
+                                      vRPCConvertParams[i].paramIdx));
     }
 }
+
+static CRPCConvertTable rpcCvtTable;
 
 // Convert strings to command-specific RPC representation
 Array RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
 {
     Array params;
-    BOOST_FOREACH(const std::string &param, strParams)
-        params.push_back(param);
 
-    int n = params.size();
+    for (unsigned int idx = 0; idx < strParams.size(); idx++) {
+        const std::string& strVal = strParams[idx];
 
-    //
-    // Special case non-string parameter types
-    //
-    if (strMethod == "stop"                   && n > 0) ConvertTo<bool>(params[0]);
-    if (strMethod == "getaddednodeinfo"       && n > 0) ConvertTo<bool>(params[0]);
-    if (strMethod == "sendtoaddress"          && n > 1) ConvertTo<double>(params[1]);
-    if (strMethod == "settxfee"               && n > 0) ConvertTo<double>(params[0]);
-    if (strMethod == "getreceivedbyaddress"   && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "getreceivedbyaccount"   && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "listreceivedbyaddress"  && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "listreceivedbyaddress"  && n > 1) ConvertTo<bool>(params[1]);
-    if (strMethod == "listreceivedbyaccount"  && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "listreceivedbyaccount"  && n > 1) ConvertTo<bool>(params[1]);
-    if (strMethod == "getbalance"             && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "getblock"               && n > 1) ConvertTo<bool>(params[1]);
-    if (strMethod == "getblockbynumber"       && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "getblockbynumber"       && n > 1) ConvertTo<bool>(params[1]);
-    if (strMethod == "getblockhash"           && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "move"                   && n > 2) ConvertTo<double>(params[2]);
-    if (strMethod == "move"                   && n > 3) ConvertTo<int64_t>(params[3]);
-    if (strMethod == "sendfrom"               && n > 2) ConvertTo<double>(params[2]);
-    if (strMethod == "sendfrom"               && n > 3) ConvertTo<int64_t>(params[3]);
-    if (strMethod == "listtransactions"       && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "listtransactions"       && n > 2) ConvertTo<int64_t>(params[2]);
-    if (strMethod == "listaccounts"           && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "walletpassphrase"       && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "walletpassphrase"       && n > 2) ConvertTo<bool>(params[2]);
-    if (strMethod == "getblocktemplate"       && n > 0) ConvertTo<Object>(params[0]);
-    if (strMethod == "listsinceblock"         && n > 1) ConvertTo<int64_t>(params[1]);
+        // insert string value directly
+        if (!rpcCvtTable.convert(strMethod, idx)) {
+            params.push_back(strVal);
+        }
 
-    if (strMethod == "sendalert"              && n > 2) ConvertTo<int64_t>(params[2]);
-    if (strMethod == "sendalert"              && n > 3) ConvertTo<int64_t>(params[3]);
-    if (strMethod == "sendalert"              && n > 4) ConvertTo<int64_t>(params[4]);
-    if (strMethod == "sendalert"              && n > 5) ConvertTo<int64_t>(params[5]);
-    if (strMethod == "sendalert"              && n > 6) ConvertTo<int64_t>(params[6]);
+        // parse string as JSON, insert bool/number/object/etc. value
+        else {
+            Value jVal;
+            if (!read_string(strVal, jVal))
+                throw runtime_error(string("Error parsing JSON:")+strVal);
+            params.push_back(jVal);
+        }
 
-    if (strMethod == "sendmany"               && n > 1) ConvertTo<Object>(params[1]);
-    if (strMethod == "sendmany"               && n > 2) ConvertTo<int64_t>(params[2]);
-    if (strMethod == "reservebalance"         && n > 0) ConvertTo<bool>(params[0]);
-    if (strMethod == "reservebalance"         && n > 1) ConvertTo<double>(params[1]);
-    if (strMethod == "addmultisigaddress"     && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "addmultisigaddress"     && n > 1) ConvertTo<Array>(params[1]);
-    if (strMethod == "listunspent"            && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "listunspent"            && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "listunspent"            && n > 2) ConvertTo<Array>(params[2]);
-    if (strMethod == "getrawtransaction"      && n > 1) ConvertTo<int64_t>(params[1]);
-    if (strMethod == "createrawtransaction"   && n > 0) ConvertTo<Array>(params[0]);
-    if (strMethod == "createrawtransaction"   && n > 1) ConvertTo<Object>(params[1]);
-    if (strMethod == "signrawtransaction"     && n > 1) ConvertTo<Array>(params[1], true);
-    if (strMethod == "signrawtransaction"     && n > 2) ConvertTo<Array>(params[2], true);
-    if (strMethod == "keypoolrefill"          && n > 0) ConvertTo<int64_t>(params[0]);
-    if (strMethod == "importprivkey"          && n > 2) ConvertTo<bool>(params[2]);
+    }
 
     return params;
 }
