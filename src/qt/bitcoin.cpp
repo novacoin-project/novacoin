@@ -112,7 +112,7 @@ void DebugMessageHandler(QtMsgType type, const char * msg)
 void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
 {
     const char *category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", QString::toStdString(msg));
+    LogPrint(category, "GUI: %s\n", msg.toStdString());
 }
 #endif
 
