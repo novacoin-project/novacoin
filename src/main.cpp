@@ -3206,10 +3206,12 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         LOCK(cs_main);
 
         bool fMissingInputs = false;
+
+        mapAlreadyAskedFor.erase(inv);
+
         if (AcceptToMemoryPool(mempool, tx, true, &fMissingInputs))
         {
             RelayTransaction(tx, inv.hash);
-            mapAlreadyAskedFor.erase(inv);
             vWorkQueue.push_back(inv.hash);
             vEraseQueue.push_back(inv.hash);
 
@@ -3231,7 +3233,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     {
                         printf("   accepted orphan tx %s\n", orphanTxHash.ToString().c_str());
                         RelayTransaction(orphanTx, orphanTxHash);
-                        mapAlreadyAskedFor.erase(CInv(MSG_TX, orphanTxHash));
                         vWorkQueue.push_back(orphanTxHash);
                         vEraseQueue.push_back(orphanTxHash);
                     }
