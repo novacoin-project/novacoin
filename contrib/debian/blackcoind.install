@@ -1,2 +1,2 @@
-debian/bin/novacoind usr/bin
-src/novacoind usr/lib/novacoin
+debian/bin/blackcoind usr/bin
+src/blackcoind usr/lib/blackcoin
