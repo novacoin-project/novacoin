@@ -59,7 +59,9 @@ private:
     ClientModel *clientModel;
     WalletModel *walletModel;
 
-    QStackedWidget *centralWidget;
+    QToolBar *toolbar;
+
+    QStackedWidget *centralStackedWidget;
 
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
@@ -169,7 +171,7 @@ private slots:
     */
     void incomingTransaction(const QModelIndex & parent, int start, int end);
     /** Encrypt the wallet */
-    void encryptWallet(bool status);
+    void encryptWallet();
     /** Backup the wallet */
     void backupWallet();
     /** Change encrypted wallet passphrase */

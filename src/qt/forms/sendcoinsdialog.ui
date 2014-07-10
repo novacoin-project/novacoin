@@ -667,10 +667,6 @@
        <property name="text">
         <string>Add &amp;Recipient</string>
        </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
-       </property>
        <property name="autoDefault">
         <bool>false</bool>
        </property>
@@ -689,10 +685,6 @@
        </property>
        <property name="text">
         <string>Clear &amp;All</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
        </property>
        <property name="autoRepeatDelay">
         <number>300</number>

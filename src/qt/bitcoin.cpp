@@ -211,6 +211,9 @@ int main(int argc, char *argv[])
 
     try
     {
+        if (fUseBlackTheme)
+            GUIUtil::SetBlackThemeQSS(app);
+
         // Regenerate startup link, to fix links to old versions
         if (GUIUtil::GetStartOnSystemStartup())
             GUIUtil::SetStartOnSystemStartup(true);

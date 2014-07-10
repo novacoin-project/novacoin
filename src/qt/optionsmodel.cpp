@@ -6,6 +6,8 @@
 #include "walletdb.h"
 #include "guiutil.h"
 
+bool fUseBlackTheme;
+
 OptionsModel::OptionsModel(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -46,6 +48,7 @@ void OptionsModel::Init()
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     nReserveBalance = settings.value("nReserveBalance").toLongLong();
     language = settings.value("language", "").toString();
+    fUseBlackTheme = settings.value("fUseBlackTheme", true).toBool();
 
     // These are shared with core Bitcoin; we want
     // command-line options to override the GUI settings:
@@ -111,6 +114,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return QVariant(fCoinControlFeatures);
         case MinimizeCoinAge:
             return settings.value("fMinimizeCoinAge", GetBoolArg("-minimizecoinage", false));
+        case UseBlackTheme:
+            return QVariant(fUseBlackTheme);
         default:
             return QVariant();
         }
@@ -205,6 +210,10 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
            fMinimizeCoinAge = value.toBool();
            settings.setValue("fMinimizeCoinAge", fMinimizeCoinAge);
            break;
+        case UseBlackTheme:
+            fUseBlackTheme = value.toBool();
+            settings.setValue("fUseBlackTheme", fUseBlackTheme);
+            break;
         default:
             break;
         }
