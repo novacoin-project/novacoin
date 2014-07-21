@@ -1253,6 +1253,7 @@ void MapPort()
 static const char *strDNSSeed[][2] = {
     {"rat4.blackcoin.co", "seed.blackcoin.co"},
     {"archon.darkfox.id.au", "foxy.seeds.darkfox.id.au"},
+    {"6.syllabear.us.to", "bcseed.syllabear.us.to"},
 };
 
 void ThreadDNSAddressSeed(void* parg)
