@@ -1333,19 +1333,30 @@ void ThreadDNSAddressSeed2(void* parg)
 
 
 
-
-
-unsigned int pnSeed[] =
-{
-    0xdf4bd379, 0x7934d29b, 0x26bc02ad, 0x7ab743ad, 0x0ab3a7bc,
-    0x375ab5bc, 0xc90b1617, 0x5352fd17, 0x5efc6c18, 0xccdc7d18,
-    0x443d9118, 0x84031b18, 0x347c1e18, 0x86512418, 0xfcfe9031,
-    0xdb5eb936, 0xef8d2e3a, 0xcf51f23c, 0x18ab663e, 0x36e0df40,
-    0xde48b641, 0xad3e4e41, 0xd0f32b44, 0x09733b44, 0x6a51f545,
-    0xe593ef48, 0xc5f5ef48, 0x96f4f148, 0xd354d34a, 0x36206f4c,
-    0xceefe953, 0x50468c55, 0x89d38d55, 0x65e61a5a, 0x16b1b95d,
-    0x702b135e, 0x0f57245e, 0xdaab5f5f, 0xba15ef63,
+struct SeedSpec6 {
+    uint8_t addr[16];
+    uint16_t port;
 };
+
+#include "chainparamsseeds.h"
+
+// Convert the pnSeeds6 array into usable address objects.
+static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data, unsigned int count)
+{
+    // It'll only connect to one or two seed nodes because once it connects,
+    // it'll get a pile of addresses with newer timestamps.
+    // Seed nodes are given a random 'last seen time' of between one and two
+    // weeks ago.
+    const int64_t nOneWeek = 7*24*60*60;
+    for (unsigned int i = 0; i < count; i++)
+    {
+        struct in6_addr ip;
+        memcpy(&ip, data[i].addr, sizeof(ip));
+        CAddress addr(CService(ip, data[i].port));
+        addr.nTime = GetTime() - GetRand(nOneWeek) - nOneWeek;
+        vSeedsOut.push_back(addr);
+    }
+}
 
 void DumpAddresses()
 {
@@ -1493,19 +1504,7 @@ void ThreadOpenConnections2(void* parg)
         if (addrman.size()==0 && (GetTime() - nStart > 60) && !fTestNet)
         {
             std::vector<CAddress> vAdd;
-            for (unsigned int i = 0; i < ARRAYLEN(pnSeed); i++)
-            {
-                // It'll only connect to one or two seed nodes because once it connects,
-                // it'll get a pile of addresses with newer timestamps.
-                // Seed nodes are given a random 'last seen time' of between one and two
-                // weeks ago.
-                const int64_t nOneWeek = 7*24*60*60;
-                struct in_addr ip;
-                memcpy(&ip, &pnSeed[i], sizeof(ip));
-                CAddress addr(CService(ip, GetDefaultPort()));
-                addr.nTime = GetTime()-GetRand(nOneWeek)-nOneWeek;
-                vAdd.push_back(addr);
-            }
+            convertSeed6(vAdd, pnSeed6_main, ARRAYLEN(pnSeed6_main));
             addrman.Add(vAdd, CNetAddr("127.0.0.1"));
         }
 
