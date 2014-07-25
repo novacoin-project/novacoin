@@ -31,6 +31,7 @@ CWallet* pwalletMain;
 CClientUIInterface uiInterface;
 std::string strWalletFileName;
 bool fConfChange;
+bool fEnforceCanonical;
 unsigned int nNodeLifespan;
 unsigned int nDerivationMethodIndex;
 unsigned int nMinerSleep;
@@ -68,7 +69,7 @@ void Shutdown(void* parg)
     static bool fTaken;
 
     // Make this thread recognisable as the shutdown thread
-    RenameThread("novacoin-shutoff");
+    RenameThread("bitcoin-shutoff");
 
     bool fFirstThread = false;
     {
@@ -292,13 +293,13 @@ std::string HelpMessage()
         "  -blocknotify=<cmd>     " + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
         "  -walletnotify=<cmd>    " + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n" +
         "  -confchange            " + _("Require a confirmations for change (default: 0)") + "\n" +
+        "  -enforcecanonical      " + _("Enforce transaction scripts to use canonical PUSH operators (default: 1)") + "\n" +
         "  -upgradewallet         " + _("Upgrade wallet to latest format") + "\n" +
         "  -keypool=<n>           " + _("Set key pool size to <n> (default: 100)") + "\n" +
         "  -rescan                " + _("Rescan the block chain for missing wallet transactions") + "\n" +
         "  -salvagewallet         " + _("Attempt to recover private keys from a corrupt wallet.dat") + "\n" +
         "  -checkblocks=<n>       " + _("How many blocks to check at startup (default: 2500, 0 = all)") + "\n" +
         "  -checklevel=<n>        " + _("How thorough the block verification is (0-6, default: 1)") + "\n" +
-        "  -par=N                 " + _("Set the number of script verification threads (1-16, 0=auto, default: 0)") + "\n" +
         "  -loadblock=<file>      " + _("Imports blocks from external blk000?.dat file") + "\n" +
 
         "\n" + _("Block creation options:") + "\n" +
@@ -422,15 +423,6 @@ bool AppInit2()
 
     // ********************************************************* Step 3: parameter-to-internal-flags
 
-    // -par=0 means autodetect, but nScriptCheckThreads==0 means no concurrency
-    nScriptCheckThreads = GetArg("-par", 0);
-    if (nScriptCheckThreads == 0)
-        nScriptCheckThreads = boost::thread::hardware_concurrency();
-    if (nScriptCheckThreads <= 1) 
-        nScriptCheckThreads = 0;
-    else if (nScriptCheckThreads > MAX_SCRIPTCHECK_THREADS)
-        nScriptCheckThreads = MAX_SCRIPTCHECK_THREADS;
-
     fDebug = GetBoolArg("-debug");
 
     // -debug implies fDebug*
@@ -483,6 +475,7 @@ bool AppInit2()
     }
 
     fConfChange = GetBoolArg("-confchange", false);
+    fEnforceCanonical = GetBoolArg("-enforcecanonical", true);
 
     if (mapArgs.count("-mininput"))
     {
@@ -542,12 +535,6 @@ bool AppInit2()
 
     if (fDaemon)
         fprintf(stdout, "NovaCoin server starting\n");
-
-    if (nScriptCheckThreads) {
-        printf("Using %u threads for script verification\n", nScriptCheckThreads);
-        for (int i=0; i<nScriptCheckThreads-1; i++)
-            NewThread(ThreadScriptCheck, NULL);
-    }
 
     int64 nStart;
 
@@ -876,7 +863,7 @@ bool AppInit2()
             if (file)
                 LoadExternalBlockFile(file);
         }
-        StartShutdown();
+        exit(0);
     }
 
     filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";

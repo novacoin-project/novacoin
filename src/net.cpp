@@ -409,7 +409,7 @@ bool GetMyExternalIP(CNetAddr& ipRet)
 void ThreadGetMyExternalIP(void* parg)
 {
     // Make this thread recognisable as the external IP detection thread
-    RenameThread("novacoin-ext-ip");
+    RenameThread("bitcoin-ext-ip");
 
     CNetAddr addrLocalHost;
     if (GetMyExternalIP(addrLocalHost))
@@ -641,7 +641,7 @@ void CNode::copyStats(CNodeStats &stats)
 void ThreadSocketHandler(void* parg)
 {
     // Make this thread recognisable as the networking thread
-    RenameThread("novacoin-net");
+    RenameThread("bitcoin-net");
 
     try
     {
@@ -1000,7 +1000,7 @@ void ThreadSocketHandler2(void* parg)
 void ThreadMapPort(void* parg)
 {
     // Make this thread recognisable as the UPnP thread
-    RenameThread("novacoin-UPnP");
+    RenameThread("bitcoin-UPnP");
 
     try
     {
@@ -1159,7 +1159,7 @@ static const char *strDNSSeed[][2] = {
 void ThreadDNSAddressSeed(void* parg)
 {
     // Make this thread recognisable as the DNS seeding thread
-    RenameThread("novacoin-dnsseed");
+    RenameThread("bitcoin-dnsseed");
 
     try
     {
@@ -1254,7 +1254,7 @@ void ThreadDumpAddress2(void* parg)
 void ThreadDumpAddress(void* parg)
 {
     // Make this thread recognisable as the address dumping thread
-    RenameThread("novacoin-adrdump");
+    RenameThread("bitcoin-adrdump");
 
     try
     {
@@ -1269,7 +1269,7 @@ void ThreadDumpAddress(void* parg)
 void ThreadOpenConnections(void* parg)
 {
     // Make this thread recognisable as the connection opening thread
-    RenameThread("novacoin-opencon");
+    RenameThread("bitcoin-opencon");
 
     try
     {
@@ -1451,7 +1451,7 @@ void ThreadOpenConnections2(void* parg)
 void ThreadOpenAddedConnections(void* parg)
 {
     // Make this thread recognisable as the connection opening thread
-    RenameThread("novacoin-opencon");
+    RenameThread("bitcoin-opencon");
 
     try
     {
@@ -1582,7 +1582,7 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOu
 void ThreadMessageHandler(void* parg)
 {
     // Make this thread recognisable as the message handling thread
-    RenameThread("novacoin-msghand");
+    RenameThread("bitcoin-msghand");
 
     try
     {
@@ -1833,7 +1833,7 @@ void static Discover()
 void StartNode(void* parg)
 {
     // Make this thread recognisable as the startup thread
-    RenameThread("novacoin-start");
+    RenameThread("bitcoin-start");
 
     if (semOutbound == NULL) {
         // initialize semaphore
@@ -1895,10 +1895,6 @@ bool StopNode()
     fShutdown = true;
     nTransactionsUpdated++;
     int64 nStart = GetTime();
-    {
-        LOCK(cs_main);
-        ThreadScriptCheckQuit();
-    }
     if (semOutbound)
         for (int i=0; i<MAX_OUTBOUND_CONNECTIONS; i++)
             semOutbound->post();
@@ -1925,8 +1921,7 @@ bool StopNode()
     if (vnThreadsRunning[THREAD_ADDEDCONNECTIONS] > 0) printf("ThreadOpenAddedConnections still running\n");
     if (vnThreadsRunning[THREAD_DUMPADDRESS] > 0) printf("ThreadDumpAddresses still running\n");
     if (vnThreadsRunning[THREAD_MINTER] > 0) printf("ThreadStakeMinter still running\n");
-    if (vnThreadsRunning[THREAD_SCRIPTCHECK] > 0) printf("ThreadScriptCheck still running\n");
-    while (vnThreadsRunning[THREAD_MESSAGEHANDLER] > 0 || vnThreadsRunning[THREAD_RPCHANDLER] > 0 || vnThreadsRunning[THREAD_SCRIPTCHECK] > 0)
+    while (vnThreadsRunning[THREAD_MESSAGEHANDLER] > 0 || vnThreadsRunning[THREAD_RPCHANDLER] > 0)
         Sleep(20);
     Sleep(50);
     DumpAddresses();

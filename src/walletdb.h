@@ -7,7 +7,6 @@
 
 #include "db.h"
 #include "base58.h"
-#include "keystore.h"
 
 class CKeyPool;
 class CAccount;
@@ -121,12 +120,6 @@ public:
     {
         nWalletDBUpdated++;
         return Write(std::make_pair(std::string("cscript"), hash), redeemScript, false);
-    }
-
-    bool WriteWatchOnly(const CTxDestination &dest)
-    {
-        nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("watch"), CBitcoinAddress(dest).ToString()), '1');
     }
 
     bool WriteBestBlock(const CBlockLocator& locator)

@@ -287,19 +287,6 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
                     wss.fAnyUnordered = true;
             }
         }
-        else if (strType == "watch")
-        {
-            std::string strAddress;
-            ssKey >> strAddress;
-            char fYes;
-            ssValue >> fYes;
-            if (fYes == '1')
-                pwallet->LoadWatchOnly(CBitcoinAddress(strAddress).Get());
-
-            // Watch-only addresses have no birthday information for now,
-            // so set the wallet birthday to the beginning of time.
-            pwallet->nTimeFirstKey = 1;
-        }
         else if (strType == "key" || strType == "wkey")
         {
             vector<unsigned char> vchPubKey;
@@ -556,7 +543,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
 void ThreadFlushWalletDB(void* parg)
 {
     // Make this thread recognisable as the wallet flushing thread
-    RenameThread("novacoin-wallet");
+    RenameThread("bitcoin-wallet");
 
     const string& strFile = ((const string*)parg)[0];
     static bool fOneThread;

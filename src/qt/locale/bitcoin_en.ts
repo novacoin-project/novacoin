@@ -1458,11 +1458,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Unconfirmed:</translation>
     </message>
     <message>
-        <location line="-55"/>
-        <source>Unspendable:</source>
-        <translation>Unspendable:</translation>
-    </message>
-    <message>
         <location line="-107"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
@@ -1486,11 +1481,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="-147"/>
         <source>Your current balance</source>
         <translation>Your current balance</translation>
-    </message>
-    <message>
-        <location line="-147"/>
-        <source>Your unspendable balance</source>
-        <translation>Your unspendable balance</translation>
     </message>
     <message>
         <location line="+58"/>

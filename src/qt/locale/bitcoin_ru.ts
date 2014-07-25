@@ -1491,11 +1491,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Незрелые:</translation>
     </message>
     <message>
-        <location line="+136"/>
-        <source>Unspendable:</source>
-        <translation>Недоступно:</translation>
-    </message>
-    <message>
         <location line="+13"/>
         <source>Mined balance that has not yet matured</source>
         <translation>Баланс добытых монет, который ещё не созрел</translation>
@@ -1509,11 +1504,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="-147"/>
         <source>Your current balance</source>
         <translation>Ваш текущий баланс</translation>
-    </message>
-    <message>
-        <location line="-147"/>
-        <source>Your unspendable balance</source>
-        <translation>Недоступный баланс</translation>
     </message>
     <message>
         <location line="+58"/>

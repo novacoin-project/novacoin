@@ -18,7 +18,6 @@
 #include "netbase.h"
 #include "protocol.h"
 #include "addrman.h"
-#include "hash.h"
 
 class CRequestTracker;
 class CNode;
@@ -107,7 +106,6 @@ enum threadId
     THREAD_DUMPADDRESS,
     THREAD_RPCHANDLER,
     THREAD_MINTER,
-    THREAD_SCRIPTCHECK,
 
     THREAD_MAX
 };

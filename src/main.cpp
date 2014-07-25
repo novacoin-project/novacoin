@@ -10,7 +10,6 @@
 #include "net.h"
 #include "init.h"
 #include "ui_interface.h"
-#include "checkqueue.h"
 #include "kernel.h"
 #include "zerocoin/Zerocoin.h"
 #include <boost/algorithm/string/replace.hpp>
@@ -60,7 +59,6 @@ uint256 nBestInvalidTrust = 0;
 uint256 hashBestChain = 0;
 CBlockIndex* pindexBest = NULL;
 int64 nTimeBestReceived = 0;
-int nScriptCheckThreads = 0;
 
 CMedianFilter<int> cPeerBlockCounts(5, 0); // Amount of blocks that other nodes claim to have
 
@@ -313,7 +311,7 @@ bool CTransaction::IsStandard() const
             return false;
         if (!txin.scriptSig.IsPushOnly())
             return false;
-        if (!txin.scriptSig.HasCanonicalPushes()) {
+        if (fEnforceCanonical && !txin.scriptSig.HasCanonicalPushes()) {
             return false;
         }
     }
@@ -327,7 +325,7 @@ bool CTransaction::IsStandard() const
             if (txout.nValue == 0) {
                 return false;
             }
-            if (!txout.scriptPubKey.HasCanonicalPushes()) {
+            if (fEnforceCanonical && !txout.scriptPubKey.HasCanonicalPushes()) {
                 return false;
             }
         }
@@ -377,7 +375,7 @@ bool CTransaction::AreInputsStandard(const MapPrevTx& mapInputs) const
         // beside "push data" in the scriptSig the
         // IsStandard() call returns false
         vector<vector<unsigned char> > stack;
-        if (!EvalScript(stack, vin[i].scriptSig, *this, i, false, 0))
+        if (!EvalScript(stack, vin[i].scriptSig, *this, i, 0))
             return false;
 
         if (whichType == TX_SCRIPTHASH)
@@ -726,7 +724,7 @@ bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
 
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
-        if (!tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1), pindexBest, false, false, true, SIG_SWITCH_TIME < tx.nTime ? STRICT_FLAGS : SOFT_FLAGS))
+        if (!tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1), pindexBest, false, false))
         {
             return error("CTxMemPool::accept() : ConnectInputs failed %s", hash.ToString().substr(0,10).c_str());
         }
@@ -1460,26 +1458,13 @@ unsigned int CTransaction::GetP2SHSigOpCount(const MapPrevTx& inputs) const
     return nSigOps;
 }
 
-bool CScriptCheck::operator()() const {
-    const CScript &scriptSig = ptxTo->vin[nIn].scriptSig;
-    if (!VerifyScript(scriptSig, scriptPubKey, *ptxTo, nIn, nFlags, nHashType))
-        return error("CScriptCheck() : %s VerifySignature failed", ptxTo->GetHash().ToString().substr(0,10).c_str());
-    return true;
-}
-
-bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType)
-{
-    return CScriptCheck(txFrom, txTo, nIn, flags, nHashType)();
-}
-
 bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTxIndex>& mapTestPool, const CDiskTxPos& posThisTx,
-    const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, bool fScriptChecks, unsigned int flags, std::vector<CScriptCheck> *pvChecks)
+    const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, bool fStrictPayToScriptHash)
 {
     // Take over previous transactions' spent pointers
     // fBlock is true when this is called from AcceptBlock when a new best-block is added to the blockchain
     // fMiner is true when called from the internal bitcoin miner
     // ... both are false when called from CTransaction::AcceptToMemoryPool
-
     if (!IsCoinBase())
     {
         int64 nValueIn = 0;
@@ -1510,10 +1495,6 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
                 return DoS(100, error("ConnectInputs() : txin values out of range"));
 
         }
-
-        if (pvChecks)
-            pvChecks->reserve(vin.size());
-
         // The first loop above does all the inexpensive checks.
         // Only if ALL inputs pass do we perform expensive ECDSA signature checks.
         // Helps prevent CPU exhaustion attacks.
@@ -1533,24 +1514,16 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
             // Skip ECDSA signature verification when connecting blocks (fBlock=true)
             // before the last blockchain checkpoint. This is safe because block merkle hashes are
             // still computed and checked, and any change will be caught at the next checkpoint.
-            if (fScriptChecks)
+            if (!(fBlock && (nBestHeight < Checkpoints::GetTotalBlocksEstimate())))
             {
                 // Verify signature
-                CScriptCheck check(txPrev, *this, i, flags, 0);
-                if (pvChecks)
+                if (!VerifySignature(txPrev, *this, i, fStrictPayToScriptHash, 0))
                 {
-                    pvChecks->push_back(CScriptCheck());
-                    check.swap(pvChecks->back());
-                }
-                else if (!check())
-                {
-                    if (flags & STRICT_FLAGS)
-                    {
-                        // Don't trigger DoS code in case of STRICT_FLAGS caused failure.
-                        CScriptCheck check(txPrev, *this, i, flags & ~STRICT_FLAGS, 0);
-                        if (check())
-                            return error("ConnectInputs() : %s strict VerifySignature failed", GetHash().ToString().substr(0,10).c_str());
-                    }
+                    // only during transition phase for P2SH: do not invoke anti-DoS code for
+                    // potentially old clients relaying bad P2SH transactions
+                    if (fStrictPayToScriptHash && VerifySignature(txPrev, *this, i, false, 0))
+                        return error("ConnectInputs() : %s P2SH VerifySignature failed", GetHash().ToString().substr(0,10).c_str());
+
                     return DoS(100,error("ConnectInputs() : %s VerifySignature failed", GetHash().ToString().substr(0,10).c_str()));
                 }
             }
@@ -1578,7 +1551,7 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
             int64 nCalculatedReward = GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize) + CENT;
 
             if (nReward > nCalculatedReward)
-                return DoS(100, error("ConnectInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nReward, nCalculatedReward));
+                return DoS(100, error("CheckInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nReward, nCalculatedReward));
         }
         else
         {
@@ -1621,8 +1594,8 @@ bool CTransaction::ClientConnectInputs()
                 return false;
 
             // Verify signature
-            if (!VerifySignature(txPrev, *this, i, SCRIPT_VERIFY_NOCACHE | SCRIPT_VERIFY_P2SH, 0))
-                return error("ClientConnectInputs() : VerifySignature failed");
+            if (!VerifySignature(txPrev, *this, i, true, 0))
+                return error("ConnectInputs() : VerifySignature failed");
 
             ///// this is redundant with the mempool.mapNextTx stuff,
             ///// not sure which I want to get rid of
@@ -1673,19 +1646,6 @@ bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
     return true;
 }
 
-static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
-
-void ThreadScriptCheck(void*) {
-    vnThreadsRunning[THREAD_SCRIPTCHECK]++;
-    RenameThread("novacoin-scriptch");
-    scriptcheckqueue.Thread();
-    vnThreadsRunning[THREAD_SCRIPTCHECK]--;
-}
-
-void ThreadScriptCheckQuit() {
-    scriptcheckqueue.Quit();
-}
-
 bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 {
     // Check it again in case a previous version let a bad block in, but skip BlockSig checking
@@ -1707,7 +1667,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     // two in the chain that violate it. This prevents exploiting the issue against nodes in their
     // initial block download.
     bool fEnforceBIP30 = true; // Always active in NovaCoin
-    bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate();
+    bool fStrictPayToScriptHash = true; // Always active in NovaCoin
 
     //// issue here: it doesn't know the version
     unsigned int nTxPos;
@@ -1719,8 +1679,6 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
         nTxPos = pindex->nBlockPos + ::GetSerializeSize(CBlock(), SER_DISK, CLIENT_VERSION) - (2 * GetSizeOfCompactSize(0)) + GetSizeOfCompactSize(vtx.size());
 
     map<uint256, CTxIndex> mapQueuedChanges;
-    CCheckQueueControl<CScriptCheck> control(fScriptChecks && nScriptCheckThreads ? &scriptcheckqueue : NULL);
-
     int64 nFees = 0;
     int64 nValueIn = 0;
     int64 nValueOut = 0;
@@ -1755,12 +1713,15 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             if (!tx.FetchInputs(txdb, mapQueuedChanges, true, false, mapInputs, fInvalid))
                 return false;
 
-            // Add in sigops done by pay-to-script-hash inputs;
-            // this is to prevent a "rogue miner" from creating
-            // an incredibly-expensive-to-validate block.
-            nSigOps += tx.GetP2SHSigOpCount(mapInputs);
-            if (nSigOps > MAX_BLOCK_SIGOPS)
-                return DoS(100, error("ConnectBlock() : too many sigops"));
+            if (fStrictPayToScriptHash)
+            {
+                // Add in sigops done by pay-to-script-hash inputs;
+                // this is to prevent a "rogue miner" from creating
+                // an incredibly-expensive-to-validate block.
+                nSigOps += tx.GetP2SHSigOpCount(mapInputs);
+                if (nSigOps > MAX_BLOCK_SIGOPS)
+                    return DoS(100, error("ConnectBlock() : too many sigops"));
+            }
 
             int64 nTxValueIn = tx.GetValueIn(mapInputs);
             int64 nTxValueOut = tx.GetValueOut();
@@ -1769,17 +1730,12 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             if (!tx.IsCoinStake())
                 nFees += nTxValueIn - nTxValueOut;
 
-            std::vector<CScriptCheck> vChecks;
-            if (!tx.ConnectInputs(txdb, mapInputs, mapQueuedChanges, posThisTx, pindex, true, false, fScriptChecks, SCRIPT_VERIFY_NOCACHE | SCRIPT_VERIFY_P2SH, nScriptCheckThreads ? &vChecks : NULL))
+            if (!tx.ConnectInputs(txdb, mapInputs, mapQueuedChanges, posThisTx, pindex, true, false, fStrictPayToScriptHash))
                 return false;
-            control.Add(vChecks);
         }
 
         mapQueuedChanges[hashTx] = CTxIndex(posThisTx, tx.vout.size());
     }
-
-    if (!control.Wait())
-        return DoS(100, false);
 
     if (IsProofOfWork())
     {
