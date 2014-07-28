@@ -26,7 +26,6 @@ public:
         ProxyUse,          // bool
         ProxyIP,           // QString
         ProxyPort,         // int
-        ProxySocksVersion, // int
         Fee,               // qint64
         ReserveBalance,    // qint64
         DisplayUnit,       // BitcoinUnits::Unit
