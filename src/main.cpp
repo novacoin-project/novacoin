@@ -726,7 +726,6 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
 
     // Store transaction in memory
     {
-        LOCK(pool.cs);
         if (ptxOld)
         {
             printf("AcceptToMemoryPool : replacing tx %s with new version\n", ptxOld->GetHash().ToString().c_str());
@@ -748,8 +747,10 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx,
 
 bool CTxMemPool::addUnchecked(const uint256& hash, CTransaction &tx)
 {
-    // Add to memory pool without checking anything.  Don't call this directly,
-    // call AcceptToMemoryPool to properly check the transaction first.
+    // Add to memory pool without checking anything.
+    // Used by main.cpp AcceptToMemoryPool(), which DOES do
+    // all the appropriate checks.
+    LOCK(cs);
     {
         mapTx[hash] = tx;
         for (unsigned int i = 0; i < tx.vin.size(); i++)
