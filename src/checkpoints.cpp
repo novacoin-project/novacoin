@@ -28,15 +28,11 @@ namespace Checkpoints
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
         ( 0,      hashGenesisBlock )
-        ( 1500,   uint256("0x000000000079987db951032e017b8e337016296bffdb83ae87dd7fc79c26668d") )
-        ( 5001,   uint256("0x2fac9021be0c311e7b6dc0933a72047c70f817e2eb1e01bede011193ad1b28bc") )
-        ( 5500,   uint256("0x00000000001636e6cb9747abc92354385f43d6580ecf7326269aa92bd5b2beac") )
-        ( 14000,  uint256("0xa82c673016dcb5ebf6dad3e772a22848454e4a32568b02a994a60612ba68a3b1") )
-        ( 37000,  uint256("0xa36f0013842adeb27aa70d20541925364879fdec25e84d6b4c4b256b71e48791") )
-        ( 38424,  uint256("0x8d82bf5332ea5540ae7aae53b77c4bde6ce96f00a30358b755ba3f15ee01096f") )
-        ( 61100,  uint256("0xdbb6934ec506b0c6d96f3c1ab36cd8831c966446a15c128486361399a8fdc4c2") )
-        ( 80000,  uint256("0xa47cec53d42bc095b7b6e10d96a221bd85c0796f8cdcf157d96cf0d91e6a52b2") )
-        ( 254348, uint256("0x9bf8d9bd757d3ef23d5906d70567e5f0da93f1e0376588c8d421a95e2421838b") )
+        ( 5001,   uint256("0x2fac9021be0c311e7b6dc0933a72047c70f817e2eb1e01bede011193ad1b28bc") ) // hardfork
+        ( 10000,  uint256("0x0000000000827e4dc601f7310a91c45af8df0dfc1b6fa1dfa5b896cb00c8767c") ) // last pow block
+        ( 38425,  uint256("0x62bf2e9701226d2f88d9fa99d650bd81f3faf2e56f305b7d71ccd1e7aa9c3075") ) // hardfork
+        ( 254348, uint256("0x9bf8d9bd757d3ef23d5906d70567e5f0da93f1e0376588c8d421a95e2421838b") ) // minor network split
+        ( 319002, uint256("0x0011494d03b2cdf1ecfc8b0818f1e0ef7ee1d9e9b3d1279c10d35456bc3899ef") ) // hardfork
     ;
 
     // TestNet has no checkpoints
