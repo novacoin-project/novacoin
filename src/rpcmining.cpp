@@ -460,8 +460,8 @@ Value getblocktemplate(const Array& params, bool fHelp)
             }
             entry.push_back(Pair("depends", deps));
 
-            int64_t nSigOps = tx.GetLegacySigOpCount();
-            nSigOps += tx.GetP2SHSigOpCount(mapInputs);
+            int64_t nSigOps = GetLegacySigOpCount(tx);
+            nSigOps += GetP2SHSigOpCount(tx, mapInputs);
             entry.push_back(Pair("sigops", nSigOps));
         }
 
