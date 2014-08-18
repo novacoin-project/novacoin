@@ -16,7 +16,6 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
     transactionTableModel(0),
     cachedBalance(0), cachedStake(0), cachedUnconfirmedBalance(0), cachedImmatureBalance(0),
-    cachedNumTransactions(0),
     cachedEncryptionStatus(Unencrypted),
     cachedNumBlocks(0)
 {
@@ -54,16 +53,6 @@ qint64 WalletModel::getStake() const
 qint64 WalletModel::getImmatureBalance() const
 {
     return wallet->GetImmatureBalance();
-}
-
-int WalletModel::getNumTransactions() const
-{
-    int numTransactions = 0;
-    {
-        LOCK(wallet->cs_wallet);
-        numTransactions = wallet->mapWallet.size();
-    }
-    return numTransactions;
 }
 
 void WalletModel::updateStatus()
@@ -121,13 +110,6 @@ void WalletModel::updateTransaction(const QString &hash, int status)
 
     // Balance and number of transactions might have changed
     checkBalanceChanged();
-
-    int newNumTransactions = getNumTransactions();
-    if(cachedNumTransactions != newNumTransactions)
-    {
-        cachedNumTransactions = newNumTransactions;
-        emit numTransactionsChanged(newNumTransactions);
-    }
 }
 
 void WalletModel::updateAddressBook(const QString &address, const QString &label, bool isMine, int status)
