@@ -44,37 +44,37 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Double-click to edit address or label</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+24"/>
         <source>Create a new address</source>
         <translation>Create a new address</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>Copy the currently selected address to the system clipboard</source>
         <translation>Copy the currently selected address to the system clipboard</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-7"/>
         <source>&amp;New Address</source>
         <translation>&amp;New Address</translation>
     </message>
     <message>
-        <location line="-46"/>
+        <location line="-43"/>
         <source>These are your BlackCoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
         <translation>These are your BlackCoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+53"/>
         <source>&amp;Copy Address</source>
         <translation>&amp;Copy Address</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+7"/>
         <source>Show &amp;QR Code</source>
         <translation>Show &amp;QR Code</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+7"/>
         <source>Sign a message to prove you own a BlackCoin address</source>
         <translation>Sign a message to prove you own a BlackCoin address</translation>
     </message>
@@ -84,12 +84,12 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+17"/>
         <source>Delete the currently selected address from the list</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-10"/>
         <source>Verify a message to ensure it was signed with a specified BlackCoin address</source>
         <translation>Verify a message to ensure it was signed with a specified BlackCoin address</translation>
     </message>
@@ -99,7 +99,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Verify Message</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>&amp;Delete</source>
         <translation>&amp;Delete</translation>
     </message>
@@ -306,22 +306,17 @@ This product includes software developed by the OpenSSL Project for use in the O
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../bitcoingui.cpp" line="+293"/>
         <source>Sign &amp;message...</source>
         <translation>Sign &amp;message...</translation>
     </message>
     <message>
-        <location line="+242"/>
+        <location line="+266"/>
         <source>Synchronizing with network...</source>
         <translation>Synchronizing with network...</translation>
     </message>
     <message>
-        <location line="-308"/>
-        <source>&amp;Overview</source>
-        <translation>&amp;Overview</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-330"/>
         <source>Show general overview of wallet</source>
         <translation>Show general overview of wallet</translation>
     </message>
@@ -346,22 +341,12 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Edit the list of stored addresses and labels</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <source>&amp;Receive coins</source>
-        <translation>&amp;Receive coins</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-18"/>
         <source>Show the list of addresses for receiving payments</source>
         <translation>Show the list of addresses for receiving payments</translation>
     </message>
     <message>
-        <location line="-7"/>
-        <source>&amp;Send coins</source>
-        <translation>&amp;Send coins</translation>
-    </message>
-    <message>
-        <location line="+35"/>
+        <location line="+34"/>
         <source>E&amp;xit</source>
         <translation>E&amp;xit</translation>
     </message>
@@ -396,7 +381,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Encrypt Wallet...</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>&amp;Backup Wallet...</source>
         <translation>&amp;Backup Wallet...</translation>
     </message>
@@ -406,7 +391,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Change Passphrase...</translation>
     </message>
     <message numerus="yes">
-        <location line="+250"/>
+        <location line="+274"/>
         <source>~%n block(s) remaining</source>
         <translation>
             <numerusform>~%n block remaining</numerusform>
@@ -414,37 +399,37 @@ This product includes software developed by the OpenSSL Project for use in the O
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Downloaded %1 of %2 blocks of transaction history (%3% done).</source>
         <translation>Downloaded %1 of %2 blocks of transaction history (%3% done).</translation>
     </message>
     <message>
-        <location line="-247"/>
+        <location line="-272"/>
         <source>&amp;Export...</source>
         <translation>&amp;Export...</translation>
     </message>
     <message>
-        <location line="-62"/>
+        <location line="-55"/>
         <source>Send coins to a BlackCoin address</source>
         <translation>Send coins to a BlackCoin address</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+39"/>
         <source>Modify configuration options for BlackCoin</source>
         <translation>Modify configuration options for BlackCoin</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Export the data in the current tab to a file</source>
         <translation>Export the data in the current tab to a file</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-13"/>
         <source>Encrypt or decrypt wallet</source>
         <translation>Encrypt or decrypt wallet</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>Backup wallet to another location</source>
         <translation>Backup wallet to another location</translation>
     </message>
@@ -469,7 +454,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Verify message...</translation>
     </message>
     <message>
-        <location line="-200"/>
+        <location line="-212"/>
         <source>BlackCoin</source>
         <translation>BlackCoin</translation>
     </message>
@@ -479,7 +464,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Wallet</translation>
     </message>
     <message>
-        <location line="+178"/>
+        <location line="+191"/>
         <source>&amp;About BlackCoin</source>
         <translation>&amp;About BlackCoin</translation>
     </message>
@@ -489,7 +474,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Show / Hide</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>Unlock wallet</source>
         <translation type="unfinished">Unlock wallet</translation>
     </message>
@@ -504,7 +489,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+28"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
@@ -519,24 +504,19 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Help</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+17"/>
         <source>Tabs toolbar</source>
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Actions toolbar</source>
-        <translation>Actions toolbar</translation>
-    </message>
-    <message>
-        <location line="+13"/>
+        <location line="+45"/>
         <location line="+9"/>
         <source>[testnet]</source>
         <translation>[testnet]</translation>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+60"/>
+        <location line="+58"/>
         <source>BlackCoin client</source>
         <translation>BlackCoin client</translation>
     </message>
@@ -549,12 +529,12 @@ This product includes software developed by the OpenSSL Project for use in the O
         </translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+41"/>
         <source>Downloaded %1 blocks of transaction history.</source>
         <translation>Downloaded %1 blocks of transaction history.</translation>
     </message>
     <message>
-        <location line="+427"/>
+        <location line="+433"/>
         <source>Staking.&lt;br&gt;Your weight is %1&lt;br&gt;Network weight is %2&lt;br&gt;Expected time to earn reward is %3</source>
         <translation></translation>
     </message>
@@ -579,7 +559,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation></translation>
     </message>
     <message numerus="yes">
-        <location line="-417"/>
+        <location line="-422"/>
         <source>%n second(s) ago</source>
         <translation>
             <numerusform>%n second ago</numerusform>
@@ -587,12 +567,27 @@ This product includes software developed by the OpenSSL Project for use in the O
         </translation>
     </message>
     <message>
-        <location line="-284"/>
+        <location line="-371"/>
+        <source>&amp;Dashboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&amp;Receive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&amp;Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+49"/>
         <source>&amp;Unlock Wallet...</source>
         <translation></translation>
     </message>
     <message numerus="yes">
-        <location line="+288"/>
+        <location line="+314"/>
         <source>%n minute(s) ago</source>
         <translation>
             <numerusform>%n minute ago</numerusform>
@@ -631,7 +626,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Last received block was generated %1.</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+61"/>
         <source>This transaction is over the size limit.  You can still send it for a fee of %1, which goes to the nodes that process your transaction and helps to support the network.  Do you want to pay the fee?</source>
         <translation></translation>
     </message>
@@ -676,17 +671,22 @@ Address: %4
         <translation>URI can not be parsed! This can be caused by an invalid BlackCoin address or malformed URI parameters.</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+9"/>
+        <source>Wallet is &lt;b&gt;not encrypted&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+8"/>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <source>Backup Wallet</source>
         <translation>Backup Wallet</translation>
     </message>
@@ -706,7 +706,7 @@ Address: %4
         <translation>There was an error trying to save the wallet data to the new location.</translation>
     </message>
     <message numerus="yes">
-        <location line="+90"/>
+        <location line="+91"/>
         <source>%n second(s)</source>
         <translation>
             <numerusform>%n second</numerusform>
@@ -738,7 +738,7 @@ Address: %4
         </translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+24"/>
         <source>Not staking</source>
         <translation type="unfinished"></translation>
     </message>
@@ -994,7 +994,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <location line="+66"/>
         <source>(no label)</source>
         <translation type="unfinished">(no label)</translation>
@@ -1271,16 +1271,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+9"/>
-        <source>Whether to show BlackCoin addresses in the transaction list or not.</source>
-        <translation>Whether to show BlackCoin addresses in the transaction list or not.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Display addresses in transaction list</source>
-        <translation>&amp;Display addresses in transaction list</translation>
-    </message>
-    <message>
-        <location line="+7"/>
         <source>Whether to show coin control features or not.</source>
         <translation></translation>
     </message>
@@ -1288,6 +1278,21 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+3"/>
         <source>Display coin &amp;control features (experts only!)</source>
         <translation></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Whether to select the coin outputs randomly or with minimal coin age.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minimize weight consumption (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Use black visual theme (requires restart)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+71"/>
@@ -1310,7 +1315,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>default</translation>
     </message>
     <message>
-        <location line="+148"/>
+        <location line="+149"/>
         <location line="+9"/>
         <source>Warning</source>
         <translation>Warning</translation>
@@ -1335,23 +1340,23 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Form</translation>
     </message>
     <message>
-        <location line="+33"/>
-        <location line="+231"/>
+        <location line="+27"/>
+        <location line="+247"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the BlackCoin network after a connection is established, but this process has not completed yet.</source>
         <translation>The displayed information may be out of date. Your wallet automatically synchronizes with the BlackCoin network after a connection is established, but this process has not completed yet.</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-173"/>
         <source>Stake:</source>
         <translation>Stake:</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+32"/>
         <source>Unconfirmed:</source>
         <translation>Unconfirmed:</translation>
     </message>
     <message>
-        <location line="-107"/>
+        <location line="-113"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
     </message>
@@ -1366,7 +1371,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+80"/>
         <source>Immature:</source>
         <translation>Immature:</translation>
     </message>
@@ -1376,7 +1381,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Mined balance that has not yet matured</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+23"/>
         <source>Total:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1386,17 +1391,17 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+50"/>
         <source>&lt;b&gt;Recent transactions&lt;/b&gt;</source>
         <translation>&lt;b&gt;Recent transactions&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="-118"/>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the current balance</source>
         <translation>Total of transactions that have yet to be confirmed, and do not yet count toward the current balance</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-32"/>
         <source>Total of coins that was staked, and do not yet count toward the current balance</source>
         <translation>Total of coins that was staked, and do not yet count toward the current balance</translation>
     </message>
@@ -1726,7 +1731,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <source>Remove all transaction fields</source>
         <translation>Remove all transaction fields</translation>
     </message>
@@ -1736,7 +1741,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Clear &amp;All</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+24"/>
         <source>Balance:</source>
         <translation>Balance:</translation>
     </message>
@@ -2422,7 +2427,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>(n/a)</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+194"/>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
         <translation>Transaction status. Hover over this field to show number of confirmations.</translation>
     </message>
@@ -2450,13 +2455,13 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>TransactionView</name>
     <message>
-        <location filename="../transactionview.cpp" line="+55"/>
-        <location line="+16"/>
+        <location filename="../transactionview.cpp" line="+57"/>
+        <location line="+17"/>
         <source>All</source>
         <translation>All</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-16"/>
         <source>Today</source>
         <translation>Today</translation>
     </message>
@@ -2486,7 +2491,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Range...</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Received with</source>
         <translation>Received with</translation>
     </message>
@@ -2551,7 +2556,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Show transaction details</translation>
     </message>
     <message>
-        <location line="+144"/>
+        <location line="+143"/>
         <source>Export Transaction Data</source>
         <translation>Export Transaction Data</translation>
     </message>
@@ -2707,12 +2712,22 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Specify your own public address</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Bind to given address. Use [host]:port notation for IPv6</source>
         <translation>Bind to given address. Use [host]:port notation for IPv6</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Always query for peer addresses via DNS lookup (default: 0)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>Threshold for disconnecting misbehaving peers (default: 100)</translation>
     </message>
@@ -2722,12 +2737,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Number of seconds to keep misbehaving peers from reconnecting (default: 86400)</translation>
     </message>
     <message>
-        <location line="-43"/>
+        <location line="-45"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+157"/>
+        <location line="+158"/>
         <source>Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
         <translation></translation>
     </message>
@@ -2737,7 +2752,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation></translation>
     </message>
     <message>
-        <location line="-87"/>
+        <location line="-86"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation></translation>
     </message>
@@ -2747,7 +2762,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Accept command line and JSON-RPC commands</translation>
     </message>
     <message>
-        <location line="+101"/>
+        <location line="+100"/>
         <source>Error: Transaction creation failed  </source>
         <translation></translation>
     </message>
@@ -2767,7 +2782,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation></translation>
     </message>
     <message>
-        <location line="-88"/>
+        <location line="-87"/>
         <source>Run in the background as a daemon and accept commands</source>
         <translation>Run in the background as a daemon and accept commands</translation>
     </message>
@@ -2777,17 +2792,17 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Use the test network</translation>
     </message>
     <message>
-        <location line="-21"/>
+        <location line="-24"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>Accept connections from outside (default: 1 if no -proxy or -connect)</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-37"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv6, falling back to IPv4: %s</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+115"/>
+        <location line="+116"/>
         <source>Error initializing database environment %s! To recover, BACKUP THAT DIRECTORY, then remove everything from it except for wallet.dat.</source>
         <translation></translation>
     </message>
@@ -2827,7 +2842,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Block creation options:</translation>
     </message>
     <message>
-        <location line="-59"/>
+        <location line="-60"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Connect only to the specified node(s)</translation>
     </message>
@@ -2837,22 +2852,17 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Discover own IP address (default: 1 when listening and no -externalip)</translation>
     </message>
     <message>
-        <location line="+92"/>
+        <location line="+93"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Failed to listen on any port. Use -listen=0 if you want this.</translation>
     </message>
     <message>
-        <location line="-88"/>
-        <source>Find peers using DNS lookup (default: 1)</source>
-        <translation>Find peers using DNS lookup (default: 1)</translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="-83"/>
         <source>Sync checkpoints policy (default: strict)</source>
         <translation>Sync checkpoints policy (default: strict)</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+81"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Invalid -tor address: &apos;%s&apos;</translation>
     </message>
@@ -2862,7 +2872,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation></translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-80"/>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: 5000)</source>
         <translation>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: 5000)</translation>
     </message>
@@ -2872,12 +2882,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Maximum per-connection send buffer, &lt;n&gt;*1000 bytes (default: 1000)</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-17"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+27"/>
         <source>Output extra debugging information. Implies all other -debug* options</source>
         <translation>Output extra debugging information. Implies all other -debug* options</translation>
     </message>
@@ -2892,17 +2902,17 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Prepend debug output with timestamp</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+34"/>
         <source>SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
         <translation>SSL options: (see the Bitcoin Wiki for SSL setup instructions)</translation>
     </message>
     <message>
-        <location line="-71"/>
+        <location line="-72"/>
         <source>Select the version of socks proxy to use (4-5, default: 5)</source>
         <translation>Select the version of socks proxy to use (4-5, default: 5)</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+40"/>
         <source>Send trace/debug info to console instead of debug.log file</source>
         <translation>Send trace/debug info to console instead of debug.log file</translation>
     </message>
@@ -2912,7 +2922,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Send trace/debug info to debugger</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>Set maximum block size in bytes (default: 250000)</source>
         <translation>Set maximum block size in bytes (default: 250000)</translation>
     </message>
@@ -2922,23 +2932,23 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Set minimum block size in bytes (default: 0)</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-28"/>
         <source>Shrink debug.log file on client startup (default: 1 when no -debug)</source>
         <translation>Shrink debug.log file on client startup (default: 1 when no -debug)</translation>
     </message>
     <message>
-        <location line="-39"/>
+        <location line="-41"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>Specify connection timeout in milliseconds (default: 5000)</translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="+108"/>
         <source>Unable to sign checkpoint, wrong checkpointkey?
 </source>
         <translation></translation>
     </message>
     <message>
-        <location line="-79"/>
+        <location line="-78"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Use UPnP to map the listening port (default: 0)</translation>
     </message>
@@ -2948,17 +2958,17 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Use UPnP to map the listening port (default: 1 when listening)</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-26"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>Use proxy to reach tor hidden services (default: same as -proxy)</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+41"/>
         <source>Username for JSON-RPC connections</source>
         <translation>Username for JSON-RPC connections</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+47"/>
         <source>Verifying database integrity...</source>
         <translation></translation>
     </message>
@@ -2983,12 +2993,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation></translation>
     </message>
     <message>
-        <location line="-55"/>
+        <location line="-54"/>
         <source>Password for JSON-RPC connections</source>
         <translation>Password for JSON-RPC connections</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-83"/>
         <source>%s, you must set a rpcpassword in the configuration file:
  %s
 It is recommended you use the following random password:
@@ -3003,12 +3013,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation type="unfinished">Find peers using internet relay chat (default: 1) {0)?}</translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="+57"/>
         <source>Sync time with other nodes. Disable if time on your system is precise e.g. syncing with NTP (default: 1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3040,11 +3045,6 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
     <message>
         <location line="+3"/>
         <source>Require a confirmations for change (default: 0)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enforce transaction scripts to use canonical PUSH operators (default: 1)</source>
         <translation></translation>
     </message>
     <message>
@@ -3118,12 +3118,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation></translation>
     </message>
     <message>
-        <location line="-155"/>
+        <location line="-156"/>
         <source>This help message</source>
         <translation>This help message</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+94"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>Wallet %s resides outside data directory %s.</translation>
     </message>
@@ -3133,17 +3133,17 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Cannot obtain a lock on data directory %s.  BlackCoin is probably already running.</translation>
     </message>
     <message>
-        <location line="-96"/>
+        <location line="-97"/>
         <source>BlackCoin</source>
         <translation>BlackCoin</translation>
     </message>
     <message>
-        <location line="+137"/>
+        <location line="+138"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>Unable to bind to %s on this computer (bind returned error %d, %s)</translation>
     </message>
     <message>
-        <location line="-127"/>
+        <location line="-128"/>
         <source>Connect through socks proxy</source>
         <translation>Connect through socks proxy</translation>
     </message>
@@ -3153,7 +3153,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Allow DNS lookups for -addnode, -seednode and -connect</translation>
     </message>
     <message>
-        <location line="+119"/>
+        <location line="+120"/>
         <source>Loading addresses...</source>
         <translation>Loading addresses...</translation>
     </message>
@@ -3238,22 +3238,27 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Loading block index...</translation>
     </message>
     <message>
-        <location line="-101"/>
+        <location line="-102"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Add a node to connect to and attempt to keep the connection open</translation>
     </message>
     <message>
-        <location line="+119"/>
+        <location line="+120"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>Unable to bind to %s on this computer. BlackCoin is probably already running.</translation>
     </message>
     <message>
-        <location line="-97"/>
+        <location line="-96"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Fee per KB to add to transactions you send</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+26"/>
+        <source>Minimize weight consumption (experimental) (default: 0)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+28"/>
         <source>Invalid amount for -mininput=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation></translation>
     </message>
@@ -3283,7 +3288,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Done loading</translation>
     </message>
     <message>
-        <location line="-164"/>
+        <location line="-165"/>
         <source>To use the %s option</source>
         <translation>To use the %s option</translation>
     </message>

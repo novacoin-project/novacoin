@@ -57,10 +57,12 @@ QT_TRANSLATE_NOOP("bitcoin-core", "Connect to a node to retrieve peer addresses,
 QT_TRANSLATE_NOOP("bitcoin-core", "Specify your own public address"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Only connect to nodes in network <net> (IPv4, IPv6 or Tor)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Discover own IP address (default: 1 when listening and no -externalip)"),
-QT_TRANSLATE_NOOP("bitcoin-core", "Find peers using internet relay chat (default: 0)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Accept connections from outside (default: 1 if no -proxy or -connect)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Bind to given address. Use [host]:port notation for IPv6"),
-QT_TRANSLATE_NOOP("bitcoin-core", "Find peers using DNS lookup (default: 1)"),
+QT_TRANSLATE_NOOP("bitcoin-core", ""
+"Query for peer addresses via DNS lookup, if low on addresses (default: 1 "
+"unless -connect)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Always query for peer addresses via DNS lookup (default: 0)"),
 QT_TRANSLATE_NOOP("bitcoin-core", ""
 "Sync time with other nodes. Disable if time on your system is precise e.g. "
 "syncing with NTP (default: 1)"),
@@ -99,8 +101,7 @@ QT_TRANSLATE_NOOP("bitcoin-core", ""
 "Execute command when a wallet transaction changes (%s in cmd is replaced by "
 "TxID)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Require a confirmations for change (default: 0)"),
-QT_TRANSLATE_NOOP("bitcoin-core", ""
-"Enforce transaction scripts to use canonical PUSH operators (default: 1)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Minimize weight consumption (experimental) (default: 0)"),
 QT_TRANSLATE_NOOP("bitcoin-core", ""
 "Execute command when a relevant alert is received (%s in cmd is replaced by "
 "message)"),

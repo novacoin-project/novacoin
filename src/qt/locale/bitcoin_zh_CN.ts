@@ -25,15 +25,15 @@ Copyright © 2014 The BlackCoin developers</source>
         <source>
 This is experimental software.
 
-Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php.
+Distributed under the MIT/X11 software license, see the accompanying file COPYING or &lt;a href=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;http://www.opensource.org/licenses/mit-license.php&lt;/a&gt;.
 
-This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP software written by Thomas Bernard.</source>
+This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (&lt;a href=&quot;https://www.openssl.org/&quot;&gt;https://www.openssl.org/&lt;/a&gt;) and cryptographic software written by Eric Young (&lt;a href=&quot;mailto:eay@cryptsoft.com&quot;&gt;eay@cryptsoft.com&lt;/a&gt;) and UPnP software written by Thomas Bernard.</source>
         <translation>
-测试版软件
+这是一套实验性软件。
 
-经MIT/X11软件授权发布, 具体参见http://www.opensource.org/licenses/mit-license.php.
+本软件是依据MIT/X11软件授权条款散布。详情见附带的COPYING或&lt;a href=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;http://www.opensource.org/licenses/mit-license.php&lt;/a&gt;.
 
-本产品包括由OpenSSL Project (http://www.openssl.org/)开发的OpenSSL工具包 ，由 Eric Young (eay@cryptsoft.com) 撰写的密码学软件以及由 Thomas Bernard 撰写的UPnP软件.</translation>
+本产品包含了由OpenSSL Project开发的OpenSSL Toolkit (&lt;a href=&quot;https://www.openssl.org/&quot;&gt;https://www.openssl.org/&lt;/a&gt;)和Eric Young (&lt;a href=&quot;mailto:eay@cryptsoft.com&quot;&gt;eay@cryptsoft.com&lt;/a&gt;) 的加密软件，以及Thomas Bernard的UPnP软件。</translation>
     </message>
 </context>
 <context>
@@ -190,12 +190,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>仅用于权益增值</translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="+35"/>
-        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;10 or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>输入钱包的新密码。&lt;br/&gt;使用的密码请至少包含&lt;b&gt;10个以上随机字符&lt;/&gt;，或者是&lt;b&gt;8个以上的单词&lt;/b&gt;。</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location filename="../askpassphrasedialog.cpp" line="+38"/>
         <source>Encrypt wallet</source>
         <translation>加密钱包</translation>
     </message>
@@ -230,7 +225,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>请输入该钱包的旧密码与新密码。</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Confirm wallet encryption</source>
         <translation>确认加密钱包</translation>
     </message>
@@ -262,7 +257,12 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>钱包已加密</translation>
     </message>
     <message>
-        <location line="-58"/>
+        <location line="-140"/>
+        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>输入钱包的新密码。&lt;br/&gt;使用的密码请至少包含&lt;b&gt;10个以上随机字符&lt;/&gt;，或者是&lt;b&gt;8个以上的单词&lt;/b&gt;。</translation>
+    </message>
+    <message>
+        <location line="+82"/>
         <source>BlackCoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
         <translation>黑币客户端即将关闭以完成加密过程。请记住，加密钱包并不能完全防止您的电子货币被入侵您计算机的木马软件盗窃。</translation>
     </message>
@@ -553,7 +553,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>已下载 %1 个区块的交易记录</translation>
     </message>
     <message>
-        <location line="+413"/>
+        <location line="+427"/>
         <source>Staking.&lt;br&gt;Your weight is %1&lt;br&gt;Network weight is %2&lt;br&gt;Expected time to earn reward is %3</source>
         <translation>权益增值中 &lt;br&gt;您的权重为 %1 &lt;br&gt;网络总权重为 %2&lt;br&gt;预计将在 %3 之后获得收益</translation>
     </message>
@@ -578,7 +578,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>未进行权益增值，因为钱包中没有成熟的黑币</translation>
     </message>
     <message numerus="yes">
-        <location line="-403"/>
+        <location line="-417"/>
         <source>%n second(s) ago</source>
         <translation><numerusform>%n 秒前</numerusform></translation>
     </message>
@@ -693,7 +693,7 @@ Address: %4
         <translation>试图将钱包地址保存到新位置时出现错误</translation>
     </message>
     <message numerus="yes">
-        <location line="+76"/>
+        <location line="+90"/>
         <source>%n second(s)</source>
         <translation><numerusform>%n秒</numerusform></translation>
     </message>
@@ -726,7 +726,7 @@ Address: %4
 <context>
     <name>ClientModel</name>
     <message>
-        <location filename="../clientmodel.cpp" line="+90"/>
+        <location filename="../clientmodel.cpp" line="+98"/>
         <source>Network Alert</source>
         <translation>网络警报</translation>
     </message>
@@ -1063,7 +1063,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>GUIUtil::HelpMessageBox</name>
     <message>
-        <location filename="../guiutil.cpp" line="+420"/>
+        <location filename="../guiutil.cpp" line="+424"/>
         <location line="+12"/>
         <source>BlackCoin-Qt</source>
         <translation>黑币客户端BlackCoin-Qt</translation>
@@ -1145,16 +1145,6 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+3"/>
         <source>&amp;Start BlackCoin on system login</source>
         <translation>开机时自动启动黑币客户端(&amp;S)</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Detach block and address databases at shutdown. This means they can be moved to another data directory, but it slows down shutdown. The wallet is always detached.</source>
-        <translation>关机时断开区块和地址数据连接使得它们可以被移动到其他目录。这样做会使关机速度变慢。钱包数据总是断开存储的。</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Detach databases at shutdown</source>
-        <translation>关机时断开区块和地址数据库连接(&amp;D)</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1302,7 +1292,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>默认</translation>
     </message>
     <message>
-        <location line="+149"/>
+        <location line="+148"/>
         <location line="+9"/>
         <source>Warning</source>
         <translation>警告</translation>
@@ -2110,17 +2100,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>TransactionDesc</name>
     <message>
-        <location filename="../transactiondesc.cpp" line="+19"/>
+        <location filename="../transactiondesc.cpp" line="+20"/>
         <source>Open until %1</source>
         <translation>至 %1 个数据块时开启</translation>
     </message>
-    <message numerus="yes">
-        <location line="-2"/>
-        <source>Open for %n block(s)</source>
-        <translation><numerusform>为 %n 个数据块开启</numerusform></translation>
-    </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>conflicted</source>
         <translation>发现冲突</translation>
     </message>
@@ -2140,7 +2125,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>%1 已确认</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
@@ -2261,7 +2246,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>输入</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+21"/>
         <source>Amount</source>
         <translation>金额</translation>
     </message>
@@ -2276,12 +2261,17 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>错误</translation>
     </message>
     <message>
-        <location line="-211"/>
+        <location line="-209"/>
         <source>, has not been successfully broadcast yet</source>
         <translation>，未被成功广播</translation>
     </message>
+    <message numerus="yes">
+        <location line="-36"/>
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>为 %n 个数据块开启</numerusform></translation>
+    </message>
     <message>
-        <location line="+35"/>
+        <location line="+71"/>
         <source>unknown</source>
         <translation>未知</translation>
     </message>
@@ -2302,7 +2292,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>TransactionTableModel</name>
     <message>
-        <location filename="../transactiontablemodel.cpp" line="+226"/>
+        <location filename="../transactiontablemodel.cpp" line="+230"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
@@ -2322,7 +2312,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>数量</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+52"/>
         <source>Open until %1</source>
         <translation>至 %1 个数据块时开启</translation>
     </message>
@@ -2599,7 +2589,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+206"/>
+        <location filename="../walletmodel.cpp" line="+219"/>
         <source>Sending...</source>
         <translation>正在发送</translation>
     </message>
@@ -2696,12 +2686,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>以IPv6 [host]:端口绑定给定地址</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Stake your coins to support network and gain reward (default: 1)</source>
-        <translation>进行权益累积以支持黑币网络并获得报酬(默认: 1)</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>断开出现问题节点阀值（缺省: 100）</translation>
     </message>
@@ -2711,17 +2696,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Number of seconds to keep misbehaving peers from reconnecting (缺省: 86400)</translation>
     </message>
     <message>
-        <location line="-44"/>
+        <location line="-43"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>设置RPC监听端口%u时发生错误, IPv4:%s</translation>
     </message>
     <message>
-        <location line="+51"/>
-        <source>Detach block and address databases. Increases shutdown time (default: 0)</source>
-        <translation>离线保存区块和地址数据库. 增加关机时间。 (默认: 0)</translation>
-    </message>
-    <message>
-        <location line="+109"/>
+        <location line="+157"/>
         <source>Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
         <translation>错误：交易被拒绝。可能由于钱包中部分金额已被使用，例如您使用了钱包数据的副本，在副本中某些金额已被使用，但在此处尚未被标记为已使用。</translation>
     </message>
@@ -2775,7 +2755,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 </translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-21"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>接受来自外部的连接 (缺省: 如果不带 -proxy or -connect 参数设置为1)</translation>
     </message>
@@ -2785,12 +2765,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>在IPv6模式下设置RPC监听端口 %u 失败，返回到IPv4模式: %s</translation>
     </message>
     <message>
-        <location line="+117"/>
+        <location line="+115"/>
         <source>Error initializing database environment %s! To recover, BACKUP THAT DIRECTORY, then remove everything from it except for wallet.dat.</source>
         <translation>数据库环境 %s 初始化错误。要修复，备份该目录并将其下除wallet.dat以外的文件全部删除。</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-21"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>设置高优先度/低手续费交易的最大字节数 (默认: 27000)</translation>
     </message>
@@ -2805,7 +2785,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>警告：请确认您计算机的本地时间。如果时钟错误，黑币客户端将不能正常工作。</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-30"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>警告：钱包文件wallet.dat读取失败！最重要的公钥、私钥数据都没有问题，但是交易记录或地址簿数据不正确，或者存在数据丢失。</translation>
     </message>
@@ -2815,7 +2795,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>警告：钱包文件wallet.dat损坏! 原始的钱包文件已经备份到%s目录下并重命名为{timestamp}.bak 。如果您的账户余额或者交易记录不正确，请使用您的钱包备份文件恢复。</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-31"/>
         <source>Attempt to recover private keys from a corrupt wallet.dat</source>
         <translation>尝试从损坏的钱包文件wallet.dat中恢复私钥</translation>
     </message>
@@ -2825,7 +2805,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>数据块创建选项：</translation>
     </message>
     <message>
-        <location line="-62"/>
+        <location line="-59"/>
         <source>Connect only to the specified node(s)</source>
         <translation>仅连接到指定节点</translation>
     </message>
@@ -2835,22 +2815,22 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>发现自己的IP地址(缺省:不带 -externalip 参数监听时设置为1)</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+92"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>监听端口失败。请使用 -listen=0 参数。</translation>
     </message>
     <message>
-        <location line="-90"/>
+        <location line="-88"/>
         <source>Find peers using DNS lookup (default: 1)</source>
         <translation>以DNS查找方式寻找节点 (默认：1)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Sync checkpoints policy (default: strict)</source>
         <translation>同步检测点政策 (默认：严格)</translation>
     </message>
     <message>
-        <location line="+83"/>
+        <location line="+82"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>无效的 -tor 地址: &apos;%s&apos;</translation>
     </message>
@@ -2860,7 +2840,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>-reservebalance=&lt;amount&gt; 金额无效</translation>
     </message>
     <message>
-        <location line="-82"/>
+        <location line="-81"/>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: 5000)</source>
         <translation>每个连接的最大接收缓存，&lt;n&gt;*1000 字节(缺省：5000)</translation>
     </message>
@@ -2870,12 +2850,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>每个连接的最大发送缓存，&lt;n&gt;*1000 字节(缺省：1000)</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-15"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>仅连接至指定网络的节点&lt;net&gt;(IPv4, IPv6 或者 Tor)</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+25"/>
         <source>Output extra debugging information. Implies all other -debug* options</source>
         <translation>输出额外的调试信息。相当于开启了其它所有-debug选项</translation>
     </message>
@@ -2895,12 +2875,12 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>SSL选项：(参见Bitcoin Wiki关于SSL设置栏目)</translation>
     </message>
     <message>
-        <location line="-74"/>
+        <location line="-71"/>
         <source>Select the version of socks proxy to use (4-5, default: 5)</source>
         <translation>选择要使用的SOCKS代理版本 (4-5, 默认 5)</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+38"/>
         <source>Send trace/debug info to console instead of debug.log file</source>
         <translation>跟踪/调试信息输出到控制台，不输出到 debug.log 文件</translation>
     </message>
@@ -2925,18 +2905,18 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>客户端启动时压缩debug.log文件(缺省：no-debug模式时为1)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-39"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>设置连接超时时间(缺省：5000毫秒)</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+107"/>
         <source>Unable to sign checkpoint, wrong checkpointkey?
 </source>
         <translation>无法为记录点签名，错误的记录点密钥。</translation>
     </message>
     <message>
-        <location line="-80"/>
+        <location line="-79"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>使用UPnP映射监听端口 (缺省: 0)</translation>
     </message>
@@ -2946,22 +2926,22 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>使用UPnp映射监听端口(缺省: 监听状态设为1)</translation>
     </message>
     <message>
-        <location line="-25"/>
+        <location line="-24"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>开启代理以使用隐藏服务 (默认: 和-proxy设置相同)</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+39"/>
         <source>Username for JSON-RPC connections</source>
         <translation>JSON-RPC 连接用户名</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+48"/>
         <source>Verifying database integrity...</source>
         <translation>正在检查数据库完整性...</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+56"/>
         <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
         <translation>警告：检测到同步记录点错误，已跳过。</translation>
     </message>
@@ -2976,18 +2956,18 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>警告：该软件版本已过时，请升级！</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-47"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>钱包文件wallet.dat损坏，抢救备份失败</translation>
     </message>
     <message>
-        <location line="-54"/>
+        <location line="-55"/>
         <source>Password for JSON-RPC connections</source>
         <translation>JSON-RPC 连接密码
 </translation>
     </message>
     <message>
-        <location line="-84"/>
+        <location line="-81"/>
         <source>%s, you must set a rpcpassword in the configuration file:
  %s
 It is recommended you use the following random password:
@@ -3017,12 +2997,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>寻找使用互联网接力聊天的节点 (默认: 1) {0)?}</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Sync time with other nodes. Disable if time on your system is precise e.g. syncing with NTP (default: 1)</source>
         <translation>自动和其它节点同步时间。如果本地计算机世界是准确的，建议关闭。(默认: 1)</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+13"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation>创建交易时自动忽略该值以下的数额 (默认：0.01)</translation>
     </message>
@@ -3115,7 +3095,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>可用加密算法 (默认: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+8"/>
+        <source>Initialization sanity check failed. BlackCoin is shutting down.</source>
+        <translation>初始化完整性检查失败。 黑币客户端即将关闭。</translation>
+    </message>
+    <message>
+        <location line="+45"/>
         <source>Error: Wallet unlocked for staking only, unable to create transaction.</source>
         <translation>错误：无法创建交易，已解锁的钱包仅用于权益累积。</translation>
     </message>
@@ -3125,13 +3110,13 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>警告：发现无效的记录点。所显示的交易信息未必正确！请升级客户端或联系开发者。</translation>
     </message>
     <message>
-        <location line="-158"/>
+        <location line="-155"/>
         <source>This help message</source>
         <translation>本帮助信息
 </translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+93"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>钱包 %s 位于数据目录 %s 之外.</translation>
     </message>
@@ -3141,17 +3126,17 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>无法从数据目录 %s 获得锁定.  黑币客户端可能已在运行中.</translation>
     </message>
     <message>
-        <location line="-98"/>
+        <location line="-96"/>
         <source>BlackCoin</source>
         <translation>黑币</translation>
     </message>
     <message>
-        <location line="+140"/>
+        <location line="+137"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>无法绑定本机端口 %s  (返回错误消息 %d, %s)</translation>
     </message>
     <message>
-        <location line="-130"/>
+        <location line="-127"/>
         <source>Connect through socks proxy</source>
         <translation>通过socks代理连接</translation>
     </message>
@@ -3161,12 +3146,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>使用 -addnode, -seednode 和 -connect 选项时允许查询DNS</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+119"/>
         <source>Loading addresses...</source>
         <translation>正在加载地址簿...</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-14"/>
         <source>Error loading blkindex.dat</source>
         <translation>blkindex.dat 文件加载出错</translation>
     </message>
@@ -3216,7 +3201,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>无法解析 -externalip 地址: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-25"/>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation>非法金额 -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
@@ -3241,17 +3226,17 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>金额不足</translation>
     </message>
     <message>
-        <location line="-34"/>
+        <location line="-33"/>
         <source>Loading block index...</source>
         <translation>正在加载数据块索引...</translation>
     </message>
     <message>
-        <location line="-103"/>
+        <location line="-101"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>添加节点并与其保持连接</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+119"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>无法绑定到该计算机上的 %s. 黑币客户端可能已在运行中。</translation>
     </message>
@@ -3266,7 +3251,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>无效的数量。 -mininput=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+26"/>
         <source>Loading wallet...</source>
         <translation>正在加载钱包...</translation>
     </message>
@@ -3274,11 +3259,6 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <location line="+8"/>
         <source>Cannot downgrade wallet</source>
         <translation>无法降级钱包</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cannot initialize keypool</source>
-        <translation>无法初始化密钥池。</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3296,7 +3276,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>加载完成</translation>
     </message>
     <message>
-        <location line="-167"/>
+        <location line="-164"/>
         <source>To use the %s option</source>
         <translation>使用 %s 选项</translation>
     </message>
