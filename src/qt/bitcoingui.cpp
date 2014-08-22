@@ -380,7 +380,7 @@ void BitcoinGUI::createToolBars()
     int w = 0;
 
     foreach(QAction *action, toolbar->actions()) {
-        w = max(w, toolbar->widgetForAction(action)->width());
+        w = std::max(w, toolbar->widgetForAction(action)->width());
     }
 
     foreach(QAction *action, toolbar->actions()) {
