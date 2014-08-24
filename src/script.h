@@ -578,6 +578,12 @@ public:
     {
         return CScriptID(Hash160(*this));
     }
+
+    void clear()
+    {
+        // The default std::vector::clear() does not release memory.
+        std::vector<unsigned char>().swap(*this);
+    }
 };
 
 
