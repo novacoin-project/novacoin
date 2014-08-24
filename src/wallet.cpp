@@ -17,8 +17,8 @@
 
 using namespace std;
 
-static unsigned int GetStakeSplitAge() { return IsProtocolV2(nBestHeight) ? (10 * 24 * 60 * 60) : (1 * 24 * 60 * 60); }
-static int64_t GetStakeCombineThreshold() { return IsProtocolV2(nBestHeight) ? (50 * COIN) : (1000 * COIN); }
+static unsigned int GetStakeSplitAge() { return 10 * 24 * 60 * 60; }
+static int64_t GetStakeCombineThreshold() { return 50 * COIN; }
 
 int64_t gcd(int64_t n,int64_t m) { return m == 0 ? n : gcd(m, n % m); }
 static uint64_t CoinWeightCost(const COutput &out)
@@ -1789,22 +1789,8 @@ bool CWallet::GetStakeWeight(uint64_t& nWeight)
         if (!txdb.ReadTxIndex(pcoin.first->GetHash(), txindex))
             continue;
 
-        if (IsProtocolV2(nBestHeight+1))
-        {
-            if (nCurrentTime - pcoin.first->nTime > nStakeMinAge)
-                nWeight += pcoin.first->vout[pcoin.second].nValue;
-        }
-        else
-        {
-            int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, nCurrentTime);
-            CBigNum bnWeight = CBigNum(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
-
-            // Weight is greater than zero
-            if (nTimeWeight > 0)
-            {
-                nWeight += bnWeight.getuint64();
-            }
-        }
+        if (nCurrentTime - pcoin.first->nTime > nStakeMinAge)
+            nWeight += pcoin.first->vout[pcoin.second].nValue;
     }
 
     return true;
