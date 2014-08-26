@@ -2013,12 +2013,20 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
     if (fCheckPOW && IsProofOfWork() && !CheckProofOfWork(GetPoWHash(), nBits))
         return DoS(50, error("CheckBlock() : proof of work failed"));
 
+    // Check timestamp
+    if (GetBlockTime() > FutureDriftV2(GetAdjustedTime()))
+        return error("CheckBlock() : block timestamp too far in the future");
+
     // First transaction must be coinbase, the rest must not be
     if (vtx.empty() || !vtx[0].IsCoinBase())
         return DoS(100, error("CheckBlock() : first tx is not coinbase"));
     for (unsigned int i = 1; i < vtx.size(); i++)
         if (vtx[i].IsCoinBase())
             return DoS(100, error("CheckBlock() : more than one coinbase"));
+
+    // Check coinbase timestamp
+    if (GetBlockTime() > FutureDriftV2((int64_t)vtx[0].nTime))
+        return DoS(50, error("CheckBlock() : coinbase timestamp is too early"));
 
     if (IsProofOfStake())
     {
@@ -2101,14 +2109,6 @@ bool CBlock::AcceptBlock()
 
     if (IsProofOfWork() && nHeight > LAST_POW_BLOCK)
         return DoS(100, error("AcceptBlock() : reject proof-of-work at height %d", nHeight));
-
-    // Check timestamp
-    if (GetBlockTime() > FutureDrift(GetAdjustedTime(), nHeight))
-        return error("AcceptBlock() : block timestamp too far in the future");
-
-    // Check coinbase timestamp
-    if (GetBlockTime() > FutureDrift((int64_t)vtx[0].nTime, nHeight))
-        return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
 
     // Check coinstake timestamp
     if (IsProofOfStake() && !CheckCoinStakeTimestamp(nHeight, GetBlockTime(), (int64_t)vtx[1].nTime))
