@@ -1280,26 +1280,6 @@ void static ProcessOneShot()
     }
 }
 
-void static ThreadStakeMiner(void* parg)
-{
-    printf("ThreadStakeMiner started\n");
-    CWallet* pwallet = (CWallet*)parg;
-    try
-    {
-        vnThreadsRunning[THREAD_STAKE_MINER]++;
-        StakeMiner(pwallet);
-        vnThreadsRunning[THREAD_STAKE_MINER]--;
-    }
-    catch (std::exception& e) {
-        vnThreadsRunning[THREAD_STAKE_MINER]--;
-        PrintException(&e, "ThreadStakeMiner()");
-    } catch (...) {
-        vnThreadsRunning[THREAD_STAKE_MINER]--;
-        PrintException(NULL, "ThreadStakeMiner()");
-    }
-    printf("ThreadStakeMiner exiting, %d threads remaining\n", vnThreadsRunning[THREAD_STAKE_MINER]);
-}
-
 void ThreadOpenConnections()
 {
     // Connect to specific addresses
@@ -1768,8 +1748,7 @@ void StartNode(void* parg)
     if (!GetBoolArg("-staking", true))
         printf("Staking disabled\n");
     else
-        if (!NewThread(ThreadStakeMiner, pwalletMain))
-            printf("Error: NewThread(ThreadStakeMiner) failed\n");
+        threadGroup->create_thread(boost::bind(&ThreadStakeMiner, pwalletMain));
 }
 
 bool StopNode()
@@ -1793,7 +1772,6 @@ bool StopNode()
             break;
         MilliSleep(20);
     } while(true);
-    if (vnThreadsRunning[THREAD_STAKE_MINER] > 0) printf("ThreadStakeMiner still running\n");
     DumpAddresses();
     return true;
 }

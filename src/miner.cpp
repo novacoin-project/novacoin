@@ -521,7 +521,7 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
     return true;
 }
 
-void StakeMiner(CWallet *pwallet)
+void ThreadStakeMiner(CWallet *pwallet)
 {
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
@@ -532,15 +532,10 @@ void StakeMiner(CWallet *pwallet)
 
     while (true)
     {
-        if (fShutdown)
-            return;
-
         while (pwallet->IsLocked())
         {
             nLastCoinStakeSearchInterval = 0;
             MilliSleep(1000);
-            if (fShutdown)
-                return;
         }
 
         while (vNodes.empty() || IsInitialBlockDownload())
@@ -548,8 +543,6 @@ void StakeMiner(CWallet *pwallet)
             nLastCoinStakeSearchInterval = 0;
             fTryToSync = true;
             MilliSleep(1000);
-            if (fShutdown)
-                return;
         }
 
         if (fTryToSync)
