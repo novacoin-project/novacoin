@@ -774,6 +774,12 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (fServer)
         StartRPCThreads();
 
+    // Mine proof-of-stake blocks in the background
+    if (!GetBoolArg("-staking", true))
+        printf("Staking disabled\n");
+    else
+        threadGroup.create_thread(boost::bind(&ThreadStakeMiner, pwalletMain));
+
     // ********************************************************* Step 12: finished
 
     uiInterface.InitMessage(_("Done loading"));
