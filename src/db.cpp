@@ -222,7 +222,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
 }
 
 
-void CDBEnv::CheckpointLSN(std::string strFile)
+void CDBEnv::CheckpointLSN(const std::string& strFile)
 {
     dbenv.txn_checkpoint(0, 0, 0);
     if (fMockDb)
@@ -231,14 +231,14 @@ void CDBEnv::CheckpointLSN(std::string strFile)
 }
 
 
-CDB::CDB(const char *pszFile, const char* pszMode) :
+CDB::CDB(const std::string& strFilename, const char* pszMode) :
     pdb(NULL), activeTxn(NULL)
 {
     int ret;
-    if (pszFile == NULL)
+    fReadOnly = (!strchr(pszMode, '+') && !strchr(pszMode, 'w'));
+    if (strFilename.empty())
         return;
 
-    fReadOnly = (!strchr(pszMode, '+') && !strchr(pszMode, 'w'));
     bool fCreate = strchr(pszMode, 'c');
     unsigned int nFlags = DB_THREAD;
     if (fCreate)
@@ -249,7 +249,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
         if (!bitdb.Open(GetDataDir()))
             throw runtime_error("env open failed");
 
-        strFile = pszFile;
+        strFile = strFilename;
         ++bitdb.mapFileUseCount[strFile];
         pdb = bitdb.mapDb[strFile];
         if (pdb == NULL)
@@ -262,14 +262,14 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
                 DbMpoolFile*mpf = pdb->get_mpf();
                 ret = mpf->set_flags(DB_MPOOL_NOFILE, 1);
                 if (ret != 0)
-                    throw runtime_error(strprintf("CDB() : failed to configure for no temp file backing for database %s", pszFile));
+                    throw runtime_error(strprintf("CDB : Failed to configure for no temp file backing for database %s", strFile.c_str()));
             }
 
-            ret = pdb->open(NULL,      // Txn pointer
-                            fMockDb ? NULL : pszFile,   // Filename
-                            "main",    // Logical db name
-                            DB_BTREE,  // Database type
-                            nFlags,    // Flags
+            ret = pdb->open(NULL, // Txn pointer
+                            fMockDb ? NULL : strFile.c_str(), // Filename
+                            fMockDb ? strFile.c_str() : "main", // Logical db name
+                            DB_BTREE, // Database type
+                            nFlags, // Flags
                             0);
 
             if (ret != 0)
@@ -278,7 +278,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
                 pdb = NULL;
                 --bitdb.mapFileUseCount[strFile];
                 strFile = "";
-                throw runtime_error(strprintf("CDB() : can't open database file %s, error %d", pszFile, ret));
+                throw runtime_error(strprintf("CDB : Error %d, can't open database %s", ret, strFile.c_str()));
             }
 
             if (fCreate && !Exists(string("version")))
