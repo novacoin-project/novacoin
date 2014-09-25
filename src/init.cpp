@@ -29,7 +29,7 @@
 using namespace std;
 using namespace boost;
 
-CWallet* pwalletMain;
+CWallet* pwalletMain = NULL;
 CClientUIInterface uiInterface;
 bool fConfChange;
 bool fMinimizeCoinAge;
@@ -95,6 +95,7 @@ void Shutdown()
     boost::filesystem::remove(GetPidFile());
     UnregisterAllWallets();
     delete pwalletMain;
+    pwalletMain = NULL;
 }
 
 //
@@ -410,6 +411,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     }
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
+
     // Sanity check
     if (!InitSanityCheck())
         return InitError(_("Initialization sanity check failed. BlackCoin is shutting down."));
