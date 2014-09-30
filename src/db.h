@@ -2,32 +2,31 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef BITCOIN_DB_H
 #define BITCOIN_DB_H
 
-#include "sync.h"
 #include "serialize.h"
+#include "sync.h"
+#include "version.h"
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 #include <db_cxx.h>
 
 class CAddrMan;
 class CBlockLocator;
 class CDiskBlockIndex;
 class CDiskTxPos;
-class CMasterKey;
 class COutPoint;
 class CTxIndex;
-class CWallet;
 
 extern unsigned int nWalletDBUpdated;
 
 void ThreadFlushWalletDB(const std::string& strWalletFile);
-bool BackupWallet(const CWallet& wallet, const std::string& strDest);
 
 
 class CDBEnv
