@@ -732,11 +732,6 @@ public:
     {
         return strprintf("COutput(%s, %d, %d) [%s]", tx->GetHash().ToString().c_str(), i, nDepth, FormatMoney(tx->vout[i].nValue).c_str());
     }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
 };
 
 

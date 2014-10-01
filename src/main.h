@@ -201,11 +201,6 @@ public:
         else
             return strprintf("(nFile=%u, nBlockPos=%u, nTxPos=%u)", nFile, nBlockPos, nTxPos);
     }
-
-    void print() const
-    {
-        LogPrintf("%s", ToString().c_str());
-    }
 };
 
 
@@ -278,11 +273,6 @@ public:
             str += strprintf(", nSequence=%u", nSequence);
         str += ")";
         return str;
-    }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
     }
 };
 
@@ -357,11 +347,6 @@ public:
     {
         if (IsEmpty()) return "CTxOut(empty)";
         return strprintf("CTxOut(nValue=%s, scriptPubKey=%s)", FormatMoney(nValue).c_str(), scriptPubKey.ToString().c_str());
-    }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
     }
 };
 
@@ -524,11 +509,6 @@ public:
         for (unsigned int i = 0; i < vout.size(); i++)
             str += "    " + vout[i].ToString() + "\n";
         return str;
-    }
-
-    void print() const
-    {
-        LogPrintf("%s", ToString().c_str());
     }
 
 
@@ -972,9 +952,10 @@ public:
 
 
 
-    void print() const
+    std::string ToString() const
     {
-        LogPrintf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%"PRIszu", vchBlockSig=%s)\n",
+        std::stringstream s;
+        s << strprintf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%"PRIszu", vchBlockSig=%s)\n",
             GetHash().ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),
@@ -984,13 +965,13 @@ public:
             HexStr(vchBlockSig.begin(), vchBlockSig.end()).c_str());
         for (unsigned int i = 0; i < vtx.size(); i++)
         {
-            LogPrintf("  ");
-            vtx[i].print();
+            s << "  " << vtx[i].ToString() << "\n";
         }
-        LogPrintf("  vMerkleTree: ");
+        s << "  vMerkleTree: ";
         for (unsigned int i = 0; i < vMerkleTree.size(); i++)
-            LogPrintf("%s ", vMerkleTree[i].ToString().c_str());
-        LogPrintf("\n");
+            s << " " << vMerkleTree[i].ToString().c_str();
+        s << "\n";
+        return s.str();
     }
 
 
@@ -1234,11 +1215,6 @@ public:
             hashMerkleRoot.ToString().c_str(),
             GetBlockHash().ToString().c_str());
     }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
 };
 
 
@@ -1328,11 +1304,6 @@ public:
             hashPrev.ToString().c_str(),
             hashNext.ToString().c_str());
         return str;
-    }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
     }
 };
 

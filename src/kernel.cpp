@@ -159,7 +159,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     }
 
     // Print selection map for visualization of the selected blocks
-    if (fDebug /* FIXME LogAcceptCategory("stakemodifier") */)
+    if (LogAcceptCategory("stakemodifier"))
     {
         string strSelectionMap = "";
         // '-' indicates proof-of-work blocks not selected

@@ -45,11 +45,6 @@ public:
     {
         return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10).c_str(), n);
     }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
 };
 
 /** An inpoint - a combination of a transaction and an index n into its vin */

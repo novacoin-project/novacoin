@@ -643,8 +643,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                 CBlock block;
                 block.ReadFromDisk(pindex);
                 block.BuildMerkleTree();
-                block.print();
-                LogPrintf("\n");
+                LogPrintf("%s\n", block.ToString());
                 nFound++;
             }
         }
