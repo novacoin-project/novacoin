@@ -30,11 +30,7 @@
 
 #include "netbase.h" // for AddTimeData
 
-// to obtain PRId64 on some old systems
-#define __STDC_FORMAT_MACROS 1
-
 #include <stdint.h>
-#include <inttypes.h>
 
 static const int64_t COIN = 100000000;
 static const int64_t CENT = 1000000;
@@ -226,7 +222,7 @@ void runCommand(std::string strCommand);
 
 inline std::string i64tostr(int64_t n)
 {
-    return strprintf("%"PRId64, n);
+    return strprintf("%d", n);
 }
 
 inline std::string itostr(int n)
