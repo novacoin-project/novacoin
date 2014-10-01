@@ -57,10 +57,10 @@ void init_blockindex(leveldb::Options& options, bool fRemoveOld = false) {
     }
 
     filesystem::create_directory(directory);
-    LogPrintf("Opening LevelDB in %s\n", directory.string().c_str());
+    LogPrintf("Opening LevelDB in %s\n", directory.string());
     leveldb::Status status = leveldb::DB::Open(options, directory.string(), &txdb);
     if (!status.ok()) {
-        throw runtime_error(strprintf("init_blockindex(): error opening database environment %s", status.ToString().c_str()));
+        throw runtime_error(strprintf("init_blockindex(): error opening database environment %s", status.ToString()));
     }
 }
 
@@ -147,7 +147,7 @@ bool CTxDB::TxnCommit()
     delete activeBatch;
     activeBatch = NULL;
     if (!status.ok()) {
-        LogPrintf("LevelDB batch commit failure: %s\n", status.ToString().c_str());
+        LogPrintf("LevelDB batch commit failure: %s\n", status.ToString());
         return false;
     }
     return true;
@@ -420,13 +420,13 @@ bool CTxDB::LoadBlockIndex()
     nBestChainTrust = pindexBest->nChainTrust;
 
     LogPrintf("LoadBlockIndex(): hashBestChain=%s  height=%d  trust=%s  date=%s\n",
-      hashBestChain.ToString().c_str(), nBestHeight, CBigNum(nBestChainTrust).ToString().c_str(),
-      DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
+      hashBestChain.ToString(), nBestHeight, CBigNum(nBestChainTrust).ToString(),
+      DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()));
 
     // NovaCoin: load hashSyncCheckpoint
     if (!ReadSyncCheckpoint(Checkpoints::hashSyncCheckpoint))
         return error("CTxDB::LoadBlockIndex() : hashSyncCheckpoint not loaded");
-    LogPrintf("LoadBlockIndex(): synchronized checkpoint %s\n", Checkpoints::hashSyncCheckpoint.ToString().c_str());
+    LogPrintf("LoadBlockIndex(): synchronized checkpoint %s\n", Checkpoints::hashSyncCheckpoint.ToString());
 
     // Load bnBestInvalidTrust, OK if it doesn't exist
     CBigNum bnBestInvalidTrust;
@@ -455,7 +455,7 @@ bool CTxDB::LoadBlockIndex()
         // check level 7: verify block signature too
         if (nCheckLevel>0 && !block.CheckBlock(true, true, (nCheckLevel>6)))
         {
-            LogPrintf("LoadBlockIndex() : *** found bad block at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str());
+            LogPrintf("LoadBlockIndex() : *** found bad block at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
             pindexFork = pindex->pprev;
         }
         // check level 2: verify transaction index validity
@@ -476,13 +476,13 @@ bool CTxDB::LoadBlockIndex()
                         CTransaction txFound;
                         if (!txFound.ReadFromDisk(txindex.pos))
                         {
-                            LogPrintf("LoadBlockIndex() : *** cannot read mislocated transaction %s\n", hashTx.ToString().c_str());
+                            LogPrintf("LoadBlockIndex() : *** cannot read mislocated transaction %s\n", hashTx.ToString());
                             pindexFork = pindex->pprev;
                         }
                         else
                             if (txFound.GetHash() != hashTx) // not a duplicate tx
                             {
-                                LogPrintf("LoadBlockIndex(): *** invalid tx position for %s\n", hashTx.ToString().c_str());
+                                LogPrintf("LoadBlockIndex(): *** invalid tx position for %s\n", hashTx.ToString());
                                 pindexFork = pindex->pprev;
                             }
                     }
@@ -497,7 +497,7 @@ bool CTxDB::LoadBlockIndex()
                                 pair<unsigned int, unsigned int> posFind = make_pair(txpos.nFile, txpos.nBlockPos);
                                 if (!mapBlockPos.count(posFind))
                                 {
-                                    LogPrintf("LoadBlockIndex(): *** found bad spend at %d, hashBlock=%s, hashTx=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str(), hashTx.ToString().c_str());
+                                    LogPrintf("LoadBlockIndex(): *** found bad spend at %d, hashBlock=%s, hashTx=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString(), hashTx.ToString());
                                     pindexFork = pindex->pprev;
                                 }
                                 // check level 6: check whether spent txouts were spent by a valid transaction that consume them
@@ -506,12 +506,12 @@ bool CTxDB::LoadBlockIndex()
                                     CTransaction txSpend;
                                     if (!txSpend.ReadFromDisk(txpos))
                                     {
-                                        LogPrintf("LoadBlockIndex(): *** cannot read spending transaction of %s:%i from disk\n", hashTx.ToString().c_str(), nOutput);
+                                        LogPrintf("LoadBlockIndex(): *** cannot read spending transaction of %s:%i from disk\n", hashTx.ToString(), nOutput);
                                         pindexFork = pindex->pprev;
                                     }
                                     else if (!txSpend.CheckTransaction())
                                     {
-                                        LogPrintf("LoadBlockIndex(): *** spending transaction of %s:%i is invalid\n", hashTx.ToString().c_str(), nOutput);
+                                        LogPrintf("LoadBlockIndex(): *** spending transaction of %s:%i is invalid\n", hashTx.ToString(), nOutput);
                                         pindexFork = pindex->pprev;
                                     }
                                     else
@@ -522,7 +522,7 @@ bool CTxDB::LoadBlockIndex()
                                                 fFound = true;
                                         if (!fFound)
                                         {
-                                            LogPrintf("LoadBlockIndex(): *** spending transaction of %s:%i does not spend it\n", hashTx.ToString().c_str(), nOutput);
+                                            LogPrintf("LoadBlockIndex(): *** spending transaction of %s:%i does not spend it\n", hashTx.ToString(), nOutput);
                                             pindexFork = pindex->pprev;
                                         }
                                     }
@@ -541,7 +541,7 @@ bool CTxDB::LoadBlockIndex()
                           if (ReadTxIndex(txin.prevout.hash, txindex))
                               if (txindex.vSpent.size()-1 < txin.prevout.n || txindex.vSpent[txin.prevout.n].IsNull())
                               {
-                                  LogPrintf("LoadBlockIndex(): *** found unspent prevout %s:%i in %s\n", txin.prevout.hash.ToString().c_str(), txin.prevout.n, hashTx.ToString().c_str());
+                                  LogPrintf("LoadBlockIndex(): *** found unspent prevout %s:%i in %s\n", txin.prevout.hash.ToString(), txin.prevout.n, hashTx.ToString());
                                   pindexFork = pindex->pprev;
                               }
                      }

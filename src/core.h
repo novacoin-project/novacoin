@@ -43,7 +43,7 @@ public:
 
     std::string ToString() const
     {
-        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10).c_str(), n);
+        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10), n);
     }
 };
 

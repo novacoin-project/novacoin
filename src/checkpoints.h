@@ -89,7 +89,7 @@ public:
                 "    hashCheckpoint = %s\n"
                 ")\n",
             nVersion,
-            hashCheckpoint.ToString().c_str());
+            hashCheckpoint.ToString());
     }
 };
 

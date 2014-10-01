@@ -446,7 +446,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
     if(!pblock->IsProofOfWork())
-        return error("CheckWork() : %s is not a proof-of-work block", hashBlock.GetHex().c_str());
+        return error("CheckWork() : %s is not a proof-of-work block", hashBlock.GetHex());
 
     if (hashProof > hashTarget)
         return error("CheckWork() : proof-of-work not meeting target");
@@ -485,16 +485,16 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
     uint256 hashBlock = pblock->GetHash();
 
     if(!pblock->IsProofOfStake())
-        return error("CheckStake() : %s is not a proof-of-stake block", hashBlock.GetHex().c_str());
+        return error("CheckStake() : %s is not a proof-of-stake block", hashBlock.GetHex());
 
     // verify hash target and signature of coinstake tx
     if (!CheckProofOfStake(mapBlockIndex[pblock->hashPrevBlock], pblock->vtx[1], pblock->nBits, proofHash, hashTarget))
         return error("CheckStake() : proof-of-stake checking failed");
 
     //// debug print
-    LogPrintf("CheckStake() : new proof-of-stake block found  \n  hash: %s \nproofhash: %s  \ntarget: %s\n", hashBlock.GetHex().c_str(), proofHash.GetHex().c_str(), hashTarget.GetHex().c_str());
+    LogPrintf("CheckStake() : new proof-of-stake block found  \n  hash: %s \nproofhash: %s  \ntarget: %s\n", hashBlock.GetHex(), proofHash.GetHex(), hashTarget.GetHex());
     LogPrintf("%s\n", pblock->ToString());
-    LogPrintf("out %s\n", FormatMoney(pblock->vtx[1].GetValueOut()).c_str());
+    LogPrintf("out %s\n", FormatMoney(pblock->vtx[1].GetValueOut()));
 
     // Found a solution
     {

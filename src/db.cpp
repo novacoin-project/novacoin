@@ -261,7 +261,7 @@ CDB::CDB(const std::string& strFilename, const char* pszMode) :
                 DbMpoolFile*mpf = pdb->get_mpf();
                 ret = mpf->set_flags(DB_MPOOL_NOFILE, 1);
                 if (ret != 0)
-                    throw runtime_error(strprintf("CDB : Failed to configure for no temp file backing for database %s", strFile.c_str()));
+                    throw runtime_error(strprintf("CDB : Failed to configure for no temp file backing for database %s", strFile));
             }
 
             ret = pdb->open(NULL, // Txn pointer
@@ -277,7 +277,7 @@ CDB::CDB(const std::string& strFilename, const char* pszMode) :
                 pdb = NULL;
                 --bitdb.mapFileUseCount[strFile];
                 strFile = "";
-                throw runtime_error(strprintf("CDB : Error %d, can't open database %s", ret, strFile.c_str()));
+                throw runtime_error(strprintf("CDB : Error %d, can't open database %s", ret, strFile));
             }
 
             if (fCreate && !Exists(string("version")))

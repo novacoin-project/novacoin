@@ -54,7 +54,7 @@ static void ThreadSafeMessageBox(const std::string& message, const std::string& 
     }
     else
     {
-        LogPrintf("%s: %s\n", caption.c_str(), message.c_str());
+        LogPrintf("%s: %s\n", caption, message);
         fprintf(stderr, "%s: %s\n", caption.c_str(), message.c_str());
     }
 }
