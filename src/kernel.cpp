@@ -308,7 +308,7 @@ static bool CheckStakeKernelHashV1(unsigned int nBits, const CBlock& blockFrom, 
 // kernel (input 0) must meet the formula
 //     hash(nStakeModifier + txPrev.block.nTime + txPrev.nTime + txPrev.vout.hash + txPrev.vout.n + nTime) < bnTarget * nWeight
 // this ensures that the chance of getting a coinstake is proportional to the
-// amount of coin age one owns.
+// amount of coins one owns.
 // The reason this hash is chosen is the following:
 //   nStakeModifier: scrambles computation to make it very difficult to precompute
 //                   future proof-of-stake
