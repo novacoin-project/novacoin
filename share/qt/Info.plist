@@ -27,5 +27,7 @@
             </array>
           </dict>
         </array>
+        <key>LSAppNapIsDisabled</key>
+          <string>True</string>
 </dict>
 </plist>
