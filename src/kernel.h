@@ -34,4 +34,9 @@ bool CheckCoinStakeTimestamp(int nHeight, int64_t nTimeBlock, int64_t nTimeTx);
 // Get time weight using supplied timestamps
 int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd);
 
+// Wrapper around CheckStakeKernelHash()
+// Also checks existence of kernel input and min age
+// Convenient for searching a kernel
+bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, int64_t nTime, const COutPoint& prevout, int64_t* pBlockTime = NULL);
+
 #endif // PPCOIN_KERNEL_H

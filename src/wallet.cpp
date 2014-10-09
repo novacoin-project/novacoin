@@ -1839,34 +1839,16 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     CTxDB txdb("r");
     BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
     {
-        CTxIndex txindex;
-        {
-            LOCK2(cs_main, cs_wallet);
-            if (!txdb.ReadTxIndex(pcoin.first->GetHash(), txindex))
-                continue;
-        }
-
-        // Read block header
-        CBlock block;
-        {
-            LOCK2(cs_main, cs_wallet);
-            if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
-                continue;
-        }
-
         static int nMaxStakeSearchInterval = 60;
-        if (block.GetBlockTime() + nStakeMinAge > txNew.nTime - nMaxStakeSearchInterval)
-            continue; // only count coins meeting min age requirement
-
         bool fKernelFound = false;
         for (unsigned int n=0; n<min(nSearchInterval,(int64_t)nMaxStakeSearchInterval) && !fKernelFound && pindexPrev == pindexBest; n++)
         {
             boost::this_thread::interruption_point();
             // Search backward in time from the given txNew timestamp 
             // Search nSearchInterval seconds back up to nMaxStakeSearchInterval
-            uint256 hashProofOfStake = 0, targetProofOfStake = 0;
             COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
-            if (CheckStakeKernelHash(pindexPrev, nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, *pcoin.first, prevoutStake, txNew.nTime - n, hashProofOfStake, targetProofOfStake))
+            int64_t nBlockTime;
+            if (CheckKernel(pindexPrev, nBits, txNew.nTime - n, prevoutStake, &nBlockTime))
             {
                 // Found a kernel
                 LogPrint("coinstake", "CreateCoinStake : kernel found\n");
@@ -1919,7 +1901,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
-                if (GetWeight(block.GetBlockTime(), (int64_t)txNew.nTime) < GetStakeSplitAge())
+                if (GetWeight(nBlockTime, (int64_t)txNew.nTime) < GetStakeSplitAge())
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
                 LogPrint("coinstake", "CreateCoinStake : added kernel type=%d\n", whichType);
                 fKernelFound = true;

@@ -430,3 +430,27 @@ bool CheckCoinStakeTimestamp(int nHeight, int64_t nTimeBlock, int64_t nTimeTx)
     else
         return (nTimeBlock == nTimeTx);
 }
+
+bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, int64_t nTime, const COutPoint& prevout, int64_t* pBlockTime)
+{
+    uint256 hashProofOfStake, targetProofOfStake;
+
+    CTxDB txdb("r");
+    CTransaction txPrev;
+    CTxIndex txindex;
+    if (!txPrev.ReadFromDisk(txdb, prevout, txindex))
+        return false;
+
+    // Read block header
+    CBlock block;
+    if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
+        return false;
+
+    if (block.GetBlockTime() + nStakeMinAge > nTime)
+        return false; // only count coins meeting min age requirement
+
+    if (pBlockTime)
+        *pBlockTime = block.GetBlockTime();
+
+    return CheckStakeKernelHash(pindexPrev, nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, txPrev, prevout, nTime, hashProofOfStake, targetProofOfStake);
+}
