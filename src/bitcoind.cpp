@@ -79,7 +79,7 @@ bool AppInit(int argc, char* argv[])
             exit(ret);
         }
 #if !defined(WIN32)
-        fDaemon = GetBoolArg("-daemon");
+        fDaemon = GetBoolArg("-daemon", false);
         if (fDaemon)
         {
             // Daemonize
