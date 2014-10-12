@@ -459,49 +459,51 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // ********************************************************* Step 5: verify database integrity
 
-    uiInterface.InitMessage(_("Verifying database integrity..."));
+    if (1) {
+        uiInterface.InitMessage(_("Verifying database integrity..."));
 
-    if (!bitdb.Open(GetDataDir()))
-    {
-        // try moving the database env out of the way
-        boost::filesystem::path pathDatabase = GetDataDir() / "database";
-        boost::filesystem::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
-        try {
-            boost::filesystem::rename(pathDatabase, pathDatabaseBak);
-            LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
-        } catch(boost::filesystem::filesystem_error &error) {
-             // failure is ok (well, not really, but it's not worse than what we started with)
-        }
-
-        // try again
-        if (!bitdb.Open(GetDataDir())) {
-            // if it still fails, it probably means we can't even create the database env
-            string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
-            return InitError(msg);
-        }
-    }
-
-    if (GetBoolArg("-salvagewallet", false))
-    {
-        // Recover readable keypairs:
-        if (!CWalletDB::Recover(bitdb, strWalletFileName, true))
-            return false;
-    }
-
-    if (filesystem::exists(GetDataDir() / strWalletFileName))
-    {
-        CDBEnv::VerifyResult r = bitdb.Verify(strWalletFileName, CWalletDB::Recover);
-        if (r == CDBEnv::RECOVER_OK)
+        if (!bitdb.Open(GetDataDir()))
         {
-            string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
-                                     " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
-                                     " your balance or transactions are incorrect you should"
-                                     " restore from a backup."), strDataDir);
-            InitWarning(msg);
+            // try moving the database env out of the way
+            boost::filesystem::path pathDatabase = GetDataDir() / "database";
+            boost::filesystem::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
+            try {
+                boost::filesystem::rename(pathDatabase, pathDatabaseBak);
+                LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
+            } catch(boost::filesystem::filesystem_error &error) {
+                 // failure is ok (well, not really, but it's not worse than what we started with)
+            }
+
+            // try again
+            if (!bitdb.Open(GetDataDir())) {
+                // if it still fails, it probably means we can't even create the database env
+                string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
+                return InitError(msg);
+            }
         }
-        if (r == CDBEnv::RECOVER_FAIL)
-            return InitError(_("wallet.dat corrupt, salvage failed"));
-    }
+
+        if (GetBoolArg("-salvagewallet", false))
+        {
+            // Recover readable keypairs:
+            if (!CWalletDB::Recover(bitdb, strWalletFileName, true))
+                return false;
+        }
+
+        if (filesystem::exists(GetDataDir() / strWalletFileName))
+        {
+            CDBEnv::VerifyResult r = bitdb.Verify(strWalletFileName, CWalletDB::Recover);
+            if (r == CDBEnv::RECOVER_OK)
+            {
+                string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
+                                         " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
+                                         " your balance or transactions are incorrect you should"
+                                         " restore from a backup."), strDataDir);
+                InitWarning(msg);
+            }
+            if (r == CDBEnv::RECOVER_FAIL)
+                return InitError(_("wallet.dat corrupt, salvage failed"));
+        }
+    } // (1)
 
     // ********************************************************* Step 6: network initialization
 
@@ -678,92 +680,94 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // ********************************************************* Step 8: load wallet
 
-    uiInterface.InitMessage(_("Loading wallet..."));
+    if (1) {
+        uiInterface.InitMessage(_("Loading wallet..."));
 
-    nStart = GetTimeMillis();
-    bool fFirstRun = true;
-    pwalletMain = new CWallet(strWalletFileName);
-    DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
-    if (nLoadWalletRet != DB_LOAD_OK)
-    {
-        if (nLoadWalletRet == DB_CORRUPT)
-            strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
-        else if (nLoadWalletRet == DB_NONCRITICAL_ERROR)
-        {
-            string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
-                         " or address book entries might be missing or incorrect."));
-            InitWarning(msg);
-        }
-        else if (nLoadWalletRet == DB_TOO_NEW)
-            strErrors << _("Error loading wallet.dat: Wallet requires newer version of BlackCoin") << "\n";
-        else if (nLoadWalletRet == DB_NEED_REWRITE)
-        {
-            strErrors << _("Wallet needed to be rewritten: restart BlackCoin to complete") << "\n";
-            LogPrintf("%s", strErrors.str());
-            return InitError(strErrors.str());
-        }
-        else
-            strErrors << _("Error loading wallet.dat") << "\n";
-    }
-
-    if (GetBoolArg("-upgradewallet", fFirstRun))
-    {
-        int nMaxVersion = GetArg("-upgradewallet", 0);
-        if (nMaxVersion == 0) // the -upgradewallet without argument case
-        {
-            LogPrintf("Performing wallet upgrade to %i\n", FEATURE_LATEST);
-            nMaxVersion = CLIENT_VERSION;
-            pwalletMain->SetMinVersion(FEATURE_LATEST); // permanently upgrade the wallet immediately
-        }
-        else
-            LogPrintf("Allowing wallet upgrade up to %i\n", nMaxVersion);
-        if (nMaxVersion < pwalletMain->GetVersion())
-            strErrors << _("Cannot downgrade wallet") << "\n";
-        pwalletMain->SetMaxVersion(nMaxVersion);
-    }
-
-    if (fFirstRun)
-    {
-        // Create new keyUser and set as default key
-        RandAddSeedPerfmon();
-
-        CPubKey newDefaultKey;
-        if (pwalletMain->GetKeyFromPool(newDefaultKey)) {
-            pwalletMain->SetDefaultKey(newDefaultKey);
-            if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultKey.GetID(), ""))
-                strErrors << _("Cannot write default address") << "\n";
-        }
-
-        pwalletMain->SetBestChain(CBlockLocator(pindexBest));
-    }
-
-    LogPrintf("%s", strErrors.str());
-    LogPrintf(" wallet      %15dms\n", GetTimeMillis() - nStart);
-
-    RegisterWallet(pwalletMain);
-
-    CBlockIndex *pindexRescan = pindexBest;
-    if (GetBoolArg("-rescan", false))
-        pindexRescan = pindexGenesisBlock;
-    else
-    {
-        CWalletDB walletdb(strWalletFileName);
-        CBlockLocator locator;
-        if (walletdb.ReadBestBlock(locator))
-            pindexRescan = locator.GetBlockIndex();
-        else
-            pindexRescan = pindexGenesisBlock;
-    }
-    if (pindexBest != pindexRescan && pindexBest && pindexRescan && pindexBest->nHeight > pindexRescan->nHeight)
-    {
-        uiInterface.InitMessage(_("Rescanning..."));
-        LogPrintf("Rescanning last %i blocks (from block %i)...\n", pindexBest->nHeight - pindexRescan->nHeight, pindexRescan->nHeight);
         nStart = GetTimeMillis();
-        pwalletMain->ScanForWalletTransactions(pindexRescan, true);
-        LogPrintf(" rescan      %15dms\n", GetTimeMillis() - nStart);
-        pwalletMain->SetBestChain(CBlockLocator(pindexBest));
-        nWalletDBUpdated++;
-    }
+        bool fFirstRun = true;
+        pwalletMain = new CWallet(strWalletFileName);
+        DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
+        if (nLoadWalletRet != DB_LOAD_OK)
+        {
+            if (nLoadWalletRet == DB_CORRUPT)
+                strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
+            else if (nLoadWalletRet == DB_NONCRITICAL_ERROR)
+            {
+                string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
+                             " or address book entries might be missing or incorrect."));
+                InitWarning(msg);
+            }
+            else if (nLoadWalletRet == DB_TOO_NEW)
+                strErrors << _("Error loading wallet.dat: Wallet requires newer version of BlackCoin") << "\n";
+            else if (nLoadWalletRet == DB_NEED_REWRITE)
+            {
+                strErrors << _("Wallet needed to be rewritten: restart BlackCoin to complete") << "\n";
+                LogPrintf("%s", strErrors.str());
+                return InitError(strErrors.str());
+            }
+            else
+                strErrors << _("Error loading wallet.dat") << "\n";
+        }
+
+        if (GetBoolArg("-upgradewallet", fFirstRun))
+        {
+            int nMaxVersion = GetArg("-upgradewallet", 0);
+            if (nMaxVersion == 0) // the -upgradewallet without argument case
+            {
+                LogPrintf("Performing wallet upgrade to %i\n", FEATURE_LATEST);
+                nMaxVersion = CLIENT_VERSION;
+                pwalletMain->SetMinVersion(FEATURE_LATEST); // permanently upgrade the wallet immediately
+            }
+            else
+                LogPrintf("Allowing wallet upgrade up to %i\n", nMaxVersion);
+            if (nMaxVersion < pwalletMain->GetVersion())
+                strErrors << _("Cannot downgrade wallet") << "\n";
+            pwalletMain->SetMaxVersion(nMaxVersion);
+        }
+
+        if (fFirstRun)
+        {
+            // Create new keyUser and set as default key
+            RandAddSeedPerfmon();
+
+            CPubKey newDefaultKey;
+            if (pwalletMain->GetKeyFromPool(newDefaultKey)) {
+                pwalletMain->SetDefaultKey(newDefaultKey);
+                if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultKey.GetID(), ""))
+                    strErrors << _("Cannot write default address") << "\n";
+            }
+
+            pwalletMain->SetBestChain(CBlockLocator(pindexBest));
+        }
+
+        LogPrintf("%s", strErrors.str());
+        LogPrintf(" wallet      %15dms\n", GetTimeMillis() - nStart);
+
+        RegisterWallet(pwalletMain);
+
+        CBlockIndex *pindexRescan = pindexBest;
+        if (GetBoolArg("-rescan", false))
+            pindexRescan = pindexGenesisBlock;
+        else
+        {
+            CWalletDB walletdb(strWalletFileName);
+            CBlockLocator locator;
+            if (walletdb.ReadBestBlock(locator))
+                pindexRescan = locator.GetBlockIndex();
+            else
+                pindexRescan = pindexGenesisBlock;
+        }
+        if (pindexBest != pindexRescan && pindexBest && pindexRescan && pindexBest->nHeight > pindexRescan->nHeight)
+        {
+            uiInterface.InitMessage(_("Rescanning..."));
+            LogPrintf("Rescanning last %i blocks (from block %i)...\n", pindexBest->nHeight - pindexRescan->nHeight, pindexRescan->nHeight);
+            nStart = GetTimeMillis();
+            pwalletMain->ScanForWalletTransactions(pindexRescan, true);
+            LogPrintf(" rescan      %15dms\n", GetTimeMillis() - nStart);
+            pwalletMain->SetBestChain(CBlockLocator(pindexBest));
+            nWalletDBUpdated++;
+        }
+    } // (1)
 
     // ********************************************************* Step 9: import blocks
 
