@@ -341,17 +341,6 @@ namespace Checkpoints
         }
         return true;
     }
-
-    // Is the sync-checkpoint outside maturity window?
-    bool IsMatureSyncCheckpoint()
-    {
-        LOCK(cs_hashSyncCheckpoint);
-        // sync-checkpoint should always be accepted block
-        assert(mapBlockIndex.count(hashSyncCheckpoint));
-        const CBlockIndex* pindexSync = mapBlockIndex[hashSyncCheckpoint];
-        return (nBestHeight >= pindexSync->nHeight + nCoinbaseMaturity ||
-                pindexSync->GetBlockTime() + nStakeMinAge < GetAdjustedTime());
-    }
 }
 
 // ppcoin: sync-checkpoint master key
