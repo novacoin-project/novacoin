@@ -9,7 +9,7 @@
     <message>
         <location line="+39"/>
         <source>&lt;b&gt;BlackCoin&lt;/b&gt; version</source>
-        <translation>verzia &lt;b&gt;BlackCoinu&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;BlackCoin&lt;/b&gt; verzia</translation>
     </message>
     <message>
         <location line="+41"/>
@@ -25,15 +25,15 @@ Copyright © 2014 The BlackCoin developers</translation>
         <source>
 This is experimental software.
 
-Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php.
+Distributed under the MIT/X11 software license, see the accompanying file COPYING or &lt;a href=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;http://www.opensource.org/licenses/mit-license.php&lt;/a&gt;.
 
-This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP software written by Thomas Bernard.</source>
+This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (&lt;a href=&quot;https://www.openssl.org/&quot;&gt;https://www.openssl.org/&lt;/a&gt;) and cryptographic software written by Eric Young (&lt;a href=&quot;mailto:eay@cryptsoft.com&quot;&gt;eay@cryptsoft.com&lt;/a&gt;) and UPnP software written by Thomas Bernard.</source>
         <translation>
 Toto je experimentálny softvér. 
 
-Distribuovaný pod softvérovou licenciou MIT/X11, viď priložený súbor COPYING alebo http://www.opensource.org/licenses/mit-license.php. 
+Distribuovaný pod softvérovou licenciou MIT/X11, viď priložený súbor COPYING alebo &lt;a href=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;http://www.opensource.org/licenses/mit-license.php&lt;/a&gt;. 
 
-Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použitie v sade OpenSSL Toolkit (http://www.openssl.org/) a šifrovací softvér, ktorý napísal Eric Young (eay@cryptsoft.com) a UPnP softvér ktorý napísaný Thomas Bernard.</translation>
+Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použitie v sade OpenSSL Toolkit  (&lt;a href=&quot;https://www.openssl.org/&quot;&gt;https://www.openssl.org/&lt;/a&gt;), šifrovací softvér, ktorý napísal Eric Young (&lt;a href=&quot;mailto:eay@cryptsoft.com&quot;&gt;eay@cryptsoft.com&lt;/a&gt;) a UPnP softvér ktorý napísal Thomas Bernard.</translation>
     </message>
 </context>
 <context>
@@ -49,37 +49,37 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Dvojklikom editovať adresu alebo popis</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+24"/>
         <source>Create a new address</source>
         <translation>Vytvoriť novú adresu</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>Copy the currently selected address to the system clipboard</source>
         <translation>Kopírovať práve zvolenú adresu do systémovej schránky</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-7"/>
         <source>&amp;New Address</source>
         <translation>&amp;Nová adresa</translation>
     </message>
     <message>
-        <location line="-46"/>
+        <location line="-43"/>
         <source>These are your BlackCoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
         <translation>Toto sú vaše BlackCoin adresy pre príjem platieb. Možno budete chcieť dať inú každému odosielateľovi, aby ste mohli sledovať, kto Vám platí.</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+53"/>
         <source>&amp;Copy Address</source>
         <translation>&amp;Kopírovať adresu</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+7"/>
         <source>Show &amp;QR Code</source>
         <translation>Ukáž &amp;QR kód</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+7"/>
         <source>Sign a message to prove you own a BlackCoin address</source>
         <translation>Podpísať správu ako dôkaz, že vlastníte túto BlackCoin adresu</translation>
     </message>
@@ -89,12 +89,12 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Podpísať &amp;správu</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+17"/>
         <source>Delete the currently selected address from the list</source>
         <translation>Vymazať aktuálne vybranú adresu zo zoznamu</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-10"/>
         <source>Verify a message to ensure it was signed with a specified BlackCoin address</source>
         <translation>Overte správu, aby ste zabezpečili, že bola podpísaná s určitou BlackCoin adresou</translation>
     </message>
@@ -104,7 +104,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>&amp;Overte správu</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>&amp;Delete</source>
         <translation>&amp;Zmazať</translation>
     </message>
@@ -142,7 +142,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
 <context>
     <name>AddressTableModel</name>
     <message>
-        <location filename="../addresstablemodel.cpp" line="+144"/>
+        <location filename="../addresstablemodel.cpp" line="+145"/>
         <source>Label</source>
         <translation>Popis</translation>
     </message>
@@ -190,12 +190,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Len pre stávkovanie</translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="+35"/>
-        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;10 or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Zadajte nové heslo k peňaženke.&lt;br/&gt;Prosím použite heslo s dĺžkou aspon &lt;b&gt;10 a viac náhodných znakov&lt;/b&gt;, alebo &lt;b&gt;8 a viac slov&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location filename="../askpassphrasedialog.cpp" line="+38"/>
         <source>Encrypt wallet</source>
         <translation>Zašifrovať peňaženku</translation>
     </message>
@@ -230,7 +225,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Zadajte staré a nové heslo k peňaženke.</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Confirm wallet encryption</source>
         <translation>Potvrďte zašifrovanie peňaženky</translation>
     </message>
@@ -262,9 +257,14 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Peňaženka zašifrovaná</translation>
     </message>
     <message>
-        <location line="-58"/>
+        <location line="-140"/>
+        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>Zadajte nové heslo k peňaženke.&lt;br/&gt;Prosím použite heslo s dĺžkou &lt;b&gt;desať alebo viac náhodných znakov&lt;/b&gt;, prípadne &lt;b&gt;osem alebo viac slov&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <location line="+82"/>
         <source>BlackCoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
-        <translation>BlackCoin sa teraz zavrie aby dokončil proces zašifrovania. Nezabudnite, že zašifrovanie vašej peňaženky nemôže plne chrániť vaše mince pred krádežou malwarom napadnutím vašeho počítača.</translation>
+        <translation>BlackCoin sa teraz zavrie aby dokončil proces zašifrovania. Nezabudnite, že zašifrovanie vašej peňaženky nemôže plne chrániť vaše mince pred krádežou malwarom, ktorý napadol váš počítač.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -311,22 +311,12 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../bitcoingui.cpp" line="+297"/>
         <source>Sign &amp;message...</source>
         <translation>Podpísať &amp;správu...</translation>
     </message>
     <message>
-        <location line="+242"/>
-        <source>Synchronizing with network...</source>
-        <translation>Synchronizácia so sieťou...</translation>
-    </message>
-    <message>
-        <location line="-308"/>
-        <source>&amp;Overview</source>
-        <translation>&amp;Prehľad</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-64"/>
         <source>Show general overview of wallet</source>
         <translation>Zobraziť celkový prehľad o peňaženke</translation>
     </message>
@@ -351,22 +341,12 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Úprava zoznamu uložených adries a popisov</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <source>&amp;Receive coins</source>
-        <translation>&amp;Prijať mince</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-18"/>
         <source>Show the list of addresses for receiving payments</source>
         <translation>Zobraziť zoznam adries pre príjem platieb</translation>
     </message>
     <message>
-        <location line="-7"/>
-        <source>&amp;Send coins</source>
-        <translation>&amp;Poslať mince</translation>
-    </message>
-    <message>
-        <location line="+35"/>
+        <location line="+34"/>
         <source>E&amp;xit</source>
         <translation>&amp;Ukončiť</translation>
     </message>
@@ -401,7 +381,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>&amp;Zašifrovať peňaženku...</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>&amp;Backup Wallet...</source>
         <translation>&amp;Zálohovať peňaženku...</translation>
     </message>
@@ -410,43 +390,33 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <source>&amp;Change Passphrase...</source>
         <translation>&amp;Zmena hesla...</translation>
     </message>
-    <message numerus="yes">
-        <location line="+250"/>
-        <source>~%n block(s) remaining</source>
-        <translation><numerusform>~%n blok zostáva</numerusform><numerusform>~%n blokov zostáva</numerusform><numerusform>Zostáva ~%n blokov</numerusform></translation>
-    </message>
     <message>
-        <location line="+6"/>
-        <source>Downloaded %1 of %2 blocks of transaction history (%3% done).</source>
-        <translation>Stiahnutých %1 z %2 blokov transakčnej histórie (%3% hotových).</translation>
-    </message>
-    <message>
-        <location line="-247"/>
+        <location line="+9"/>
         <source>&amp;Export...</source>
         <translation>&amp;Export...</translation>
     </message>
     <message>
-        <location line="-62"/>
+        <location line="-55"/>
         <source>Send coins to a BlackCoin address</source>
         <translation>Poslať mince na BlackCoin adresu</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+39"/>
         <source>Modify configuration options for BlackCoin</source>
         <translation>Upraviť možnosti konfigurácie pre BlackCoin</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Export the data in the current tab to a file</source>
         <translation>Exportovať dáta v aktuálnej karte do súboru</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-13"/>
         <source>Encrypt or decrypt wallet</source>
         <translation>Zašifrovať alebo dešifrovať peňaženku</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>Backup wallet to another location</source>
         <translation>Zálohovať peňaženku na iné miesto</translation>
     </message>
@@ -471,17 +441,18 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Overiť správu</translation>
     </message>
     <message>
-        <location line="-200"/>
+        <location line="-214"/>
+        <location line="+551"/>
         <source>BlackCoin</source>
         <translation>BlackCoin</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-551"/>
         <source>Wallet</source>
         <translation>Peňaženka</translation>
     </message>
     <message>
-        <location line="+178"/>
+        <location line="+193"/>
         <source>&amp;About BlackCoin</source>
         <translation>&amp;O BlackCoin</translation>
     </message>
@@ -491,7 +462,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Zobraziť / skryť</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>Unlock wallet</source>
         <translation>Odomknúť peňaženku</translation>
     </message>
@@ -506,7 +477,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>Zamknúť peňaženku</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+28"/>
         <source>&amp;File</source>
         <translation>&amp;Súbor</translation>
     </message>
@@ -521,24 +492,19 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation>&amp;Pomoc</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+17"/>
         <source>Tabs toolbar</source>
         <translation>Lišta záložiek</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Actions toolbar</source>
-        <translation>Lišta činností</translation>
-    </message>
-    <message>
-        <location line="+13"/>
+        <location line="+46"/>
         <location line="+9"/>
         <source>[testnet]</source>
         <translation>[testovacia sieť]</translation>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+60"/>
+        <location line="+58"/>
         <source>BlackCoin client</source>
         <translation>BlackCoin klient</translation>
     </message>
@@ -548,12 +514,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <translation><numerusform>%n aktívne spojenie s BlackCoin sieťov</numerusform><numerusform>%n aktívnych spojení s BlackCoin sieťov</numerusform><numerusform>%n aktívnych spojení s BlackCoin sieťou</numerusform></translation>
     </message>
     <message>
-        <location line="+40"/>
-        <source>Downloaded %1 blocks of transaction history.</source>
-        <translation>Stiahnutých %1 blokov z transakčnej histórie.</translation>
-    </message>
-    <message>
-        <location line="+413"/>
+        <location line="+488"/>
         <source>Staking.&lt;br&gt;Your weight is %1&lt;br&gt;Network weight is %2&lt;br&gt;Expected time to earn reward is %3</source>
         <translation>Stávkovanie.&lt;br&gt;Vaša váha je %1&lt;br&gt;Váha siete je %2&lt;br&gt;Odhadovaný čas pre získanie odmeny je %3</translation>
     </message>
@@ -577,53 +538,38 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
         <source>Not staking because you don&apos;t have mature coins</source>
         <translation>Nestávkujem pretože nemáte odležané mince</translation>
     </message>
-    <message numerus="yes">
-        <location line="-403"/>
-        <source>%n second(s) ago</source>
-        <translation><numerusform>pred %n sekundou</numerusform><numerusform>pred %n sekundami</numerusform><numerusform>pred %n sekundami</numerusform></translation>
-    </message>
     <message>
-        <location line="-284"/>
-        <source>&amp;Unlock Wallet...</source>
-        <translation>&amp;Odomknúť peňaženku...</translation>
-    </message>
-    <message numerus="yes">
-        <location line="+288"/>
-        <source>%n minute(s) ago</source>
-        <translation><numerusform>pred %n minutou</numerusform><numerusform>pred %n minutami</numerusform><numerusform>pred %n minutami</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+4"/>
-        <source>%n hour(s) ago</source>
-        <translation><numerusform>pred %n hodinou</numerusform><numerusform>pred %n hodinami</numerusform><numerusform>pred %n hodinami</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+4"/>
-        <source>%n day(s) ago</source>
-        <translation><numerusform>pred %n dňom</numerusform><numerusform>pred %n dňami</numerusform><numerusform>pred %n dňami</numerusform></translation>
+        <location line="-808"/>
+        <source>&amp;Dashboard</source>
+        <translation>&amp;Tabuľa (dashboard):</translation>
     </message>
     <message>
         <location line="+6"/>
+        <source>&amp;Receive</source>
+        <translation>&amp;Prijať</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&amp;Send</source>
+        <translation>&amp;Poslať</translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>&amp;Unlock Wallet...</source>
+        <translation>&amp;Odomknúť peňaženku...</translation>
+    </message>
+    <message>
+        <location line="+273"/>
         <source>Up to date</source>
         <translation>Aktualizovaný</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+43"/>
         <source>Catching up...</source>
         <translation>Sťahujem...</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Last received block was generated %1.</source>
-        <translation>Posledný prijatý blok bol vytvorený %1.</translation>
-    </message>
-    <message>
-        <location line="+59"/>
-        <source>This transaction is over the size limit.  You can still send it for a fee of %1, which goes to the nodes that process your transaction and helps to support the network.  Do you want to pay the fee?</source>
-        <translation>Táto transakcia je nad veľkostný limit. Stále ju môžete poslať za poplatok %1, ktorý ide uzlom spracujúcim vaše transakcie, čím pomáhate podporovať sieť. Chcete zaplatiť poplatok?</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+113"/>
         <source>Confirm transaction fee</source>
         <translation>Potvrďte transakčný poplatok</translation>
     </message>
@@ -662,17 +608,22 @@ Adresa: %4</translation>
         <translation>URI nemožno analyzovať! Toto môže byť spôsobené neplatnou BlackCoin adresu alebo chybnými URI parametrami.</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+9"/>
+        <source>Wallet is &lt;b&gt;not encrypted&lt;/b&gt;</source>
+        <translation>Peňaženka &lt;b&gt;nie je zašifrovaná&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
         <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/b&gt; a momentálne &lt;b&gt;odomknutá&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+8"/>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/b&gt; a momentálne &lt;b&gt;zamknutá&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <source>Backup Wallet</source>
         <translation>Zálohovanie peňaženky</translation>
     </message>
@@ -692,7 +643,7 @@ Adresa: %4</translation>
         <translation>Došlo k chybe pri pokuse o uloženie dát peňaženky do nového umiestnenia.</translation>
     </message>
     <message numerus="yes">
-        <location line="+76"/>
+        <location line="+91"/>
         <source>%n second(s)</source>
         <translation><numerusform>%n sekunda</numerusform><numerusform>%n sekúnd</numerusform><numerusform>%n sekúnd</numerusform></translation>
     </message>
@@ -702,22 +653,80 @@ Adresa: %4</translation>
         <translation><numerusform>%n minúta</numerusform><numerusform>%n minút</numerusform><numerusform>%n minút</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="-429"/>
+        <location line="+433"/>
         <source>%n hour(s)</source>
         <translation><numerusform>%n hodina</numerusform><numerusform>%n hodiny</numerusform><numerusform>%n hodín</numerusform></translation>
     </message>
+    <message>
+        <location line="-456"/>
+        <source>Processed %1 blocks of transaction history.</source>
+        <translation>Spracovaných %1 blokov transakčnej histórie.</translation>
+    </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+27"/>
+        <location line="+433"/>
         <source>%n day(s)</source>
         <translation><numerusform>%n deň</numerusform><numerusform>%n dni</numerusform><numerusform>%n dní</numerusform></translation>
     </message>
+    <message numerus="yes">
+        <location line="-429"/>
+        <location line="+6"/>
+        <source>%n week(s)</source>
+        <translation><numerusform>%n týždeň</numerusform><numerusform>%n týždne</numerusform><numerusform>%n týždňov</numerusform></translation>
+    </message>
     <message>
-        <location line="+18"/>
+        <location line="+0"/>
+        <source>%1 and %2</source>
+        <translation>%1 a %2</translation>
+    </message>
+    <message numerus="yes">
+        <location line="+0"/>
+        <source>%n year(s)</source>
+        <translation><numerusform>%n rok</numerusform><numerusform>%n roky</numerusform><numerusform>%n rokov</numerusform></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1 behind</source>
+        <translation>%1 pozadu</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Posledný prijatý blok bol vytvorený pred %1.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Transakcie po tejto ešte nebudú viditeľné</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Error</source>
+        <translation>Chyba</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Warning</source>
+        <translation>Varovanie</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Information</source>
+        <translation>Informácia</translation>
+    </message>
+    <message>
+        <location line="+69"/>
+        <source>This transaction is over the size limit. You can still send it for a fee of %1, which goes to the nodes that process your transaction and helps to support the network. Do you want to pay the fee?</source>
+        <translation>Táto transakcia je nad veľkostný limit. Stále ju môžete poslať za poplatok %1, ktorý ide uzlom spracujúcim vaše transakcie, čím pomáhate podporovať sieť. Chcete zaplatiť poplatok?</translation>
+    </message>
+    <message>
+        <location line="+324"/>
         <source>Not staking</source>
         <translation>Nestávkuje sa</translation>
     </message>
     <message>
-        <location filename="../bitcoin.cpp" line="+109"/>
+        <location filename="../bitcoin.cpp" line="+104"/>
         <source>A fatal error occurred. BlackCoin can no longer continue safely and will quit.</source>
         <translation>Došlo k závažnej chybe. BlackCoin už nemôže pokračovať bezpečne a bude ukončený.</translation>
     </message>
@@ -725,7 +734,7 @@ Adresa: %4</translation>
 <context>
     <name>ClientModel</name>
     <message>
-        <location filename="../clientmodel.cpp" line="+90"/>
+        <location filename="../clientmodel.cpp" line="+110"/>
         <source>Network Alert</source>
         <translation>Výstraha siete</translation>
     </message>
@@ -768,7 +777,7 @@ Adresa: %4</translation>
         <translation>Nízky výstup:</translation>
     </message>
     <message>
-        <location filename="../coincontroldialog.cpp" line="+551"/>
+        <location filename="../coincontroldialog.cpp" line="+552"/>
         <source>no</source>
         <translation>nie</translation>
     </message>
@@ -785,7 +794,7 @@ Adresa: %4</translation>
     <message>
         <location line="+69"/>
         <source>(un)select all</source>
-        <translation>(ne)označiť všetko</translation>
+        <translation>(Ne)označiť všetko</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -891,37 +900,37 @@ Adresa: %4</translation>
     <message>
         <location line="+317"/>
         <source>highest</source>
-        <translation>najvyššie</translation>
+        <translation>najvyššia</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>high</source>
-        <translation>vysoké</translation>
+        <translation>vysoká</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>medium-high</source>
-        <translation>stredne vysoké</translation>
+        <translation>stredne vysoká</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>medium</source>
-        <translation>stredné</translation>
+        <translation>stredná</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>low-medium</source>
-        <translation>stredne nízke</translation>
+        <translation>stredne nízka</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>low</source>
-        <translation>nízke</translation>
+        <translation>nízka</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>lowest</source>
-        <translation>najnižšie</translation>
+        <translation>najnižšia</translation>
     </message>
     <message>
         <location line="+155"/>
@@ -982,7 +991,7 @@ Sumy nižšie ako 0,546 násobok minimálneho poplatku sú zobrazené ako PRACH.
 To znamená, že je potrebný poplatok aspoň %2.</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <location line="+66"/>
         <source>(no label)</source>
         <translation>(bez popisu)</translation>
@@ -1026,7 +1035,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Adresa spojená s položkou v tomto adresári. Toto môže byť zmenené iba pre odosielané adresy.</translation>
     </message>
     <message>
-        <location filename="../editaddressdialog.cpp" line="+20"/>
+        <location filename="../editaddressdialog.cpp" line="+21"/>
         <source>New receiving address</source>
         <translation>Nová adresa pre prijímanie</translation>
     </message>
@@ -1069,7 +1078,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
 <context>
     <name>GUIUtil::HelpMessageBox</name>
     <message>
-        <location filename="../guiutil.cpp" line="+420"/>
+        <location filename="../guiutil.cpp" line="+426"/>
         <location line="+12"/>
         <source>BlackCoin-Qt</source>
         <translation>BlackCoin-Qt</translation>
@@ -1151,16 +1160,6 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <location line="+3"/>
         <source>&amp;Start BlackCoin on system login</source>
         <translation>&amp;Spustiť BlackCoin pri prihlásení do systému</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Detach block and address databases at shutdown. This means they can be moved to another data directory, but it slows down shutdown. The wallet is always detached.</source>
-        <translation>Odpojiť blok a databázy z adresami pri vypnutí počítača. To znamená, že môžu byť presunuté do iného adresára dát, ale to spomaľuje vypnutie. Peňaženka je vždy odpojená.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Detach databases at shutdown</source>
-        <translation>&amp;Odpojiť databázy pri vypnutí</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1269,23 +1268,28 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>Whether to show BlackCoin addresses in the transaction list or not.</source>
-        <translation>Či chcete zobraziť BlackCoin adresy v zozname transakcií alebo nie.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Display addresses in transaction list</source>
-        <translation>&amp;Zobraziť adresy v zozname transakcií</translation>
-    </message>
-    <message>
-        <location line="+7"/>
         <source>Whether to show coin control features or not.</source>
-        <translation>Či sa majú zobraziť coin control features alebo nie.</translation>
+        <translation>Či sa majú zobraziť funkcie kontroly mincí alebo nie.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Display coin &amp;control features (experts only!)</source>
-        <translation>Zobraziť coin &amp;control features (len pre odborníkov!)</translation>
+        <translation>Zobraziť funkcie &amp;kontroly mincí (len pre odborníkov!)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Whether to select the coin outputs randomly or with minimal coin age.</source>
+        <translation>Zvoliť výstupy mincí náhodne, alebo s minimálnym vekom mince.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minimize weight consumption (experimental)</source>
+        <translation>Minimalizovať spotrebu hmotnosti (experimentálne)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Use black visual theme (requires restart)</source>
+        <translation>Použiť čiernu vizuálnu tému (vyžaduje reštart)</translation>
     </message>
     <message>
         <location line="+71"/>
@@ -1303,7 +1307,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>&amp;Použiť</translation>
     </message>
     <message>
-        <location filename="../optionsdialog.cpp" line="+55"/>
+        <location filename="../optionsdialog.cpp" line="+53"/>
         <source>default</source>
         <translation>predvolené</translation>
     </message>
@@ -1333,23 +1337,23 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Forma</translation>
     </message>
     <message>
-        <location line="+33"/>
-        <location line="+231"/>
+        <location line="+46"/>
+        <location line="+247"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the BlackCoin network after a connection is established, but this process has not completed yet.</source>
         <translation>Zobrazené informácie môžu byť zastaralé. Vaša peňaženka sa automaticky synchronizuje so sieťou BlackCoin po nadviazaní spojenia, ale tento proces nie je ešte dokončený.</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-173"/>
         <source>Stake:</source>
         <translation>V stávke:</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+32"/>
         <source>Unconfirmed:</source>
         <translation>Nepotvrdené:</translation>
     </message>
     <message>
-        <location line="-107"/>
+        <location line="-113"/>
         <source>Wallet</source>
         <translation>Peňaženka</translation>
     </message>
@@ -1364,7 +1368,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Váš aktuálny použiteľný zostatok</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+80"/>
         <source>Immature:</source>
         <translation>Nezrelé:</translation>
     </message>
@@ -1374,7 +1378,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Vyťažený zostatok, ktorý nebol ešte dozretý</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+23"/>
         <source>Total:</source>
         <translation>Celkovo:</translation>
     </message>
@@ -1384,25 +1388,33 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Váš súčasný celkový zostatok</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+50"/>
         <source>&lt;b&gt;Recent transactions&lt;/b&gt;</source>
         <translation>&lt;b&gt;Nedávne transakcie&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="-118"/>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the current balance</source>
         <translation>Súčet transakcií, ktoré neboli ešte potvrdené, a ešte nezapočítané do aktuálneho zostatku</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-32"/>
         <source>Total of coins that was staked, and do not yet count toward the current balance</source>
         <translation>Súčet mincí, ktoré sú v stávke a ešte neboli započítané do aktuálneho zostatku</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="+113"/>
+        <location filename="../overviewpage.cpp" line="+116"/>
         <location line="+1"/>
         <source>out of sync</source>
         <translation>nezosynchronizované</translation>
+    </message>
+</context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <location filename="../paymentserver.cpp" line="+107"/>
+        <source>Cannot start blackcoin: click-to-pay handler</source>
+        <translation>BlackCoin sa nedá spustiť: click-to-pay handler</translation>
     </message>
 </context>
 <context>
@@ -1479,13 +1491,11 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <location line="+36"/>
         <location line="+53"/>
         <location line="+23"/>
-        <location line="+23"/>
-        <location filename="../rpcconsole.cpp" line="+348"/>
         <source>N/A</source>
         <translation>nie je k dispozícii</translation>
     </message>
     <message>
-        <location line="-217"/>
+        <location line="-194"/>
         <source>Client version</source>
         <translation>Verzia klienta</translation>
     </message>
@@ -1530,12 +1540,32 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Aktuálny počet blokov</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <source>Estimated total blocks</source>
-        <translation>Očakávaných blokov celkovo</translation>
+        <location line="+197"/>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;Sieťové prenosy</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+52"/>
+        <source>&amp;Clear</source>
+        <translation>Vymazať</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Totals</source>
+        <translation>Súčty</translation>
+    </message>
+    <message>
+        <location line="+64"/>
+        <source>In:</source>
+        <translation>Vstup:</translation>
+    </message>
+    <message>
+        <location line="+80"/>
+        <source>Out:</source>
+        <translation>Výstup:</translation>
+    </message>
+    <message>
+        <location line="-383"/>
         <source>Last block time</source>
         <translation>Čas posledného bloku</translation>
     </message>
@@ -1565,7 +1595,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>&amp;Konzola</translation>
     </message>
     <message>
-        <location line="-260"/>
+        <location line="-237"/>
         <source>Build date</source>
         <translation>Dátum zostavenia</translation>
     </message>
@@ -1580,7 +1610,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Jadro BlackCoin</translation>
     </message>
     <message>
-        <location line="+279"/>
+        <location line="+256"/>
         <source>Debug log file</source>
         <translation>Súbor denníka ladenia</translation>
     </message>
@@ -1595,7 +1625,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Vymazať konzolu</translation>
     </message>
     <message>
-        <location filename="../rpcconsole.cpp" line="-33"/>
+        <location filename="../rpcconsole.cpp" line="+325"/>
         <source>Welcome to the BlackCoin RPC console.</source>
         <translation>Vitajte v konzole Blackcoin RPC.</translation>
     </message>
@@ -1609,12 +1639,47 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
         <translation>Zadajte &lt;b&gt;help&lt;/b&gt; pre prehľad dostupných príkazov.</translation>
     </message>
+    <message>
+        <location line="+127"/>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>%1 m</source>
+        <translation>%1 m</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 h %2 m</source>
+        <translation>%1 h %2 m</translation>
+    </message>
 </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
         <location filename="../forms/sendcoinsdialog.ui" line="+14"/>
-        <location filename="../sendcoinsdialog.cpp" line="+182"/>
+        <location filename="../sendcoinsdialog.cpp" line="+181"/>
         <location line="+5"/>
         <location line="+5"/>
         <location line="+5"/>
@@ -1627,7 +1692,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     <message>
         <location line="+76"/>
         <source>Coin Control Features</source>
-        <translation>Coin Control Features</translation>
+        <translation>Funkcie kontroly mincí</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -1724,7 +1789,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>&amp;Pridať príjemcu</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <source>Remove all transaction fields</source>
         <translation>Odstráňte všetky transakčné polia</translation>
     </message>
@@ -1734,7 +1799,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Zmazať &amp;všetko</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+24"/>
         <source>Balance:</source>
         <translation>Zostatok:</translation>
     </message>
@@ -1845,8 +1910,8 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Error: Transaction creation failed.</source>
-        <translation>Chyba: Vytvorenie transakcie zlyhalo.</translation>
+        <source>Error: Transaction creation failed!</source>
+        <translation>Chyba: Vytvorenie transakcie zlyhalo!</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1854,7 +1919,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Chyba: Transakcia bola zamietnutá. To môže nastať, ak niektoré z mincí vo vašej peňaženke sa už použili, ako napríklad, ak ste použili kópiu wallet.dat a mince boli použité v kópii, ale neboli označené tu ako použité.</translation>
     </message>
     <message>
-        <location line="+251"/>
+        <location line="+247"/>
         <source>WARNING: Invalid BlackCoin address</source>
         <translation>UPOZORNENIE: Neplatná BlackCoin adresa</translation>
     </message>
@@ -1887,23 +1952,23 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Zapla&amp;tiť:</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <location filename="../sendcoinsentry.cpp" line="+25"/>
+        <location line="+34"/>
+        <source>The address to send the payment to (e.g. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</source>
+        <translation>Adresa pre poslanie platby (napr. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</translation>
+    </message>
+    <message>
+        <location line="+60"/>
+        <location filename="../sendcoinsentry.cpp" line="+26"/>
         <source>Enter a label for this address to add it to your address book</source>
         <translation>Vložte popis pre túto adresu aby sa pridala do adresára</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="-78"/>
         <source>&amp;Label:</source>
         <translation>&amp;Popis:</translation>
     </message>
     <message>
-        <location line="+18"/>
-        <source>The address to send the payment to  (e.g. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</source>
-        <translation>Adresa pre poslanie platby (napr. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</translation>
-    </message>
-    <message>
-        <location line="+10"/>
+        <location line="+28"/>
         <source>Choose address from address book</source>
         <translation>Vybrať adresu z adresára</translation>
     </message>
@@ -2114,19 +2179,22 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     </message>
 </context>
 <context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <location filename="../trafficgraphwidget.cpp" line="+75"/>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
     <name>TransactionDesc</name>
     <message>
-        <location filename="../transactiondesc.cpp" line="+19"/>
+        <location filename="../transactiondesc.cpp" line="+25"/>
         <source>Open until %1</source>
         <translation>Otvorené do %1</translation>
     </message>
-    <message numerus="yes">
-        <location line="-2"/>
-        <source>Open for %n block(s)</source>
-        <translation><numerusform>Otvoriť pre %n blok</numerusform><numerusform>Otvoriť pre %n blokov</numerusform><numerusform>Otvoriť pre %n blokov</numerusform></translation>
-    </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>conflicted</source>
         <translation>v rozpore</translation>
     </message>
@@ -2146,7 +2214,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>%1 potvrdení</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Status</source>
         <translation>Stav</translation>
     </message>
@@ -2267,7 +2335,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Vstupy</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+21"/>
         <source>Amount</source>
         <translation>Suma</translation>
     </message>
@@ -2282,12 +2350,17 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>nepravda</translation>
     </message>
     <message>
-        <location line="-211"/>
+        <location line="-209"/>
         <source>, has not been successfully broadcast yet</source>
         <translation>, ešte nebola úspešne odoslaná</translation>
     </message>
+    <message numerus="yes">
+        <location line="-36"/>
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Otvorené pre %n ďalší blok</numerusform><numerusform>Otvorené pre %n ďalšie bloky</numerusform><numerusform>Otvorené pre %n ďalších blokov</numerusform></translation>
+    </message>
     <message>
-        <location line="+35"/>
+        <location line="+71"/>
         <source>unknown</source>
         <translation>neznámy</translation>
     </message>
@@ -2308,7 +2381,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
 <context>
     <name>TransactionTableModel</name>
     <message>
-        <location filename="../transactiontablemodel.cpp" line="+226"/>
+        <location filename="../transactiontablemodel.cpp" line="+231"/>
         <source>Date</source>
         <translation>Dátum</translation>
     </message>
@@ -2328,7 +2401,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Hodnota</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+52"/>
         <source>Open until %1</source>
         <translation>Otvorené do %1</translation>
     </message>
@@ -2408,7 +2481,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>(n/a)</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+194"/>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
         <translation>Status transakcie. Presuňte myš nad toto pole a zobrazí sa počet potvrdení.</translation>
     </message>
@@ -2436,13 +2509,13 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
 <context>
     <name>TransactionView</name>
     <message>
-        <location filename="../transactionview.cpp" line="+55"/>
-        <location line="+16"/>
+        <location filename="../transactionview.cpp" line="+54"/>
+        <location line="+17"/>
         <source>All</source>
         <translation>Všetko</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-16"/>
         <source>Today</source>
         <translation>Dnes</translation>
     </message>
@@ -2472,7 +2545,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Rozsah...</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Received with</source>
         <translation>Prijaté s</translation>
     </message>
@@ -2484,7 +2557,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     <message>
         <location line="+2"/>
         <source>To yourself</source>
-        <translation>Samému sebe</translation>
+        <translation>Sebe samému</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2537,7 +2610,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Zobraziť podrobnosti transakcie</translation>
     </message>
     <message>
-        <location line="+144"/>
+        <location line="+138"/>
         <source>Export Transaction Data</source>
         <translation>Export transakčných údajov</translation>
     </message>
@@ -2605,7 +2678,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+206"/>
+        <location filename="../walletmodel.cpp" line="+208"/>
         <source>Sending...</source>
         <translation>Posielam...</translation>
     </message>
@@ -2613,7 +2686,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+33"/>
+        <location filename="../bitcoinstrings.cpp" line="+173"/>
         <source>BlackCoin version</source>
         <translation>BlackCoin verzia</translation>
     </message>
@@ -2638,7 +2711,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Získať pomoc pre príkaz</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-147"/>
         <source>Options:</source>
         <translation>Možnosti:</translation>
     </message>
@@ -2663,7 +2736,32 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Zadajte priečinok s dátami</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-25"/>
+        <source>%s, you must set a rpcpassword in the configuration file:
+%s
+It is recommended you use the following random password:
+rpcuser=blackcoinrpc
+rpcpassword=%s
+(you do not need to remember this password)
+The username and password MUST NOT be the same.
+If the file does not exist, create it with owner-readable-only file permissions.
+It is also recommended to set alertnotify so you are notified of problems;
+for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
+</source>
+        <translation>%s, musíte nastaviť rpcpassword v konfiguračnom súbore:
+%s
+Doporučuje sa použiť nasledovné náhodne heslo:
+rpcuser=blackcoinrpc
+rpcpassword=%s
+(toto heslo si nemusíte pamätať)
+Užívateľské meno a heslo NESMIE byť rovnaké.
+Ak súbor neexistuje, vytvorte ho s právami &quot;môže čítať iba vlastník&quot;.
+Odporúča sa tiež nastaviť &quot;alertnotify&quot;, takže budete upozornení na problémy,
+napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; admin@foo.com
+</translation>
+    </message>
+    <message>
+        <location line="+27"/>
         <source>Set database cache size in megabytes (default: 25)</source>
         <translation>Nastaviť veľkosť vyrovnávajúcej pamäte pre databázu v megabytoch (predvolené: 25)</translation>
     </message>
@@ -2693,14 +2791,19 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Určite vašu vlastnú verejnú adresu</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Bind to given address. Use [host]:port notation for IPv6</source>
         <translation>Spojiť do danej adresy. Použite [host]:port zápis pre IPv6</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Stake your coins to support network and gain reward (default: 1)</source>
-        <translation>Nechajte stávkovať vaše mince pre podporu siete a získajte odmenu (predvolené: 1)</translation>
+        <location line="+1"/>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
+        <translation>Dotaz na partnerské adresy pomocou vyhľadávania DNS v prípade nedostatku adries (predvolené: 1, pokiaľ -connect)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Always query for peer addresses via DNS lookup (default: 0)</source>
+        <translation>Vždy sa pýtať na partnerské adresy pomocou vyhľadávania DNS (predvolené: 0)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2713,57 +2816,22 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Počet sekúnd kedy sa zabráni zle sa správajúcim peerom znovupripojenie (predvolené: 86400)</translation>
     </message>
     <message>
-        <location line="-44"/>
+        <location line="-37"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>Pri nastavovaní portu RPC %u pre počúvanie na IPv4 došlo k chybe: %s</translation>
     </message>
     <message>
-        <location line="+51"/>
-        <source>Detach block and address databases. Increases shutdown time (default: 0)</source>
-        <translation>Odpojiť blok a databázy adries. Zvyšuje vypínací čas (predvolené: 0)</translation>
-    </message>
-    <message>
-        <location line="+109"/>
-        <source>Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Chyba: Transakcia bola zamietnutá. To môže nastať, ak niektoré z mincí vo vašej peňaženke sa už použili, ako napríklad, ak ste použili kópiu wallet.dat a mince boli použité v kópii, ale neboli označené ako použité tu.</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds  </source>
-        <translation>Chyba: Táto operácia vyžaduje transakčný poplatok vo výške aspoň %s, pretože jeho množstvo, zložitosť, alebo použitím nedávno prijatých finančných prostriedkov</translation>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+65"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation>Počúvajte pre JSON-RPC spojenie na &lt;port&gt; (predvolené: 15715 alebo testovaciasieť: 25715)</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-17"/>
         <source>Accept command line and JSON-RPC commands</source>
         <translation>Prijímať príkazy z príkazového riadku a JSON-RPC</translation>
     </message>
     <message>
-        <location line="+101"/>
-        <source>Error: Transaction creation failed  </source>
-        <translation>Chyba: Vytvorenie transakcie zlyhalo</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Error: Wallet locked, unable to create transaction  </source>
-        <translation>Chyba: Peňaženka je zamknutá, nie je možné vytvoriť transakciu</translation>
-    </message>
-    <message>
-        <location line="-8"/>
-        <source>Importing blockchain data file.</source>
-        <translation>Importovanie dátového súboru reťazca blokov.</translation>
-    </message>
-    <message>
         <location line="+1"/>
-        <source>Importing bootstrap blockchain data file.</source>
-        <translation>Import zavádzacej časti blockchain dátového súbora.</translation>
-    </message>
-    <message>
-        <location line="-88"/>
         <source>Run in the background as a daemon and accept commands</source>
         <translation>Bežať na pozadí ako démon a prijímať príkazy</translation>
     </message>
@@ -2778,32 +2846,27 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Prijímať pripojenie z vonka (predvolené: 1, ak nie -proxy alebo -connect)</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-29"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv6, falling back to IPv4: %s</source>
         <translation>Pri nastavovaní portu RPC %u pre počúvanie na IPv6, spadne späť do IPv4 došlo k chybe: %s</translation>
     </message>
     <message>
-        <location line="+117"/>
-        <source>Error initializing database environment %s! To recover, BACKUP THAT DIRECTORY, then remove everything from it except for wallet.dat.</source>
-        <translation>Chyba pri inicializácii databázy prostredie %s! Ak chcete obnoviť, ZÁLOHUJTE TENTO ADRESÁR, potom všetko z neho odstránte okrem wallet.dat.</translation>
-    </message>
-    <message>
-        <location line="-20"/>
+        <location line="+96"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>Nastavte maximálnu veľkosť high-priority/low-fee transakcií v bajtoch (predvolené: 27000)</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
         <translation>Upozornenie: -paytxfee je nastavené veľmi vysoko. Toto sú transakčné poplatky ktoré zaplatíte ak odošlete transakciu.</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation>Upozornenie: Skontrolujte, že dátum a čas počítača sú správne! Ak je Váš čas nesprávny BlackCoin nebude pracovať správne.</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="+132"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Upozornenie: Chyba pri čítaní wallet.dat! Všetky kľúče načítané správne, ale transakčné dáta alebo položky adresára môže chýbať alebo byť nesprávne.</translation>
     </message>
@@ -2813,17 +2876,17 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Upozornenie: wallet.dat poškodený, údaje zachránené! Pôvodný wallet.dat bol uložený ako wallet.{timestamp}.bak v %s; ak váš zostatok alebo transakcie nie sú správne, mali by ste obnoviť zo zálohy.</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-31"/>
         <source>Attempt to recover private keys from a corrupt wallet.dat</source>
         <translation>Pokus obnoviť súkromné kľúče z poškodeného wallet.dat</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Block creation options:</source>
         <translation>Voľby vytvorenia bloku:</translation>
     </message>
     <message>
-        <location line="-62"/>
+        <location line="-69"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Pripojiť sa len k určenému uzlu(om)</translation>
     </message>
@@ -2833,22 +2896,17 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Objavte vlastnú IP adresa (predvolené: 1 pri počúvaní a nie -externalip)</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Nepodarilo sa počúvať žiadnom porte. Použite -listen=0 ak to chcete.</translation>
     </message>
     <message>
-        <location line="-90"/>
-        <source>Find peers using DNS lookup (default: 1)</source>
-        <translation>Nájsť peerov pomocou vyhľadávania DNS (predvolené: 1)</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="-91"/>
         <source>Sync checkpoints policy (default: strict)</source>
         <translation>Sync checkpoints policy (predvolené: strict)</translation>
     </message>
     <message>
-        <location line="+83"/>
+        <location line="+89"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Neplatná -tor adresa: &apos;%s&apos;</translation>
     </message>
@@ -2858,7 +2916,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Neplatná suma pre -reservebalance=&lt;množstvo&gt;</translation>
     </message>
     <message>
-        <location line="-82"/>
+        <location line="-88"/>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: 5000)</source>
         <translation>Maximum pre-pripojenie prijímacej vyrovnávacej pamäti, &lt;n&gt;*1000 bajtov (predvolené: 5000)</translation>
     </message>
@@ -2868,47 +2926,37 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Maximum pre-pripojenie posielacej vyrovnávacej pamäti, &lt;n&gt;*1000 bajtov (predvolené: 1000)</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-17"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>Pripojiť len k uzlom siete &lt;net&gt; (IPv4, IPv6 alebo Tor)</translation>
     </message>
     <message>
-        <location line="+28"/>
-        <source>Output extra debugging information. Implies all other -debug* options</source>
-        <translation>Výstupné ďalšie informácie o ladení. Znamená všetky -debug* možnosti</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Output extra network debugging information</source>
-        <translation>Výstupné ďalšie sieťové informácie o ladení</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+31"/>
         <source>Prepend debug output with timestamp</source>
         <translation>Pred debug výstup s časovou pečiatkou</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+41"/>
         <source>SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
         <translation>SSL možnosť: (pozrite Bitcoin Wiki pre návod na nastavenie SSL)</translation>
     </message>
     <message>
-        <location line="-74"/>
+        <location line="-81"/>
         <source>Select the version of socks proxy to use (4-5, default: 5)</source>
         <translation>Vyberte verziu SOCKS proxy pre používanie (4-5, predvolené: 5)</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+42"/>
         <source>Send trace/debug info to console instead of debug.log file</source>
         <translation>Odoslať trace/debug informácie na konzolu namiesto debug.info žurnálu</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+5"/>
         <source>Send trace/debug info to debugger</source>
         <translation>Poslať stopy/ladiace informácie do debuggera</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+30"/>
         <source>Set maximum block size in bytes (default: 250000)</source>
         <translation>Nastavte maximálnu veľkosť bloku v bajtoch (predvolené: 250000)</translation>
     </message>
@@ -2918,24 +2966,24 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Nastavte minimálnu veľkosť bloku v bajtoch (predvolené: 0)</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-35"/>
         <source>Shrink debug.log file on client startup (default: 1 when no -debug)</source>
         <translation>Stlačiť debug.log súbor na spustenie klienta (predvolené: 1, keď nie -debug)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-43"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>Určiť aut spojenia v milisekundách (predvolené: 5000)</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+116"/>
         <source>Unable to sign checkpoint, wrong checkpointkey?
 </source>
         <translation>Nemožno podpísať kontrolný bod, zlý checkpointkey?
 </translation>
     </message>
     <message>
-        <location line="-80"/>
+        <location line="-86"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Skúsiť použiť UPnP pre mapovanie počúvajúceho portu (default: 0)</translation>
     </message>
@@ -2945,86 +2993,102 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
         <translation>Skúsiť použiť UPnP pre mapovanie počúvajúceho portu (default: 1 when listening)</translation>
     </message>
     <message>
-        <location line="-25"/>
+        <location line="-26"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>Použiť proxy server k získaniu Tor skrytých služieb (predvolené: rovnaká ako -proxy)</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+47"/>
         <source>Username for JSON-RPC connections</source>
         <translation>Užívateľské meno pre JSON-RPC spojenia</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+51"/>
         <source>Verifying database integrity...</source>
         <translation>Overenie integrity databázy ...</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+44"/>
+        <source>Error: Wallet locked, unable to create transaction!</source>
+        <translation>Chyba: Peňaženka je zamknutá, nie je možné vytvoriť transakciu!</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!</source>
+        <translation>Chyba: Táto operácia vyžaduje transakčný poplatok vo výške aspoň %s, kvôli jej množstvu, zložitosti, alebo použitím nedávno prijatých finančných prostriedkov!</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error: Transaction creation failed!</source>
+        <translation>Chyba: Vytvorenie transakcie zlyhalo!</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
+        <translation>Chyba: Transakcia bola zamietnutá! Toto môže nastať, ak niektoré z mincí vo vašej peňaženke sa už použili, ako napríklad, ak ste použili kópiu wallet.dat a mince boli použité v kópii, ale neboli označené ako použité tu.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Warning</source>
+        <translation>Varovanie</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Information</source>
+        <translation>Informácia</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
         <translation>UPOZORNENIE: detekovaný synchronizovaný porušený checkpoint, ale preskočený!</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Warning: Disk space is low!</source>
-        <translation>Upozornenie: Nedostatok miesta na disku!</translation>
-    </message>
-    <message>
-        <location line="-2"/>
+        <location line="-1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Upozornenie: Táto verzia je zastaraná, vyžaduje sa aktualizácia!</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-54"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat je poškodený, záchrana zlyhala</translation>
     </message>
     <message>
-        <location line="-54"/>
+        <location line="-56"/>
         <source>Password for JSON-RPC connections</source>
         <translation>Heslo pre JSON-rPC spojenia</translation>
     </message>
     <message>
-        <location line="-84"/>
-        <source>%s, you must set a rpcpassword in the configuration file:
- %s
-It is recommended you use the following random password:
-rpcuser=blackcoinrpc
-rpcpassword=%s
-(you do not need to remember this password)
-The username and password MUST NOT be the same.
-If the file does not exist, create it with owner-readable-only file permissions.
-It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
-</source>
-        <translation>%s, musíte nastaviť rpcpassword v konfiguračnom súbore:
- %s
-Je odporúčané použiť nasledujúce náhodné heslo:
-rpcuser=blackcoinrpc
-rpcpassword=%s
-(Nemusíte si pamätať toto heslo)
-Užívateľské meno a heslo nesmú byť rovnaké. 
-Ak súbor neexistuje, vytvorte ho s oprávneniami súborov vlastníkov iba na čítatanie.
-Odporúča sa tiež nastaviť alertnotify, takže budete upozornení na problémy;
-napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com</translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Nájsť peerov pomocou Internet Relay Chat (predvolené: 1)  {0)?}</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="-32"/>
         <source>Sync time with other nodes. Disable if time on your system is precise e.g. syncing with NTP (default: 1)</source>
         <translation>Synchronizácia času s ostatnými uzlami. Zakázať ak čas na vašom systéme je presný, napr synchronizáciu s NTP (predvolené: 1)</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+13"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation>Pri vytváraní transakcií, ignorovať vstupy s hodnotou nižšou než táto (predvolené: 0.01)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+6"/>
+        <source>Output debugging information (default: 0, supplying &lt;category&gt; is optional)</source>
+        <translation>Výstupné informácie o ladení. (predvolené: 0, zadanie &lt;category&gt; je nepovinné)</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
+        <translation>Ak nie je zadaná &lt;category&gt;, vypíš všetky ladiace informácie</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;category&gt; can be:</source>
+        <translation>&lt;category&gt; môže byť:</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly. This is intended for regression testing tools and app development.</source>
+        <translation>Vstúpte do režimu testovania regresiou, ktorá používa špeciálny reťazec, v ktorom môžu byť bloky vyriešiť okamžite. Tento je určený pre regresné testovanie nástrojov a vývoja aplikácie.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Allow JSON-RPC connections from specified IP address</source>
         <translation>Povoliť JSON-RPC spojenia z určenej IP adresy.</translation>
     </message>
@@ -3032,6 +3096,16 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <location line="+1"/>
         <source>Send commands to node running on &lt;ip&gt; (default: 127.0.0.1)</source>
         <translation>Poslať príkaz nóde bežiacej na &lt;ip&gt; (predvolené: 127.0.0.1)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wait for RPC server to start</source>
+        <translation>Pred spustením počkať na RPC server</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Set the number of threads to service RPC calls (default: 4)</source>
+        <translation>Nastavte počet vlákien pre obsluhu RPC volaní (predvolené: 4)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3047,11 +3121,6 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <location line="+3"/>
         <source>Require a confirmations for change (default: 0)</source>
         <translation>Požadovať potvrdenie pre zmenu (predvolené: 0)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enforce transaction scripts to use canonical PUSH operators (default: 1)</source>
-        <translation>Presadzovať transakčné skripty k používaniu kanonických PUSH operátorov (predvolené: 1)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3074,12 +3143,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Znovu skenovať reťaz blokov pre chýbajúce transakcie</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>How many blocks to check at startup (default: 2500, 0 = all)</source>
-        <translation>Koľko blokov na kontrolu pri štarte (predvolené: 2500, 0 = všetky)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>How thorough the block verification is (0-6, default: 1)</source>
         <translation>Ako dôkladné overenie bloku je (0-6, predvolené: 1)</translation>
     </message>
@@ -3089,7 +3153,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Importovať bloky z externého blk000?.dat súbora</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>Použiť OpenSSL (https) pre JSON-RPC spojenia</translation>
     </message>
@@ -3104,47 +3168,47 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Súkromný kľúč servra (predvolené: server.pem)</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Acceptable ciphers (default: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</source>
-        <translation>Akceptovateľné ciphers (predvolené: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</translation>
+        <location line="+10"/>
+        <source>Initialization sanity check failed. BlackCoin is shutting down.</source>
+        <translation>Úvodné kontrolné testy zlyhali. BlackCoin sa teraz zatvori.</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+50"/>
         <source>Error: Wallet unlocked for staking only, unable to create transaction.</source>
-        <translation>Chyba: Peňaženka odomknuté len pre stávkovanie, nemožné vytvoriť transakciu.</translation>
+        <translation>Chyba: Peňaženka je odomknutá len pre stávkovanie, nemožné vytvoriť transakciu.</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
+        <source>Error: Disk space is low!</source>
+        <translation>Chyba: Nedostatok miesta na disku!</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Toto je predbežná testovacia zostava - používate na vlastné riziko - nepoužívajte na ťaženie alebo obchodné aplikácie</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
         <translation>UPOZORNENIE: Neplatný checkpoint nájdený! Uvedené transakcie nemusia byť správne! Možno budete musieť upgradovať, alebo upozorniť vývojárov.</translation>
     </message>
     <message>
-        <location line="-158"/>
+        <location line="-174"/>
         <source>This help message</source>
         <translation>Táto pomocná správa</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>Peňaženka %s bydlisko mimo dátový adresár %s.</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Cannot obtain a lock on data directory %s.  BlackCoin is probably already running.</source>
-        <translation>Nemožno získať zámok na dátový adresár %s. BlackCoin už pravdepodobne beží.</translation>
-    </message>
-    <message>
-        <location line="-98"/>
-        <source>BlackCoin</source>
-        <translation>BlackCoin</translation>
-    </message>
-    <message>
-        <location line="+140"/>
+        <location line="+37"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>Nemôžem sa pripojiť k %s na tomto počítači (bind vrátil chybu %d, %s)</translation>
     </message>
     <message>
-        <location line="-130"/>
+        <location line="-133"/>
         <source>Connect through socks proxy</source>
         <translation>Pripojenie cez SOCKS proxy</translation>
     </message>
@@ -3154,12 +3218,12 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Povoliť vyhľadávanie DNS pre pridanie nódy a spojenie</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+126"/>
         <source>Loading addresses...</source>
         <translation>Načítavanie adries...</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-12"/>
         <source>Error loading blkindex.dat</source>
         <translation>Chyba pri načítaní blkindex.dat</translation>
     </message>
@@ -3209,17 +3273,12 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Nemožno rozložiť -externalip adresu: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation>Neplatná suma pre -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+44"/>
-        <source>Error: could not start node</source>
-        <translation>Chyba: nemožno spustiť uzol</translation>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+60"/>
         <source>Sending...</source>
         <translation>Posielam...</translation>
     </message>
@@ -3234,32 +3293,67 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Nedostatok prostriedkov</translation>
     </message>
     <message>
-        <location line="-34"/>
+        <location line="-40"/>
         <source>Loading block index...</source>
         <translation>Načítavanie zoznamu blokov...</translation>
     </message>
     <message>
-        <location line="-103"/>
+        <location line="-110"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Pridať nód na pripojenie a pokus o udržanie pripojenia otvoreného</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+125"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>Nemôžem sa pripojiť na %s na tomto počítači. BlackCoin je pravdepodobne už beží.</translation>
     </message>
     <message>
-        <location line="-97"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Poplatok za KB pridať do transakcií, ktoré odosielate</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+34"/>
+        <source>Minimize weight consumption (experimental) (default: 0)</source>
+        <translation>Minimalizovať spotrebu hmotnosti (experimentálne) (predvolené: 0)</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>How many blocks to check at startup (default: 500, 0 = all)</source>
+        <translation>Koľko blokov skontrolovať pri štarte (predvolené: 2500, 0 = všetky) {500, 0 ?}</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
+        <translation>Uchovávať najviac &lt;n&gt; nepripojiteľných blokov v pamäti (predvolené: %u)</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
+        <translation>Akceptovateľné šifry (predvolené: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Warning: Deprecated argument -debugnet ignored, use -debug=net</source>
+        <translation>Upozornenie: Zastaraný argument -debugnet bol ignorovaný, použite -debug=net</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Invalid amount for -mininput=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation>Neplatná suma pre -mininput=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+3"/>
+        <source>Cannot obtain a lock on data directory %s. BlackCoin is probably already running.</source>
+        <translation>Nedá sa zamknúť dátová zložka %s. BlackCoin je pravdepodobne už spustený</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Chyba pri inicializácii databázového prostredia peňaženky %s!</translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>Loading wallet...</source>
         <translation>Načítavam peňaženku...</translation>
     </message>
@@ -3267,11 +3361,6 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <location line="+8"/>
         <source>Cannot downgrade wallet</source>
         <translation>Nie je možné prejsť na nižšiu verziu peňaženky</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cannot initialize keypool</source>
-        <translation>Nemožno inicializovať keypool</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3284,22 +3373,22 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Nové prehľadávanie...</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+2"/>
         <source>Done loading</source>
         <translation>Dokončené načítavanie</translation>
     </message>
     <message>
-        <location line="-167"/>
+        <location line="-161"/>
         <source>To use the %s option</source>
         <translation>Použiť %s možnosť.</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+188"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-18"/>
         <source>You must set rpcpassword=&lt;password&gt; in the configuration file:
 %s
 If the file does not exist, create it with owner-readable-only file permissions.</source>

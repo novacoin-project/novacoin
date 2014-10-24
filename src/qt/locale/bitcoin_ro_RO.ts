@@ -25,15 +25,10 @@ Copyright © 2014 The BlackCoin developers</translation>
         <source>
 This is experimental software.
 
-Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php.
+Distributed under the MIT/X11 software license, see the accompanying file COPYING or &lt;a href=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;http://www.opensource.org/licenses/mit-license.php&lt;/a&gt;.
 
-This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP software written by Thomas Bernard.</source>
-        <translation>
-Acesta este un software experimental.
-
-Distribuit sub licența MIT/X11, vezi fișierul însoțitor COPYING sau http://www.opensource.org/licenses/mit-license.php.
-
-Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi folosite în OpenSSL Toolkit (http://www.openssl.org/) și programe criptografice scrise de către Eric Young (eay@cryptsoft.com) și programe UPnP scrise de către Thomas Bernard.</translation>
+This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (&lt;a href=&quot;https://www.openssl.org/&quot;&gt;https://www.openssl.org/&lt;/a&gt;) and cryptographic software written by Eric Young (&lt;a href=&quot;mailto:eay@cryptsoft.com&quot;&gt;eay@cryptsoft.com&lt;/a&gt;) and UPnP software written by Thomas Bernard.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -49,37 +44,37 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Dublu-click pentru a edita adresa sau eticheta</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+24"/>
         <source>Create a new address</source>
         <translation>Creează o adresă nouă</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>Copy the currently selected address to the system clipboard</source>
         <translation>Copiază adresa selectată în clipboard</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-7"/>
         <source>&amp;New Address</source>
         <translation>Adresă nouă</translation>
     </message>
     <message>
-        <location line="-46"/>
+        <location line="-43"/>
         <source>These are your BlackCoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
         <translation>Acestea sunt adresele BlackCoin pentru a primi plăți. Poate doriți sa dați o adresa noua fiecarui expeditor pentru a putea ține evidența la cine efectuează plăti.</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+53"/>
         <source>&amp;Copy Address</source>
         <translation>&amp;Copiază adresa</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+7"/>
         <source>Show &amp;QR Code</source>
         <translation>Arată cod &amp;QR</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+7"/>
         <source>Sign a message to prove you own a BlackCoin address</source>
         <translation>Semnează un mesaj pentru a dovedi că dețineti o adresă BlackCoin</translation>
     </message>
@@ -89,12 +84,12 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Semnează &amp;Mesajul</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+17"/>
         <source>Delete the currently selected address from the list</source>
         <translation>Sterge adresele curent selectate din lista</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-10"/>
         <source>Verify a message to ensure it was signed with a specified BlackCoin address</source>
         <translation>Verifică un mesaj pentru a vă asigura că a fost semnat cu o anumită adresă BlackCoin</translation>
     </message>
@@ -104,7 +99,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>&amp;Verifică mesajul</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>&amp;Delete</source>
         <translation>Ște&amp;rge</translation>
     </message>
@@ -142,7 +137,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
 <context>
     <name>AddressTableModel</name>
     <message>
-        <location filename="../addresstablemodel.cpp" line="+144"/>
+        <location filename="../addresstablemodel.cpp" line="+145"/>
         <source>Label</source>
         <translation>Etichetă</translation>
     </message>
@@ -190,12 +185,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Doar pentru staking</translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="+35"/>
-        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;10 or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Introdu noua parolă a portofelului electronic.&lt;br/&gt;Te rog folosește &lt;b&gt;minim 10 caractere aleatoare&lt;/b&gt;, sau &lt;b&gt;minim 8 cuvinte&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location filename="../askpassphrasedialog.cpp" line="+38"/>
         <source>Encrypt wallet</source>
         <translation>Criptează portofelul</translation>
     </message>
@@ -230,7 +220,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Introdu vechea și noua parolă pentru portofel.</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Confirm wallet encryption</source>
         <translation>Confirmă criptarea portofelului</translation>
     </message>
@@ -262,7 +252,12 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Portofel criptat</translation>
     </message>
     <message>
-        <location line="-58"/>
+        <location line="-140"/>
+        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+82"/>
         <source>BlackCoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
         <translation>BlackCoin se va inchide pentru a termina procesul de encriptie. Amintiți-vă, criptarea portofelul dumneavoastră nu poate proteja pe deplin monedele dvs. de a fi furate de  infectarea cu malware a computerului.</translation>
     </message>
@@ -311,22 +306,12 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../bitcoingui.cpp" line="+297"/>
         <source>Sign &amp;message...</source>
         <translation>Semnează &amp;mesaj...</translation>
     </message>
     <message>
-        <location line="+242"/>
-        <source>Synchronizing with network...</source>
-        <translation>Se sincronizează cu rețeaua...</translation>
-    </message>
-    <message>
-        <location line="-308"/>
-        <source>&amp;Overview</source>
-        <translation>&amp;Imagine de ansamblu</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-64"/>
         <source>Show general overview of wallet</source>
         <translation>Arată o stare generală de ansamblu a portofelului</translation>
     </message>
@@ -351,22 +336,12 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Editează lista de adrese si etichete stocate</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <source>&amp;Receive coins</source>
-        <translation>Primește monede</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-18"/>
         <source>Show the list of addresses for receiving payments</source>
         <translation>Arată lista de adrese pentru primire plăți</translation>
     </message>
     <message>
-        <location line="-7"/>
-        <source>&amp;Send coins</source>
-        <translation>&amp;Trimite monede</translation>
-    </message>
-    <message>
-        <location line="+35"/>
+        <location line="+34"/>
         <source>E&amp;xit</source>
         <translation>&amp;Ieșire</translation>
     </message>
@@ -401,7 +376,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Criptează portofelul electronic...</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>&amp;Backup Wallet...</source>
         <translation>&amp;Fă o copie de siguranță a  portofelului...</translation>
     </message>
@@ -410,43 +385,33 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <source>&amp;Change Passphrase...</source>
         <translation>S&amp;chimbă parola...</translation>
     </message>
-    <message numerus="yes">
-        <location line="+250"/>
-        <source>~%n block(s) remaining</source>
-        <translation><numerusform>~%n bloc rămas</numerusform><numerusform>~%n blocuri rămase</numerusform><numerusform>~%n blocuri rămase</numerusform></translation>
-    </message>
     <message>
-        <location line="+6"/>
-        <source>Downloaded %1 of %2 blocks of transaction history (%3% done).</source>
-        <translation>Descărcat %1 din %2  blocuri din istoricul tranzacțiilor(%3% terminat).</translation>
-    </message>
-    <message>
-        <location line="-247"/>
+        <location line="+9"/>
         <source>&amp;Export...</source>
         <translation>&amp;Exportă</translation>
     </message>
     <message>
-        <location line="-62"/>
+        <location line="-55"/>
         <source>Send coins to a BlackCoin address</source>
         <translation>Trimite monede către o adresă BlackCoin</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+39"/>
         <source>Modify configuration options for BlackCoin</source>
         <translation>Modifică opțiuni de configurare pentru BlackCoin</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Export the data in the current tab to a file</source>
         <translation>Exportă datele din tab-ul curent într-un fișier</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-13"/>
         <source>Encrypt or decrypt wallet</source>
         <translation>Criptează sau decriptează portofelul</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>Backup wallet to another location</source>
         <translation>Creează o copie de rezervă a portofelului într-o locație diferită</translation>
     </message>
@@ -471,17 +436,18 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>&amp;Verifică mesajul...</translation>
     </message>
     <message>
-        <location line="-200"/>
+        <location line="-214"/>
+        <location line="+551"/>
         <source>BlackCoin</source>
         <translation>BlackCoin</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-551"/>
         <source>Wallet</source>
         <translation>Portofelul</translation>
     </message>
     <message>
-        <location line="+178"/>
+        <location line="+193"/>
         <source>&amp;About BlackCoin</source>
         <translation>Despre BlackCoin</translation>
     </message>
@@ -491,7 +457,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Arata/Ascunde</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>Unlock wallet</source>
         <translation>Deblochează portofelul</translation>
     </message>
@@ -506,7 +472,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>Blochează portofelul</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+28"/>
         <source>&amp;File</source>
         <translation>&amp;Fișier</translation>
     </message>
@@ -521,24 +487,19 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation>A&amp;jutor</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+17"/>
         <source>Tabs toolbar</source>
         <translation>Bara de file</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Actions toolbar</source>
-        <translation>Bara de instrumente Actiuni</translation>
-    </message>
-    <message>
-        <location line="+13"/>
+        <location line="+46"/>
         <location line="+9"/>
         <source>[testnet]</source>
         <translation>[testnet]</translation>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+60"/>
+        <location line="+58"/>
         <source>BlackCoin client</source>
         <translation>Clientul BlackCoin</translation>
     </message>
@@ -548,12 +509,7 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <translation><numerusform>%n conexiune activă la reteaua BlackCoin</numerusform><numerusform>%n conexiuni active la reteaua BlackCoin</numerusform><numerusform>%n conexiuni active la reteaua BlackCoin</numerusform></translation>
     </message>
     <message>
-        <location line="+40"/>
-        <source>Downloaded %1 blocks of transaction history.</source>
-        <translation>Descărcat %1 blocuri din istoricul tranzacțiilor.</translation>
-    </message>
-    <message>
-        <location line="+413"/>
+        <location line="+488"/>
         <source>Staking.&lt;br&gt;Your weight is %1&lt;br&gt;Network weight is %2&lt;br&gt;Expected time to earn reward is %3</source>
         <translation>Staking. &lt;br&gt;Greutatea este %1&lt;br&gt;Greutatea retelei este %2&lt;br&gt;Timp estimat pentru a castiga recompensa este %3</translation>
     </message>
@@ -577,53 +533,38 @@ Acest produs include programe dezvoltate de către OpenSSL Project pentru a fi f
         <source>Not staking because you don&apos;t have mature coins</source>
         <translation>Nu este in modul stake deoarece nu sunt destule monede maturate</translation>
     </message>
-    <message numerus="yes">
-        <location line="-403"/>
-        <source>%n second(s) ago</source>
-        <translation><numerusform>%n secundă în urmă</numerusform><numerusform>%n secunde în urmă</numerusform><numerusform>%n secunde în urmă</numerusform></translation>
-    </message>
     <message>
-        <location line="-284"/>
-        <source>&amp;Unlock Wallet...</source>
-        <translation>&amp;Deblochează portofelul</translation>
-    </message>
-    <message numerus="yes">
-        <location line="+288"/>
-        <source>%n minute(s) ago</source>
-        <translation><numerusform>%n minut în urmă</numerusform><numerusform>%n minute în urmă</numerusform><numerusform>%n minute în urmă</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+4"/>
-        <source>%n hour(s) ago</source>
-        <translation><numerusform>%n oră în urmă</numerusform><numerusform>%n ore în urmă</numerusform><numerusform>%n ore în urmă</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+4"/>
-        <source>%n day(s) ago</source>
-        <translation><numerusform>%n zi în urmă</numerusform><numerusform>%n zile în urmă</numerusform><numerusform>%n zile în urmă</numerusform></translation>
+        <location line="-808"/>
+        <source>&amp;Dashboard</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location line="+6"/>
+        <source>&amp;Receive</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&amp;Send</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>&amp;Unlock Wallet...</source>
+        <translation>&amp;Deblochează portofelul</translation>
+    </message>
+    <message>
+        <location line="+273"/>
         <source>Up to date</source>
         <translation>Actualizat</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+43"/>
         <source>Catching up...</source>
         <translation>Se actualizează...</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Last received block was generated %1.</source>
-        <translation>Ultimul bloc primit a fost generat %1.</translation>
-    </message>
-    <message>
-        <location line="+59"/>
-        <source>This transaction is over the size limit.  You can still send it for a fee of %1, which goes to the nodes that process your transaction and helps to support the network.  Do you want to pay the fee?</source>
-        <translation>Această tranzactie este peste limita admisa. Puteți sa trimiteți pentru o taxa de 1%, care este pentru nodurile care proceseaza tranzactia si ajuta la sprijinirea retelei. Vrei să plătești taxa?</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+113"/>
         <source>Confirm transaction fee</source>
         <translation>Confirmă comisinoul tranzacției</translation>
     </message>
@@ -663,17 +604,22 @@ Adresa: %4
         <translation>URI nu poate fi parsatt! Cauza poate fi o adresa BlackCoin invalidă sau parametrii URI malformați.</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+9"/>
+        <source>Wallet is &lt;b&gt;not encrypted&lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
         <translation>Portofelul este &lt;b&gt;criptat&lt;/b&gt; iar în momentul de față este &lt;b&gt;deblocat&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+8"/>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Portofelul este &lt;b&gt;criptat&lt;/b&gt; iar în momentul de față este &lt;b&gt;blocat&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <source>Backup Wallet</source>
         <translation>Fă o copie de siguranță a portofelului</translation>
     </message>
@@ -693,7 +639,7 @@ Adresa: %4
         <translation>Eroare la încercarea de a salva datele portofelului în noua locaţie.</translation>
     </message>
     <message numerus="yes">
-        <location line="+76"/>
+        <location line="+91"/>
         <source>%n second(s)</source>
         <translation><numerusform>%n secundă</numerusform><numerusform>%n secunde</numerusform><numerusform>%n secunde</numerusform></translation>
     </message>
@@ -703,22 +649,80 @@ Adresa: %4
         <translation><numerusform>%n minut</numerusform><numerusform>%n minute</numerusform><numerusform>%n minute</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="-429"/>
+        <location line="+433"/>
         <source>%n hour(s)</source>
         <translation><numerusform>%n oră</numerusform><numerusform>%n ore</numerusform><numerusform>%n ore</numerusform></translation>
     </message>
+    <message>
+        <location line="-456"/>
+        <source>Processed %1 blocks of transaction history.</source>
+        <translation type="unfinished"/>
+    </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+27"/>
+        <location line="+433"/>
         <source>%n day(s)</source>
         <translation><numerusform>%n zi</numerusform><numerusform>%n zile</numerusform><numerusform>%n zile</numerusform></translation>
     </message>
+    <message numerus="yes">
+        <location line="-429"/>
+        <location line="+6"/>
+        <source>%n week(s)</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
     <message>
-        <location line="+18"/>
+        <location line="+0"/>
+        <source>%1 and %2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <location line="+0"/>
+        <source>%n year(s)</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1 behind</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Last received block was generated %1 ago.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Warning</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Information</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+69"/>
+        <source>This transaction is over the size limit. You can still send it for a fee of %1, which goes to the nodes that process your transaction and helps to support the network. Do you want to pay the fee?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+324"/>
         <source>Not staking</source>
         <translation>Not staking</translation>
     </message>
     <message>
-        <location filename="../bitcoin.cpp" line="+109"/>
+        <location filename="../bitcoin.cpp" line="+104"/>
         <source>A fatal error occurred. BlackCoin can no longer continue safely and will quit.</source>
         <translation>A apărut o eroare fatală. BlackCoin nu mai poate continua în condiții de siguranță și va iesi.</translation>
     </message>
@@ -726,7 +730,7 @@ Adresa: %4
 <context>
     <name>ClientModel</name>
     <message>
-        <location filename="../clientmodel.cpp" line="+90"/>
+        <location filename="../clientmodel.cpp" line="+110"/>
         <source>Network Alert</source>
         <translation>Alertă rețea</translation>
     </message>
@@ -769,7 +773,7 @@ Adresa: %4
         <translation>Ieşire minimă: </translation>
     </message>
     <message>
-        <location filename="../coincontroldialog.cpp" line="+551"/>
+        <location filename="../coincontroldialog.cpp" line="+552"/>
         <source>no</source>
         <translation>nu</translation>
     </message>
@@ -983,7 +987,7 @@ Sume mai mici decat 0.546 ori minimul comisionului de relay sunt afisate ca DUST
 Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <location line="+66"/>
         <source>(no label)</source>
         <translation>(fără etichetă)</translation>
@@ -1027,7 +1031,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Adresa asociată cu această intrare în agendă. Acest lucru poate fi modificat numai pentru adresele de trimitere.</translation>
     </message>
     <message>
-        <location filename="../editaddressdialog.cpp" line="+20"/>
+        <location filename="../editaddressdialog.cpp" line="+21"/>
         <source>New receiving address</source>
         <translation>Noua adresă de primire</translation>
     </message>
@@ -1070,7 +1074,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
 <context>
     <name>GUIUtil::HelpMessageBox</name>
     <message>
-        <location filename="../guiutil.cpp" line="+420"/>
+        <location filename="../guiutil.cpp" line="+426"/>
         <location line="+12"/>
         <source>BlackCoin-Qt</source>
         <translation>BlackCoin-Qt</translation>
@@ -1152,16 +1156,6 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <location line="+3"/>
         <source>&amp;Start BlackCoin on system login</source>
         <translation>$Pornește BlackCoin la logarea în sistem</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Detach block and address databases at shutdown. This means they can be moved to another data directory, but it slows down shutdown. The wallet is always detached.</source>
-        <translation>Detașați bloc și baze de date de adrese la închidere. Acest lucru înseamnă că pot fi mutate într-u  alt director de date, dar incetineste închiderea. Portofelul este întotdeauna detașat.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Detach databases at shutdown</source>
-        <translation>&amp;Detasaza baza de date la inchidere</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1270,16 +1264,6 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>Whether to show BlackCoin addresses in the transaction list or not.</source>
-        <translation>Dacă să arate adrese BlackCoin din lista de tranzacție sau nu.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Display addresses in transaction list</source>
-        <translation>&amp;Afişează adresele în lista de tranzacţii</translation>
-    </message>
-    <message>
-        <location line="+7"/>
         <source>Whether to show coin control features or not.</source>
         <translation>Dacă să se afişeze controlul caracteristicilor monedei sau nu.</translation>
     </message>
@@ -1287,6 +1271,21 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <location line="+3"/>
         <source>Display coin &amp;control features (experts only!)</source>
         <translation>Afiseaza &amp;caracteristiclei de control ale monedei(numai experti!)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Whether to select the coin outputs randomly or with minimal coin age.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minimize weight consumption (experimental)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Use black visual theme (requires restart)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location line="+71"/>
@@ -1304,7 +1303,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>&amp;Aplica</translation>
     </message>
     <message>
-        <location filename="../optionsdialog.cpp" line="+55"/>
+        <location filename="../optionsdialog.cpp" line="+53"/>
         <source>default</source>
         <translation>Initial</translation>
     </message>
@@ -1334,23 +1333,23 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Form</translation>
     </message>
     <message>
-        <location line="+33"/>
-        <location line="+231"/>
+        <location line="+46"/>
+        <location line="+247"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the BlackCoin network after a connection is established, but this process has not completed yet.</source>
         <translation>Informatia afisata poate fi depasita.  Portofel se sincronizează automat cu rețeaua BlackCoin după ce se stabilește o conexiune, dar acest proces nu s-a finalizat încă.</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-173"/>
         <source>Stake:</source>
         <translation>Stake:</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+32"/>
         <source>Unconfirmed:</source>
         <translation>Neconfirmat:</translation>
     </message>
     <message>
-        <location line="-107"/>
+        <location line="-113"/>
         <source>Wallet</source>
         <translation>Portofel</translation>
     </message>
@@ -1365,7 +1364,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Balanța ta curentă de cheltuieli</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+80"/>
         <source>Immature:</source>
         <translation>Nematurizat:</translation>
     </message>
@@ -1375,7 +1374,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Balanta minata care nu s-a maturizat inca</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+23"/>
         <source>Total:</source>
         <translation>Total:</translation>
     </message>
@@ -1385,25 +1384,33 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Balanța totală curentă</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+50"/>
         <source>&lt;b&gt;Recent transactions&lt;/b&gt;</source>
         <translation>&lt;b&gt;Tranzacții recente&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="-118"/>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the current balance</source>
         <translation>Total al tranzacțiilor care nu au fost confirmate  încă și nu contează față de balanța curentă</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-32"/>
         <source>Total of coins that was staked, and do not yet count toward the current balance</source>
         <translation>Totalul de monede care au fost in stake si nu sunt numarate in balanta curenta</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="+113"/>
+        <location filename="../overviewpage.cpp" line="+116"/>
         <location line="+1"/>
         <source>out of sync</source>
         <translation>Nu este sincronizat</translation>
+    </message>
+</context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <location filename="../paymentserver.cpp" line="+107"/>
+        <source>Cannot start blackcoin: click-to-pay handler</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1480,13 +1487,11 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <location line="+36"/>
         <location line="+53"/>
         <location line="+23"/>
-        <location line="+23"/>
-        <location filename="../rpcconsole.cpp" line="+348"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="-217"/>
+        <location line="-194"/>
         <source>Client version</source>
         <translation>Versiune client</translation>
     </message>
@@ -1531,12 +1536,32 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Numărul curent de blocuri</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <source>Estimated total blocks</source>
-        <translation>Blocurile totale estimate</translation>
+        <location line="+197"/>
+        <source>&amp;Network Traffic</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+52"/>
+        <source>&amp;Clear</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Totals</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+64"/>
+        <source>In:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+80"/>
+        <source>Out:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="-383"/>
         <source>Last block time</source>
         <translation>Data ultimului bloc</translation>
     </message>
@@ -1566,7 +1591,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>&amp;Consolă</translation>
     </message>
     <message>
-        <location line="-260"/>
+        <location line="-237"/>
         <source>Build date</source>
         <translation>Construit la data</translation>
     </message>
@@ -1581,7 +1606,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>BlackCoin Core</translation>
     </message>
     <message>
-        <location line="+279"/>
+        <location line="+256"/>
         <source>Debug log file</source>
         <translation>Loguri debug</translation>
     </message>
@@ -1596,7 +1621,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Curăță consola</translation>
     </message>
     <message>
-        <location filename="../rpcconsole.cpp" line="-33"/>
+        <location filename="../rpcconsole.cpp" line="+325"/>
         <source>Welcome to the BlackCoin RPC console.</source>
         <translation>Bine ati venit la consola BlackCoin RPC.</translation>
     </message>
@@ -1610,12 +1635,47 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
         <translation>Scrie &lt;b&gt;help&lt;/b&gt; pentru a vedea comenzile disponibile</translation>
     </message>
+    <message>
+        <location line="+127"/>
+        <source>%1 B</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 KB</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 MB</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 GB</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>%1 m</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1 h</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 h %2 m</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
         <location filename="../forms/sendcoinsdialog.ui" line="+14"/>
-        <location filename="../sendcoinsdialog.cpp" line="+182"/>
+        <location filename="../sendcoinsdialog.cpp" line="+181"/>
         <location line="+5"/>
         <location line="+5"/>
         <location line="+5"/>
@@ -1725,7 +1785,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>&amp;Adaugă destinatar</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <source>Remove all transaction fields</source>
         <translation>Scoateți toate câmpuirile de tranzacții</translation>
     </message>
@@ -1735,7 +1795,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Șterge &amp;tot</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+24"/>
         <source>Balance:</source>
         <translation>Balanță:</translation>
     </message>
@@ -1846,8 +1906,8 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Error: Transaction creation failed.</source>
-        <translation>Eroare: crearea tranzacției a eșuat.</translation>
+        <source>Error: Transaction creation failed!</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location line="+5"/>
@@ -1855,7 +1915,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Eroare: tranzacția a fost respinsă. Acest lucru s-ar putea întâmpla în cazul în care unele dintre monedele din portofel au fost deja cheltuite, cum si cum ați utilizat o copie a wallet.dat și monedele au fost cheltuite în copie dar nu au fost marcate ca și cheltuite aici.</translation>
     </message>
     <message>
-        <location line="+251"/>
+        <location line="+247"/>
         <source>WARNING: Invalid BlackCoin address</source>
         <translation>Atenție: Adresă BlackCoin invalidă</translation>
     </message>
@@ -1888,23 +1948,23 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Plătește că&amp;tre:</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <location filename="../sendcoinsentry.cpp" line="+25"/>
+        <location line="+34"/>
+        <source>The address to send the payment to (e.g. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+60"/>
+        <location filename="../sendcoinsentry.cpp" line="+26"/>
         <source>Enter a label for this address to add it to your address book</source>
         <translation>Introdu o etichetă pentru această adresă pentru a fi adăugată în lista ta de adrese</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="-78"/>
         <source>&amp;Label:</source>
         <translation>&amp;Etichetă:</translation>
     </message>
     <message>
-        <location line="+18"/>
-        <source>The address to send the payment to  (e.g. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</source>
-        <translation>Adresa catre care trimiteti plata(ex. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</translation>
-    </message>
-    <message>
-        <location line="+10"/>
+        <location line="+28"/>
         <source>Choose address from address book</source>
         <translation>Alegeti adresa din agenda</translation>
     </message>
@@ -2115,19 +2175,22 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
     </message>
 </context>
 <context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <location filename="../trafficgraphwidget.cpp" line="+75"/>
+        <source>KB/s</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>TransactionDesc</name>
     <message>
-        <location filename="../transactiondesc.cpp" line="+19"/>
+        <location filename="../transactiondesc.cpp" line="+25"/>
         <source>Open until %1</source>
         <translation>Deschis până la %1</translation>
     </message>
-    <message numerus="yes">
-        <location line="-2"/>
-        <source>Open for %n block(s)</source>
-        <translation><numerusform>Deschde pentru încă %1 bloc</numerusform><numerusform>Deschde pentru încă %1 blocuri</numerusform><numerusform>Deschde pentru încă %1 blocuri</numerusform></translation>
-    </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>conflicted</source>
         <translation>conflictual</translation>
     </message>
@@ -2147,7 +2210,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>%1 confirmări</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Status</source>
         <translation>Stare</translation>
     </message>
@@ -2268,7 +2331,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Intrari</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+21"/>
         <source>Amount</source>
         <translation>Sumă</translation>
     </message>
@@ -2283,12 +2346,17 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Fals!</translation>
     </message>
     <message>
-        <location line="-211"/>
+        <location line="-209"/>
         <source>, has not been successfully broadcast yet</source>
         <translation>, nu s-a propagat încă</translation>
     </message>
+    <message numerus="yes">
+        <location line="-36"/>
+        <source>Open for %n more block(s)</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
     <message>
-        <location line="+35"/>
+        <location line="+71"/>
         <source>unknown</source>
         <translation>necunoscut</translation>
     </message>
@@ -2309,7 +2377,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
 <context>
     <name>TransactionTableModel</name>
     <message>
-        <location filename="../transactiontablemodel.cpp" line="+226"/>
+        <location filename="../transactiontablemodel.cpp" line="+231"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
@@ -2329,7 +2397,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Cantitate</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+52"/>
         <source>Open until %1</source>
         <translation>Deschis până la %1</translation>
     </message>
@@ -2409,7 +2477,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>(n/a)</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+194"/>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
         <translation>Starea tranzacției. Treci cu mausul peste acest câmp pentru afișarea numărului de confirmări.</translation>
     </message>
@@ -2437,13 +2505,13 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
 <context>
     <name>TransactionView</name>
     <message>
-        <location filename="../transactionview.cpp" line="+55"/>
-        <location line="+16"/>
+        <location filename="../transactionview.cpp" line="+54"/>
+        <location line="+17"/>
         <source>All</source>
         <translation>Toate</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-16"/>
         <source>Today</source>
         <translation>Astăzi</translation>
     </message>
@@ -2473,7 +2541,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Între...</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Received with</source>
         <translation>Recepționat cu</translation>
     </message>
@@ -2538,7 +2606,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Arată detaliile tranzacției</translation>
     </message>
     <message>
-        <location line="+144"/>
+        <location line="+138"/>
         <source>Export Transaction Data</source>
         <translation>Exporta datele trazactiei</translation>
     </message>
@@ -2606,7 +2674,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+206"/>
+        <location filename="../walletmodel.cpp" line="+208"/>
         <source>Sending...</source>
         <translation>Se trimite...</translation>
     </message>
@@ -2614,7 +2682,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+33"/>
+        <location filename="../bitcoinstrings.cpp" line="+173"/>
         <source>BlackCoin version</source>
         <translation>Versiune BlackCoin</translation>
     </message>
@@ -2639,7 +2707,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Ajutor pentru o comandă</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-147"/>
         <source>Options:</source>
         <translation>Setări:</translation>
     </message>
@@ -2664,7 +2732,22 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Specifică dosarul de date</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-25"/>
+        <source>%s, you must set a rpcpassword in the configuration file:
+%s
+It is recommended you use the following random password:
+rpcuser=blackcoinrpc
+rpcpassword=%s
+(you do not need to remember this password)
+The username and password MUST NOT be the same.
+If the file does not exist, create it with owner-readable-only file permissions.
+It is also recommended to set alertnotify so you are notified of problems;
+for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
+</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+27"/>
         <source>Set database cache size in megabytes (default: 25)</source>
         <translation>Setează mărimea cache a bazei de date în megabiți (implicit: 25)</translation>
     </message>
@@ -2694,14 +2777,19 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Specifică adresa ta publică</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Bind to given address. Use [host]:port notation for IPv6</source>
         <translation>Leaga la o adresa data. Utilizeaza notatie [host]:port pt IPv6</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Stake your coins to support network and gain reward (default: 1)</source>
-        <translation>Pune monedele in modul stake pentru a ajuta reteaua si a castiva bonusuri(implicit: 1)</translation>
+        <location line="+1"/>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Always query for peer addresses via DNS lookup (default: 0)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location line="+5"/>
@@ -2714,57 +2802,22 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Numărul de secunde pentru a preveni reconectarea partenerilor care nu funcționează corect (implicit: 86400)</translation>
     </message>
     <message>
-        <location line="-44"/>
+        <location line="-37"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>A intervenit o eroare in timp ce se seta portul RPC %u pentru ascultare pe IPv4: %s</translation>
     </message>
     <message>
-        <location line="+51"/>
-        <source>Detach block and address databases. Increases shutdown time (default: 0)</source>
-        <translation>Detaseaza bloc si baza de date de adrese. Creste timpul de inchidere(implicit:0)</translation>
-    </message>
-    <message>
-        <location line="+109"/>
-        <source>Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Eroare: tranzacția a fost respinsă. Acest lucru s-ar putea întâmpla în cazul în care unele dintre monedele din portofel au fost deja cheltuite, cum si cum ați utilizat o copie a wallet.dat și monedele au fost cheltuite în copie dar nu au fost marcate ca și cheltuite aici.</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds  </source>
-        <translation>Eroare: Această tranzacție necesită un comision de tranzacție de cel puțin %s din cauza valorii sale, complexitate, sau utilizarea de fonduri recent primite</translation>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+65"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation>Ascultă pentru conexiuni JSON-RPC pe &lt;port&gt; (implicit:15715 sau testnet: 25715)</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-17"/>
         <source>Accept command line and JSON-RPC commands</source>
         <translation>Se acceptă comenzi din linia de comandă și comenzi JSON-RPC</translation>
     </message>
     <message>
-        <location line="+101"/>
-        <source>Error: Transaction creation failed  </source>
-        <translation>Eroare: crearea tranzacției a eșuat.</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Error: Wallet locked, unable to create transaction  </source>
-        <translation>Eroare: portofel blocat, tranzactia nu s-a creat</translation>
-    </message>
-    <message>
-        <location line="-8"/>
-        <source>Importing blockchain data file.</source>
-        <translation>Se importa fisierul blockchain</translation>
-    </message>
-    <message>
         <location line="+1"/>
-        <source>Importing bootstrap blockchain data file.</source>
-        <translation>Se importa fisierul bootstrap blockchain</translation>
-    </message>
-    <message>
-        <location line="-88"/>
         <source>Run in the background as a daemon and accept commands</source>
         <translation>Rulează în fundal ca un demon și acceptă comenzi</translation>
     </message>
@@ -2779,32 +2832,27 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Acceptă conexiuni din afară (implicit: 1  dacă nu se folosește -proxy sau -connect)</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-29"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv6, falling back to IPv4: %s</source>
         <translation>A intervenit o eroare in timp ce se seta portul RPC %u pentru ascultare pe IPv6, reintoarcere la IPv4: %s</translation>
     </message>
     <message>
-        <location line="+117"/>
-        <source>Error initializing database environment %s! To recover, BACKUP THAT DIRECTORY, then remove everything from it except for wallet.dat.</source>
-        <translation>Eroare la inițializarea mediu de baze de date %s! Pentru a recupera, SALVATI ACEL DIRECTORr, apoi scoateți totul din el, cu excepția wallet.dat.</translation>
-    </message>
-    <message>
-        <location line="-20"/>
+        <location line="+96"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>Setati valoarea maxima a prioritate mare/taxa scazuta in bytes(implicit: 27000)</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
         <translation>Atentie: setarea -paytxfee este foarte ridicata! Aceasta este taxa tranzactiei pe care o vei plati daca trimiti o tranzactie.</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation>Atentie: Va rugam verificati ca timpul si data calculatorului sunt corete. Daca timpul este gresit BlackCoin nu va functiona corect.</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="+132"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Atentie: eroare la citirea fisierului wallet.dat! Toate cheile sunt citite corect, dar datele tranzactiei sau anumite intrari din agenda sunt incorecte sau lipsesc.</translation>
     </message>
@@ -2814,17 +2862,17 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Atentie: fisierul wallet.dat este corupt, date salvate! Fisierul original wallet.dat a fost salvat ca wallet.{timestamp}.bak in %s; daca balansul sau tranzactiile sunt incorecte ar trebui sa restaurati dintr-o copie de siguranta. </translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-31"/>
         <source>Attempt to recover private keys from a corrupt wallet.dat</source>
         <translation>Încearcă recuperarea cheilor private dintr-un wallet.dat corupt</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Block creation options:</source>
         <translation>Optiuni creare block</translation>
     </message>
     <message>
-        <location line="-62"/>
+        <location line="-69"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Conecteaza-te doar la nod(urile) specifice</translation>
     </message>
@@ -2834,22 +2882,17 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Descopera propria ta adresa IP (intial: 1)</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Am esuat ascultarea pe orice port. Folositi -listen=0 daca vreti asta.</translation>
     </message>
     <message>
-        <location line="-90"/>
-        <source>Find peers using DNS lookup (default: 1)</source>
-        <translation>Gaseste peers folosind cautare DNS(implicit: 1)</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="-91"/>
         <source>Sync checkpoints policy (default: strict)</source>
         <translation>Sincronizeaza politica checkpoint(implicit: strict)</translation>
     </message>
     <message>
-        <location line="+83"/>
+        <location line="+89"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Adresa -tor invalida: &apos;%s&apos;</translation>
     </message>
@@ -2859,7 +2902,7 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Suma invalida pentru -reservebalance=&lt;amount&gt;</translation>
     </message>
     <message>
-        <location line="-82"/>
+        <location line="-88"/>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: 5000)</source>
         <translation>Tampon maxim pentru recepție per conexiune, &lt;n&gt;*1000 baiți (implicit: 5000)</translation>
     </message>
@@ -2869,47 +2912,37 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Tampon maxim pentru transmitere per conexiune, &lt;n&gt;*1000 baiți (implicit: 1000)</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-17"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>Efectuează conexiuni doar către nodurile din rețeaua &lt;net&gt; (IPv4, IPv6 sau Tor)</translation>
     </message>
     <message>
-        <location line="+28"/>
-        <source>Output extra debugging information. Implies all other -debug* options</source>
-        <translation>Extra informatii despre depanare. Implica toate optiunile -debug*</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Output extra network debugging information</source>
-        <translation>Extra informatii despre depanare retea.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+31"/>
         <source>Prepend debug output with timestamp</source>
         <translation>Ataseaza output depanare cu log de timp</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+41"/>
         <source>SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
         <translation>Optiuni SSl (vezi Bitcoin wiki pentru intructiunile de instalare)</translation>
     </message>
     <message>
-        <location line="-74"/>
+        <location line="-81"/>
         <source>Select the version of socks proxy to use (4-5, default: 5)</source>
         <translation>Selectati versiunea de proxy socks(4-5, implicit: 5)</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+42"/>
         <source>Send trace/debug info to console instead of debug.log file</source>
         <translation>Trimite informațiile trace/debug la consolă în locul fișierului debug.log</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+5"/>
         <source>Send trace/debug info to debugger</source>
         <translation>Trimite informațiile trace/debug la consolă</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+30"/>
         <source>Set maximum block size in bytes (default: 250000)</source>
         <translation>Setează mărimea maxima a blocului în bytes (implicit: 250000)</translation>
     </message>
@@ -2919,24 +2952,24 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Setează mărimea minimă a blocului în baiți (implicit: 0)</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-35"/>
         <source>Shrink debug.log file on client startup (default: 1 when no -debug)</source>
         <translation>Micsorati fisierul debug.log la inceperea clientului (implicit: 1 cand nu -debug)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-43"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>Specifică intervalul maxim de conectare în milisecunde (implicit: 5000)</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+116"/>
         <source>Unable to sign checkpoint, wrong checkpointkey?
 </source>
         <translation>În imposibilitatea de a semna checkpoint-ul, checkpointkey greșit?
 </translation>
     </message>
     <message>
-        <location line="-80"/>
+        <location line="-86"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Foloseste UPnP pentru a vedea porturile (initial: 0)</translation>
     </message>
@@ -2946,85 +2979,102 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
         <translation>Foloseste UPnP pentru a vedea porturile (initial: 1 cand listezi)</translation>
     </message>
     <message>
-        <location line="-25"/>
+        <location line="-26"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>Utilizati proxy pentru a ajunge la serviciile tor (implicit: la fel ca proxy)</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+47"/>
         <source>Username for JSON-RPC connections</source>
         <translation>Utilizator pentru conexiunile JSON-RPC</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+51"/>
         <source>Verifying database integrity...</source>
         <translation>Se verifica integritatea bazei de date...</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+44"/>
+        <source>Error: Wallet locked, unable to create transaction!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error: Transaction creation failed!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Warning</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Information</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
         <translation>ATENTIONARE: s-a detectat o violare a checkpoint-ului sincronizat, dar s-a ignorat!</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Warning: Disk space is low!</source>
-        <translation>Avertisment: spațiul pe disc este scăzut!</translation>
-    </message>
-    <message>
-        <location line="-2"/>
+        <location line="-1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Atenție: această versiune este depășită, este necesară actualizarea!</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-54"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat corupt, recuperare eșuată</translation>
     </message>
     <message>
-        <location line="-54"/>
+        <location line="-56"/>
         <source>Password for JSON-RPC connections</source>
         <translation>Parola pentru conexiunile JSON-RPC</translation>
     </message>
     <message>
-        <location line="-84"/>
-        <source>%s, you must set a rpcpassword in the configuration file:
- %s
-It is recommended you use the following random password:
-rpcuser=blackcoinrpc
-rpcpassword=%s
-(you do not need to remember this password)
-The username and password MUST NOT be the same.
-If the file does not exist, create it with owner-readable-only file permissions.
-It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
-</source>
-        <translation>%s, trebuie să configurați o parolă rpc în fișierul de configurare: %s
-Este recomandat să folosiți următoarea parolă generată aleator: rpcuser=blackcoinrpc
-rpcpassword=%s
-(nu trebuie să țineți minte această parolă)
-Username-ul și parola NU TREBUIE să fie aceleași.
-Dacă fișierul nu există, creați-l cu drepturi de citire doar de către deținător.
-Este deasemenea recomandat să setați alertnotify pentru a fi notificat de probleme;
-de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
-</translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Gaseste noduri fosoling irc (implicit: 1) {0)?}</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="-32"/>
         <source>Sync time with other nodes. Disable if time on your system is precise e.g. syncing with NTP (default: 1)</source>
         <translation>Sincronizează timp cu alte noduri. Dezactivează daca timpul de pe sistemul dumneavoastră este precis ex: sincronizare cu NTP (implicit: 1)</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+13"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation>Când creați tranzacții, ignorați intrări cu valori mai mici decât aceasta (implicit: 0,01)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+6"/>
+        <source>Output debugging information (default: 0, supplying &lt;category&gt; is optional)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;category&gt; can be:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly. This is intended for regression testing tools and app development.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Allow JSON-RPC connections from specified IP address</source>
         <translation>Permite conexiuni JSON-RPC de la adresa IP specificată</translation>
     </message>
@@ -3032,6 +3082,16 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <location line="+1"/>
         <source>Send commands to node running on &lt;ip&gt; (default: 127.0.0.1)</source>
         <translation>Trimite comenzi la nodul care rulează la &lt;ip&gt; (implicit: 127.0.0.1)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wait for RPC server to start</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Set the number of threads to service RPC calls (default: 4)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location line="+1"/>
@@ -3047,11 +3107,6 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <location line="+3"/>
         <source>Require a confirmations for change (default: 0)</source>
         <translation>Necesita confirmari pentru schimbare (implicit: 0)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enforce transaction scripts to use canonical PUSH operators (default: 1)</source>
-        <translation>Enforseaza tranzactiile script sa foloseasca operatori canonici PUSH(implicit: 1)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3074,12 +3129,7 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Rescanează lanțul de bloc pentru tranzacțiile portofel lipsă</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>How many blocks to check at startup (default: 2500, 0 = all)</source>
-        <translation>Câte block-uri se verifică la initializare (implicit: 2500, 0 = toate)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>How thorough the block verification is (0-6, default: 1)</source>
         <translation>Cat de temeinica sa fie verificarea blocurilor( 0-6, implicit: 1)</translation>
     </message>
@@ -3089,7 +3139,7 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Importă blocuri dintr-un fișier extern blk000?.dat</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>Folosește OpenSSL (https) pentru conexiunile JSON-RPC</translation>
     </message>
@@ -3104,47 +3154,47 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Cheia privată a serverului (implicit: server.pem)</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Acceptable ciphers (default: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</source>
-        <translation>Cifruri acceptabile (implicit: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</translation>
+        <location line="+10"/>
+        <source>Initialization sanity check failed. BlackCoin is shutting down.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+50"/>
         <source>Error: Wallet unlocked for staking only, unable to create transaction.</source>
         <translation>Eroare: portofel blocat doar pentru staking, tranzactia nu s-a creat.</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
+        <source>Error: Disk space is low!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
         <translation>ATENTIONARE: checkpoint invalid! Trazatiile afisate pot fi incorecte! Posibil să aveți nevoie să faceți upgrade, sau să  notificati dezvoltatorii.</translation>
     </message>
     <message>
-        <location line="-158"/>
+        <location line="-174"/>
         <source>This help message</source>
         <translation>Acest mesaj de ajutor</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>Portofelul %s este in afara directorului %s</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Cannot obtain a lock on data directory %s.  BlackCoin is probably already running.</source>
-        <translation>Nu se poate obtine un lock pe directorul de date &amp;s. Blackoin probabil ruleaza deja.</translation>
-    </message>
-    <message>
-        <location line="-98"/>
-        <source>BlackCoin</source>
-        <translation>BlackCoin</translation>
-    </message>
-    <message>
-        <location line="+140"/>
+        <location line="+37"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>Nu se poate folosi %s pe acest calculator (eroarea returnată este %d, %s)</translation>
     </message>
     <message>
-        <location line="-130"/>
+        <location line="-133"/>
         <source>Connect through socks proxy</source>
         <translation>Conectează-te printr-un proxy socks</translation>
     </message>
@@ -3154,12 +3204,12 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Permite căutări DNS pentru -addnode, -seednode și -connect</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+126"/>
         <source>Loading addresses...</source>
         <translation>Încarc adrese...</translation>
     </message>
     <message>
-        <location line="-15"/>
+        <location line="-12"/>
         <source>Error loading blkindex.dat</source>
         <translation>Eroare la încărcarea blkindex.dat</translation>
     </message>
@@ -3209,17 +3259,12 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Nu se poate rezolva adresa -externalip: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation>Suma nevalidă pentru -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+44"/>
-        <source>Error: could not start node</source>
-        <translation>Eroare: nodul nu a putut fi pornit</translation>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+60"/>
         <source>Sending...</source>
         <translation>Se trimite...</translation>
     </message>
@@ -3234,32 +3279,67 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Fonduri insuficiente</translation>
     </message>
     <message>
-        <location line="-34"/>
+        <location line="-40"/>
         <source>Loading block index...</source>
         <translation>Încarc indice bloc...</translation>
     </message>
     <message>
-        <location line="-103"/>
+        <location line="-110"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Adaugă un nod la care te poți conecta pentru a menține conexiunea deschisă</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+125"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>Imposibil de conectat %s pe acest computer. Cel mai probabil BlackCoin ruleaza</translation>
     </message>
     <message>
-        <location line="-97"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Comision pe kB de adaugat la tranzactiile pe care le trimiti</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+34"/>
+        <source>Minimize weight consumption (experimental) (default: 0)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>How many blocks to check at startup (default: 500, 0 = all)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Warning: Deprecated argument -debugnet ignored, use -debug=net</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Invalid amount for -mininput=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation>Suma invalida pentru -mininput=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+3"/>
+        <source>Cannot obtain a lock on data directory %s. BlackCoin is probably already running.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>Loading wallet...</source>
         <translation>Încarc portofel...</translation>
     </message>
@@ -3267,11 +3347,6 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <location line="+8"/>
         <source>Cannot downgrade wallet</source>
         <translation>Nu se poate retrograda portofelul</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cannot initialize keypool</source>
-        <translation>Nu se poate initializa keypool</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3284,22 +3359,22 @@ de exemplu: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo
         <translation>Rescanez...</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+2"/>
         <source>Done loading</source>
         <translation>Încărcare terminată</translation>
     </message>
     <message>
-        <location line="-167"/>
+        <location line="-161"/>
         <source>To use the %s option</source>
         <translation>Pentru a folosi opțiunea %s</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+188"/>
         <source>Error</source>
         <translation>Eroare</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-18"/>
         <source>You must set rpcpassword=&lt;password&gt; in the configuration file:
 %s
 If the file does not exist, create it with owner-readable-only file permissions.</source>
