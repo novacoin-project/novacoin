@@ -27,7 +27,6 @@ namespace Checkpoints
     //
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-        ( 0,      Params().HashGenesisBlock() )
         ( 5001,   uint256("0x2fac9021be0c311e7b6dc0933a72047c70f817e2eb1e01bede011193ad1b28bc") ) // hardfork
         ( 10000,  uint256("0x0000000000827e4dc601f7310a91c45af8df0dfc1b6fa1dfa5b896cb00c8767c") ) // last pow block
         ( 38425,  uint256("0x62bf2e9701226d2f88d9fa99d650bd81f3faf2e56f305b7d71ccd1e7aa9c3075") ) // hardfork
@@ -36,10 +35,7 @@ namespace Checkpoints
     ;
 
     // TestNet has no checkpoints
-    static MapCheckpoints mapCheckpointsTestnet =
-        boost::assign::map_list_of
-        ( 0, Params().HashGenesisBlock() )
-        ;
+    static MapCheckpoints mapCheckpointsTestnet;
 
     bool CheckHardened(int nHeight, const uint256& hash)
     {
@@ -281,7 +277,10 @@ namespace Checkpoints
             }
         }
 
-        return false;
+        if (!WriteSyncCheckpoint(Params().HashGenesisBlock()))
+            return error("ResetSyncCheckpoint: failed to write sync checkpoint genesis block");
+        LogPrintf("ResetSyncCheckpoint: sync-checkpoint reset to genesis block\n");
+        return true;
     }
 
     void AskForPendingSyncCheckpoint(CNode* pfrom)
