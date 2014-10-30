@@ -129,18 +129,7 @@ public:
         return SerializeHash(*this);
     }
 
-    bool RelayTo(CNode* pnode) const
-    {
-        // returns true if wasn't already sent
-        if (pnode->hashCheckpointKnown != hashCheckpoint)
-        {
-            pnode->hashCheckpointKnown = hashCheckpoint;
-            pnode->PushMessage("checkpoint", *this);
-            return true;
-        }
-        return false;
-    }
-
+    bool RelayTo(CNode* pnode) const;
     bool CheckSignature();
     bool ProcessSyncCheckpoint(CNode* pfrom);
 };
