@@ -289,6 +289,7 @@ static const CRPCCommand vRPCCommands[] =
     { "listunspent",            &listunspent,            false,     false,     true },
     { "settxfee",               &settxfee,               false,     false,     true },
     { "getsubsidy",             &getsubsidy,             true,      true,      false },
+    { "getstakesubsidy",        &getstakesubsidy,        true,      true,      false },
     { "reservebalance",         &reservebalance,         false,     true,      true },
     { "checkwallet",            &checkwallet,            false,     true,      true },
     { "repairwallet",           &repairwallet,           false,     true,      true },

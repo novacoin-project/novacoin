@@ -11,8 +11,11 @@
 #include "init.h"
 #include "miner.h"
 
+#include <boost/assign/list_of.hpp>
+
 using namespace json_spirit;
 using namespace std;
+using namespace boost::assign;
 
 // Key used by getwork/getblocktemplate miners.
 // Allocated in InitRPCMining, free'd in ShutdownRPCMining
@@ -43,6 +46,33 @@ Value getsubsidy(const Array& params, bool fHelp)
             "Returns proof-of-work subsidy value for the specified value of target.");
 
     return (uint64_t)GetProofOfWorkReward(0);
+}
+
+Value getstakesubsidy(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getstakesubsidy <hex string>\n"
+            "Returns proof-of-stake subsidy value for the specified coinstake.");
+
+    RPCTypeCheck(params, list_of(str_type));
+
+    vector<unsigned char> txData(ParseHex(params[0].get_str()));
+    CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
+    CTransaction tx;
+    try {
+        ssData >> tx;
+    }
+    catch (std::exception &e) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+    }
+
+    uint64_t nCoinAge;
+    CTxDB txdb("r");
+    if (!tx.GetCoinAge(txdb, nCoinAge))
+        throw JSONRPCError(RPC_MISC_ERROR, "GetCoinAge failed");
+
+    return (uint64_t)GetProofOfStakeReward(nCoinAge, 0);
 }
 
 Value getmininginfo(const Array& params, bool fHelp)
