@@ -10,6 +10,7 @@
 #include "txdb.h"
 #include "init.h"
 #include "miner.h"
+#include "kernel.h"
 
 #include <boost/assign/list_of.hpp>
 
@@ -146,6 +147,92 @@ Value getstakinginfo(const Array& params, bool fHelp)
     obj.push_back(Pair("expectedtime", nExpectedTime));
 
     return obj;
+}
+
+Value checkkernel(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw runtime_error(
+            "checkkernel [{\"txid\":txid,\"vout\":n},...] [createblocktemplate=false]\n"
+            "Check if one of given inputs is a kernel input at the moment.\n"
+        );
+
+    RPCTypeCheck(params, list_of(array_type)(bool_type));
+
+    Array inputs = params[0].get_array();
+    bool fCreateBlockTemplate = params.size() > 1 ? params[1].get_bool() : false;
+
+    if (vNodes.empty())
+        throw JSONRPCError(-9, "BlackCoin is not connected!");
+
+    if (IsInitialBlockDownload())
+        throw JSONRPCError(-10, "BlackCoin is downloading blocks...");
+
+    COutPoint kernel;
+    CBlockIndex* pindexPrev = pindexBest;
+    unsigned int nBits = GetNextTargetRequired(pindexPrev, true);
+    int64_t nTime = GetAdjustedTime();
+    nTime &= ~STAKE_TIMESTAMP_MASK;
+
+    BOOST_FOREACH(Value& input, inputs)
+    {
+        const Object& o = input.get_obj();
+
+        const Value& txid_v = find_value(o, "txid");
+        if (txid_v.type() != str_type)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing txid key");
+        string txid = txid_v.get_str();
+        if (!IsHex(txid))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex txid");
+
+        const Value& vout_v = find_value(o, "vout");
+        if (vout_v.type() != int_type)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing vout key");
+        int nOutput = vout_v.get_int();
+        if (nOutput < 0)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, vout must be positive");
+
+        COutPoint cInput(uint256(txid), nOutput);
+        if (CheckKernel(pindexPrev, nBits, nTime, cInput))
+        {
+            kernel = cInput;
+            break;
+        }
+    }
+
+    Object result;
+    result.push_back(Pair("found", !kernel.IsNull()));
+
+    if (kernel.IsNull())
+        return result;
+
+    Object oKernel;
+    oKernel.push_back(Pair("txid", kernel.hash.GetHex()));
+    oKernel.push_back(Pair("vout", (int64_t)kernel.n));
+    oKernel.push_back(Pair("time", nTime));
+    result.push_back(Pair("kernel", oKernel));
+
+    if (!fCreateBlockTemplate)
+        return result;
+
+    int64_t nFees;
+    auto_ptr<CBlock> pblock(CreateNewBlock(*pMiningKey, true, &nFees));
+
+    pblock->nTime = pblock->vtx[0].nTime = nTime;
+
+    CDataStream ss(SER_DISK, PROTOCOL_VERSION);
+    ss << *pblock;
+
+    result.push_back(Pair("blocktemplate", HexStr(ss.begin(), ss.end())));
+    result.push_back(Pair("blocktemplatefees", nFees));
+
+    CPubKey pubkey;
+    if (!pMiningKey->GetReservedKey(pubkey))
+        throw JSONRPCError(RPC_MISC_ERROR, "GetReservedKey failed");
+
+    result.push_back(Pair("blocktemplatesignkey", HexStr(pubkey)));
+
+    return result;
 }
 
 Value getworkex(const Array& params, bool fHelp)
