@@ -118,6 +118,7 @@ OBJS= \
     obj/timedata.o \
     obj/script.o \
     obj/sync.o \
+    obj/txmempool.o \
     obj/util.o \
     obj/hash.o \
     obj/noui.o \

@@ -1712,7 +1712,7 @@ bool StopNode()
 {
     LogPrintf("StopNode()\n");
     MapPort(false);
-    nTransactionsUpdated++;
+    mempool.AddTransactionsUpdated(1);
     if (semOutbound)
         for (int i=0; i<MAX_OUTBOUND_CONNECTIONS; i++)
             semOutbound->post();
