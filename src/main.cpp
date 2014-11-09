@@ -2821,11 +2821,11 @@ void static ProcessGetData(CNode* pfrom)
                     // Trigger them to send a getblocks request for the next batch of inventory
                     if (inv.hash == pfrom->hashContinue)
                     {
-                        // ppcoin: send latest proof-of-work block to allow the
-                        // download node to accept as orphan (proof-of-stake
-                        // block might be rejected by stake connection check)
+                        // Bypass PushInventory, this must send even if redundant,
+                        // and we want it right after the last block so they don't
+                        // wait for other stuff first.
                         vector<CInv> vInv;
-                        vInv.push_back(CInv(MSG_BLOCK, GetLastBlockIndex(pindexBest, false)->GetBlockHash()));
+                        vInv.push_back(CInv(MSG_BLOCK, hashBestChain));
                         pfrom->PushMessage("inv", vInv);
                         pfrom->hashContinue = 0;
                     }
@@ -3187,10 +3187,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             if (pindex->GetBlockHash() == hashStop)
             {
                 LogPrint("net", "  getblocks stopping at %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
-                // ppcoin: tell downloading node about the latest block if it's
-                // without risk being rejected due to stake connection check
-                if (hashStop != hashBestChain && pindex->GetBlockTime() + nStakeMinAge > pindexBest->GetBlockTime())
-                    pfrom->PushInventory(CInv(MSG_BLOCK, hashBestChain));
                 break;
             }
             pfrom->PushInventory(CInv(MSG_BLOCK, pindex->GetBlockHash()));
