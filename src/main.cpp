@@ -2150,8 +2150,7 @@ bool CBlock::AcceptBlock()
         uint256 targetProofOfStake;
         if (!CheckProofOfStake(pindexPrev, vtx[1], nBits, hashProof, targetProofOfStake))
         {
-            LogPrintf("WARNING: AcceptBlock(): check proof-of-stake failed for block %s\n", hash.ToString());
-            return false; // do not error here as we expect this during initial block download
+            return error("AcceptBlock() : check proof-of-stake failed for block %s", hash.ToString());
         }
     }
     // PoW is checked in CheckBlock()
