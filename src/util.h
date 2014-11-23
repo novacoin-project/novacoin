@@ -143,7 +143,6 @@ extern bool fServer;
 extern bool fCommandLine;
 extern std::string strMiscWarning;
 extern bool fTestNet;
-extern bool fNoListen;
 extern bool fLogTimestamps;
 extern bool fReopenDebugLog;
 
