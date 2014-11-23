@@ -262,7 +262,7 @@ public:
     {
         if (hSocket != INVALID_SOCKET)
         {
-            closesocket(hSocket);
+            CloseSocket(hSocket);
             hSocket = INVALID_SOCKET;
         }
     }

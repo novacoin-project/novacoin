@@ -243,7 +243,7 @@ void ThreadIRCSeed2(void* parg)
 
         if (!RecvUntil(hSocket, "Found your hostname", "using your IP address instead", "Couldn't look up your hostname", "ignoring hostname"))
         {
-            closesocket(hSocket);
+            CloseSocket(hSocket);
             hSocket = INVALID_SOCKET;
             nErrorWait = nErrorWait * 11 / 10;
             if (Wait(nErrorWait += 60))
@@ -268,7 +268,7 @@ void ThreadIRCSeed2(void* parg)
         int nRet = RecvUntil(hSocket, " 004 ", " 433 ");
         if (nRet != 1)
         {
-            closesocket(hSocket);
+            CloseSocket(hSocket);
             hSocket = INVALID_SOCKET;
             if (nRet == 2)
             {
@@ -363,7 +363,7 @@ void ThreadIRCSeed2(void* parg)
                 }
             }
         }
-        closesocket(hSocket);
+        CloseSocket(hSocket);
         hSocket = INVALID_SOCKET;
 
         if (GetTime() - nStart > 20 * 60)

@@ -439,8 +439,7 @@ void CNode::CloseSocketDisconnect()
     if (hSocket != INVALID_SOCKET)
     {
         LogPrintf("disconnecting node %s\n", addrName.c_str());
-        closesocket(hSocket);
-        hSocket = INVALID_SOCKET;
+        CloseSocket(hSocket);
         vRecv.clear();
     }
 
@@ -751,13 +750,13 @@ void ThreadSocketHandler2(void* parg)
                 {
                     LOCK(cs_setservAddNodeAddresses);
                     if (!setservAddNodeAddresses.count(addr))
-                        closesocket(hSocket);
+                        CloseSocket(hSocket);
                 }
             }
             else if (CNode::IsBanned(addr))
             {
                 LogPrintf("connection from %s dropped (banned)\n", addr.ToString().c_str());
-                closesocket(hSocket);
+                CloseSocket(hSocket);
             }
             else
             {
@@ -1892,11 +1891,11 @@ public:
         // Close sockets
         BOOST_FOREACH(CNode* pnode, vNodes)
             if (pnode->hSocket != INVALID_SOCKET)
-                closesocket(pnode->hSocket);
+                CloseSocket(pnode->hSocket);
         BOOST_FOREACH(SOCKET hListenSocket, vhListenSocket)
             if (hListenSocket != INVALID_SOCKET)
-                if (closesocket(hListenSocket) == SOCKET_ERROR)
-                    LogPrintf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+                if (CloseSocket(hListenSocket) == SOCKET_ERROR)
+                    LogPrintf("CloseSocket(hListenSocket) failed with error %d\n", WSAGetLastError());
 
 #ifdef WIN32
         // Shutdown Windows Sockets
