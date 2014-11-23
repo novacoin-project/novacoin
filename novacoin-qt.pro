@@ -211,6 +211,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/net.h \
     src/key.h \
     src/db.h \
+    src/tinyformat.h \
     src/txdb.h \
     src/walletdb.h \
     src/script.h \
