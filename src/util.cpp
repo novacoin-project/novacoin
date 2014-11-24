@@ -325,7 +325,7 @@ string vstrprintf(const char *format, va_list ap)
         va_list arg_ptr = ap;
 #endif
 #ifdef WIN32
-        ret = vsnprintf(p, limit, format, arg_ptr);
+        ret = _vsnprintf(p, limit, format, arg_ptr);
 #else
         ret = vsnprintf(p, limit, format, arg_ptr);
 #endif
