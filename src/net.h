@@ -94,7 +94,6 @@ enum
 extern bool fDiscover;
 extern uint64_t nLocalServices;
 extern uint64_t nLocalHostNonce;
-extern CAddress addrSeenByPeer;
 extern CAddrMan addrman;
 
 extern std::vector<CNode*> vNodes;
