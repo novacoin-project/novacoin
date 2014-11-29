@@ -62,7 +62,7 @@ bool DecodeAddress(string str, CService& addr)
 static bool Send(SOCKET hSocket, const char* pszSend)
 {
     if (strstr(pszSend, "PONG") != pszSend)
-        printf("IRC SENDING: %s\n", pszSend);
+        LogPrintf("IRC SENDING: %s\n", pszSend);
     const char* psz = pszSend;
     const char* pszEnd = psz + strlen(psz);
     while (psz < pszEnd)
@@ -106,7 +106,7 @@ int RecvUntil(SOCKET hSocket, const char* psz1, const char* psz2=NULL, const cha
         strLine.reserve(10000);
         if (!RecvLineIRC(hSocket, strLine))
             return 0;
-        printf("IRC %s\n", strLine.c_str());
+        LogPrintf("IRC %s\n", strLine.c_str());
         if (psz1 && strLine.find(psz1) != string::npos)
             return 1;
         if (psz2 && strLine.find(psz2) != string::npos)
@@ -122,7 +122,7 @@ bool Wait(int nSeconds)
 {
     if (fShutdown)
         return false;
-    printf("IRC waiting %d seconds to reconnect\n", nSeconds);
+    LogPrintf("IRC waiting %d seconds to reconnect\n", nSeconds);
     for (int i = 0; i < nSeconds; i++)
     {
         if (fShutdown)
@@ -148,7 +148,7 @@ bool RecvCodeLine(SOCKET hSocket, const char* psz1, string& strRet)
 
         if (vWords[1] == psz1)
         {
-            printf("IRC %s\n", strLine.c_str());
+            LogPrintf("IRC %s\n", strLine.c_str());
             strRet = strLine;
             return true;
         }
@@ -175,7 +175,7 @@ bool GetIPFromIRC(SOCKET hSocket, string strMyName, CNetAddr& ipRet)
 
     // Hybrid IRC used by lfnet always returns IP when you userhost yourself,
     // but in case another IRC is ever used this should work.
-    printf("GetIPFromIRC() got userhost %s\n", strHost.c_str());
+    LogPrintf("GetIPFromIRC() got userhost %s\n", strHost.c_str());
     CNetAddr addr(strHost, true);
     if (!addr.IsValid())
         return false;
@@ -200,7 +200,7 @@ void ThreadIRCSeed(void* parg)
     } catch (...) {
         PrintExceptionContinue(NULL, "ThreadIRCSeed()");
     }
-    printf("ThreadIRCSeed exited\n");
+    LogPrintf("ThreadIRCSeed exited\n");
 }
 
 void ThreadIRCSeed2(void* parg)
@@ -217,7 +217,7 @@ void ThreadIRCSeed2(void* parg)
     if (!GetBoolArg("-irc", true))
         return;
 
-    printf("ThreadIRCSeed started\n");
+    LogPrintf("ThreadIRCSeed started\n");
     int nErrorWait = 10;
     int nRetryWait = 10;
     int nNameRetry = 0;
@@ -233,7 +233,7 @@ void ThreadIRCSeed2(void* parg)
         SOCKET hSocket;
         if (!ConnectSocket(addrConnect, hSocket))
         {
-            printf("IRC connect failed\n");
+            LogPrintf("IRC connect failed\n");
             nErrorWait = nErrorWait * 11 / 10;
             if (Wait(nErrorWait += 60))
                 continue;
@@ -243,7 +243,7 @@ void ThreadIRCSeed2(void* parg)
 
         if (!RecvUntil(hSocket, "Found your hostname", "using your IP address instead", "Couldn't look up your hostname", "ignoring hostname"))
         {
-            closesocket(hSocket);
+            CloseSocket(hSocket);
             hSocket = INVALID_SOCKET;
             nErrorWait = nErrorWait * 11 / 10;
             if (Wait(nErrorWait += 60))
@@ -268,11 +268,11 @@ void ThreadIRCSeed2(void* parg)
         int nRet = RecvUntil(hSocket, " 004 ", " 433 ");
         if (nRet != 1)
         {
-            closesocket(hSocket);
+            CloseSocket(hSocket);
             hSocket = INVALID_SOCKET;
             if (nRet == 2)
             {
-                printf("IRC name already in use\n");
+                LogPrintf("IRC name already in use\n");
                 nNameRetry++;
                 Wait(10);
                 continue;
@@ -290,7 +290,7 @@ void ThreadIRCSeed2(void* parg)
         CNetAddr addrFromIRC;
         if (GetIPFromIRC(hSocket, strMyName, addrFromIRC))
         {
-            printf("GetIPFromIRC() returned %s\n", addrFromIRC.ToString().c_str());
+            LogPrintf("GetIPFromIRC() returned %s\n", addrFromIRC.ToString().c_str());
             // Don't use our IP as our nick if we're not listening
             if (!fNoListen && addrFromIRC.IsRoutable())
             {
@@ -335,7 +335,7 @@ void ThreadIRCSeed2(void* parg)
                 // index 7 is limited to 16 characters
                 // could get full length name at index 10, but would be different from join messages
                 strlcpy(pszName, vWords[7].c_str(), sizeof(pszName));
-                printf("IRC got who\n");
+                LogPrintf("IRC got who\n");
             }
 
             if (vWords[1] == "JOIN" && vWords[0].size() > 1)
@@ -344,7 +344,7 @@ void ThreadIRCSeed2(void* parg)
                 strlcpy(pszName, vWords[0].c_str() + 1, sizeof(pszName));
                 if (strchr(pszName, '!'))
                     *strchr(pszName, '!') = '\0';
-                printf("IRC got join\n");
+                LogPrintf("IRC got join\n");
             }
 
             if (pszName[0] == 'u')
@@ -354,16 +354,16 @@ void ThreadIRCSeed2(void* parg)
                 {
                     addr.nTime = GetAdjustedTime();
                     if (addrman.Add(addr, addrConnect, 51 * 60))
-                        printf("IRC got new address: %s\n", addr.ToString().c_str());
+                        LogPrintf("IRC got new address: %s\n", addr.ToString().c_str());
                     nGotIRCAddresses++;
                 }
                 else
                 {
-                    printf("IRC decode failed\n");
+                    LogPrintf("IRC decode failed\n");
                 }
             }
         }
-        closesocket(hSocket);
+        CloseSocket(hSocket);
         hSocket = INVALID_SOCKET;
 
         if (GetTime() - nStart > 20 * 60)
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != NO_ERROR)
     {
-        printf("Error at WSAStartup()\n");
+        LogPrintf("Error at WSAStartup()\n");
         return false;
     }
 

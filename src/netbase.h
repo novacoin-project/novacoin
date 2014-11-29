@@ -19,7 +19,7 @@ extern int nConnectTimeout;
 
 enum Network
 {
-    NET_UNROUTABLE,
+    NET_UNROUTABLE = 0,
     NET_IPV4,
     NET_IPV6,
     NET_TOR,
@@ -136,6 +136,7 @@ class CService : public CNetAddr
 typedef std::pair<CService, int> proxyType;
 
 enum Network ParseNetwork(std::string net);
+std::string GetNetworkName(enum Network net);
 void SplitHostPort(std::string in, int &portOut, std::string &hostOut);
 bool SetProxy(enum Network net, CService addrProxy, int nSocksVersion = 5);
 bool GetProxy(enum Network net, proxyType &proxyInfoOut);
@@ -149,5 +150,6 @@ bool Lookup(const char *pszName, std::vector<CService>& vAddr, int portDefault =
 bool LookupNumeric(const char *pszName, CService& addr, int portDefault = 0);
 bool ConnectSocket(const CService &addr, SOCKET& hSocketRet, int nTimeout = nConnectTimeout);
 bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, int portDefault = 0, int nTimeout = nConnectTimeout);
-
+/** Close socket and set hSocket to INVALID_SOCKET */
+bool CloseSocket(SOCKET& hSocket);
 #endif

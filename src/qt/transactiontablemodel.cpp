@@ -15,6 +15,7 @@
 #include <QList>
 #include <QColor>
 #include <QTimer>
+#include <QDebug>
 #include <QIcon>
 #include <QDateTime>
 #include <QtAlgorithms>
@@ -67,7 +68,7 @@ public:
      */
     void refreshWallet()
     {
-        OutputDebugStringF("refreshWallet\n");
+        qWarning() << "refreshWallet\n";
         cachedWallet.clear();
         {
             LOCK(wallet->cs_wallet);
@@ -86,7 +87,8 @@ public:
      */
     void updateWallet(const uint256 &hash, int status)
     {
-        OutputDebugStringF("updateWallet %s %i\n", hash.ToString().c_str(), status);
+        QString strHash = QString::fromStdString(hash.GetHex());
+        qWarning() << "updateWallet " + strHash + " " + QString::number(status) + "\n";
         {
             LOCK(wallet->cs_wallet);
 
@@ -114,20 +116,19 @@ public:
                     status = CT_DELETED; /* In model, but want to hide, treat as deleted */
             }
 
-            OutputDebugStringF("   inWallet=%i inModel=%i Index=%i-%i showTransaction=%i derivedStatus=%i\n",
-                     inWallet, inModel, lowerIndex, upperIndex, showTransaction, status);
+            qWarning() << "   inWallet=" + QString::number(inWallet)+ " inModel=" + QString::number(inModel) + " Index=" + QString::number(lowerIndex) + "-" + QString::number(upperIndex) + " showTransaction=" + QString::number(showTransaction) + " derivedStatus=" + QString::number(status) + "\n";
 
             switch(status)
             {
             case CT_NEW:
                 if(inModel)
                 {
-                    OutputDebugStringF("Warning: updateWallet: Got CT_NEW, but transaction is already in model\n");
+                    qWarning() << "Warning: updateWallet: Got CT_NEW, but transaction is already in model\n";
                     break;
                 }
                 if(!inWallet)
                 {
-                    OutputDebugStringF("Warning: updateWallet: Got CT_NEW, but transaction is not in wallet\n");
+                    qWarning() << "Warning: updateWallet: Got CT_NEW, but transaction is not in wallet\n";
                     break;
                 }
                 if(showTransaction)
@@ -151,7 +152,7 @@ public:
             case CT_DELETED:
                 if(!inModel)
                 {
-                    OutputDebugStringF("Warning: updateWallet: Got CT_DELETED, but transaction is not in model\n");
+                    qWarning() << "Warning: updateWallet: Got CT_DELETED, but transaction is not in model\n";
                     break;
                 }
                 // Removed -- remove entire transaction from table
