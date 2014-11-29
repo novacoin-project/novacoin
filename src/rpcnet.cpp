@@ -216,7 +216,7 @@ Value getnetworkinfo(const Array& params, bool fHelp)
         FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>())));
     obj.push_back(Pair("protocolversion",PROTOCOL_VERSION));
     obj.push_back(Pair("localservices",       strprintf("%016x", nLocalServices)));
-    obj.push_back(Pair("timeoffset",    GetTimeOffset()));
+    obj.push_back(Pair("timeoffset",    (int64_t)GetTimeOffset()));
     obj.push_back(Pair("connections",   (int)vNodes.size()));
     obj.push_back(Pair("networks",      GetNetworksInfo()));
     //obj.push_back(Pair("relayfee",      ValueFromAmount(::minRelayTxFee.GetFeePerK())));
