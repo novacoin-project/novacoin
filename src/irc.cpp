@@ -210,7 +210,7 @@ void ThreadIRCSeed2(void* parg)
         return;
 
     // ... or if we won't make outbound connections and won't accept inbound ones.
-    if (mapArgs.count("-connect") && !fListen)
+    if (mapArgs.count("-connect") && fNoListen)
         return;
 
     // ... or if IRC is not enabled.
@@ -257,7 +257,7 @@ void ThreadIRCSeed2(void* parg)
         string strMyName;
         // Don't use our IP as our nick if we're not listening
         // or if it keeps failing because the nick is already in use.
-        if (fListen && GetLocal(addrLocal, &addrIPv4) && nNameRetry<3)
+        if (!fNoListen && GetLocal(addrLocal, &addrIPv4) && nNameRetry<3)
             strMyName = EncodeAddress(GetLocalAddress(&addrConnect));
         if (strMyName == "")
             strMyName = strprintf("x%"PRI64u"", GetRand(1000000000));
@@ -292,7 +292,7 @@ void ThreadIRCSeed2(void* parg)
         {
             LogPrintf("GetIPFromIRC() returned %s\n", addrFromIRC.ToString().c_str());
             // Don't use our IP as our nick if we're not listening
-            if (fListen && addrFromIRC.IsRoutable())
+            if (!fNoListen && addrFromIRC.IsRoutable())
             {
                 // IRC lets you to re-nick
                 AddLocal(addrFromIRC, LOCAL_IRC);

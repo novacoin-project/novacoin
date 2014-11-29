@@ -407,9 +407,6 @@ bool AppInit2()
     if (mapArgs.count("-proxy")) {
         // to protect privacy, do not listen by default if a proxy server is specified
         SoftSetBoolArg("-listen", false);
-        // to protect privacy, do not discover addresses by default
-        if (SoftSetBoolArg("-discover", false))
-            LogPrintf("AppInit2 : parameter interaction: -proxy set -> setting -discover=0\n");
     }
 
     if (!GetBoolArg("-listen", true)) {
@@ -654,7 +651,7 @@ bool AppInit2()
     }
 
     // see Step 2: parameter interactions for more information about these
-    fListen = GetBoolArg("-listen", DEFAULT_LISTEN);
+    fNoListen = !GetBoolArg("-listen", true);
     fDiscover = GetBoolArg("-discover", true);
     fNameLookup = GetBoolArg("-dns", true);
 #ifdef USE_UPNP
@@ -662,7 +659,7 @@ bool AppInit2()
 #endif
 
     bool fBound = false;
-    if (fListen)
+    if (!fNoListen)
     {
         std::string strError;
         if (mapArgs.count("-bind")) {
