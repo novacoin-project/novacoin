@@ -119,17 +119,6 @@ inline void Sleep(int64 n)
 }
 #endif
 
-/* This GNU C extension enables the compiler to check the format string against the parameters provided.
- * X is the number of the "format string" parameter, and Y is the number of the first variadic parameter.
- * Parameters count from 1.
- */
-#ifdef __GNUC__
-#define ATTR_WARN_PRINTF(X,Y) __attribute__((format(printf,X,Y)))
-#else
-#define ATTR_WARN_PRINTF(X,Y)
-#endif
-
-
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
 extern bool fDebug;
@@ -183,24 +172,16 @@ TINYFORMAT_FOREACH_ARGNUM(MAKE_ERROR_AND_LOG_FUNC)
  * Zero-arg versions of logging and error, these are not covered by
  * TINYFORMAT_FOREACH_ARGNUM
  */
-std::string real_strprintf(const std::string &format, int dummy, ...);
-#define strprintf(format, ...) real_strprintf(format, 0, __VA_ARGS__)
-std::string vstrprintf(const char *format, va_list ap);
 static inline int LogPrint(const char* category, const char* format)
 {
     if(!LogAcceptCategory(category)) return 0;
     return LogPrintStr(format);
 }
-
-/* Redefine printf so that it directs output to debug.log
- *
- * Do this *after* defining the other printf-like functions, because otherwise the
- * __attribute__((format(printf,X,Y))) gets expanded to __attribute__((format(OutputDebugStringF,X,Y)))
- * which confuses gcc.
- */
-#define printf OutputDebugStringF
-
-bool ATTR_WARN_PRINTF(1,2) error(const char *format, ...);
+static inline bool error(const char* format)
+{
+    LogPrintStr(std::string("ERROR: ") + format + "\n");
+    return false;
+}
 
 void LogException(std::exception* pex, const char* pszThread);
 void PrintException(std::exception* pex, const char* pszThread);
