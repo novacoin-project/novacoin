@@ -3,6 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "checkpoints.h"
 #include "main.h"
 #include "bitcoinrpc.h"
 
@@ -272,6 +273,37 @@ Value getblockbynumber(const Array& params, bool fHelp)
 
     return blockToJSON(block, pblockindex, params.size() > 1 ? params[1].get_bool() : false);
 }
+
+Value getblockchaininfo(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getblockchaininfo\n"
+            "Returns an object containing various state info regarding block chain processing.\n"
+            "\nResult:\n"
+            "{\n"
+//            "  \"chain\": \"xxxx\",        (string) current network name as defined in BIP70 (main, test, regtest)\n"
+//            "  \"blocks\": xxxxxx,         (numeric) the current number of blocks processed in the server\n"
+//            "  \"headers\": xxxxxx,        (numeric) the current number of headers we have validated\n"
+//            "  \"bestblockhash\": \"...\", (string) the hash of the currently best block\n"
+            "  \"difficulty\": xxxxxx,     (numeric) the current difficulty\n"
+//            "  \"verificationprogress\": xxxx, (numeric) estimate of verification progress [0..1]\n"
+//            "  \"chainwork\": \"xxxx\"     (string) total amount of work in active chain, in hexadecimal\n"
+            "}\n"
+            "\nExamples:\n"
+        );
+
+    Object obj;
+//    obj.push_back(Pair("chain",                 Params().NetworkIDString()));
+//    obj.push_back(Pair("blocks",                (int)chainActive.Height()));
+//    obj.push_back(Pair("headers",               pindexBestHeader ? pindexBestHeader->nHeight : -1));
+//    obj.push_back(Pair("bestblockhash",         chainActive.Tip()->GetBlockHash().GetHex()));
+    obj.push_back(Pair("difficulty",            (double)GetDifficulty()));
+//    obj.push_back(Pair("verificationprogress",  Checkpoints::GuessVerificationProgress(chainActive.Tip())));
+//    obj.push_back(Pair("chainwork",             chainActive.Tip()->nChainWork.GetHex()));
+    return obj;
+}
+
 
 // get information of sync-checkpoint
 Value getcheckpoint(const Array& params, bool fHelp)
