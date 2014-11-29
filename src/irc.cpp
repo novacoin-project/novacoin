@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != NO_ERROR)
     {
-        printf("Error at WSAStartup()\n");
+        LogPrintf("Error at WSAStartup()\n");
         return false;
     }
 
