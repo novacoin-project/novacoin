@@ -103,6 +103,22 @@ static std::string Translate(const char* psz)
     return QCoreApplication::translate("bitcoin-core", psz).toStdString();
 }
 
+/* qDebug() message handler --> debug.log */
+#if QT_VERSION < 0x050000
+void DebugMessageHandler(QtMsgType type, const char *msg)
+{
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg);
+}
+#else
+void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
+{
+    Q_UNUSED(context);
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg.toStdString());
+}
+#endif
+
 /* Handle runaway exceptions. Shows a message box with the problem and quits the program.
  */
 static void handleRunawayException(std::exception *e)
