@@ -117,7 +117,7 @@ CTxDB::CTxDB(const char* pszMode)
         fReadOnly = fTmp;
     }
 
-    LogPrint("Opened LevelDB successfully\n");
+    LogPrintStr("Opened LevelDB successfully\n");
 }
 
 void CTxDB::Close()
