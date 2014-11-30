@@ -186,7 +186,8 @@ static void NotifyNumConnectionsChanged(ClientModel *clientmodel, int newNumConn
 
 static void NotifyAlertChanged(ClientModel *clientmodel, const uint256 &hash, ChangeType status)
 {
-    qDebug() << "NotifyAlertChanged %s status=%i\n", hash.GetHex().c_str(), status;
+    QString strHash = QString::fromStdString(hash.GetHex());
+    qDebug() << "NotifyAlertChanged " + strHash + " status=" + QString::number(status) + "\n";
     QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection,
                               Q_ARG(QString, QString::fromStdString(hash.GetHex())),
                               Q_ARG(int, status));

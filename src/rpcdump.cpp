@@ -7,8 +7,6 @@
 #include "ui_interface.h"
 #include "base58.h"
 
-#define printf OutputDebugStringF
-
 using namespace json_spirit;
 using namespace std;
 

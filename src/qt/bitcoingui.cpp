@@ -9,6 +9,7 @@
 #include "addressbookpage.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
+#include "multisigdialog.h"
 #include "optionsdialog.h"
 #include "aboutdialog.h"
 #include "clientmodel.h"
@@ -130,6 +131,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     sendCoinsPage = new SendCoinsDialog(this);
 
     signVerifyMessageDialog = new SignVerifyMessageDialog(this);
+
+    multisigPage = new MultisigDialog(this);
 
     centralWidget = new QStackedWidget(this);
     centralWidget->addWidget(overviewPage);
@@ -254,6 +257,9 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     tabGroup->addAction(addressBookAction);
 
+    multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
+    tabGroup->addAction(multisigAction);
+
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -266,6 +272,8 @@ void BitcoinGUI::createActions()
     connect(mintingAction, SIGNAL(triggered()), this, SLOT(gotoMintingPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(gotoAddressBookPage()));
+    connect(multisigAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(multisigAction, SIGNAL(triggered()), this, SLOT(gotoMultisigPage()));
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
     quitAction->setToolTip(tr("Quit application"));
@@ -352,6 +360,7 @@ void BitcoinGUI::createMenuBar()
     file->addAction(exportAction);
     file->addAction(signMessageAction);
     file->addAction(verifyMessageAction);
+    file->addAction(multisigAction);
     file->addSeparator();
     file->addAction(quitAction);
 
@@ -385,6 +394,8 @@ void BitcoinGUI::createToolBars()
     QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar2->addAction(exportAction);
+    toolbar2->setVisible(false);
+    
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -418,7 +429,10 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
 
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getNumBlocksOfPeers());
         connect(clientModel, SIGNAL(numBlocksChanged(int,int)), this, SLOT(setNumBlocks(int,int)));
-        connect(clientModel, SIGNAL(numBlocksChanged(int,int)), this, SLOT(updateMining()));
+
+        QTimer *timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(updateMining()));
+        timer->start(10*1000); //10 seconds
 
         // Report errors from network/worker thread
         connect(clientModel, SIGNAL(error(QString,QString,bool)), this, SLOT(error(QString,QString,bool)));
@@ -446,6 +460,7 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
+        multisigPage->setModel(walletModel);
 
         setEncryptionStatus(walletModel->getEncryptionStatus());
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(setEncryptionStatus(int)));
@@ -483,6 +498,7 @@ void BitcoinGUI::createTrayIcon()
     trayIconMenu->addAction(toggleHideAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(sendCoinsAction);
+    trayIconMenu->addAction(multisigAction);
     trayIconMenu->addAction(receiveCoinsAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(signMessageAction);
@@ -490,9 +506,12 @@ void BitcoinGUI::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(optionsAction);
     trayIconMenu->addAction(openRPCConsoleAction);
-#ifndef Q_OS_MAC // This is built-in on Mac
+#ifndef Q_OS_MAC
+    // This is built-in on Mac
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(quitAction);
+
+    notificator = new Notificator(qApp->applicationName(), trayIcon, 0);
 #endif
 }
 
@@ -668,10 +687,10 @@ void BitcoinGUI::updateMining()
         return;
     }
 
-    uint64 nMinWeight = 0, nMaxWeight = 0, nTotalWeight = 0;
-    walletModel->getStakeWeight(nMinWeight, nMaxWeight, nTotalWeight);
+    float nKernelsRate = 0, nCoinDaysRate = 0;
+    walletModel->getStakeStats(nKernelsRate, nCoinDaysRate);
 
-    if (nTotalWeight > 0)
+    if (nKernelsRate > 0)
     {
         labelMiningIcon->setPixmap(QIcon(":/icons/mining_active").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
 
@@ -694,7 +713,7 @@ void BitcoinGUI::updateMining()
         labelMiningIcon->setToolTip(tr("Stake miner is active\nYour current stake weight is %1\nNetwork weight is %2\nAverage block generation time is %3").arg(nTotalWeight).arg(dNetworkWeight).arg(msg));
 */
 
-        labelMiningIcon->setToolTip(tr("Stake miner is active\nYour current stake weight is %1\nNetwork weight is %2").arg(nTotalWeight).arg(nNetworkWeight));
+        labelMiningIcon->setToolTip(tr("Stake miner is active\nKernel rate is %1 k/s\nCD rate is %2 CD/s\nNetwork weight is %3").arg(nKernelsRate).arg(nCoinDaysRate).arg(nNetworkWeight));
     }
     else
         labelMiningIcon->setToolTip(tr("No suitable inputs were found"));
@@ -785,8 +804,7 @@ void BitcoinGUI::closeEvent(QCloseEvent *event)
     if(clientModel)
     {
 #ifndef Q_OS_MAC // Ignored on Mac
-        if(!clientModel->getOptionsModel()->getMinimizeToTray() &&
-           !clientModel->getOptionsModel()->getMinimizeOnClose())
+        if(!clientModel->getOptionsModel()->getMinimizeOnClose())
         {
             qApp->quit();
         }
@@ -918,6 +936,12 @@ void BitcoinGUI::gotoVerifyMessageTab(QString addr)
 
     if(!addr.isEmpty())
         signVerifyMessageDialog->setAddress_VM(addr);
+}
+
+void BitcoinGUI::gotoMultisigPage()
+{
+    multisigPage->show();
+    multisigPage->setFocus();
 }
 
 void BitcoinGUI::dragEnterEvent(QDragEnterEvent *event)

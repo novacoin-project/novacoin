@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <boost/version.hpp>
-#if defined(WIN32) && BOOST_VERSION == 104900
+#if defined(WIN32) && BOOST_VERSION <= 104900
 #define BOOST_INTERPROCESS_HAS_WINDOWS_KERNEL_BOOTTIME
 #define BOOST_INTERPROCESS_HAS_KERNEL_BOOTTIME
 #endif
@@ -19,7 +19,7 @@
 #include <boost/version.hpp>
 
 #ifndef _MSC_VER
-#if defined(WIN32) && (!defined(BOOST_INTERPROCESS_HAS_WINDOWS_KERNEL_BOOTTIME) || !defined(BOOST_INTERPROCESS_HAS_KERNEL_BOOTTIME) || BOOST_VERSION < 104900)
+#if defined(WIN32) && (!defined(BOOST_INTERPROCESS_HAS_WINDOWS_KERNEL_BOOTTIME) || !defined(BOOST_INTERPROCESS_HAS_KERNEL_BOOTTIME)) && BOOST_VERSION <= 104900
 #warning Compiling without BOOST_INTERPROCESS_HAS_WINDOWS_KERNEL_BOOTTIME and BOOST_INTERPROCESS_HAS_KERNEL_BOOTTIME uncommented in boost/interprocess/detail/tmp_dir_helpers.hpp or using a boost version before 1.49 may have unintended results see svn.boost.org/trac/boost/ticket/5392
 #endif
 #endif
@@ -59,7 +59,7 @@ static bool ipcScanCmd(int argc, char *argv[], bool fRelay)
                 // the first start of the first instance
                 if (ex.get_error_code() != boost::interprocess::not_found_error || !fRelay)
                 {
-                    printf("main() - boost interprocess exception #%d: %s\n", ex.get_error_code(), ex.what());
+                    LogPrintf("main() - boost interprocess exception #%d: %s\n", ex.get_error_code(), ex.what());
                     break;
                 }
             }
@@ -88,12 +88,12 @@ static void ipcThread(void* pArg)
     } catch (...) {
         PrintExceptionContinue(NULL, "ipcThread()");
     }
-    printf("ipcThread exited\n");
+    LogPrintStr("ipcThread exited\n");
 }
 
 static void ipcThread2(void* pArg)
 {
-    printf("ipcThread started\n");
+    LogPrintStr("ipcThread started\n");
 
     message_queue* mq = (message_queue*)pArg;
     char buffer[MAX_URI_LENGTH + 1] = "";
@@ -148,7 +148,7 @@ void ipcInit(int argc, char *argv[])
         mq = new message_queue(open_or_create, BITCOINURI_QUEUE_NAME, 2, MAX_URI_LENGTH);
     }
     catch (interprocess_exception &ex) {
-        printf("ipcInit() - boost interprocess exception #%d: %s\n", ex.get_error_code(), ex.what());
+        LogPrintf("ipcInit() - boost interprocess exception #%d: %s\n", ex.get_error_code(), ex.what());
         return;
     }
 

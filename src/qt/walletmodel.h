@@ -102,7 +102,7 @@ public:
     bool dumpWallet(const QString &filename);
     bool importWallet(const QString &filename);
 
-    void getStakeWeight(quint64& nMinWeight, quint64& nMaxWeight, quint64& nWeight);
+    void getStakeStats(float &nKernelsRate, float &nCoinDaysRate);
     void getStakeWeightFromValue(const qint64& nTime, const qint64& nValue, quint64& nWeight);
 
     // RAI object for unlocking wallet, returned by requestUnlock()
@@ -135,6 +135,7 @@ public:
     void unlockCoin(COutPoint& output);
     void listLockedCoins(std::vector<COutPoint>& vOutpts);
     void clearOrphans();
+    CWallet* getWallet();
 
 private:
     CWallet *wallet;

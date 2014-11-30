@@ -87,7 +87,8 @@ public:
      */
     void updateWallet(const uint256 &hash, int status)
     {
-        qWarning() << "updateWallet %s %i\n", hash.ToString().c_str(), status;
+        QString strHash = QString::fromStdString(hash.GetHex());
+        qWarning() << "updateWallet " + strHash + " " + QString::number(status) + "\n";
         {
             LOCK(wallet->cs_wallet);
 
@@ -115,8 +116,7 @@ public:
                     status = CT_DELETED; /* In model, but want to hide, treat as deleted */
             }
 
-            qWarning() << "   inWallet=%i inModel=%i Index=%i-%i showTransaction=%i derivedStatus=%i\n",
-                     inWallet, inModel, lowerIndex, upperIndex, showTransaction, status;
+            qWarning() << "   inWallet=" + QString::number(inWallet)+ " inModel=" + QString::number(inModel) + " Index=" + QString::number(lowerIndex) + "-" + QString::number(upperIndex) + " showTransaction=" + QString::number(showTransaction) + " derivedStatus=" + QString::number(status) + "\n";
 
             switch(status)
             {
