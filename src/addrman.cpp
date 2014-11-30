@@ -261,7 +261,7 @@ void CAddrMan::MakeTried(CAddrInfo& info, int nId, int nOrigin)
 
 void CAddrMan::Good_(const CService &addr, int64 nTime)
 {
-//    printf("Good: addr=%s\n", addr.ToString().c_str());
+//    LogPrint("addrman", "Good: addr=%s\n", addr.ToString());
 
     int nId;
     CAddrInfo *pinfo = Find(addr, &nId);
@@ -304,7 +304,7 @@ void CAddrMan::Good_(const CService &addr, int64 nTime)
     // TODO: maybe re-add the node, but for now, just bail out
     if (nUBucket == -1) return;
 
-    LogPrintf("Moving %s to tried\n", addr.ToString().c_str());
+    LogPrint("addrman", "Moving %s to tried\n", addr.ToString());
 
     // move nId to the tried tables
     MakeTried(info, nId, nUBucket);

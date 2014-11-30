@@ -482,7 +482,7 @@ bool AppInit2()
     if (mapArgs.count("-paytxfee"))
     {
         if (!ParseMoney(mapArgs["-paytxfee"], nTransactionFee))
-            return InitError(strprintf(_("Invalid amount for -paytxfee=<amount>: '%s'"), mapArgs["-paytxfee"].c_str()));
+            return InitError(strprintf(_("Invalid amount for -paytxfee=<amount>: '%s'"), mapArgs["-paytxfee"]));
         if (nTransactionFee > 0.25 * COIN)
             InitWarning(_("Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction."));
     }
@@ -502,7 +502,7 @@ bool AppInit2()
 
     // strWalletFileName must be a plain filename without a directory
     if (strWalletFileName != boost::filesystem::basename(strWalletFileName) + boost::filesystem::extension(strWalletFileName))
-        return InitError(strprintf(_("Wallet %s resides outside data directory %s."), strWalletFileName.c_str(), strDataDir.c_str()));
+        return InitError(strprintf(_("Wallet %s resides outside data directory %s."), strWalletFileName, strDataDir));
 
     // Make sure only a single Bitcoin process is using the data directory.
     boost::filesystem::path pathLockFile = GetDataDir() / ".lock";
@@ -510,7 +510,7 @@ bool AppInit2()
     if (file) fclose(file);
     static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
     if (!lock.try_lock())
-        return InitError(strprintf(_("Cannot obtain a lock on data directory %s.  NovaCoin is probably already running."), strDataDir.c_str()));
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s.  NovaCoin is probably already running."), strDataDir));
 
 #if !defined(WIN32) && !defined(QT_GUI)
     if (fDaemon)
@@ -537,12 +537,12 @@ bool AppInit2()
     if (GetBoolArg("-shrinkdebugfile", !fDebug))
         ShrinkDebugFile();
     LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    LogPrintf("NovaCoin version %s (%s)\n", FormatFullVersion().c_str(), CLIENT_DATE.c_str());
+    LogPrintf("NovaCoin version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
     LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
     if (!fLogTimestamps)
-        LogPrintf("Startup time: %s\n", DateTimeStrFormat("%x %H:%M:%S", GetTime()).c_str());
-    LogPrintf("Default data directory %s\n", GetDefaultDataDir().string().c_str());
-    LogPrintf("Used data directory %s\n", strDataDir.c_str());
+        LogPrintf("Startup time: %s\n", DateTimeStrFormat("%x %H:%M:%S", GetTime()));
+    LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
+    LogPrintf("Used data directory %s\n", strDataDir);
     std::ostringstream strErrors;
 
     if (fDaemon)
@@ -602,7 +602,7 @@ bool AppInit2()
         BOOST_FOREACH(std::string snet, mapMultiArgs["-onlynet"]) {
             enum Network net = ParseNetwork(snet);
             if (net == NET_UNROUTABLE)
-                return InitError(strprintf(_("Unknown network specified in -onlynet: '%s'"), snet.c_str()));
+                return InitError(strprintf(_("Unknown network specified in -onlynet: '%s'"), snet));
             nets.insert(net);
         }
         for (int n = 0; n < NET_MAX; n++) {
@@ -623,7 +623,7 @@ bool AppInit2()
     if (mapArgs.count("-proxy")) {
         addrProxy = CService(mapArgs["-proxy"], 9050);
         if (!addrProxy.IsValid())
-            return InitError(strprintf(_("Invalid -proxy address: '%s'"), mapArgs["-proxy"].c_str()));
+            return InitError(strprintf(_("Invalid -proxy address: '%s'"), mapArgs["-proxy"]));
 
         if (!IsLimited(NET_IPV4))
             SetProxy(NET_IPV4, addrProxy, nSocksVersion);
@@ -645,7 +645,7 @@ bool AppInit2()
         else
             addrOnion = CService(mapArgs["-tor"], 9050);
         if (!addrOnion.IsValid())
-            return InitError(strprintf(_("Invalid -tor address: '%s'"), mapArgs["-tor"].c_str()));
+            return InitError(strprintf(_("Invalid -tor address: '%s'"), mapArgs["-tor"]));
         SetProxy(NET_TOR, addrOnion, 5);
         SetReachable(NET_TOR);
     }
@@ -666,7 +666,7 @@ bool AppInit2()
             BOOST_FOREACH(std::string strBind, mapMultiArgs["-bind"]) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
-                    return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind.c_str()));
+                    return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind));
                 fBound |= Bind(addrBind);
             }
         } else {
@@ -688,7 +688,7 @@ bool AppInit2()
         BOOST_FOREACH(string strAddr, mapMultiArgs["-externalip"]) {
             CService addrLocal(strAddr, GetListenPort(), fNameLookup);
             if (!addrLocal.IsValid())
-                return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr.c_str()));
+                return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr));
             AddLocal(CService(strAddr, GetListenPort(), fNameLookup), LOCAL_MANUAL);
         }
     }
@@ -772,7 +772,7 @@ bool AppInit2()
             }
         }
         if (nFound == 0)
-            LogPrintf("No blocks matching %s were found\n", strMatch.c_str());
+            LogPrintf("No blocks matching %s were found\n", strMatch);
         return false;
     }
 
@@ -799,7 +799,7 @@ bool AppInit2()
         else if (nLoadWalletRet == DB_NEED_REWRITE)
         {
             strErrors << _("Wallet needed to be rewritten: restart NovaCoin to complete") << "\n";
-            LogPrintf("%s", strErrors.str().c_str());
+            LogPrintf("%s", strErrors.str());
             return InitError(strErrors.str());
         }
         else
@@ -835,7 +835,7 @@ bool AppInit2()
             strErrors << _("Cannot write default address") << "\n";
     }
 
-    LogPrintf("%s", strErrors.str().c_str());
+    LogPrintf("%s", strErrors.str());
     LogPrintf(" wallet      %15"PRI64d"ms\n", GetTimeMillis() - nStart);
 
     RegisterWallet(pwalletMain);

@@ -215,7 +215,7 @@ bool AddOrphanTx(const CTransaction& tx)
 
     if (nSize > 5000)
     {
-        LogPrintf("ignoring large orphan tx (size: %"PRIszu", hash: %s)\n", nSize, hash.ToString().substr(0,10).c_str());
+        LogPrintf("ignoring large orphan tx (size: %"PRIszu", hash: %s)\n", nSize, hash.ToString());
         return false;
     }
 
@@ -223,7 +223,7 @@ bool AddOrphanTx(const CTransaction& tx)
     BOOST_FOREACH(const CTxIn& txin, tx.vin)
         mapOrphanTransactionsByPrev[txin.prevout.hash].insert(hash);
 
-    LogPrintf("stored orphan tx %s (mapsz %"PRIszu")\n", hash.ToString().substr(0,10).c_str(),
+    LogPrintf("stored orphan tx %s (mapsz %"PRIszu")\n", hash.ToString(),
         mapOrphanTransactions.size());
     return true;
 }
@@ -675,7 +675,7 @@ bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
         if (!tx.FetchInputs(txdb, mapUnused, false, false, mapInputs, fInvalid))
         {
             if (fInvalid)
-                return error("CTxMemPool::accept() : FetchInputs found invalid tx %s", hash.ToString().substr(0,10).c_str());
+                return error("CTxMemPool::accept() : FetchInputs found invalid tx %s", hash.ToString());
             if (pfMissingInputs)
                 *pfMissingInputs = true;
             return false;
