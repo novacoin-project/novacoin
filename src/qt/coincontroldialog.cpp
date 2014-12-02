@@ -497,21 +497,6 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
         {
             nChange = nAmount - nPayFee - nPayAmount;
             
-            // if sub-cent change is required, the fee must be raised to at least CTransaction::nMinTxFee   
-            if (nPayFee < CENT && nChange > 0 && nChange < CENT)
-            {
-                if (nChange < CENT) // change < 0.01 => simply move all change to fees
-                {
-                    nPayFee = nChange;
-                    nChange = 0;
-                }
-                else
-                {
-                    nChange = nChange + nPayFee - CENT;
-                    nPayFee = CENT;
-                }  
-            }
-            
             if (nChange == 0)
                 nBytes -= 34;
         }
