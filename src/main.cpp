@@ -59,6 +59,7 @@ bool fHaveGUI = false;
 struct COrphanBlock {
     uint256 hashBlock;
     uint256 hashPrev;
+    std::pair<COutPoint, unsigned int> stake;
     vector<unsigned char> vchBlock;
 };
 map<uint256, COrphanBlock*> mapOrphanBlocks;
@@ -930,6 +931,7 @@ void static PruneOrphanBlocks()
         it = it2;
     } while(1);
 
+    setStakeSeenOrphan.erase(it->second->stake);
     uint256 hash = it->second->hashBlock;
     delete it->second;
     mapOrphanBlocksByPrev.erase(it);
@@ -2267,6 +2269,7 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
             }
             pblock2->hashBlock = hash;
             pblock2->hashPrev = pblock->hashPrevBlock;
+            pblock2->stake = pblock->GetProofOfStake();
             mapOrphanBlocks.insert(make_pair(hash, pblock2));
             mapOrphanBlocksByPrev.insert(make_pair(pblock2->hashPrev, pblock2));
             if (pblock->IsProofOfStake())
