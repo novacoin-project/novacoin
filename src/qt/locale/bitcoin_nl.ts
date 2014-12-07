@@ -516,12 +516,12 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+6"/>
         <source>Not staking because wallet is locked</source>
-        <translation>Niet staking omdat portemonnee aan het beveiligd is</translation>
+        <translation>Niet staking omdat portemonnee beveiligd is</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Not staking because wallet is offline</source>
-        <translation>Niet staking omdat portemonnee aan het offline is</translation>
+        <translation>Niet staking omdat portemonnee offline is</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -541,12 +541,12 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+6"/>
         <source>&amp;Receive</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Ontvangen</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>&amp;Send</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Verzenden</translation>
     </message>
     <message>
         <location line="+49"/>
@@ -689,7 +689,7 @@ Adres: %4
     <message>
         <location line="+15"/>
         <source>Last received block was generated %1 ago.</source>
-        <translation type="unfinished"/>
+        <translation>Laatst ontvangen block was %1 geleden</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -704,12 +704,12 @@ Adres: %4
     <message>
         <location line="+3"/>
         <source>Warning</source>
-        <translation type="unfinished"/>
+        <translation>Waarschuwing</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Information</source>
-        <translation type="unfinished"/>
+        <translation>Informatie</translation>
     </message>
     <message>
         <location line="+69"/>
@@ -2682,7 +2682,7 @@ Dit betekend dat een fee van %2 is vereist.</translation>
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+173"/>
+        <location filename="../bitcoinstrings.cpp" line="+172"/>
         <source>BlackCoin version</source>
         <translation>BlackCoin versie</translation>
     </message>
@@ -2707,7 +2707,7 @@ Dit betekend dat een fee van %2 is vereist.</translation>
         <translation>Toon hulp voor een commando</translation>
     </message>
     <message>
-        <location line="-147"/>
+        <location line="-146"/>
         <source>Options:</source>
         <translation>Opties:</translation>
     </message>
@@ -2807,12 +2807,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Er is een fout opgetreden tijdens het instellen van de inkomende RPC-poort %u op IPv4: %s</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+64"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation>Wacht op JSON-RPC-connecties op &lt;poort&gt; (standaard: 15715 of testnet: 25715) </translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Accept command line and JSON-RPC commands</source>
         <translation>Aanvaard commandoregel- en JSON-RPC-commando&apos;s</translation>
     </message>
@@ -2837,7 +2837,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Er is een fout opgetreden tijdens het instellen van de inkomende RPC-poort %u op IPv6, terugval naar IPv4: %s</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+95"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>Stel maximale grootte van high-priority/low-fee transacties in bytes (standaard: 27000)</translation>
     </message>
@@ -2847,12 +2847,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Waarschuwing: -paytxfee is zeer hoog ingesteld.  Dit zijn de transactiekosten die u betaalt bij het versturen van een transactie.</translation>
     </message>
     <message>
-        <location line="-103"/>
+        <location line="-102"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation>Waarschuwing: Controleer of de datum en tijd van de computer juist zijn! Als uw klok verkeerd is BlackCoin zal niet goed werken.</translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+131"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Waarschuwing: Fout bij het lezen van wallet.dat! Alle sleutels zijn in goede orde uitgelezen, maar transactiedata of adresboeklemma&apos;s zouden kunnen ontbreken of fouten bevatten.</translation>
     </message>
@@ -2872,7 +2872,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Blokcreatie-opties:</translation>
     </message>
     <message>
-        <location line="-69"/>
+        <location line="-68"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Verbind alleen naar de gespecificeerde node(s)</translation>
     </message>
@@ -2882,17 +2882,17 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Ontdek eigen IP-adres (standaard: 1 als er wordt geluisterd en geen -externalip is opgegeven)</translation>
     </message>
     <message>
-        <location line="+101"/>
+        <location line="+100"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Mislukt om op welke poort dan ook te luisteren. Gebruik -listen=0 as u dit wilt.</translation>
     </message>
     <message>
-        <location line="-91"/>
+        <location line="-90"/>
         <source>Sync checkpoints policy (default: strict)</source>
         <translation>Sync checkpoints beleid (standaard: strikt)</translation>
     </message>
     <message>
-        <location line="+89"/>
+        <location line="+88"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Ongeldig-tor adres: &apos;%s&apos;</translation>
     </message>
@@ -2902,7 +2902,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Ongeldig bedrag voor -reservebalance = &lt;bedrag&gt;</translation>
     </message>
     <message>
-        <location line="-88"/>
+        <location line="-87"/>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: 5000)</source>
         <translation>Maximum per-connectie ontvangstbuffer, &lt;n&gt;*1000 bytes (standaard: 5000)</translation>
     </message>
@@ -2922,12 +2922,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Voeg een tijdstempel toe aan debug output</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+40"/>
         <source>SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
         <translation>SSL-opties: (zie de Bitcoin wiki voor SSL-instructies)</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-80"/>
         <source>Select the version of socks proxy to use (4-5, default: 5)</source>
         <translation>Selecteer de versie van socks proxy (4-5, default: 5)</translation>
     </message>
@@ -2937,12 +2937,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Stuur trace/debug-info naar de console in plaats van het debug.log bestand</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Send trace/debug info to debugger</source>
-        <translation>Stuur trace/debug info naar de debugger</translation>
-    </message>
-    <message>
-        <location line="+30"/>
+        <location line="+34"/>
         <source>Set maximum block size in bytes (default: 250000)</source>
         <translation>Stel maximale block grootte in bytes in (standaard: 250000)</translation>
     </message>
@@ -2952,7 +2947,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Stel minimum blokgrootte in in bytes (standaard: 0)</translation>
     </message>
     <message>
-        <location line="-35"/>
+        <location line="-34"/>
         <source>Shrink debug.log file on client startup (default: 1 when no -debug)</source>
         <translation>Verklein debug.log-bestand bij het opstarten van de client (standaard: 1 als geen -debug)</translation>
     </message>
@@ -2962,14 +2957,14 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Specificeer de time-outtijd in milliseconden (standaard: 5000)</translation>
     </message>
     <message>
-        <location line="+116"/>
+        <location line="+115"/>
         <source>Unable to sign checkpoint, wrong checkpointkey?
 </source>
         <translation>Kan checkpoint niet ondertekenen, verkeerde checkpoint sleutel? 
 </translation>
     </message>
     <message>
-        <location line="-86"/>
+        <location line="-85"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Gebruik UPnP om de luisterende poort te mappen (standaard: 0)</translation>
     </message>
@@ -2984,7 +2979,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Gebruik proxy tor verborgen diensten (standaard: zelfde als -proxy)</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+46"/>
         <source>Username for JSON-RPC connections</source>
         <translation>Gebruikersnaam voor JSON-RPC-verbindingen</translation>
     </message>
@@ -3044,7 +3039,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Wachtwoord voor JSON-RPC-verbindingen</translation>
     </message>
     <message>
-        <location line="-32"/>
+        <location line="-31"/>
         <source>Sync time with other nodes. Disable if time on your system is precise e.g. syncing with NTP (default: 1)</source>
         <translation>Synchroniseer tijd met andere connecties. Uitschakelen als de tijd op uw systeem nauwkeurig is bijv. synchroniseren met NTP (standaard: 1)</translation>
     </message>
@@ -3074,7 +3069,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>Allow JSON-RPC connections from specified IP address</source>
         <translation>Sta JSON-RPC verbindingen van opgegeven IP-adres toe</translation>
     </message>
@@ -3179,12 +3174,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>WAARSCHUWING: Ongeldig controlepunt gevonden! Weergegeven transacties kunnen niet kloppen! Het is mogelijk dat je moet upgraden, of developers moet waarschuwen.</translation>
     </message>
     <message>
-        <location line="-174"/>
+        <location line="-173"/>
         <source>This help message</source>
         <translation>Dit helpbericht</translation>
     </message>
     <message>
-        <location line="+104"/>
+        <location line="+103"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>Portemonnee %s bevindt zich buiten de datamap %s.</translation>
     </message>
@@ -3194,7 +3189,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Niet in staat om aan %s te binden op deze computer (bind gaf error %d, %s)</translation>
     </message>
     <message>
-        <location line="-133"/>
+        <location line="-132"/>
         <source>Connect through socks proxy</source>
         <translation>Verbind door socks proxy</translation>
     </message>
@@ -3204,7 +3199,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Sta DNS-naslag toe voor -addnode, -seednode en -connect</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+125"/>
         <source>Loading addresses...</source>
         <translation>Adressen aan het laden...</translation>
     </message>
@@ -3284,22 +3279,22 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Blokindex aan het laden...</translation>
     </message>
     <message>
-        <location line="-110"/>
+        <location line="-109"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Voeg een node om naar te verbinden toe en probeer de verbinding open te houden</translation>
     </message>
     <message>
-        <location line="+125"/>
+        <location line="+124"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>Niet mogelijk om %s op deze computer. BlackCoin is waarschijnlijk al geopened.</translation>
     </message>
     <message>
-        <location line="-101"/>
+        <location line="-100"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Vergoeding per KB toe te voegen aan de transacties die u verzendt</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+33"/>
         <source>Minimize weight consumption (experimental) (default: 0)</source>
         <translation type="unfinished"/>
     </message>
@@ -3364,12 +3359,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Klaar met laden</translation>
     </message>
     <message>
-        <location line="-161"/>
+        <location line="-160"/>
         <source>To use the %s option</source>
         <translation>Om de %s optie te gebruiken</translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+187"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>

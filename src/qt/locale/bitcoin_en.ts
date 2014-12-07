@@ -794,7 +794,7 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../coincontroldialog.cpp" line="+552"/>
+        <location filename="../coincontroldialog.cpp" line="+537"/>
         <source>no</source>
         <translation type="unfinished"></translation>
     </message>
@@ -859,7 +859,7 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../coincontroldialog.cpp" line="-515"/>
+        <location filename="../coincontroldialog.cpp" line="-500"/>
         <source>Copy address</source>
         <translation type="unfinished">Copy address</translation>
     </message>
@@ -950,7 +950,7 @@ Address: %4
         <translation></translation>
     </message>
     <message>
-        <location line="+155"/>
+        <location line="+140"/>
         <source>DUST</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1682,7 +1682,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <name>SendCoinsDialog</name>
     <message>
         <location filename="../forms/sendcoinsdialog.ui" line="+14"/>
-        <location filename="../sendcoinsdialog.cpp" line="+181"/>
+        <location filename="../sendcoinsdialog.cpp" line="+182"/>
         <location line="+5"/>
         <location line="+5"/>
         <location line="+5"/>
@@ -1822,7 +1822,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../sendcoinsdialog.cpp" line="-173"/>
+        <location filename="../sendcoinsdialog.cpp" line="-174"/>
         <source>Enter a BlackCoin address (e.g. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</source>
         <translation>Enter a BlackCoin address (e.g. B8gZqgY4r2RoEdqYk3QsAqFckyf9pRHN6i)</translation>
     </message>
@@ -1867,7 +1867,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation></translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="+87"/>
         <source>&lt;b&gt;%1&lt;/b&gt; to %2 (%3)</source>
         <translation>&lt;b&gt;%1&lt;/b&gt; to %2 (%3)</translation>
     </message>
@@ -2115,7 +2115,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Enter BlackCoin signature</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+85"/>
         <location line="+81"/>
         <source>The entered address is invalid.</source>
         <translation>The entered address is invalid.</translation>
@@ -2246,19 +2246,19 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+5"/>
-        <location line="+17"/>
+        <location line="+13"/>
         <source>From</source>
         <translation>From</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+22"/>
+        <location line="+19"/>
         <location line="+58"/>
         <source>To</source>
         <translation>To</translation>
     </message>
     <message>
-        <location line="-77"/>
+        <location line="-74"/>
         <location line="+2"/>
         <source>own address</source>
         <translation>own address</translation>
@@ -2269,7 +2269,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>label</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+34"/>
         <location line="+12"/>
         <location line="+45"/>
         <location line="+17"/>
@@ -2359,7 +2359,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>false</translation>
     </message>
     <message>
-        <location line="-209"/>
+        <location line="-202"/>
         <source>, has not been successfully broadcast yet</source>
         <translation>, has not been successfully broadcast yet</translation>
     </message>
@@ -2372,7 +2372,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         </translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+67"/>
         <source>unknown</source>
         <translation>unknown</translation>
     </message>
