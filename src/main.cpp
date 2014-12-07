@@ -2184,6 +2184,15 @@ bool static ReserealizeBlockSignature(CBlock* pblock)
     return CKey::ReserealizeSignature(pblock->vchBlockSig);
 }
 
+bool static IsCanonicalBlockSignature(CBlock* pblock)
+{
+    if (pblock->IsProofOfWork()) {
+        return pblock->vchBlockSig.empty();
+    }
+
+    return IsDERSignature(pblock->vchBlockSig, false);
+}
+
 bool ProcessBlock(CNode* pfrom, CBlock* pblock)
 {
     AssertLockHeld(cs_main);
@@ -2234,8 +2243,10 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
 
     // Block signature can be malleated in such a way that it increases block size up to maximum allowed by protocol
     // For now we just strip garbage from newly received blocks
-    if (!ReserealizeBlockSignature(pblock))
-        LogPrintf("WARNING: ProcessBlock() : ReserealizeBlockSignature FAILED\n");
+    if (!IsCanonicalBlockSignature(pblock)) {
+        if (!ReserealizeBlockSignature(pblock))
+            LogPrintf("WARNING: ProcessBlock() : ReserealizeBlockSignature FAILED\n");
+    }
 
     // Preliminary checks
     if (!pblock->CheckBlock())

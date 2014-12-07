@@ -268,7 +268,7 @@ static bool IsCompressedOrUncompressedPubKey(const valtype &vchPubKey) {
     return true;
 }
 
-bool IsDERSignature(const valtype &vchSig) {
+bool IsDERSignature(const valtype &vchSig, bool haveHashType) {
     // See https://bitcointalk.org/index.php?topic=8392.msg127623#msg127623
     // A canonical signature exists of: <30> <total len> <02> <len R> <R> <02> <len S> <S> <hashtype>
     // Where R and S are not negative (their first byte has its highest bit not set), and not
@@ -280,13 +280,13 @@ bool IsDERSignature(const valtype &vchSig) {
         return error("Non-canonical signature: too long");
     if (vchSig[0] != 0x30)
         return error("Non-canonical signature: wrong type");
-    if (vchSig[1] != vchSig.size()-3)
+    if (vchSig[1] != vchSig.size() - (haveHashType ? 3 : 2))
         return error("Non-canonical signature: wrong length marker");
     unsigned int nLenR = vchSig[3];
     if (5 + nLenR >= vchSig.size())
         return error("Non-canonical signature: S length misplaced");
     unsigned int nLenS = vchSig[5+nLenR];
-    if ((unsigned long)(nLenR+nLenS+7) != vchSig.size())
+    if ((unsigned long)(nLenR + nLenS + (haveHashType ? 7 : 6)) != vchSig.size())
         return error("Non-canonical signature: R+S length mismatch");
 
     const unsigned char *R = &vchSig[4];
