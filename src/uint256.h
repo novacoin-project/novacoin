@@ -380,6 +380,23 @@ public:
         s.read((char*)pn, sizeof(pn));
     }
 
+    // Temporary for migration to opaque uint160/256
+    uint64_t GetCheapHash() const
+    {
+        return GetLow64();
+    }
+    void SetNull()
+    {
+        memset(pn, 0, sizeof(pn));
+    }
+    bool IsNull() const
+    {
+        for (int i = 0; i < WIDTH; i++)
+            if (pn[i] != 0)
+                return false;
+        return true;
+    }
+
     friend class uint160;
     friend class uint256;
     friend inline int Testuint256AdHoc(std::vector<std::string> vArg);
@@ -763,4 +780,7 @@ inline int Testuint256AdHoc(std::vector<std::string> vArg)
 
 #endif
 
-#endif
+// Temporary for migration to opaque uint160/256
+inline uint256 uint256S(const std::string &x) { return uint256(x); }
+
+#endif // BITCOIN_UINT256_H
