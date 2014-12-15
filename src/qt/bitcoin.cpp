@@ -52,7 +52,7 @@ static void ThreadSafeMessageBox(const std::string& message, const std::string& 
     }
     else
     {
-        printf("%s: %s\n", caption.c_str(), message.c_str());
+        LogPrintf("%s: %s\n", caption.c_str(), message.c_str());
         fprintf(stderr, "%s: %s\n", caption.c_str(), message.c_str());
     }
 }
@@ -103,6 +103,22 @@ static std::string Translate(const char* psz)
     return QCoreApplication::translate("bitcoin-core", psz).toStdString();
 }
 
+/* qDebug() message handler --> debug.log */
+#if QT_VERSION < 0x050000
+void DebugMessageHandler(QtMsgType type, const char *msg)
+{
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg);
+}
+#else
+void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
+{
+    Q_UNUSED(context);
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg.toStdString());
+}
+#endif
+
 /* Handle runaway exceptions. Shows a message box with the problem and quits the program.
  */
 static void handleRunawayException(std::exception *e)
@@ -127,7 +143,17 @@ int main(int argc, char *argv[])
 
     // Install global event filter that makes sure that long tooltips can be word-wrapped
     app.installEventFilter(new GUIUtil::ToolTipToRichTextFilter(TOOLTIP_WRAP_THRESHOLD, &app));
-
+#if QT_VERSION < 0x050000
+    // Install qDebug() message handler to route to debug.log
+    qInstallMsgHandler(DebugMessageHandler);
+#else
+#if defined(Q_OS_WIN)
+    // Install global event filter for processing Windows session related Windows messages (WM_QUERYENDSESSION and WM_ENDSESSION)
+    qApp->installNativeEventFilter(new WinShutdownMonitor());
+#endif
+    // Install qDebug() message handler to route to debug.log
+    qInstallMessageHandler(DebugMessageHandler);
+#endif
     // Command-line options take precedence:
     ParseParameters(argc, argv);
 

@@ -66,6 +66,7 @@ bool AddLocal(const CNetAddr& addr, int nScore = LOCAL_NONE);
 bool SeenLocal(const CService& addr);
 bool IsLocal(const CService& addr);
 bool GetLocal(CService &addr, const CNetAddr *paddrPeer = NULL);
+bool IsReachable(enum Network net);
 bool IsReachable(const CNetAddr &addr);
 void SetReachable(enum Network net, bool fFlag = true);
 CAddress GetLocalAddress(const CNetAddr *paddrPeer = NULL);
@@ -132,6 +133,13 @@ extern std::map<CInv, int64> mapAlreadyAskedFor;
 
 
 
+struct LocalServiceInfo {
+    int nScore;
+    int nPort;
+};
+
+extern CCriticalSection cs_mapLocalHost;
+extern std::map<CNetAddr, LocalServiceInfo> mapLocalHost;
 
 class CNodeStats
 {
@@ -262,7 +270,7 @@ public:
     {
         if (hSocket != INVALID_SOCKET)
         {
-            closesocket(hSocket);
+            CloseSocket(hSocket);
             hSocket = INVALID_SOCKET;
         }
     }
@@ -338,7 +346,7 @@ public:
         // the key is the earliest time the request can be sent
         int64& nRequestTime = mapAlreadyAskedFor[inv];
         if (fDebugNet)
-            printf("askfor %s   %"PRI64d" (%s)\n", inv.ToString().c_str(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000).c_str());
+            LogPrintf("askfor %s   %"PRI64d" (%s)\n", inv.ToString().c_str(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000).c_str());
 
         // Make sure not to reuse time indexes to keep things in the same order
         int64 nNow = (GetTime() - 1) * 1000000;
@@ -363,7 +371,7 @@ public:
         vSend << CMessageHeader(pszCommand, 0);
         nMessageStart = vSend.size();
         if (fDebug)
-            printf("sending: %s ", pszCommand);
+            LogPrintf("sending: %s ", pszCommand);
     }
 
     void AbortMessage()
@@ -376,14 +384,14 @@ public:
         LEAVE_CRITICAL_SECTION(cs_vSend);
 
         if (fDebug)
-            printf("(aborted)\n");
+            LogPrintf("(aborted)\n");
     }
 
     void EndMessage()
     {
         if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0)
         {
-            printf("dropmessages DROPPING SEND MESSAGE\n");
+            LogPrintf("dropmessages DROPPING SEND MESSAGE\n");
             AbortMessage();
             return;
         }
@@ -403,7 +411,7 @@ public:
         memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::CHECKSUM_OFFSET, &nChecksum, sizeof(nChecksum));
 
         if (fDebug) {
-            printf("(%d bytes)\n", nSize);
+            LogPrintf("(%d bytes)\n", nSize);
         }
 
         nHeaderStart = -1;
