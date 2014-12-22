@@ -1139,15 +1139,23 @@ void CWallet::AvailableCoinsForStaking(vector<COutput>& vCoins, unsigned int nSp
         {
             const CWalletTx* pcoin = &(*it).second;
 
-            // Filtering by tx timestamp instead of block timestamp may give false positives but never false negatives
-            if (pcoin->nTime + nStakeMinAge > nSpendTime)
-                continue;
-
-            if (pcoin->GetBlocksToMaturity() > 0)
-                continue;
-
             int nDepth = pcoin->GetDepthInMainChain();
             if (nDepth < 1)
+                continue;
+
+            if (IsProtocolV3(nSpendTime))
+            {
+                if (nDepth < nStakeMinConfirmations)
+                    continue;
+            }
+            else
+            {
+                // Filtering by tx timestamp instead of block timestamp may give false positives but never false negatives
+                if (pcoin->nTime + nStakeMinAge > nSpendTime)
+                    continue;
+            }
+
+            if (pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++)
@@ -1819,12 +1827,20 @@ uint64_t CWallet::GetStakeWeight() const
     LOCK2(cs_main, cs_wallet);
     BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
     {
-        CTxIndex txindex;
-        if (!txdb.ReadTxIndex(pcoin.first->GetHash(), txindex))
-            continue;
+        if (IsProtocolV3(nCurrentTime))
+        {
+            if (pcoin.first->GetDepthInMainChain() >= nStakeMinConfirmations)
+                nWeight += pcoin.first->vout[pcoin.second].nValue;
+        }
+        else
+        {
+            CTxIndex txindex;
+            if (!txdb.ReadTxIndex(pcoin.first->GetHash(), txindex))
+                continue;
 
-        if (nCurrentTime - pcoin.first->nTime > nStakeMinAge)
-            nWeight += pcoin.first->vout[pcoin.second].nValue;
+            if (nCurrentTime - pcoin.first->nTime > nStakeMinAge)
+                nWeight += pcoin.first->vout[pcoin.second].nValue;
+        }
     }
 
     return nWeight;
@@ -1961,8 +1977,15 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
                 continue;
             // Do not add input that is still too young
-            if (nTimeWeight < nStakeMinAge)
-                continue;
+            if (IsProtocolV3(txNew.nTime))
+            {
+                // properly handled by selection function
+            }
+            else
+            {
+                if (nTimeWeight < nStakeMinAge)
+                    continue;
+            }
 
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
             nCredit += pcoin.first->vout[pcoin.second].nValue;
@@ -1974,7 +1997,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     {
         uint64_t nCoinAge;
         CTxDB txdb("r");
-        if (!txNew.GetCoinAge(txdb, nCoinAge))
+        if (!txNew.GetCoinAge(txdb, pindexPrev, nCoinAge))
             return error("CreateCoinStake : failed to calculate coin age");
 
         int64_t nReward = GetProofOfStakeReward(nCoinAge, nFees);

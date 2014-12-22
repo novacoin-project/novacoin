@@ -248,8 +248,6 @@ static bool CheckStakeKernelHashV1(unsigned int nBits, const CBlock& blockFrom, 
         return error("CheckStakeKernelHash() : nTime violation");
 
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
-    if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
-        return error("CheckStakeKernelHash() : min age violation");
 
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
@@ -328,9 +326,6 @@ static bool CheckStakeKernelHashV2(CBlockIndex* pindexPrev, unsigned int nBits, 
 {
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
         return error("CheckStakeKernelHash() : nTime violation");
-
-    if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
-        return error("CheckStakeKernelHash() : min age violation");
 
     // Base target
     CBigNum bnTarget;
@@ -416,6 +411,20 @@ bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned
     if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
         return fDebug? error("CheckProofOfStake() : read block failed") : false; // unable to read block of previous transaction
 
+    // Min age requirement
+    if (IsProtocolV3(tx.nTime))
+    {
+        int nDepth;
+        if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nDepth))
+            return tx.DoS(100, error("CheckProofOfStake() : tried to stake at depth %d", nDepth + 1));
+    }
+    else
+    {
+        unsigned int nTimeBlockFrom = block.GetBlockTime();
+        if (nTimeBlockFrom + nStakeMinAge > tx.nTime)
+            return error("CheckProofOfStake() : min age violation");
+    }
+
     if (!CheckStakeKernelHash(pindexPrev, nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, txPrev, txin.prevout, tx.nTime, hashProofOfStake, targetProofOfStake, fDebug))
         return tx.DoS(1, error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s", tx.GetHash().ToString(), hashProofOfStake.ToString())); // may occur during initial download or if behind on block chain sync
 
@@ -446,8 +455,17 @@ bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, int64_t nTime, con
     if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
         return false;
 
-    if (block.GetBlockTime() + nStakeMinAge > nTime)
-        return false; // only count coins meeting min age requirement
+    if (IsProtocolV3(nTime))
+    {
+        int nDepth;
+        if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nDepth))
+            return false;
+    }
+    else
+    {
+        if (block.GetBlockTime() + nStakeMinAge > nTime)
+            return false; // only count coins meeting min age requirement
+    }
 
     if (pBlockTime)
         *pBlockTime = block.GetBlockTime();
