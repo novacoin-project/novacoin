@@ -662,7 +662,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     nStart = GetTimeMillis();
     if (!LoadBlockIndex())
-        return InitError(_("Error loading blkindex.dat"));
+        return InitError(_("Error loading block database"));
 
 
     // as LoadBlockIndex can take several minutes, it's possible the user
