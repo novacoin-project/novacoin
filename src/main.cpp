@@ -1284,6 +1284,12 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
             if (txPrev.nTime > nTime)
                 return DoS(100, error("ConnectInputs() : transaction timestamp earlier than input transaction"));
 
+            if (IsProtocolV3(nTime))
+            {
+                if (txPrev.vout[prevout.n].IsEmpty())
+                    return DoS(1, error("ConnectInputs() : special marker is not spendable"));
+            }
+
             // Check for negative or overflow input values
             nValueIn += txPrev.vout[prevout.n].nValue;
             if (!MoneyRange(txPrev.vout[prevout.n].nValue) || !MoneyRange(nValueIn))
