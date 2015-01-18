@@ -401,10 +401,8 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
         // the proxy, mark this as an attempt.
         addrman.Attempt(addrConnect);
     }
-    else
-    {
-        return NULL;
-    }
+
+    return NULL;
 }
 
 void CNode::CloseSocketDisconnect()
