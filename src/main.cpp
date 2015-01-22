@@ -2173,30 +2173,12 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     {
         // Extra checks to prevent "fill up memory by spamming with bogus blocks"
         int64_t deltaTime = pblock->GetBlockTime() - pcheckpoint->nTime;
-        if (deltaTime < -10*60)
+        if (deltaTime < 0)
         {
             if (pfrom)
                 pfrom->Misbehaving(1);
             return error("ProcessBlock() : block with timestamp before last checkpoint");
         }
-
-/* FIXME
-        CBigNum bnNewBlock;
-        bnNewBlock.SetCompact(pblock->nBits);
-        CBigNum bnRequired;
-
-        if (pblock->IsProofOfStake())
-            bnRequired.SetCompact(ComputeMinStake(GetLastBlockIndex(pcheckpoint, true)->nBits, deltaTime, pblock->nTime));
-        else
-            bnRequired.SetCompact(ComputeMinWork(GetLastBlockIndex(pcheckpoint, false)->nBits, deltaTime));
-
-        if (bnNewBlock > bnRequired)
-        {
-            if (pfrom)
-                pfrom->Misbehaving(100);
-            return error("ProcessBlock() : block with too little %s", pblock->IsProofOfStake()? "proof-of-stake" : "proof-of-work");
-        }
-*/
     }
 
     // Block signature can be malleated in such a way that it increases block size up to maximum allowed by protocol
