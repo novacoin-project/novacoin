@@ -339,10 +339,15 @@ bool static IsDefinedHashtypeSignature(const valtype &vchSig) {
     return true;
 }
 
-bool static CheckSignatureEncoding(const valtype &vchSig) {
+bool static CheckSignatureEncoding(const valtype &vchSig, unsigned int flags) {
+    // Empty signature. Not strictly DER encoded, but allowed to provide a
+    // compact way to provide an invalid signature for use with CHECK(MULTI)SIG
+    if ((flags & SCRIPT_VERIFY_ALLOW_EMPTY_SIG) && vchSig.size() == 0) {
+        return true;
+    }
     if (!IsLowDERSignature(vchSig)) {
         return false;
-    } else if (!IsDefinedHashtypeSignature(vchSig)) {
+    } else if (!(flags & SCRIPT_VERIFY_FIX_HASHTYPE) && !IsDefinedHashtypeSignature(vchSig)) {
         return false;
     }
     return true;
@@ -1048,10 +1053,10 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // Drop the signature, since there's no way for a signature to sign itself
                     scriptCode.FindAndDelete(CScript(vchSig));
 
-                    if ((flags & SCRIPT_VERIFY_STRICTENC) && (!CheckSignatureEncoding(vchSig) || !CheckPubKeyEncoding(vchPubKey)))
+                    if ((flags & SCRIPT_VERIFY_STRICTENC) && (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey)))
                         return false;
 
-                    bool fSuccess = CheckSignatureEncoding(vchSig) && CheckPubKeyEncoding(vchPubKey) &&
+                    bool fSuccess = CheckSignatureEncoding(vchSig, flags) && CheckPubKeyEncoding(vchPubKey) &&
                         CheckSig(vchSig, vchPubKey, scriptCode, txTo, nIn, nHashType, flags);
 
                     popstack(stack);
@@ -1111,11 +1116,11 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                         valtype& vchSig    = stacktop(-isig);
                         valtype& vchPubKey = stacktop(-ikey);
 
-                        if ((flags & SCRIPT_VERIFY_STRICTENC) && (!CheckSignatureEncoding(vchSig) || !CheckPubKeyEncoding(vchPubKey)))
+                        if ((flags & SCRIPT_VERIFY_STRICTENC) && (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey)))
                             return false;
 
                         // Check signature
-                        bool fOk = CheckSignatureEncoding(vchSig) && CheckPubKeyEncoding(vchPubKey) &&
+                        bool fOk = CheckSignatureEncoding(vchSig, flags) && CheckPubKeyEncoding(vchPubKey) &&
                             CheckSig(vchSig, vchPubKey, scriptCode, txTo, nIn, nHashType, flags);
 
                         if (fOk)

@@ -52,6 +52,8 @@ enum
     SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS = (1U << 2),
 
     SCRIPT_VERIFY_STRICTENC = (1U << 3),
+    SCRIPT_VERIFY_ALLOW_EMPTY_SIG = (1U << 4),
+    SCRIPT_VERIFY_FIX_HASHTYPE = (1U << 5),
 };
 
 // Mandatory script verification flags that all new blocks must comply with for
