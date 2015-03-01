@@ -6,6 +6,8 @@
 #ifndef _BITCOINRPC_PROTOCOL_H_
 #define _BITCOINRPC_PROTOCOL_H_ 1
 
+#include "compat.h"
+
 #include <list>
 #include <map>
 #include <stdint.h>
