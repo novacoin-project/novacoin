@@ -8,6 +8,7 @@
 #include "protocol.h"
 #include "sync.h"
 #include "timedata.h"
+#include "uint256.h"
 #include "util.h"
 
 #include <map>
@@ -74,13 +75,13 @@ public:
     }
 
     // Calculate in which "tried" bucket this entry belongs
-    int GetTriedBucket(const std::vector<unsigned char> &nKey) const;
+    int GetTriedBucket(const uint256 &nKey) const;
 
     // Calculate in which "new" bucket this entry belongs, given a certain source
-    int GetNewBucket(const std::vector<unsigned char> &nKey, const CNetAddr& src) const;
+    int GetNewBucket(const uint256 &nKey, const CNetAddr& src) const;
 
     // Calculate in which "new" bucket this entry belongs, using its default source
-    int GetNewBucket(const std::vector<unsigned char> &nKey) const
+    int GetNewBucket(const uint256 &nKey) const
     {
         return GetNewBucket(nKey, source);
     }
@@ -169,7 +170,7 @@ private:
     mutable CCriticalSection cs;
 
     // secret key to randomize bucket select with
-    std::vector<unsigned char> nKey;
+    uint256 nKey;
 
     // last used nId
     int nIdCount;
@@ -274,6 +275,7 @@ public:
 
         unsigned char nVersion = 0;
         s << nVersion;
+        s << ((unsigned char)32);
         s << nKey;
         s << nNew;
         s << nTried;
@@ -318,6 +320,9 @@ public:
 
         unsigned char nVersion;
         s >> nVersion;
+        unsigned char nKeySize;
+        s >> nKeySize;
+        if (nKeySize != 32) throw std::ios_base::failure("Incorrect keysize in addrman");
         s >> nKey;
         s >> nNew;
         s >> nTried;
@@ -383,12 +388,16 @@ public:
 
     CAddrMan() : vRandom(0), vvTried(ADDRMAN_TRIED_BUCKET_COUNT, std::vector<int>(0)), vvNew(ADDRMAN_NEW_BUCKET_COUNT, std::set<int>())
     {
-         nKey.resize(32);
-         RAND_bytes(&nKey[0], 32);
+         nKey = GetRandHash();
 
          nIdCount = 0;
          nTried = 0;
          nNew = 0;
+    }
+
+    ~CAddrMan()
+    {
+         nKey.SetNull();
     }
 
     // Return the number of (unique) addresses in all tables.
