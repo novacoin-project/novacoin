@@ -318,7 +318,11 @@ void BitcoinGUI::createActions()
 
 void BitcoinGUI::createMenuBar()
 {
-    appMenuBar = new QMenuBar();
+    // workaround for unity's global menu
+    if (qgetenv("QT_QPA_PLATFORMTHEME") == "appmenu-qt5")
+        appMenuBar = menuBar();
+    else
+        appMenuBar = new QMenuBar();
 
     // Configure the menus
     QMenu *file = appMenuBar->addMenu(tr("&File"));
