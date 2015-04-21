@@ -8,12 +8,6 @@
 #include "net.h"
 #include "util.h"
 
-#ifdef WIN32
-#undef STRICT
-#undef PERMISSIVE
-#undef ADVISORY
-#endif
-
 class uint256;
 class CBlockIndex;
 class CSyncCheckpoint;
@@ -23,17 +17,6 @@ class CSyncCheckpoint;
  */
 namespace Checkpoints
 {
-    /** Checkpointing mode */
-    enum CPMode
-    {
-        // Scrict checkpoints policy, perform conflicts verification and resolve conflicts
-        STRICT = 0,
-        // Advisory checkpoints policy, perform conflicts verification but don't try to resolve them
-        ADVISORY = 1,
-        // Permissive checkpoints policy, don't perform any checking
-        PERMISSIVE = 2
-    };
-
     // Returns true if block passes checkpoint checks
     bool CheckHardened(int nHeight, const uint256& hash);
 
@@ -51,11 +34,9 @@ namespace Checkpoints
     CBlockIndex* GetLastSyncCheckpoint();
     bool WriteSyncCheckpoint(const uint256& hashCheckpoint);
     bool AcceptPendingSyncCheckpoint();
-    uint256 AutoSelectSyncCheckpoint();
-    bool CheckSync(const uint256& hashBlock, const CBlockIndex* pindexPrev);
-    bool WantedByPendingSyncCheckpoint(uint256 hashBlock);
+    const CBlockIndex* AutoSelectSyncCheckpoint();
+    bool CheckSync(int nHeight);
     bool ResetSyncCheckpoint();
-    void AskForPendingSyncCheckpoint(CNode* pfrom);
     bool SetCheckpointPrivKey(std::string strPrivKey);
     bool SendSyncCheckpoint(uint256 hashCheckpoint);
 }
