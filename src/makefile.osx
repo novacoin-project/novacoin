@@ -49,6 +49,9 @@ endif
 
 DEFS=-DMAC_OSX -DMSG_NOSIGNAL=0 -DBOOST_SPIRIT_THREADSAFE
 
+# workaround for boost 1.58
+DEFS += -DBOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
+
 ifdef RELEASE
 # Compile for maximum compatibility and smallest size.
 # This requires that dependencies are compiled
