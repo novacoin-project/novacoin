@@ -41,6 +41,7 @@ static void init_blockindex(leveldb::Options& options, bool fRemoveOld = false, 
     if (fRemoveOld) {
         filesystem::remove_all(directory); // remove directory
         unsigned int nFile = 1;
+        filesystem::path bootstrap = GetDataDir() / "bootstrap.dat";
 
         while (true)
         {
@@ -50,10 +51,8 @@ static void init_blockindex(leveldb::Options& options, bool fRemoveOld = false, 
             if( !filesystem::exists( strBlockFile ) )
                 break;
 
-            if (fCreateBootstrap && nFile == 1) {
-                filesystem::path bootstrap = GetDataDir() / "bootstrap.dat";
-                if (!filesystem::exists(bootstrap))
-                    filesystem::rename(strBlockFile, bootstrap);
+            if (fCreateBootstrap && nFile == 1 && !filesystem::exists(bootstrap)) {
+                filesystem::rename(strBlockFile, bootstrap);
             } else {
                 filesystem::remove(strBlockFile);
             }
