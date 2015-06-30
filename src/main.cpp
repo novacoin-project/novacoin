@@ -2193,10 +2193,13 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     }
 
     // Block signature can be malleated in such a way that it increases block size up to maximum allowed by protocol
-    // For now we just strip garbage from newly received blocks
     if (!IsCanonicalBlockSignature(pblock)) {
-        if (!ReserealizeBlockSignature(pblock))
+        if (pfrom && pfrom->nVersion >= CANONICAL_BLOCK_SIG_VERSION) {
+            pfrom->Misbehaving(100);
+            return error("ProcessBlock(): bad block signature encoding");
+        } else if (!ReserealizeBlockSignature(pblock)) {
             LogPrintf("WARNING: ProcessBlock() : ReserealizeBlockSignature FAILED\n");
+        }
     }
 
     // Preliminary checks
