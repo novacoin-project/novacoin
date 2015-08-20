@@ -658,6 +658,39 @@ Value submitblock(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
     }
 
+    if (params.size() > 1)
+    {
+        const Object& oparam = params[1].get_obj();
+
+        const Value& coinstake_v = find_value(oparam, "coinstake");
+        if (coinstake_v.type() == str_type)
+        {
+            vector<unsigned char> txData(ParseHex(coinstake_v.get_str()));
+            CDataStream ssTx(txData, SER_NETWORK, PROTOCOL_VERSION);
+            CTransaction txCoinStake;
+            try {
+                ssTx >> txCoinStake;
+            }
+            catch (std::exception &e) {
+                throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Coinstake decode failed");
+            }
+
+            block.vtx.insert(block.vtx.begin() + 1, txCoinStake);
+            block.hashMerkleRoot = block.BuildMerkleTree();
+
+            CPubKey pubkey;
+            if (!pMiningKey->GetReservedKey(pubkey))
+                throw JSONRPCError(RPC_MISC_ERROR, "GetReservedKey failed");
+
+            CKey key;
+            if (!pwalletMain->GetKey(pubkey.GetID(), key))
+                throw JSONRPCError(RPC_MISC_ERROR, "GetKey failed");
+
+            if (!key.Sign(block.GetHash(), block.vchBlockSig))
+                throw JSONRPCError(RPC_MISC_ERROR, "Sign failed");
+        }
+    }
+
     bool fAccepted = ProcessBlock(NULL, &block);
     if (!fAccepted)
         return "rejected";

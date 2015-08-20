@@ -152,6 +152,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "importprivkey", 2 },
     { "checkkernel", 0 },
     { "checkkernel", 1 },
+    { "submitblock", 1 },
 };
 
 class CRPCConvertTable
