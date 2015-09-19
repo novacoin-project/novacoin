@@ -111,7 +111,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
     <message>
         <location filename="../addressbookpage.cpp" line="+65"/>
         <source>Copy &amp;Label</source>
-        <translation>Kopírovať &amp;Popis</translation>
+        <translation>Kopírovať &amp;popis</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -561,7 +561,7 @@ Tento produkt obsahuje softvér vyvinutý projektom OpenSSL Project pre použiti
     <message>
         <location line="+277"/>
         <source>Up to date</source>
-        <translation>Aktualizovaný</translation>
+        <translation>Aktualizované</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -1199,12 +1199,12 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     <message>
         <location line="-57"/>
         <source>Connect to the BlackCoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
-        <translation type="unfinished"/>
+        <translation>Pripojiť k sieti BlackCoin cez SOCKS5 proxy (napr. pri pripojení cez Tor).</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;Connect through SOCKS5 proxy:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Pripojenie cez SOCKS5 proxy:</translation>
     </message>
     <message>
         <location line="+90"/>
@@ -1234,7 +1234,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     <message>
         <location line="+21"/>
         <source>&amp;Display</source>
-        <translation>&amp;Displej</translation>
+        <translation>&amp;Zobraznie</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2665,7 +2665,7 @@ To znamená, že je potrebný poplatok aspoň %2.</translation>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+173"/>
         <source>BlackCoin version</source>
-        <translation>BlackCoin verzia</translation>
+        <translation>Verzia BlackCoin</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2860,7 +2860,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="+5"/>
         <source>Block creation options:</source>
-        <translation>Voľby vytvorenia bloku:</translation>
+        <translation>Možnosti vytvorenia bloku:</translation>
     </message>
     <message>
         <location line="-68"/>
@@ -3027,7 +3027,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="-48"/>
         <source>Connect through SOCKS5 proxy</source>
-        <translation type="unfinished"/>
+        <translation>Pripojenie cez SOCKS5 proxy</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -3142,7 +3142,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="+5"/>
         <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
-        <translation type="unfinished"/>
+        <translation>Chyba: Nájdený nepodporovaný argument -socks. Nastavenie SOCKS verzie nie je už možné, podporované sú už iba proxy SOCKS5.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3152,7 +3152,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="+21"/>
         <source>Error loading block database</source>
-        <translation type="unfinished"/>
+        <translation>Chyba pri načítaní databáze blokov</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -3172,7 +3172,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="+3"/>
         <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
-        <translation>UPOZORNENIE: Neplatný checkpoint nájdený! Uvedené transakcie nemusia byť správne! Možno budete musieť upgradovať, alebo upozorniť vývojárov.</translation>
+        <translation>UPOZORNENIE: Nájdený neplatný checkpoint ! Uvedené transakcie nemusia byť správne! Možno budete musieť upgradovať, alebo upozorniť vývojárov.</translation>
     </message>
     <message>
         <location line="-174"/>
@@ -3192,12 +3192,12 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="-131"/>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
-        <translation>Povoliť vyhľadávanie DNS pre pridanie nódy a spojenie</translation>
+        <translation>Povoliť vyhľadávania DNS pre -addnode, -seenode a -connect</translation>
     </message>
     <message>
         <location line="+127"/>
         <source>Loading addresses...</source>
-        <translation>Načítavanie adries...</translation>
+        <translation>Načítavajú sa adresy...</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -3232,12 +3232,12 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="+3"/>
         <source>Cannot resolve -bind address: &apos;%s&apos;</source>
-        <translation>Nemožno rozložiť -bind adresu: &apos;%s&apos;</translation>
+        <translation>Nedá sa vyriešiť -bind adresa: &apos;%s&apos;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
-        <translation>Nemožno rozložiť -externalip adresu: &apos;%s&apos;</translation>
+        <translation>Nemožno vyriešiť -externalip adresu: &apos;%s&apos;</translation>
     </message>
     <message>
         <location line="-22"/>
@@ -3262,12 +3262,12 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="-40"/>
         <source>Loading block index...</source>
-        <translation>Načítavanie zoznamu blokov...</translation>
+        <translation>Načítava sa  zoznam blokov...</translation>
     </message>
     <message>
         <location line="-111"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
-        <translation>Pridať nód na pripojenie a pokus o udržanie pripojenia otvoreného</translation>
+        <translation>Pridať uzol pre pripojenie a pokúsiť sa udržať otvorené pripojenie</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -3332,7 +3332,7 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BlackCoin upozornenie&quot; adm
     <message>
         <location line="+1"/>
         <source>Cannot write default address</source>
-        <translation>Nie je možné zapísať predvolenú adresu.</translation>
+        <translation>Nie je možné zapísať predvolenú adresu</translation>
     </message>
     <message>
         <location line="+1"/>
