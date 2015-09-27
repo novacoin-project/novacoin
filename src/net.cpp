@@ -1738,7 +1738,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     {
         strError = strprintf("Error: Couldn't open socket for incoming connections (socket returned error %d)", WSAGetLastError());
         printf("%s\n", strError.c_str());
-	closesocket(hListenSocket);
+        closesocket(hListenSocket);
         return false;
     }
 
@@ -1761,7 +1761,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     {
         strError = strprintf("Error: Couldn't set properties on socket for incoming connections (error %d)", WSAGetLastError());
         printf("%s\n", strError.c_str());
-	closesocket(hListenSocket);
+        closesocket(hListenSocket);
         return false;
     }
 
@@ -2009,7 +2009,7 @@ public:
             delete pnode;
         vNodes.clear();
         vNodesDisconnected.clear();
-	vhListenSocket.clear();
+        vhListenSocket.clear();
         delete semOutbound;
         semOutbound = NULL;
         delete pnodeLocalHost;
