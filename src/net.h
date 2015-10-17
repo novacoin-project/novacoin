@@ -233,7 +233,6 @@ public:
     mruset<CAddress> setAddrKnown;
     bool fGetAddr;
     std::set<uint256> setKnown;
-    uint256 hashCheckpointKnown; // ppcoin: known sent sync-checkpoint
 
     // inventory based relay
     mruset<CInv> setInventoryKnown;
@@ -282,7 +281,6 @@ public:
         fStartSync = false;
         fGetAddr = false;
         nMisbehavior = 0;
-        hashCheckpointKnown = 0;
         setInventoryKnown.max_size(SendBufferSize() / 1000);
         nPingNonceSent = 0;
         nPingUsecStart = 0;
