@@ -368,7 +368,7 @@ string rfc1123Time()
     return DateTimeStrFormat("%a, %d %b %Y %H:%M:%S +0000", GetTime());
 }
 
-static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
+static string HTTPReply(int nStatus, const string& strMsg, const string& strReplyType, bool keepalive)
 {
     if (nStatus == HTTP_UNAUTHORIZED)
         return strprintf("HTTP/1.0 401 Authorization Required\r\n"
@@ -399,7 +399,7 @@ static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
             "Date: %s\r\n"
             "Connection: %s\r\n"
             "Content-Length: %" PRIszu "\r\n"
-            "Content-Type: application/json\r\n"
+            "Content-Type: %s\r\n"
             "Server: novacoin-json-rpc/%s\r\n"
             "\r\n"
             "%s",
@@ -408,11 +408,12 @@ static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
         rfc1123Time().c_str(),
         keepalive ? "keep-alive" : "close",
         strMsg.size(),
+        strReplyType.c_str(),
         FormatFullVersion().c_str(),
         strMsg.c_str());
 }
 
-int ReadHTTPStatus(std::basic_istream<char>& stream, int &proto)
+int ReadHTTPStatus(std::basic_istream<char>& stream, int &proto, bool &fGet, string &strLocation)
 {
     string str;
     getline(stream, str);
@@ -420,6 +421,9 @@ int ReadHTTPStatus(std::basic_istream<char>& stream, int &proto)
     boost::split(vWords, str, boost::is_any_of(" "));
     if (vWords.size() < 2)
         return HTTP_INTERNAL_SERVER_ERROR;
+    const char *reqget = strstr(str.c_str(), "GET");
+    fGet = (reqget != NULL);
+    strLocation = vWords[1];
     proto = 0;
     const char *ver = strstr(str.c_str(), "HTTP/1.");
     if (ver != NULL)
@@ -454,24 +458,40 @@ int ReadHTTPHeader(std::basic_istream<char>& stream, map<string, string>& mapHea
 
 int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRet, string& strMessageRet)
 {
+    bool fGet;
+    (void) fGet; // silence
+    return ReadHTTP(stream, mapHeadersRet, strMessageRet);
+}
+
+int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRet, string& strMessageRet, bool& fGet)
+{
     mapHeadersRet.clear();
     strMessageRet = "";
 
     // Read status
     int nProto = 0;
-    int nStatus = ReadHTTPStatus(stream, nProto);
+    string strLocation = "";
+    int nStatus = ReadHTTPStatus(stream, nProto, fGet, strLocation);
 
     // Read header
     int nLen = ReadHTTPHeader(stream, mapHeadersRet);
     if (nLen < 0 || nLen > (int)MAX_SIZE)
         return HTTP_INTERNAL_SERVER_ERROR;
 
-    // Read message
-    if (nLen > 0)
+    if (fGet)
     {
-        vector<char> vch(nLen);
-        stream.read(&vch[0], nLen);
-        strMessageRet = string(vch.begin(), vch.end());
+        // Just return a location
+        strMessageRet = strLocation;
+    }
+    else
+    {
+        // Read message
+        if (nLen > 0)
+        {
+            vector<char> vch(nLen);
+            stream.read(&vch[0], nLen);
+            strMessageRet = string(vch.begin(), vch.end());
+        }
     }
 
     string sConHdr = mapHeadersRet["connection"];
@@ -542,7 +562,7 @@ void ErrorReply(std::ostream& stream, const Object& objError, const Value& id)
     if (code == RPC_INVALID_REQUEST) nStatus = HTTP_BAD_REQUEST;
     else if (code == RPC_METHOD_NOT_FOUND) nStatus = HTTP_NOT_FOUND;
     string strReply = JSONRPCReply(Value::null, objError, id);
-    stream << HTTPReply(nStatus, strReply, false) << std::flush;
+    stream << HTTPReply(nStatus, strReply, "application/json", false) << std::flush;
 }
 
 bool ClientAllowed(const boost::asio::ip::address& address)
@@ -753,7 +773,7 @@ static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol, 
     {
         // Only send a 403 if we're not using SSL to prevent a DoS during the SSL handshake.
         if (!fUseSSL)
-            conn->stream() << HTTPReply(HTTP_FORBIDDEN, "", false) << std::flush;
+            conn->stream() << HTTPReply(HTTP_FORBIDDEN, "", "text/html", false) << std::flush;
         delete conn;
     }
 
@@ -996,12 +1016,13 @@ void ThreadRPCServer3(void* parg)
         map<string, string> mapHeaders;
         string strRequest;
 
-        ReadHTTP(conn->stream(), mapHeaders, strRequest);
+        bool fGet = false;
+        ReadHTTP(conn->stream(), mapHeaders, strRequest, fGet);
 
         // Check authorization
         if (mapHeaders.count("authorization") == 0)
         {
-            conn->stream() << HTTPReply(HTTP_UNAUTHORIZED, "", false) << std::flush;
+            conn->stream() << HTTPReply(HTTP_UNAUTHORIZED, "", "text/html", false) << std::flush;
             break;
         }
         if (!HTTPAuthorized(mapHeaders))
@@ -1013,7 +1034,7 @@ void ThreadRPCServer3(void* parg)
             if (mapArgs["-rpcpassword"].size() < 20)
                 Sleep(250);
 
-            conn->stream() << HTTPReply(HTTP_UNAUTHORIZED, "", false) << std::flush;
+            conn->stream() << HTTPReply(HTTP_UNAUTHORIZED, "", "text/html", false) << std::flush;
             break;
         }
         if (mapHeaders["connection"] == "close")
@@ -1022,29 +1043,53 @@ void ThreadRPCServer3(void* parg)
         JSONRequest jreq;
         try
         {
-            // Parse request
-            Value valRequest;
-            if (!read_string(strRequest, valRequest))
-                throw JSONRPCError(RPC_PARSE_ERROR, "Parse error");
-
             string strReply;
+            string strReplyType;
+            HTTPStatusCode httpCode = HTTP_OK;
 
-            // singleton request
-            if (valRequest.type() == obj_type) {
-                jreq.parse(valRequest);
-
-                Value result = tableRPC.execute(jreq.strMethod, jreq.params);
-
-                // Send reply
-                strReply = JSONRPCReply(result, Value::null, jreq.id);
-
-            // array of requests
-            } else if (valRequest.type() == array_type)
-                strReply = JSONRPCExecBatch(valRequest.get_array());
+            if (fGet)
+            {
+                // Process GET requests here
+                if (strRequest == "/")
+                {
+                    strReply = "It works!";
+                    strReplyType = "text/html";
+                    httpCode = HTTP_OK;
+                }
+                else
+                {
+                    strReply = "Not found";
+                    strReplyType = "text/html";
+                    httpCode = HTTP_NOT_FOUND;
+                }
+            }
             else
-                throw JSONRPCError(RPC_PARSE_ERROR, "Top-level object parse error");
+            {
+                // Parse JSON-RPC request
+                Value valRequest;
+                if (!read_string(strRequest, valRequest))
+                    throw JSONRPCError(RPC_PARSE_ERROR, "Parse error");
 
-            conn->stream() << HTTPReply(HTTP_OK, strReply, fRun) << std::flush;
+
+                // singleton request
+                if (valRequest.type() == obj_type) {
+                    jreq.parse(valRequest);
+
+                    Value result = tableRPC.execute(jreq.strMethod, jreq.params);
+
+                    // Send reply
+                    strReply = JSONRPCReply(result, Value::null, jreq.id);
+                    strReplyType = "application/json";
+                    httpCode = HTTP_OK;
+
+                // array of requests
+                } else if (valRequest.type() == array_type)
+                    strReply = JSONRPCExecBatch(valRequest.get_array());
+                else
+                    throw JSONRPCError(RPC_PARSE_ERROR, "Top-level object parse error");
+            }
+
+            conn->stream() << HTTPReply(httpCode, strReply, strReplyType, fRun) << std::flush;
         }
         catch (Object& objError)
         {
