@@ -1,7 +1,8 @@
-OBJS = obj/ext-all-debug.js.o \
+OBJS = obj/ext-all-debug.js.o obj/ux-debug.js.o \
        obj/classic__locale__locale-ru-debug.js.o \
        obj/classic__locale__locale-ukr-debug.js.o \
        obj/classic__locale__locale-en-debug.js.o \
+       obj/ux__ux-all-debug.css.o \
        obj/classic__theme-triton__resources__theme-triton-all-debug_1.css.o \
        obj/classic__theme-triton__resources__theme-triton-all-debug_2.css.o \
        obj/fonts__OpenSans-BoldItalic.ttf.o \
@@ -23,10 +24,17 @@ OBJS = obj/ext-all-debug.js.o \
        obj/font-ext__fonts__ExtJS.eot.o \
        obj/font-ext__fonts__ExtJS.svg.o \
        obj/font-ext__fonts__ExtJS.ttf.o \
-       obj/font-ext__fonts__ExtJS.woff.o
+       obj/font-ext__fonts__ExtJS.woff.o \
+       obj/index.o
 
+
+obj/index.o: index.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 obj/ext-all-debug.js.o: ext-all-debug.js
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+
+obj/ux-debug.js.o: ux-debug.js
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
 obj/%.js.o: resources/js/%.js
