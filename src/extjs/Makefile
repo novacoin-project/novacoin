@@ -26,32 +26,37 @@ OBJS = obj/ext-all-debug.js.o \
        obj/font-ext__fonts__ExtJS.woff.o
 
 
-
-obj/%.js.o: js/%.js
+obj/ext-all-debug.js.o: ext-all-debug.js
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.css.o: css/%.css
+obj/%.js.o: resources/js/%.js
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.ttf.o: ttf/%.ttf
+obj/%.css.o: resources/css/%.css
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.eot.o: eot/%.eot
+obj/%.ttf.o: resources/ttf/%.ttf
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.svg.o: svg/%.svg.o
+obj/%.eot.o: resources/eot/%.eot
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.woff.o: woff/%.woff
+obj/%.svg.o: resources/svg/%.svg.o
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.woff2.o: woff2/%.woff2
+obj/%.woff.o: resources/woff/%.woff
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.otf.o: otf/%.otf
+obj/%.woff2.o: resources/woff2/%.woff2
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
-obj/%.svg.o: svg/%.svg
+obj/%.otf.o: resources/otf/%.otf
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+
+obj/%.svg.o: resources/svg/%.svg
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
 all: $(OBJS:obj/%=obj/%)
+
+clean:
+	-rm -f obj/*.o
