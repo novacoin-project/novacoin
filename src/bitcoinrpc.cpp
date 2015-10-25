@@ -11,6 +11,10 @@
 #include "bitcoinrpc.h"
 #include "db.h"
 
+#ifdef USE_EXTJS
+#include "index.h"
+#endif
+
 #undef printf
 #include <boost/asio.hpp>
 #include <boost/asio/ip/v6_only.hpp>
@@ -462,6 +466,7 @@ int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRe
     (void) fGet; // silence
     return ReadHTTP(stream, mapHeadersRet, strMessageRet);
 }
+
 
 int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRet, string& strMessageRet, bool& fGet)
 {
@@ -1058,9 +1063,23 @@ void ThreadRPCServer3(void* parg)
                 }
                 else
                 {
+#ifdef USE_EXTJS
+                    vector<unsigned char> data = vector<unsigned char>();
+                    if (!get_file(strRequest, data, strReplyType))
+                    {
+                        strReply = "Not found";
+                        strReplyType = "text/html";
+                        httpCode = HTTP_NOT_FOUND;
+                    }
+                    else
+                    {
+                        strReply.assign(data.begin(), data.end());
+                    }
+#else
                     strReply = "Not found";
                     strReplyType = "text/html";
                     httpCode = HTTP_NOT_FOUND;
+#endif
                 }
             }
             else

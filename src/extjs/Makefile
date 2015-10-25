@@ -29,43 +29,43 @@ OBJS = obj/ext-all-debug.js.o obj/ux-debug.js.o \
 
 
 obj/index.o: index.cpp
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+	$(CXX) -std=c++11 -c $(CXXFLAGS) -o $@ $<
 
 obj/ext-all-debug.js.o: ext-all-debug.js
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/ux-debug.js.o: ux-debug.js
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.js.o: resources/js/%.js
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.css.o: resources/css/%.css
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.ttf.o: resources/ttf/%.ttf
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.eot.o: resources/eot/%.eot
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.svg.o: resources/svg/%.svg.o
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.woff.o: resources/woff/%.woff
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.woff2.o: resources/woff2/%.woff2
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.otf.o: resources/otf/%.otf
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.svg.o: resources/svg/%.svg
-	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 all: $(OBJS:obj/%=obj/%)
-	$(AR) -rvs ExtJS.a obj/*.o
+	$(AR) -rcs libExtJS.a obj/*.o
 
 clean:
 	-rm -f obj/*.o
