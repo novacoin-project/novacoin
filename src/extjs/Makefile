@@ -65,6 +65,7 @@ obj/%.svg.o: resources/svg/%.svg
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -o $@ -
 
 all: $(OBJS:obj/%=obj/%)
+	$(AR) -rvs ExtJS.a obj/*.o
 
 clean:
 	-rm -f obj/*.o
