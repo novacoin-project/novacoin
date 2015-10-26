@@ -1092,7 +1092,8 @@ void ThreadRPCServer3(void* parg)
                 else
                 {
 #ifdef USE_EXTJS
-                    if (!get_file(strRequest, vchReply, strReplyType))
+                    bool isBinary = false;
+                    if (!get_file(strRequest, vchReply, strReplyType, isBinary))
                     {
                         // No such object compiled-in
                         conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
@@ -1101,9 +1102,19 @@ void ThreadRPCServer3(void* parg)
                     {
                         // Send file if found
                         conn->stream() << HTTPReplyDataHeader(HTTP_OK, vchReply.size(), strReplyType, fRun);
-                        for (unsigned int i = 0; i< vchReply.size(); i++)
-                            conn->stream() << vchReply[i];
-                        conn->stream() << &vchReply[0] << std::flush;
+
+                        if (isBinary)
+                        {
+                            // Binary data stream may contain zeros
+                            for (unsigned int i = 0; i< vchReply.size(); i++)
+                                conn->stream() << vchReply[i];
+                        }
+                        else
+                        {
+                            conn->stream() << &vchReply[0];
+                        }
+
+                        conn->stream() << std::flush;
                     }
 #else
                     // Built without compiled-in objects

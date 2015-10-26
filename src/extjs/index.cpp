@@ -109,7 +109,7 @@ pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[] =
 
 unsigned int extfs_items_len = 28;
 
-bool get_file(const string& path, vector<unsigned char>& data, string& mimeType)
+bool get_file(const string& path, vector<unsigned char>& data, string& mimeType, bool& isBinary)
 {
     for(unsigned int i = 0; i < extfs_items_len; i++)
     {
@@ -120,6 +120,7 @@ bool get_file(const string& path, vector<unsigned char>& data, string& mimeType)
         {
             data.assign(get<0>(extfs_items[i].second), get<0>(extfs_items[i].second) + get<1>(extfs_items[i].second));
             mimeType = get<2>(extfs_items[i].second);
+            isBinary = strstr(mimeType.c_str(), "text/") == NULL;
             return true;
         }
     }
