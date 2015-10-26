@@ -435,6 +435,7 @@ static string HTTPReplyDataHeader(int nStatus, size_t nSize, const string& strRe
             "Connection: %s\r\n"
             "Content-Length: %" PRIszu "\r\n"
             "Content-Type: %s\r\n"
+            "Cache-Control: max-age=86400, public\r\n"
             "Server: novacoin-json-rpc/%s\r\n"
             "\r\n",
         nStatus,
