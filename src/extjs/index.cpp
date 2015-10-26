@@ -33,6 +33,7 @@ extern unsigned char resources_ttf_fonts__OpenSans_Light_ttf[];
 extern unsigned char resources_js_classic__locale__locale_ukr_debug_js[];
 extern unsigned char resources_js_classic__locale__locale_ru_debug_js[];
 extern unsigned char resources_js_classic__locale__locale_en_debug_js[];
+extern unsigned char resources_favicon_ico[];
 
 extern unsigned int ux_debug_js_len;
 extern unsigned int ext_all_debug_js_len;
@@ -62,6 +63,7 @@ extern unsigned int resources_ttf_fonts__OpenSans_Light_ttf_len;
 extern unsigned int resources_js_classic__locale__locale_ukr_debug_js_len;
 extern unsigned int resources_js_classic__locale__locale_ru_debug_js_len;
 extern unsigned int resources_js_classic__locale__locale_en_debug_js_len;
+extern unsigned int resources_favicon_ico_len;
 
 pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[] = 
 {
@@ -78,6 +80,9 @@ pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[] =
     make_pair("/classic/locale/locale-en-debug.js",                           make_tuple(resources_js_classic__locale__locale_en_debug_js, resources_js_classic__locale__locale_ukr_debug_js_len, "text/javascript")),
     make_pair("/classic/locale/locale-ru-debug.js",                           make_tuple(resources_js_classic__locale__locale_ru_debug_js, resources_js_classic__locale__locale_ukr_debug_js_len, "text/javascript")),
     make_pair("/classic/locale/locale-ukr-debug.js",                          make_tuple(resources_js_classic__locale__locale_ukr_debug_js, resources_js_classic__locale__locale_ukr_debug_js_len, "text/javascript")),
+
+    // Icon
+    make_pair("/favicon.ico",                                                 make_tuple(resources_favicon_ico, resources_favicon_ico_len, "image/vnd.microsoft.icon")),
 
     // Fonts
     make_pair("/fonts/OpenSans-BoldItalic.ttf",                               make_tuple(resources_ttf_fonts__OpenSans_BoldItalic_ttf, resources_ttf_fonts__OpenSans_BoldItalic_ttf_len, "application/octet-stream")),
@@ -102,7 +107,7 @@ pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[] =
     make_pair("/font-ext/fonts/ExtJS.eot",                                    make_tuple(resources_eot_font_ext__fonts__ExtJS_eot, resources_eot_font_ext__fonts__ExtJS_eot_len, "application/vnd.ms-fontobject")),
 };
 
-unsigned int extfs_items_len = 27;
+unsigned int extfs_items_len = 28;
 
 bool get_file(const string& path, vector<unsigned char>& data, string& mimeType)
 {

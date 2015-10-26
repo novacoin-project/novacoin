@@ -25,11 +25,14 @@ OBJS = obj/ext-all-debug.js.o obj/ux-debug.js.o \
        obj/font-ext__fonts__ExtJS.svg.o \
        obj/font-ext__fonts__ExtJS.ttf.o \
        obj/font-ext__fonts__ExtJS.woff.o \
-       obj/index.o
+       obj/index.o obj/favicon.ico.o
 
 
 obj/index.o: index.cpp
 	$(CXX) -std=c++11 -c $(CXXFLAGS) -o $@ $<
+
+obj/favicon.ico.o: resources/favicon.ico
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/ext-all-debug.js.o: ext-all-debug.js
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -

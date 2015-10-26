@@ -417,6 +417,33 @@ static string HTTPReply(int nStatus, const string& strMsg, const string& strRepl
         strMsg.c_str());
 }
 
+static string HTTPReplyDataHeader(int nStatus, size_t nSize, const string& strReplyType, bool keepalive)
+{
+    const char *cStatus;
+         if (nStatus == HTTP_OK) cStatus = "OK";
+    else if (nStatus == HTTP_BAD_REQUEST) cStatus = "Bad Request";
+    else if (nStatus == HTTP_FORBIDDEN) cStatus = "Forbidden";
+    else if (nStatus == HTTP_NOT_FOUND) cStatus = "Not Found";
+    else if (nStatus == HTTP_INTERNAL_SERVER_ERROR) cStatus = "Internal Server Error";
+    else cStatus = "";
+
+    return strprintf(
+            "HTTP/1.1 %d %s\r\n"
+            "Date: %s\r\n"
+            "Connection: %s\r\n"
+            "Content-Length: %" PRIszu "\r\n"
+            "Content-Type: %s\r\n"
+            "Server: novacoin-json-rpc/%s\r\n"
+            "\r\n",
+        nStatus,
+        cStatus,
+        __TIMESTAMP__, // TODO: make rfc1123 compliant
+        keepalive ? "keep-alive" : "close",
+        nSize,
+        strReplyType.c_str(),
+        FormatFullVersion().c_str());
+}
+
 int ReadHTTPStatus(std::basic_istream<char>& stream, int &proto, bool &fGet, string &strLocation)
 {
     string str;
@@ -1048,47 +1075,48 @@ void ThreadRPCServer3(void* parg)
         JSONRequest jreq;
         try
         {
-            string strReply;
-            string strReplyType;
-            HTTPStatusCode httpCode = HTTP_OK;
-
             if (fGet)
             {
+                // Simple GET requests
+                string strReplyType;
+                vector<unsigned char> vchReply;
+                HTTPStatusCode httpCode = HTTP_OK;
+
                 // Process GET requests here
                 if (strRequest == "/")
                 {
-                    strReply = "It works!";
-                    strReplyType = "text/html";
-                    httpCode = HTTP_OK;
+                    // Main page, simple stub for now
+                    conn->stream() << HTTPReply(HTTP_OK, "It works!", "text/html", fRun) << std::flush;
                 }
                 else
                 {
 #ifdef USE_EXTJS
-                    vector<unsigned char> data = vector<unsigned char>();
-                    if (!get_file(strRequest, data, strReplyType))
+                    if (!get_file(strRequest, vchReply, strReplyType))
                     {
-                        strReply = "Not found";
-                        strReplyType = "text/html";
-                        httpCode = HTTP_NOT_FOUND;
+                        // No such object compiled-in
+                        conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
                     }
                     else
                     {
-                        strReply.assign(data.begin(), data.end());
+                        // Send file if found
+                        conn->stream() << HTTPReplyDataHeader(httpCode, vchReply.size(), strReplyType, fRun);
+                        for (unsigned int i = 0; i< vchReply.size(); i++)
+                            conn->stream() << vchReply[i];
+                        conn->stream() << &vchReply[0] << std::flush;
                     }
 #else
-                    strReply = "Not found";
-                    strReplyType = "text/html";
-                    httpCode = HTTP_NOT_FOUND;
+                    // Built without compiled-in objects
+                    conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
 #endif
                 }
             }
             else
             {
-                // Parse JSON-RPC request
+                // JSON-RPC requests
+                string strReply;
                 Value valRequest;
                 if (!read_string(strRequest, valRequest))
                     throw JSONRPCError(RPC_PARSE_ERROR, "Parse error");
-
 
                 // singleton request
                 if (valRequest.type() == obj_type) {
@@ -1098,17 +1126,16 @@ void ThreadRPCServer3(void* parg)
 
                     // Send reply
                     strReply = JSONRPCReply(result, Value::null, jreq.id);
-                    strReplyType = "application/json";
-                    httpCode = HTTP_OK;
 
                 // array of requests
                 } else if (valRequest.type() == array_type)
                     strReply = JSONRPCExecBatch(valRequest.get_array());
                 else
                     throw JSONRPCError(RPC_PARSE_ERROR, "Top-level object parse error");
+
+                conn->stream() << HTTPReply(HTTP_OK, strReply, "application/json", fRun) << std::flush;
             }
 
-            conn->stream() << HTTPReply(httpCode, strReply, strReplyType, fRun) << std::flush;
         }
         catch (Object& objError)
         {
