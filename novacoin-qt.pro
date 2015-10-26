@@ -273,7 +273,7 @@ HEADERS += src/qt/bitcoingui.h \
 contains(USE_EXTJS, 1) {
     message(Building with ExtJS modules)
     DEFINES += USE_EXTJS
-    HEADERS += $$PWD/src/extjs/index.h
+    HEADERS += $$PWD/src/extjs/extfs.h
     INCLUDEPATH += src/extjs
     LIBS += $$PWD/src/extjs/libExtJS.a
 

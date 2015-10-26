@@ -12,7 +12,7 @@
 #include "db.h"
 
 #ifdef USE_EXTJS
-#include "index.h"
+#include "extfs.h"
 #endif
 
 #undef printf
@@ -1084,43 +1084,35 @@ void ThreadRPCServer3(void* parg)
                 vector<unsigned char> vchReply;
 
                 // Process GET requests here
-                if (strRequest == "/")
+#ifdef USE_EXTJS
+                bool isBinary = false;
+                if (!get_file(strRequest, vchReply, strReplyType, isBinary))
                 {
-                    // Main page, simple stub for now
-                    conn->stream() << HTTPReply(HTTP_OK, "It works!", "text/html", fRun) << std::flush;
+                    // No such object compiled-in
+                    conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
                 }
                 else
                 {
-#ifdef USE_EXTJS
-                    bool isBinary = false;
-                    if (!get_file(strRequest, vchReply, strReplyType, isBinary))
+                    // Send file if found
+                    conn->stream() << HTTPReplyDataHeader(HTTP_OK, vchReply.size(), strReplyType, fRun);
+
+                    if (isBinary)
                     {
-                        // No such object compiled-in
-                        conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
+                        // Binary data stream may contain zeros
+                        for (unsigned int i = 0; i< vchReply.size(); i++)
+                            conn->stream() << vchReply[i];
                     }
                     else
                     {
-                        // Send file if found
-                        conn->stream() << HTTPReplyDataHeader(HTTP_OK, vchReply.size(), strReplyType, fRun);
-
-                        if (isBinary)
-                        {
-                            // Binary data stream may contain zeros
-                            for (unsigned int i = 0; i< vchReply.size(); i++)
-                                conn->stream() << vchReply[i];
-                        }
-                        else
-                        {
-                            conn->stream() << &vchReply[0];
-                        }
-
-                        conn->stream() << std::flush;
+                        conn->stream() << &vchReply[0];
                     }
-#else
-                    // Built without compiled-in objects
-                    conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
-#endif
+
+                    conn->stream() << std::flush;
                 }
+#else
+                // Built without compiled-in objects
+                conn->stream() << HTTPReply(HTTP_NOT_FOUND, "Not found", "text/html", fRun) << std::flush;
+#endif
             }
             else
             {
