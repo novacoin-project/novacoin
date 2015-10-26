@@ -419,6 +419,8 @@ static string HTTPReply(int nStatus, const string& strMsg, const string& strRepl
 
 static string HTTPReplyDataHeader(int nStatus, size_t nSize, const string& strReplyType, bool keepalive)
 {
+    static int64_t nTime = GetTime();
+
     const char *cStatus;
          if (nStatus == HTTP_OK) cStatus = "OK";
     else if (nStatus == HTTP_BAD_REQUEST) cStatus = "Bad Request";
@@ -437,7 +439,7 @@ static string HTTPReplyDataHeader(int nStatus, size_t nSize, const string& strRe
             "\r\n",
         nStatus,
         cStatus,
-        __TIMESTAMP__, // TODO: make rfc1123 compliant
+        DateTimeStrFormat("%a, %d %b %Y %H:%M:%S +0000", nTime).c_str(),
         keepalive ? "keep-alive" : "close",
         nSize,
         strReplyType.c_str(),
@@ -1098,7 +1100,7 @@ void ThreadRPCServer3(void* parg)
                     else
                     {
                         // Send file if found
-                        conn->stream() << HTTPReplyDataHeader(httpCode, vchReply.size(), strReplyType, fRun);
+                        conn->stream() << HTTPReplyDataHeader(HTTP_OK, vchReply.size(), strReplyType, fRun);
                         for (unsigned int i = 0; i< vchReply.size(); i++)
                             conn->stream() << vchReply[i];
                         conn->stream() << &vchReply[0] << std::flush;
