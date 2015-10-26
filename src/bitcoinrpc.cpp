@@ -1080,7 +1080,6 @@ void ThreadRPCServer3(void* parg)
                 // Simple GET requests
                 string strReplyType;
                 vector<unsigned char> vchReply;
-                HTTPStatusCode httpCode = HTTP_OK;
 
                 // Process GET requests here
                 if (strRequest == "/")
