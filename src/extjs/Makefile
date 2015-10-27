@@ -25,8 +25,8 @@ OBJS = obj/ext-all-debug.js.o obj/ux-debug.js.o \
        obj/font-ext__fonts__ExtJS.svg.o \
        obj/font-ext__fonts__ExtJS.ttf.o \
        obj/font-ext__fonts__ExtJS.woff.o \
+       obj/info.js.o \
        obj/extfs.o obj/favicon.ico.o obj/index.html.o
-
 
 obj/extfs.o: extfs.cpp
 	$(CXX) -std=c++11 -c $(CXXFLAGS) -o $@ $<
@@ -41,6 +41,9 @@ obj/ext-all-debug.js.o: ext-all-debug.js
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/ux-debug.js.o: ux-debug.js
+	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
+
+obj/info.js.o: forms/info.js
 	xxd -i $< | $(CXX) -x c++ -c $(CXXFLAGS) -static -o $@ -
 
 obj/%.js.o: resources/js/%.js

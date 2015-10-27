@@ -35,6 +35,7 @@ extern unsigned char resources_js_classic__locale__locale_ru_debug_js[];
 extern unsigned char resources_js_classic__locale__locale_en_debug_js[];
 extern unsigned char resources_favicon_ico[];
 extern unsigned char index_html[];
+extern unsigned char forms_info_js[];
 
 extern unsigned int ux_debug_js_len;
 extern unsigned int ext_all_debug_js_len;
@@ -66,6 +67,7 @@ extern unsigned int resources_js_classic__locale__locale_ru_debug_js_len;
 extern unsigned int resources_js_classic__locale__locale_en_debug_js_len;
 extern unsigned int resources_favicon_ico_len;
 extern unsigned int index_html_len;
+extern unsigned int forms_info_js_len;
 
 pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[31] = 
 {
@@ -108,23 +110,24 @@ pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[31] =
     make_pair("/font-ext/fonts/ExtJS.svg",                                    make_tuple(resources_svg_font_ext__fonts__ExtJS_svg, resources_svg_font_ext__fonts__ExtJS_svg_len, "image/svg+xml")),
     make_pair("/font-ext/fonts/ExtJS.eot",                                    make_tuple(resources_eot_font_ext__fonts__ExtJS_eot, resources_eot_font_ext__fonts__ExtJS_eot_len, "application/vnd.ms-fontobject")),
 
+    make_pair("/forms/info.js",                                               make_tuple(forms_info_js, forms_info_js_len, "text/javascript")),
     make_pair("/index.html",                                                  make_tuple(index_html, index_html_len, "text/html")),
 };
 
-unsigned int extfs_items_len = 30;
+unsigned int extfs_items_len = 31;
 
 bool get_file(const string& path, vector<unsigned char>& data, string& mimeType, bool& isBinary)
 {
     if (path == "/" || path == "/index.html")
     {
-        data.assign(get<0>(extfs_items[29].second), get<0>(extfs_items[29].second) + get<1>(extfs_items[29].second));
-        mimeType = get<2>(extfs_items[29].second);
+        data.assign(get<0>(extfs_items[30].second), get<0>(extfs_items[30].second) + get<1>(extfs_items[30].second));
+        mimeType = get<2>(extfs_items[30].second);
         isBinary = false;
 
         return true;
     }
 
-    for(unsigned int i = 0; i < extfs_items_len - 2; i++)
+    for(unsigned int i = 0; i < extfs_items_len - 1; i++)
     {
         if (path.size() < extfs_items[i].first.size())
             continue;
