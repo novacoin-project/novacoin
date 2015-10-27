@@ -13,9 +13,13 @@
     <link rel="stylesheet" type="text/css" href="/classic/theme-triton/resources/theme-triton-all-debug_2.css"/>
     <link rel="stylesheet" type="text/css" href="/ux/ux-all-debug.css"/>
 
+    <script type="text/javascript">
+        var request_id = 0;
+    </script>
+
     <!-- Forms -->
     <script type="text/javascript" src="/forms/info.js"></script>
-
+    <script type="text/javascript" src="/forms/peerinfo.js"></script>
 
     <style type="text/css">
         .x-panel-body p {
@@ -24,8 +28,6 @@
         }
     </style>
     <script type="text/javascript">
-        var request_id = 0;
-
         Ext.onReady(function(){
             var mainPanel = Ext.create('Ext.tab.Panel', {
                 title : 'Novacoin console',
@@ -34,9 +36,9 @@
                 renderTo : 'main'
             });
 
-
             mainPanel.add(InfoForm);
             loadInfo();
+            mainPanel.add(peergrid);
         });
     </script>
 </head>
