@@ -60,8 +60,8 @@ peergrid = new Ext.create('Ext.grid.Panel', {
     id: 'peergrid',
     title: 'Peer info',
     store: new Ext.data.JsonStore({
-            fields : peerfields,
-            data   : rpc_getpeerinfo()
+        fields : peerfields,
+        data   : rpc_getpeerinfo()
     }),
     columns: [
         {header: "Address", width: 100,dataIndex: 'addr', sortable: true},
