@@ -94,6 +94,7 @@ var InfoForm = Ext.create('Ext.form.Panel', {
     items: [
         {
             fieldLabel: 'Version',
+            htmlEncode: true,
             name: 'version',
         },
         {
@@ -184,7 +185,7 @@ var InfoForm = Ext.create('Ext.form.Panel', {
     buttons: [
         {
             xtype: 'button',
-            text: 'Process request',
+            text: 'Refresh',
             handler: loadInfo
         },
     ]

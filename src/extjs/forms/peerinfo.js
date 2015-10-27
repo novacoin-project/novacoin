@@ -34,7 +34,7 @@ function rpc_getpeerinfo()
 
 var peerfields = [
     {name : 'addr', type : 'string'},
-    {name : 'services', type : 'int'},
+    {name : 'services', type : 'string'},
     {name : 'lastsend', type : 'int'},
     {name : 'lastrecv', type : 'int'},
     {name : 'bytessent', type : 'int'},
@@ -49,6 +49,12 @@ var peerfields = [
     {name : 'banscore', type : 'int'},
 ];
 
+var timestampRenderer = function(value)
+{
+    var date = Ext.Date.parse(value, 'U');
+    return Ext.Date.format(date, 'd.m.Y, H:i:s');
+}
+
 var peergrid = null;
 peergrid = new Ext.create('Ext.grid.Panel', {
     id: 'peergrid',
@@ -60,14 +66,14 @@ peergrid = new Ext.create('Ext.grid.Panel', {
     columns: [
         {header: "Address", width: 100,dataIndex: 'addr', sortable: true},
         {header: "Services", dataIndex: 'services', sortable: true},
-        {header: "Last send", dataIndex: 'lastsend', sortable: true},
-        {header: "Last receive", dataIndex: 'lastrecv', sortable: true},
+        {header: "Last send", dataIndex: 'lastsend', renderer: timestampRenderer, sortable: true},
+        {header: "Last receive", dataIndex: 'lastrecv', renderer: timestampRenderer, sortable: true},
         {header: "Bytes sent", dataIndex: 'bytessent', sortable: true},
         {header: "Bytes received", dataIndex: 'bytesrecv', sortable: true},
-        {header: "Connection time", dataIndex: 'conntime', sortable: true},
+        {header: "Connection time", dataIndex: 'conntime', renderer: timestampRenderer, sortable: true},
         {header: "Version", dataIndex: 'version', sortable: true},
 
-        {header: "Subver", width: 100, dataIndex: 'subver', sortable: true},
+        {header: "Subver", width: 100, dataIndex: 'subver', renderer: Ext.util.Format.htmlEncode, sortable: true},
         {header: "Inbound", dataIndex: 'inbound', sortable: true},
         {header: "Release time", dataIndex: 'releasetime', sortable: true},
         {header: "Starting height", dataIndex: 'startingheight', sortable: true},
@@ -76,7 +82,7 @@ peergrid = new Ext.create('Ext.grid.Panel', {
     buttons: [
         {
             xtype: 'button',
-            text: 'Process request',
+            text: 'Refresh',
             handler: function() { peergrid.getStore().loadData(rpc_getpeerinfo()); }
         },
     ],
