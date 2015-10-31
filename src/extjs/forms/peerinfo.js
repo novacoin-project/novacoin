@@ -64,7 +64,7 @@ peergrid = new Ext.create('Ext.grid.Panel', {
         data   : rpc_getpeerinfo()
     }),
     columns: [
-        {header: "Address", width: 100,dataIndex: 'addr', sortable: true},
+        {header: "Address", width: 100, dataIndex: 'addr', sortable: true},
         {header: "Services", dataIndex: 'services', sortable: true},
         {header: "Last send", dataIndex: 'lastsend', renderer: timestampRenderer, sortable: true},
         {header: "Last receive", dataIndex: 'lastrecv', renderer: timestampRenderer, sortable: true},
@@ -74,7 +74,7 @@ peergrid = new Ext.create('Ext.grid.Panel', {
         {header: "Version", dataIndex: 'version', sortable: true},
 
         {header: "Subver", width: 100, dataIndex: 'subver', renderer: Ext.util.Format.htmlEncode, sortable: true},
-        {header: "Inbound", dataIndex: 'inbound', sortable: true},
+        {header: "Inbound", dataIndex: 'inbound', sortable: true, xtype: 'checkcolumn', processEvent: Ext.emptyFn},
         {header: "Release time", dataIndex: 'releasetime', sortable: true},
         {header: "Starting height", dataIndex: 'startingheight', sortable: true},
         {header: "Ban score", dataIndex: 'banscore', sortable: true}

@@ -13511,8 +13511,8 @@ body > .x-mask {
 }
 /* http://localhost:1843/classic/theme-neutral/sass/src/form/Labelable.scss:150 */
 .x-form-item-default.x-item-disabled {
-    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
-    opacity: 0.3;
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
+    opacity: 0.7;
 }
 /* http://localhost:1843/classic/theme-neutral/sass/src/form/Labelable.scss:188 */
 .x-autocontainer-form-item,

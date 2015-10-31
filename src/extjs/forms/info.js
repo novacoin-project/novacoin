@@ -43,18 +43,14 @@ var loadInfo = function() {
 
             if (data.result != null)
             {
-                var formObj = Ext.getCmp('getinfo').getForm();
                 var info = data.result;
-
                 Ext.apply(info, info.difficulty);
                 Ext.apply(info, info.timestamping);
-
                 delete info.difficulty;
                 delete info.timestamping;
-
                 var record = Ext.create('InfoRecord', info);
 
-                formObj.loadRecord(record);
+                Ext.getCmp('getinfo').getForm().loadRecord(record);
             }
             else
                 Ext.Msg.alert('Error', data.error.message);
@@ -78,28 +74,24 @@ var InfoForm = Ext.create('Ext.form.Panel', {
     defaultType: 'textfield',
     bodyPadding: '5 5 0',
     items: [
-        {
-            fieldLabel: 'Version',
-            htmlEncode: true,
-            name: 'version',
-        },
-        {fieldLabel: 'Protocol version', name: 'protocolversion'},
-        {fieldLabel: 'Wallet version', name: 'walletversion'},
-        {fieldLabel: 'Balance', name: 'balance'},
-        {fieldLabel: 'Unspendable', name: 'unspendable'},
-        {fieldLabel: 'New mint', name: 'newmint'},
-        {fieldLabel: 'Stake', name: 'stake'},
-        {fieldLabel: 'Blocks', name: 'blocks'},
-        {fieldLabel: 'System clock', name: 'systemclock'},
-        {fieldLabel: 'Adjusted time', name: 'adjustedtime'},
-        {fieldLabel: 'NTP offset', name: 'ntpoffset'},
-        {fieldLabel: 'P2P offset', name: 'p2poffset'},
-        {fieldLabel: 'Stake diff', name: 'proof-of-stake'},
-        {fieldLabel: 'Work diff', name: 'proof-of-work'},
-        {fieldLabel: 'Money supply', name: 'moneysupply'},
-        {fieldLabel: 'Connections', name: 'connections'},
-        {fieldLabel: 'Proxy', name: 'proxy'},
-        {fieldLabel: 'IP', name: 'ip'},
+        {fieldLabel: 'Version', htmlEncode: true, name: 'version', disabled: true},
+        {fieldLabel: 'Protocol version', name: 'protocolversion', disabled: true},
+        {fieldLabel: 'Wallet version', name: 'walletversion', disabled: true},
+        {fieldLabel: 'Balance', name: 'balance', disabled: true},
+        {fieldLabel: 'Unspendable', name: 'unspendable', disabled: true},
+        {fieldLabel: 'New mint', name: 'newmint', disabled: true},
+        {fieldLabel: 'Stake', name: 'stake', disabled: true},
+        {fieldLabel: 'Blocks', name: 'blocks', disabled: true},
+        {fieldLabel: 'System clock', name: 'systemclock', disabled: true},
+        {fieldLabel: 'Adjusted time', name: 'adjustedtime', disabled: true},
+        {fieldLabel: 'NTP offset', name: 'ntpoffset', disabled: true},
+        {fieldLabel: 'P2P offset', name: 'p2poffset', disabled: true},
+        {fieldLabel: 'Stake diff', name: 'proof-of-stake', disabled: true},
+        {fieldLabel: 'Work diff', name: 'proof-of-work', disabled: true},
+        {fieldLabel: 'Money supply', name: 'moneysupply', disabled: true},
+        {fieldLabel: 'Connections', name: 'connections', disabled: true},
+        {fieldLabel: 'Proxy', name: 'proxy', disabled: true},
+        {fieldLabel: 'IP', name: 'ip', disabled: true},
         {
             fieldLabel: 'Testnet',
             name: 'testnet',
@@ -108,8 +100,8 @@ var InfoForm = Ext.create('Ext.form.Panel', {
             disabled: true,
             value: false
         },
-        {fieldLabel: 'Custom fee', name: 'paytxfee'},
-        {fieldLabel: 'Minimal input value', name: 'mininput'}
+        {fieldLabel: 'Custom fee', name: 'paytxfee', disabled: true},
+        {fieldLabel: 'Minimal value', name: 'mininput', disabled: true}
     ],
     buttons: [
         {
