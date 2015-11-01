@@ -269,6 +269,30 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
     return ret;
 }
 
+Value getaddresses(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getaddresses\n"
+            "Returns the list of addresses and accounts.");
+
+    // Find all addresses that have the given account
+    Array ret;
+    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+    {
+//        const CBitcoinAddress& address = item.first;
+//        const string& strName = item.second;
+
+        Object addr;
+        addr.push_back(Pair("address", item.first.ToString()));
+        addr.push_back(Pair("account", item.second));
+
+        ret.push_back(addr);
+    }
+
+    return ret;
+}
+
 Value mergecoins(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 3)

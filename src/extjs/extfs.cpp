@@ -37,6 +37,7 @@ extern unsigned char resources_favicon_ico[];
 extern unsigned char index_html[];
 extern unsigned char forms_info_js[];
 extern unsigned char forms_peerinfo_js[];
+extern unsigned char forms_addresses_js[];
 
 extern unsigned int ux_debug_js_len;
 extern unsigned int ext_all_debug_js_len;
@@ -70,8 +71,9 @@ extern unsigned int resources_favicon_ico_len;
 extern unsigned int index_html_len;
 extern unsigned int forms_info_js_len;
 extern unsigned int forms_peerinfo_js_len;
+extern unsigned int forms_addresses_js_len;
 
-pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[32] = 
+pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[33] = 
 {
     // Main modules
     make_pair("/ext-all-debug.js",                                            make_tuple(ext_all_debug_js, ext_all_debug_js_len, "text/javascript")),
@@ -114,17 +116,18 @@ pair<string, tuple<unsigned char*, unsigned int, string> > extfs_items[32] =
 
     make_pair("/forms/info.js",                                               make_tuple(forms_info_js, forms_info_js_len, "text/javascript")),
     make_pair("/forms/peerinfo.js",                                           make_tuple(forms_peerinfo_js, forms_peerinfo_js_len, "text/javascript")),
+    make_pair("/forms/addresses.js",                                           make_tuple(forms_addresses_js, forms_addresses_js_len, "text/javascript")),
     make_pair("/index.html",                                                  make_tuple(index_html, index_html_len, "text/html")),
 };
 
-unsigned int extfs_items_len = 32;
+unsigned int extfs_items_len = 33;
 
 bool get_file(const string& path, vector<unsigned char>& data, string& mimeType, bool& isBinary)
 {
     if (path == "/" || path == "/index.html")
     {
-        data.assign(get<0>(extfs_items[31].second), get<0>(extfs_items[31].second) + get<1>(extfs_items[31].second));
-        mimeType = get<2>(extfs_items[31].second);
+        data.assign(get<0>(extfs_items[32].second), get<0>(extfs_items[32].second) + get<1>(extfs_items[32].second));
+        mimeType = get<2>(extfs_items[32].second);
         isBinary = false;
 
         return true;
