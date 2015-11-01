@@ -49,20 +49,22 @@ var peerfields = [
     {name : 'banscore', type : 'int'},
 ];
 
-var timestampRenderer = function(value)
+function timestampRenderer(value)
 {
     var date = Ext.Date.parse(value, 'U');
     return Ext.Date.format(date, 'd.m.Y, H:i:s');
+}
+
+function LoadPeerInfo()
+{
+    peergrid.getStore().loadData(rpc_getpeerinfo());
 }
 
 var peergrid = null;
 peergrid = new Ext.create('Ext.grid.Panel', {
     id: 'peergrid',
     title: 'Peer info',
-    store: new Ext.data.JsonStore({
-        fields : peerfields,
-        data   : rpc_getpeerinfo()
-    }),
+    store: new Ext.data.JsonStore({fields : peerfields, data   : []}),
     columns: [
         {header: "Address", width: 100, dataIndex: 'addr', sortable: true},
         {header: "Services", dataIndex: 'services', sortable: true},
@@ -79,11 +81,14 @@ peergrid = new Ext.create('Ext.grid.Panel', {
         {header: "Starting height", dataIndex: 'startingheight', sortable: true},
         {header: "Ban score", dataIndex: 'banscore', sortable: true}
     ],
+    listeners: {
+        activate: LoadPeerInfo
+    },
     buttons: [
         {
             xtype: 'button',
             text: 'Refresh',
-            handler: function() { peergrid.getStore().loadData(rpc_getpeerinfo()); }
+            handler: LoadPeerInfo
         },
     ],
     layout: 'fit'

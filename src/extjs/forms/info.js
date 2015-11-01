@@ -103,6 +103,9 @@ var InfoForm = Ext.create('Ext.form.Panel', {
         {fieldLabel: 'Custom fee', name: 'paytxfee', disabled: true},
         {fieldLabel: 'Minimal value', name: 'mininput', disabled: true}
     ],
+    listeners: {
+        activate: loadInfo
+    },
     buttons: [
         {
             xtype: 'button',
