@@ -1,37 +1,3 @@
-function rpc_getpeerinfo()
-{
-    var req = {
-      id: request_id++,
-      jsonrpc: '2.0',
-      method: 'getpeerinfo',
-      params: []
-    };
-
-    var reqResult = null;
-
-    Ext.Ajax.request({
-        url : '/',
-        async: false,
-        method: 'POST',
-        jsonData: Ext.encode(req),
-
-        success: function(response) {
-            var data = Ext.decode(response.responseText);
-
-            if (data.result != null)
-                reqResult = data.result;
-            else
-                Ext.Msg.alert('Error', data.error.message);
-        },
-
-        failure: function(response) {
-            Ext.Msg.alert('Error', response.responseText);
-        }
-    });
-
-    return reqResult;
-}
-
 var peerfields = [
     {name : 'addr', type : 'string'},
     {name : 'services', type : 'string'},
@@ -57,14 +23,40 @@ function timestampRenderer(value)
 
 function LoadPeerInfo()
 {
-    peergrid.getStore().loadData(rpc_getpeerinfo());
+    var req = {
+      id: request_id++,
+      jsonrpc: '2.0',
+      method: 'getpeerinfo',
+      params: []
+    };
+
+    var reqResult = null;
+
+    Ext.Ajax.request({
+        url : '/',
+        async: false,
+        method: 'POST',
+        jsonData: Ext.encode(req),
+
+        success: function(response) {
+            var data = Ext.decode(response.responseText);
+
+            if (data.result != null)
+                Ext.getCmp('peergrid').getStore().loadData(data.result);
+            else
+                Ext.Msg.alert('Error', data.error.message);
+        },
+
+        failure: function(response) {
+            Ext.Msg.alert('Error', response.responseText);
+        }
+    });
 }
 
-var peergrid = null;
-peergrid = new Ext.create('Ext.grid.Panel', {
+var peergrid = new Ext.create('Ext.grid.Panel', {
     id: 'peergrid',
     title: 'Peer info',
-    store: new Ext.data.JsonStore({fields : peerfields, data   : []}),
+    store: new Ext.data.JsonStore({fields: peerfields, data: []}),
     columns: [
         {header: "Address", width: 100, dataIndex: 'addr', sortable: true},
         {header: "Services", dataIndex: 'services', sortable: true},
