@@ -27,7 +27,8 @@ Ext.define('InfoRecord', {
     ]
 });
 
-var loadInfo = function() {
+function loadInfo()
+{
     Ext.Ajax.request({
         url : '/',
         method: 'POST',
@@ -59,6 +60,31 @@ var loadInfo = function() {
         }
     });
 };
+
+function SetTxFee(strTxFee)
+{
+    Ext.Ajax.request({
+        url : '/',
+        method: 'POST',
+        jsonData: Ext.encode({
+            id: request_id++,
+            jsonrpc: '2.0',
+            method: 'settxfee',
+            params: [parseFloat(strTxFee)]
+        }),
+        success: function(response) {
+            var data = Ext.decode(response.responseText);
+
+            if (data.error == null)
+                loadInfo();
+            else
+                Ext.Msg.alert('Error', data.error.message);
+        },
+        failure: function(response) {
+            Ext.Msg.alert('Error', response.responseText);
+        }
+    });
+}
 
 var InfoForm = Ext.create('Ext.form.Panel', {
     id: 'getinfo',
@@ -106,6 +132,19 @@ var InfoForm = Ext.create('Ext.form.Panel', {
         activate: loadInfo
     },
     buttons: [
+        {
+            xtype: 'button',
+            text: 'Set tx fee',
+            handler: function() {
+                Ext.Msg.prompt('New fee', 'Additional fee to be included into your transactions', function(btn, text)
+                {
+                    if (btn == 'ok')
+                    {
+                        SetTxFee(text);
+                    }
+                }, this, false, Ext.getCmp('getinfo').getForm().findField("paytxfee").getValue());
+            }
+        },
         {
             xtype: 'button',
             text: 'Refresh',
