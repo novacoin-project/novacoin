@@ -14,7 +14,6 @@ function LoadAddressInfo()
 
     Ext.Ajax.request({
         url : '/',
-        async: false,
         method: 'POST',
         jsonData: Ext.encode(req),
 
@@ -44,7 +43,6 @@ function NewAddress(strAddrLabel)
 
     Ext.Ajax.request({
         url : '/',
-        async: false,
         method: 'POST',
         jsonData: Ext.encode(req),
 
@@ -74,7 +72,6 @@ function SetLabel(strAddress, strLabel)
 
     Ext.Ajax.request({
         url : '/',
-        async: false,
         method: 'POST',
         jsonData: Ext.encode(req),
 

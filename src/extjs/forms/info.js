@@ -30,7 +30,6 @@ Ext.define('InfoRecord', {
 var loadInfo = function() {
     Ext.Ajax.request({
         url : '/',
-        async: false,
         method: 'POST',
         jsonData: Ext.encode({
             id: request_id++,

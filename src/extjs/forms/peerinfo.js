@@ -34,7 +34,6 @@ function LoadPeerInfo()
 
     Ext.Ajax.request({
         url : '/',
-        async: false,
         method: 'POST',
         jsonData: Ext.encode(req),
 
