@@ -107,8 +107,6 @@ var addressesgrid = new Ext.create('Ext.grid.Panel', {
         activate: LoadAddressInfo,
         celldblclick: function(ctx, td, cellIndex, record, tr, rowIndex, e, eOptions)
         {
-            // console.log(record);
-
             Ext.Msg.prompt('New label for ' + record.data.address, 'Please enter new label', function(btn, text)
             {
                 if (btn == 'ok')

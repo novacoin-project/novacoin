@@ -276,13 +276,9 @@ Value getaddresses(const Array& params, bool fHelp)
             "getaddresses\n"
             "Returns the list of addresses and accounts.");
 
-    // Find all addresses that have the given account
     Array ret;
     BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
     {
-//        const CBitcoinAddress& address = item.first;
-//        const string& strName = item.second;
-
         Object addr;
         addr.push_back(Pair("address", item.first.ToString()));
         addr.push_back(Pair("account", item.second));
