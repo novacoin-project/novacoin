@@ -102,17 +102,17 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;삭제</translation>
     </message>
     <message>
-        <location filename="../addressbookpage.cpp" line="+65"/>
+        <location filename="../addressbookpage.cpp" line="+66"/>
         <source>Copy &amp;Label</source>
         <translation>표 복사</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>&amp;Edit</source>
         <translation>편집&amp;</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+248"/>
         <source>Export Address Book Data</source>
         <translation type="unfinished"/>
     </message>
@@ -2635,7 +2635,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+208"/>
+        <location filename="../walletmodel.cpp" line="+212"/>
         <source>Sending...</source>
         <translation type="unfinished"/>
     </message>
@@ -2643,7 +2643,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+173"/>
+        <location filename="../bitcoinstrings.cpp" line="+171"/>
         <source>BlackCoin version</source>
         <translation type="unfinished"/>
     </message>
@@ -2668,7 +2668,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>커맨드 도움말</translation>
     </message>
     <message>
-        <location line="-147"/>
+        <location line="-145"/>
         <source>Options:</source>
         <translation>옵션:</translation>
     </message>
@@ -2753,7 +2753,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>이상행동 네트워크 참여자의 연결을 차단시키기 위한 한계치 (기본값: 100)</translation>
     </message>
@@ -2763,12 +2763,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>이상행동을 하는 네트워크 참여자들을 다시 연결시키는데 걸리는 시간 (기본값: 86400초)</translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-35"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>IPv4 감청을 위한 RPC 포트 %u번을 설정중 오류가 발생했습니다: %s</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+62"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation type="unfinished"/>
     </message>
@@ -2788,7 +2788,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>테스트 네트워크 사용</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>외부 접속을 승인합니다</translation>
     </message>
@@ -2798,7 +2798,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+93"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation type="unfinished"/>
     </message>
@@ -2808,17 +2808,17 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>경고: -paytxfee값이 너무 큽니다! 이 값은 송금할때 지불할 송금 수수료입니다.</translation>
     </message>
     <message>
-        <location line="-104"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+130"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
         <translation type="unfinished"/>
     </message>
@@ -2833,7 +2833,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>블록 생성 옵션:</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Connect only to the specified node(s)</source>
         <translation>지정된 노드에만 연결하기</translation>
     </message>
@@ -2843,17 +2843,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="-92"/>
-        <source>Sync checkpoints policy (default: strict)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="+90"/>
+        <location line="-2"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation type="unfinished"/>
     </message>
@@ -2873,12 +2868,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+30"/>
         <source>Prepend debug output with timestamp</source>
         <translation type="unfinished"/>
     </message>
@@ -2908,18 +2903,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>클라이언트 시작시 debug.log 파일 비우기(기본값: 디버그 안할때 1)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-41"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>밀리초 단위로 연결 제한시간을 설정하십시오(기본값: 5000)</translation>
     </message>
     <message>
-        <location line="+116"/>
-        <source>Unable to sign checkpoint, wrong checkpointkey?
-</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+28"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation type="unfinished"/>
     </message>
@@ -2929,12 +2918,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-25"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Username for JSON-RPC connections</source>
         <translation>JSON-RPC 연결에 사용할 사용자 이름</translation>
     </message>
@@ -2944,7 +2933,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation type="unfinished"/>
     </message>
@@ -2974,17 +2963,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+2"/>
-        <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="+1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>경고: 이 버전이 오래되어 업그레이드가 필요합니다!</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-52"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat 파일이 손상되었고 복구가 실패하였습니다.</translation>
     </message>
@@ -2994,7 +2978,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>JSON-RPC 연결에 사용할 암호</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-47"/>
         <source>Connect through SOCKS5 proxy</source>
         <translation type="unfinished"/>
     </message>
@@ -3004,7 +2988,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation type="unfinished"/>
     </message>
@@ -3094,7 +3078,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Keep at most &lt;n&gt; MiB of unconnectable blocks in memory (default: %u)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>JSON-RPC 연결에 OpenSSL(https) 사용</translation>
     </message>
@@ -3119,7 +3108,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+20"/>
         <source>Error loading block database</source>
         <translation type="unfinished"/>
     </message>
@@ -3129,7 +3118,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+16"/>
         <source>Error: Disk space is low!</source>
         <translation type="unfinished"/>
     </message>
@@ -3139,32 +3128,27 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+3"/>
-        <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="-174"/>
+        <location line="-168"/>
         <source>This help message</source>
         <translation>도움말 메시지입니다</translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>이 컴퓨터의 %s에 바인딩할 수 없습니다 (바인딩 과정에 %d 오류 발생, %s)</translation>
     </message>
     <message>
-        <location line="-131"/>
+        <location line="-129"/>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
         <translation>-addnode, -seednode, -connect 옵션에 대해 DNS 탐색 허용</translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+125"/>
         <source>Loading addresses...</source>
         <translation>주소를 불러오는 중...</translation>
     </message>
@@ -3189,7 +3173,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>wallet.dat 불러오기 에러</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-15"/>
         <source>Invalid -proxy address: &apos;%s&apos;</source>
         <translation>잘못된 -proxy 주소입니다: &apos;%s&apos;</translation>
     </message>
@@ -3214,7 +3198,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>-paytxfee=&lt;amount&gt;에 대한 양이 잘못되었습니다: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+58"/>
         <source>Sending...</source>
         <translation type="unfinished"/>
     </message>
@@ -3234,17 +3218,17 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>블럭 인덱스를 불러오는 중...</translation>
     </message>
     <message>
-        <location line="-111"/>
+        <location line="-109"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+124"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="-102"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation type="unfinished"/>
     </message>
@@ -3259,12 +3243,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+14"/>
         <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
         <translation type="unfinished"/>
     </message>
@@ -3289,7 +3268,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+15"/>
         <source>Loading wallet...</source>
         <translation>지갑을 불러오는 중...</translation>
     </message>
@@ -3314,12 +3293,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>로딩 완료</translation>
     </message>
     <message>
-        <location line="-161"/>
+        <location line="-159"/>
         <source>To use the %s option</source>
         <translation>%s 옵션을 사용하려면</translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+186"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>

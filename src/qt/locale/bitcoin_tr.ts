@@ -109,17 +109,17 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
         <translation>&amp;Sil</translation>
     </message>
     <message>
-        <location filename="../addressbookpage.cpp" line="+65"/>
+        <location filename="../addressbookpage.cpp" line="+66"/>
         <source>Copy &amp;Label</source>
         <translation>&amp;Etiketi Kopyala</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>&amp;Edit</source>
         <translation>&amp;Düzenle</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+248"/>
         <source>Export Address Book Data</source>
         <translation>Adres Defteri Verisini Dışarı Aktar</translation>
     </message>
@@ -2656,7 +2656,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+208"/>
+        <location filename="../walletmodel.cpp" line="+212"/>
         <source>Sending...</source>
         <translation>Gönderiyor...</translation>
     </message>
@@ -2664,7 +2664,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+173"/>
+        <location filename="../bitcoinstrings.cpp" line="+171"/>
         <source>BlackCoin version</source>
         <translation>BlackCoin versiyonu</translation>
     </message>
@@ -2689,7 +2689,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <translation>Bir komut için yardım al</translation>
     </message>
     <message>
-        <location line="-147"/>
+        <location line="-145"/>
         <source>Options:</source>
         <translation>Seçenekler:</translation>
     </message>
@@ -2784,7 +2784,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>DNS araması ile eş adresleri her zaman sorgula (varsayılan: 0)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>Aksaklık gösteren eşlerle bağlantıyı kesme sınırı (varsayılan: 100)</translation>
     </message>
@@ -2794,12 +2794,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Aksaklık gösteren eşlerle yeni bağlantıları engelleme süresi, saniye olarak (varsayılan: 86400)</translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-35"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>IPv4 üzerinde dinlemek için %u numaralı RPC portunun kurulumu sırasında hata meydana geldi: %s</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+62"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation>&lt;port&gt; üzerinde JSON-RPC bağlantılarını dinle (varsayılan: 15715 veya testnet: 25715)</translation>
     </message>
@@ -2819,7 +2819,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Deneme şebekesini kullan</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>Dışarıdan gelen bağlantıları kabul et (varsayılan: -proxy veya -connect yoksa 1)</translation>
     </message>
@@ -2829,7 +2829,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>IPv6 üzerinde dinlemek için %u numaralı RPC portu kurulurken bir hata meydana geldi, IPv4&apos;e dönülüyor: %s</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+93"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>Bayt olarak yüksek öncelikli/düşük ücretli işlemlerin maksimum boyutunu belirle (varsayılan: 27000)</translation>
     </message>
@@ -2839,17 +2839,17 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Uyarı: -paytxfee çok yüksek bir değere ayarlanmış! Bu, bir işlem gönderdiğiniz takdirde ödeyeceğiniz ücrettir.</translation>
     </message>
     <message>
-        <location line="-104"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation>Uyarı: Lütfen bilgisayarınızın tarih ve saatinin doğru olduğunu kontrol ediniz! Saatiniz yanlış ise, BlackCoin düzgün çalışmayacaktır.</translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+130"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Uyarı: wallet.dat dosyasının okunması sırasında bir hata meydana geldi! Tüm anahtarlar doğru bir şekilde okundu, ancak işlem verileri ya da adres defteri girdileri hatalı veya eksik olabilir.</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
         <translation>Uyarı: wallet.dat bozuk, veriler geri kazanıldı! Orijinal wallet.dat, wallet.{zamandamgası}.bak olarak %s klasörüne kaydedildi; bakiyeniz ya da işlemleriniz yanlışsa bir yedekten tekrar yüklemelisiniz.</translation>
     </message>
@@ -2864,7 +2864,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Blok oluşturma seçenekleri:</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Sadece belirtilen düğüme veya düğümlere bağlan</translation>
     </message>
@@ -2874,17 +2874,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Kendi IP adresini keşfet (varsayılan: dinlenildiğinde ve -externalip yoksa 1)</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Herhangi bir portun dinlenmesi başarısız oldu. Bunu istiyorsanız -listen=0 seçeneğini kullanınız.</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <source>Sync checkpoints policy (default: strict)</source>
-        <translation>Kontrol noktası politikasını senkronize et (varsayılan: sıkı)</translation>
-    </message>
-    <message>
-        <location line="+90"/>
+        <location line="-2"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Geçersiz -tor adresi: &apos;%s&apos;</translation>
     </message>
@@ -2904,12 +2899,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Bağlantı başına azami yollama tamponu, &lt;n&gt;*1000 bayt (varsayılan: 1000)</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>Sadece &lt;net&gt; şebekesindeki düğümlere bağlan (IPv4, IPv6 ya da Tor)</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+30"/>
         <source>Prepend debug output with timestamp</source>
         <translation>Tarih bilgisini, hata ayıklama çıktısının başına ekle</translation>
     </message>
@@ -2939,19 +2934,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>İstemci başlatıldığında debug.log dosyasını küçült (varsayılan: -debug bulunmadığında 1)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-41"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>Bağlantı zaman aşım süresini milisaniye olarak belirt (varsayılan: 5000)</translation>
     </message>
     <message>
-        <location line="+116"/>
-        <source>Unable to sign checkpoint, wrong checkpointkey?
-</source>
-        <translation>Kontrol noktası imzalanamadı, bu bir hatalı kontrol noktası anahtarı mı?
-</translation>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+28"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Dinlenecek portu haritalamak için UPnP kullan (varsayılan: 0)</translation>
     </message>
@@ -2961,12 +2949,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Dinlenecek portu haritalamak için UPnP kullan (varsayılan: dinlenildiğinde 1)</translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-25"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>Tor gizli servisine erişim için vekil sunucu kullan (varsayılan: -proxy ile aynı)</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Username for JSON-RPC connections</source>
         <translation>JSON-RPC bağlantıları için kullanıcı ismi</translation>
     </message>
@@ -2976,7 +2964,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Veritabanı bütünlüğü doğrulanıyor...</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation>Hata: Cüzdan kilitli, işlem yaratılamıyor!</translation>
     </message>
@@ -3006,17 +2994,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Bilgi</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
-        <translation>UYARI: senkronize edilen kontrol noktası ihlali tespit edildi ancak atlandı!</translation>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="+1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Uyarı: Bu sürüm çok eskidir, güncellemeniz gerekir!</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-52"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat bozuk, geri kazanım başarısız oldu</translation>
     </message>
@@ -3026,7 +3009,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>JSON-RPC bağlantıları için parola</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-47"/>
         <source>Connect through SOCKS5 proxy</source>
         <translation type="unfinished"/>
     </message>
@@ -3036,7 +3019,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Diğer devrelerle saati senkronize et. Sisteminizdeki saat doğru ise devre dışı bırakın, örn: NTC ile senkronize etme (varsayılan: 1)</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation>İşlem yaratırken, bundan daha küçük değere sahip girdileri yok say (varsayılan: 0.01)</translation>
     </message>
@@ -3126,7 +3109,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Harici blk000?.dat dosyasından blok içeri aktar</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Keep at most &lt;n&gt; MiB of unconnectable blocks in memory (default: %u)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>JSON-RPC bağlantıları için OpenSSL (https) kullan</translation>
     </message>
@@ -3151,7 +3139,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Başlangıç uygunluk kontrolü başarısız oldu. BlackCoin kapatılıyor.</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+20"/>
         <source>Error loading block database</source>
         <translation type="unfinished"/>
     </message>
@@ -3161,7 +3149,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Hata: Cüzdanın kilidi sadece pay almak için açılmıştır, işlem yaratılamıyor.</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+16"/>
         <source>Error: Disk space is low!</source>
         <translation>Uyarı: Disk alanı düşük!</translation>
     </message>
@@ -3171,32 +3159,27 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Bu bir ön test sürümüdür - kullanım riski size aittir - madencilik veya ticari uygulamalarda kullanmayın</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
-        <translation>UYARI: Geçersiz kontrol noktası bulundu! Görüntülenen işlemler doğru olmayabilir! Güncelleme yapmanız veya geliştiricilere haber vermeniz gerekebilir.</translation>
-    </message>
-    <message>
-        <location line="-174"/>
+        <location line="-168"/>
         <source>This help message</source>
         <translation>Bu yardım mesajı</translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>Cüzdan %s, veri klasörü %s dışında yer alıyor.</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>Bu bilgisayarda %s unsuruna bağlanılamadı. (bind şu hatayı iletti: %d, %s)</translation>
     </message>
     <message>
-        <location line="-131"/>
+        <location line="-129"/>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
         <translation>-addnode, -seednode ve -connect için DNS aramalarına izin ver</translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+125"/>
         <source>Loading addresses...</source>
         <translation>Adresler yükleniyor...</translation>
     </message>
@@ -3221,7 +3204,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>wallet.dat dosyasının yüklenmesinde hata oluştu</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-15"/>
         <source>Invalid -proxy address: &apos;%s&apos;</source>
         <translation>Geçersiz -proxy adresi: &apos;%s&apos;</translation>
     </message>
@@ -3246,7 +3229,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>-paytxfee=&lt;meblağ&gt; için geçersiz meblağ: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+58"/>
         <source>Sending...</source>
         <translation>Gönderiyor...</translation>
     </message>
@@ -3266,17 +3249,17 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Blok indeksi yükleniyor...</translation>
     </message>
     <message>
-        <location line="-111"/>
+        <location line="-109"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Bağlanılacak düğüm ekle ve bağlantıyı zinde tutmaya çalış</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+124"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>Bu bilgisayarda %s bağlanamadı. BlackCoin muhtemelen halen çalışmaktadır.</translation>
     </message>
     <message>
-        <location line="-102"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Gönderdiğiniz işleme eklenmek üzere KB başına ücret</translation>
     </message>
@@ -3291,12 +3274,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Başlangıçta kontrol edilecek blok sayısı (varsayılan: 500, 0 = tümü)</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
-        <translation>En fazla &lt;n&gt; bağlanılamayan bloğu bellekte tut (varsayılan: %u)</translation>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+14"/>
         <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
         <translation>Kabul edilebilir şifre kodları (varsayılan: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</translation>
     </message>
@@ -3321,7 +3299,7 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Cüzdan veritabanı ortamı %s başlatılmaya çalışılırken hata oluştu!</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+15"/>
         <source>Loading wallet...</source>
         <translation>Cüzdan yükleniyor...</translation>
     </message>
@@ -3346,12 +3324,12 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
         <translation>Yükleme tamamlandı</translation>
     </message>
     <message>
-        <location line="-161"/>
+        <location line="-159"/>
         <source>To use the %s option</source>
         <translation>%s seçeneğini kullanmak için</translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+186"/>
         <source>Error</source>
         <translation>Hata</translation>
     </message>

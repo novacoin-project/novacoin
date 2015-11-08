@@ -102,17 +102,17 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>&amp;Cancella</translation>
     </message>
     <message>
-        <location filename="../addressbookpage.cpp" line="+65"/>
+        <location filename="../addressbookpage.cpp" line="+66"/>
         <source>Copy &amp;Label</source>
         <translation>Copia &amp;l&apos;etichetta</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>&amp;Edit</source>
         <translation>&amp;Modifica</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+248"/>
         <source>Export Address Book Data</source>
         <translation type="unfinished"/>
     </message>
@@ -2636,7 +2636,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+208"/>
+        <location filename="../walletmodel.cpp" line="+212"/>
         <source>Sending...</source>
         <translation type="unfinished"/>
     </message>
@@ -2644,7 +2644,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+173"/>
+        <location filename="../bitcoinstrings.cpp" line="+171"/>
         <source>BlackCoin version</source>
         <translation type="unfinished"/>
     </message>
@@ -2671,7 +2671,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 </translation>
     </message>
     <message>
-        <location line="-147"/>
+        <location line="-145"/>
         <source>Options:</source>
         <translation>Opzioni:
 </translation>
@@ -2758,7 +2758,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>Soglia di disconnessione dei peer di cattiva qualità (predefinita: 100)</translation>
     </message>
@@ -2768,12 +2768,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Numero di secondi di sospensione che i peer di cattiva qualità devono trascorrere prima di riconnettersi (predefiniti: 86400)</translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-35"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>Errore riscontrato durante l&apos;impostazione della porta RPC %u per l&apos;ascolto su IPv4: %s</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+62"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation type="unfinished"/>
     </message>
@@ -2796,7 +2796,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
 </translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>Accetta connessioni dall&apos;esterno (predefinito: 1 se no -proxy o -connect)</translation>
     </message>
@@ -2806,7 +2806,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Errore riscontrato durante l&apos;impostazione della porta RPC %u per l&apos;ascolto su IPv6, tornando su IPv4: %s</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+93"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation type="unfinished"/>
     </message>
@@ -2816,17 +2816,17 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Attenzione: -paytxfee è molto alta. Questa è la commissione che si paga quando si invia una transazione.</translation>
     </message>
     <message>
-        <location line="-104"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+130"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Attenzione: errore di lettura di wallet.dat!  Tutte le chiave lette correttamente, ma i dati delle transazioni o le voci in rubrica potrebbero mancare o non essere corretti.</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
         <translation>Attenzione: wallet.dat corrotto, dati salvati! Il wallet.dat originale salvato come wallet.{timestamp}.bak in %s; se il tuo bilancio o le transazioni non sono corrette dovresti ripristinare da un backup.</translation>
     </message>
@@ -2841,7 +2841,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Opzioni creazione blocco:</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Connetti solo al nodo specificato</translation>
     </message>
@@ -2851,17 +2851,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Scopri proprio indirizzo IP (predefinito: 1 se in ascolto e no -externalip)</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Impossibile mettersi in ascolto su una porta. Usa -listen=0 se vuoi usare questa opzione.</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <source>Sync checkpoints policy (default: strict)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="+90"/>
+        <location line="-2"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation type="unfinished"/>
     </message>
@@ -2881,12 +2876,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Buffer di invio massimo per connessione, &lt;n&gt;*1000 byte (predefinito: 1000)</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>Connetti solo a nodi nella rete &lt;net&gt; (IPv4, IPv6 o Tor)</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+30"/>
         <source>Prepend debug output with timestamp</source>
         <translation type="unfinished"/>
     </message>
@@ -2916,18 +2911,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Riduci il file debug.log all&apos;avvio del client (predefinito: 1 se non impostato -debug)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-41"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>Specifica il timeout di connessione in millisecondi (predefinito: 5000)</translation>
     </message>
     <message>
-        <location line="+116"/>
-        <source>Unable to sign checkpoint, wrong checkpointkey?
-</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+28"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Usa UPnP per mappare la porta in ascolto (predefinito: 0)</translation>
     </message>
@@ -2937,12 +2926,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Usa UPnP per mappare la porta in ascolto (predefinito: 1 when listening)</translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-25"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Username for JSON-RPC connections</source>
         <translation>Nome utente per connessioni JSON-RPC
 </translation>
@@ -2953,7 +2942,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation type="unfinished"/>
     </message>
@@ -2983,17 +2972,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+2"/>
-        <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="+1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Attenzione: questa versione è obsoleta, aggiornamento necessario!</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-52"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat corrotto, salvataggio fallito</translation>
     </message>
@@ -3004,7 +2988,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
 </translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-47"/>
         <source>Connect through SOCKS5 proxy</source>
         <translation type="unfinished"/>
     </message>
@@ -3014,7 +2998,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation type="unfinished"/>
     </message>
@@ -3106,7 +3090,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Keep at most &lt;n&gt; MiB of unconnectable blocks in memory (default: %u)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>Utilizzare OpenSSL (https) per le connessioni  JSON-RPC
 </translation>
@@ -3132,7 +3121,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+20"/>
         <source>Error loading block database</source>
         <translation type="unfinished"/>
     </message>
@@ -3142,7 +3131,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+16"/>
         <source>Error: Disk space is low!</source>
         <translation type="unfinished"/>
     </message>
@@ -3152,34 +3141,29 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+3"/>
-        <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="-174"/>
+        <location line="-168"/>
         <source>This help message</source>
         <translation>Questo messaggio di aiuto
 </translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>Impossibile collegarsi alla %s su questo computer (bind returned error %d, %s)</translation>
     </message>
     <message>
-        <location line="-131"/>
+        <location line="-129"/>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
         <translation>Consenti ricerche DNS per aggiungere nodi e collegare
 </translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+125"/>
         <source>Loading addresses...</source>
         <translation>Caricamento indirizzi...</translation>
     </message>
@@ -3204,7 +3188,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Errore caricamento wallet.dat</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-15"/>
         <source>Invalid -proxy address: &apos;%s&apos;</source>
         <translation>Indirizzo -proxy non valido: &apos;%s&apos;</translation>
     </message>
@@ -3229,7 +3213,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Importo non valido per -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+58"/>
         <source>Sending...</source>
         <translation type="unfinished"/>
     </message>
@@ -3249,17 +3233,17 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Caricamento dell&apos;indice del blocco...</translation>
     </message>
     <message>
-        <location line="-111"/>
+        <location line="-109"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Elérendő csomópont megadása and attempt to keep the connection open</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+124"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="-102"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation type="unfinished"/>
     </message>
@@ -3274,12 +3258,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+14"/>
         <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
         <translation type="unfinished"/>
     </message>
@@ -3304,7 +3283,7 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation type="unfinished"/>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+15"/>
         <source>Loading wallet...</source>
         <translation>Caricamento portamonete...</translation>
     </message>
@@ -3329,12 +3308,12 @@ for example: alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@fo
         <translation>Caricamento completato</translation>
     </message>
     <message>
-        <location line="-161"/>
+        <location line="-159"/>
         <source>To use the %s option</source>
         <translation>Per usare la opzione %s</translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+186"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>

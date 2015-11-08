@@ -109,17 +109,17 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>删除(&amp;D)</translation>
     </message>
     <message>
-        <location filename="../addressbookpage.cpp" line="+65"/>
+        <location filename="../addressbookpage.cpp" line="+66"/>
         <source>Copy &amp;Label</source>
         <translation>复制标签(&amp;L)</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>&amp;Edit</source>
         <translation>编辑(&amp;E)</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+248"/>
         <source>Export Address Book Data</source>
         <translation>导出地址簿数据</translation>
     </message>
@@ -2649,7 +2649,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+208"/>
+        <location filename="../walletmodel.cpp" line="+212"/>
         <source>Sending...</source>
         <translation>正在发送</translation>
     </message>
@@ -2657,7 +2657,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+173"/>
+        <location filename="../bitcoinstrings.cpp" line="+171"/>
         <source>BlackCoin version</source>
         <translation>黑币客户端 版本</translation>
     </message>
@@ -2684,7 +2684,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 </translation>
     </message>
     <message>
-        <location line="-147"/>
+        <location line="-145"/>
         <source>Options:</source>
         <translation>选项：
 </translation>
@@ -2781,7 +2781,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>总是通过DNS查询节点的地址（默认值：0）</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>断开出现问题节点阀值（缺省: 100）</translation>
     </message>
@@ -2791,12 +2791,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>Number of seconds to keep misbehaving peers from reconnecting (缺省: 86400)</translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-35"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>设置RPC监听端口%u时发生错误, IPv4:%s</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+62"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation>监听 &lt;port&gt; 端口的JSON-RPC连接 (默认: 15715 测试网: 25715)</translation>
     </message>
@@ -2820,7 +2820,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
 </translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>接受来自外部的连接 (缺省: 如果不带 -proxy or -connect 参数设置为1)</translation>
     </message>
@@ -2830,7 +2830,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>在IPv6模式下设置RPC监听端口 %u 失败，返回到IPv4模式: %s</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+93"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>设置高优先度/低手续费交易的最大字节数 (默认: 27000)</translation>
     </message>
@@ -2840,17 +2840,17 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>警告：-paytxfee 交易费设置得太高了！每笔交易都将支付交易费。</translation>
     </message>
     <message>
-        <location line="-104"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation>警告：请确认您计算机的本地时间。如果时钟错误，黑币客户端将不能正常工作。</translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+130"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>警告：钱包文件wallet.dat读取失败！最重要的公钥、私钥数据都没有问题，但是交易记录或地址簿数据不正确，或者存在数据丢失。</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
         <translation>警告：钱包文件wallet.dat损坏! 原始的钱包文件已经备份到%s目录下并重命名为{timestamp}.bak 。如果您的账户余额或者交易记录不正确，请使用您的钱包备份文件恢复。</translation>
     </message>
@@ -2865,7 +2865,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>数据块创建选项：</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Connect only to the specified node(s)</source>
         <translation>仅连接到指定节点</translation>
     </message>
@@ -2875,17 +2875,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>发现自己的IP地址(缺省:不带 -externalip 参数监听时设置为1)</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>监听端口失败。请使用 -listen=0 参数。</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <source>Sync checkpoints policy (default: strict)</source>
-        <translation>同步检测点政策 (默认：严格)</translation>
-    </message>
-    <message>
-        <location line="+90"/>
+        <location line="-2"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>无效的 -tor 地址: &apos;%s&apos;</translation>
     </message>
@@ -2905,12 +2900,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>每个连接的最大发送缓存，&lt;n&gt;*1000 字节(缺省：1000)</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>仅连接至指定网络的节点&lt;net&gt;(IPv4, IPv6 或者 Tor)</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+30"/>
         <source>Prepend debug output with timestamp</source>
         <translation>将时间信息加入调试输出中</translation>
     </message>
@@ -2940,18 +2935,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>客户端启动时压缩debug.log文件(缺省：no-debug模式时为1)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-41"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>设置连接超时时间(缺省：5000毫秒)</translation>
     </message>
     <message>
-        <location line="+116"/>
-        <source>Unable to sign checkpoint, wrong checkpointkey?
-</source>
-        <translation>无法为记录点签名，错误的记录点密钥。</translation>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+28"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>使用UPnP映射监听端口 (缺省: 0)</translation>
     </message>
@@ -2961,12 +2950,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>使用UPnp映射监听端口(缺省: 监听状态设为1)</translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-25"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>开启代理以使用隐藏服务 (默认: 和-proxy设置相同)</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Username for JSON-RPC connections</source>
         <translation>JSON-RPC 连接用户名</translation>
     </message>
@@ -2976,7 +2965,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>正在检查数据库完整性...</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation>错误：钱包已锁定，无法创建交易。</translation>
     </message>
@@ -3006,17 +2995,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>信息</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
-        <translation>警告：检测到同步记录点错误，已跳过。</translation>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="+1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>警告：该软件版本已过时，请升级！</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-52"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>钱包文件wallet.dat损坏，抢救备份失败</translation>
     </message>
@@ -3027,7 +3011,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
 </translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-47"/>
         <source>Connect through SOCKS5 proxy</source>
         <translation type="unfinished"/>
     </message>
@@ -3037,7 +3021,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>自动和其它节点同步时间。如果本地计算机世界是准确的，建议关闭。(默认: 1)</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation>创建交易时自动忽略该值以下的数额 (默认：0.01)</translation>
     </message>
@@ -3128,7 +3112,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>从外部 blk000?.dat 文件导入区块</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Keep at most &lt;n&gt; MiB of unconnectable blocks in memory (default: %u)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>为 JSON-RPC 连接使用 OpenSSL (https) 连接</translation>
     </message>
@@ -3155,7 +3144,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>初始化完整性检查失败。 黑币客户端即将关闭。</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+20"/>
         <source>Error loading block database</source>
         <translation type="unfinished"/>
     </message>
@@ -3165,7 +3154,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>错误：无法创建交易，已解锁的钱包仅用于权益累积。</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+16"/>
         <source>Error: Disk space is low!</source>
         <translation>警告：磁盘空间低。</translation>
     </message>
@@ -3175,33 +3164,28 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>这是一个预发布测试版本 - 风险须自行承担 - 不适用于挖矿或商家应用</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
-        <translation>警告：发现无效的记录点。所显示的交易信息未必正确！请升级客户端或联系开发者。</translation>
-    </message>
-    <message>
-        <location line="-174"/>
+        <location line="-168"/>
         <source>This help message</source>
         <translation>本帮助信息
 </translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>钱包 %s 位于数据目录 %s 之外.</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>无法绑定本机端口 %s  (返回错误消息 %d, %s)</translation>
     </message>
     <message>
-        <location line="-131"/>
+        <location line="-129"/>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
         <translation>使用 -addnode, -seednode 和 -connect 选项时允许查询DNS</translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+125"/>
         <source>Loading addresses...</source>
         <translation>正在加载地址簿...</translation>
     </message>
@@ -3226,7 +3210,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>wallet.dat 钱包文件加载出错</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-15"/>
         <source>Invalid -proxy address: &apos;%s&apos;</source>
         <translation>无效的代理地址：%s</translation>
     </message>
@@ -3251,7 +3235,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>非法金额 -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+58"/>
         <source>Sending...</source>
         <translation>正在发送</translation>
     </message>
@@ -3271,17 +3255,17 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>正在加载数据块索引...</translation>
     </message>
     <message>
-        <location line="-111"/>
+        <location line="-109"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>添加节点并与其保持连接</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+124"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>无法绑定到该计算机上的 %s. 黑币客户端可能已在运行中。</translation>
     </message>
     <message>
-        <location line="-102"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>每kB交易所支付的手续费</translation>
     </message>
@@ -3296,12 +3280,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>启动时检测的区块数量 (默认: 2500, 0表示检测全部)</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
-        <translation>在内存中保留至少 &lt;n&gt; 无法连接的区块 (默认: %u)</translation>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+14"/>
         <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
         <translation>可用加密算法 (默认: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</translation>
     </message>
@@ -3326,7 +3305,7 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>初始化钱包数据库环境%s时出现错误！</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+15"/>
         <source>Loading wallet...</source>
         <translation>正在加载钱包...</translation>
     </message>
@@ -3351,12 +3330,12 @@ alertnotify=echo %%s | mail -s &quot;BlackCoin Alert&quot; admin@foo.com
         <translation>加载完成</translation>
     </message>
     <message>
-        <location line="-161"/>
+        <location line="-159"/>
         <source>To use the %s option</source>
         <translation>使用 %s 选项</translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+186"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>

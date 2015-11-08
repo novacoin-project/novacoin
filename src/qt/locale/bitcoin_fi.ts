@@ -110,17 +110,17 @@ Tämä tuote sisältää OpenSSL-projektin kehittämää ohjelmistoa OpenSSL-ty�
         <translation>&amp;Poista</translation>
     </message>
     <message>
-        <location filename="../addressbookpage.cpp" line="+65"/>
+        <location filename="../addressbookpage.cpp" line="+66"/>
         <source>Copy &amp;Label</source>
         <translation>Kopioi &amp;nimike</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>&amp;Edit</source>
         <translation>&amp;Muokkaa</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+248"/>
         <source>Export Address Book Data</source>
         <translation>Vie osoitekirja</translation>
     </message>
@@ -1200,12 +1200,12 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     <message>
         <location line="-57"/>
         <source>Connect to the BlackCoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
-        <translation type="unfinished"/>
+        <translation>Yhdistä Blackcoin-verkkoon SOCKS5-välityspalvelimen kautta (esim. kun yhdistetään Tor:lla).</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;Connect through SOCKS5 proxy:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Yhdistä SOCKS5-välityspalvelimen kautta:</translation>
     </message>
     <message>
         <location line="+90"/>
@@ -2656,7 +2656,7 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+208"/>
+        <location filename="../walletmodel.cpp" line="+212"/>
         <source>Sending...</source>
         <translation>Lähetetään...</translation>
     </message>
@@ -2664,7 +2664,7 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
 <context>
     <name>bitcoin-core</name>
     <message>
-        <location filename="../bitcoinstrings.cpp" line="+173"/>
+        <location filename="../bitcoinstrings.cpp" line="+171"/>
         <source>BlackCoin version</source>
         <translation>BlackCoinin versio</translation>
     </message>
@@ -2689,7 +2689,7 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
         <translation>Hanki apua käskylle</translation>
     </message>
     <message>
-        <location line="-147"/>
+        <location line="-145"/>
         <source>Options:</source>
         <translation>Asetukset:</translation>
     </message>
@@ -2781,7 +2781,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Pyydä aina vertaistesi osoitteita DNS-kyselyn avulla (oletus: 0)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Threshold for disconnecting misbehaving peers (default: 100)</source>
         <translation>Kynnysarvo irtautumiselle epäilyttävistä vertaisista (oletus: 100)</translation>
     </message>
@@ -2791,12 +2791,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Sekunteina aika, kuinka kauan estetään epäilyttävien vertaisten uudelleenyhdistysyritykset (oletus: 86400)</translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-35"/>
         <source>An error occurred while setting up the RPC port %u for listening on IPv4: %s</source>
         <translation>Virhe avattaessa RPC-porttia %u kuunneltavaksi IPv4-osoitteessa: %s</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+62"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
         <translation>Kuuntele JSON-RPC-yhteyksiä portissa &lt;port&gt; (oletus: 15715 tai testiverkko: 25715)</translation>
     </message>
@@ -2816,7 +2816,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Käytä testiverkkoa</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-23"/>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation>Hyväksy yhteydet ulkomaailmasta (vakioasetus: 1 jos -proxy tai -connect ei ole määritetty)</translation>
     </message>
@@ -2826,7 +2826,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Virhe kohdattu määritettäessä RPC-porttia %u IPv6-osoitteelle, palataan takaisin IPv4:n käyttöön: %s</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+93"/>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)</source>
         <translation>Aseta suurin mahdollinen koko korkean prioriteetin/pienen siirtokulun rahansiirroille tavuina (oletus: 27000)</translation>
     </message>
@@ -2836,17 +2836,17 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Varoitus: -paytxfee on asetettu erittäin korkeaksi! Tämä on maksukulu jonka tulet maksamaan kun lähetät siirron.</translation>
     </message>
     <message>
-        <location line="-104"/>
+        <location line="-103"/>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong BlackCoin will not work properly.</source>
         <translation>Varoitus: Tarkista, että tietokoneesi aika ja päivämäärä ovat oikeassa! Jos kellosi on väärässä, BlackCoin ei toimi oikein.</translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+130"/>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Varoitus: Virhe luettaessa wallet.dat-tiedostoa! Kaikki avaimet luettiin oikein, mutta rahansiirtodata tai osoitekirjan kentät voivat olla puuttuvat tai väärät.</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
         <translation>Varoitus: wallet.dat-tiedosto on korruptoitunut, data pelastettu! Alkuperäinen wallet.dat on tallennettu nimellä wallet.{aikaleima}.bak kohteeseen %s; Jos saldosi tai rahansiirrot ovat väärät, sinun tulee palauttaa lompakko varmuuskopiosta.</translation>
     </message>
@@ -2861,7 +2861,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Lohkon luonnin asetukset:</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Connect only to the specified node(s)</source>
         <translation>Yhdistä vain määritettyihin solmukohtiin</translation>
     </message>
@@ -2871,17 +2871,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Paljasta oma IP-osoite (vakioasetus: 1 kun kuuntelemassa ja ei -externalip)</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+101"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Kuuntelu ei onnistunut missään portissa. Käytä -listen=0 jos haluat tätä.</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <source>Sync checkpoints policy (default: strict)</source>
-        <translation>Synkronoi tallennuspisteiden käytännöt (oletus: strict)</translation>
-    </message>
-    <message>
-        <location line="+90"/>
+        <location line="-2"/>
         <source>Invalid -tor address: &apos;%s&apos;</source>
         <translation>Epäkelpo -tor-osoite: &apos;%s&apos;</translation>
     </message>
@@ -2901,12 +2896,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Suurin lähetyspuskuri yksittäiselle yhteydelle, &lt;n&gt;*1000 tavua (vakioasetus: 1000)</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-16"/>
         <source>Only connect to nodes in network &lt;net&gt; (IPv4, IPv6 or Tor)</source>
         <translation>Yhdistä vain solmukohtiin verkossa &lt;net&gt; (IPv4, IPv6 tai Tor)</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+30"/>
         <source>Prepend debug output with timestamp</source>
         <translation>Lisää debug-tulosteiden alkuun aikaleimat</translation>
     </message>
@@ -2936,19 +2931,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Pienennä debug.log tiedosto käynnistyksen yhteydessä (vakioasetus: 1 kun ei -debug)</translation>
     </message>
     <message>
-        <location line="-42"/>
+        <location line="-41"/>
         <source>Specify connection timeout in milliseconds (default: 5000)</source>
         <translation>Määritä yhteyden aikakataisu millisekunneissa (vakioasetus: 5000)</translation>
     </message>
     <message>
-        <location line="+116"/>
-        <source>Unable to sign checkpoint, wrong checkpointkey?
-</source>
-        <translation>Ei voitu kirjata tallennuspistettä, väärä checkpointkey?
-</translation>
-    </message>
-    <message>
-        <location line="-87"/>
+        <location line="+28"/>
         <source>Use UPnP to map the listening port (default: 0)</source>
         <translation>Käytä UPnP:tä kuunneltavan portin avaamiseen (vakioasetus: 0)</translation>
     </message>
@@ -2958,12 +2946,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Käytä UPnP:tä kuunneltavan portin avaamiseen (vakioasetus: 1 kun kuuntelemassa)</translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-25"/>
         <source>Use proxy to reach tor hidden services (default: same as -proxy)</source>
         <translation>Käytä välityspalvelinta saavuttaaksesi tor:n piilotetut palvelut (oletus: sama kuin -proxy)</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Username for JSON-RPC connections</source>
         <translation>Käyttäjätunnus JSON-RPC-yhteyksille</translation>
     </message>
@@ -2973,7 +2961,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Tarkistetaan tietokannan eheyttä...</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation>Virhe: Lompakko lukittu, rahansiirron luonti epäonnistui!</translation>
     </message>
@@ -3003,17 +2991,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Tietoa</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>WARNING: syncronized checkpoint violation detected, but skipped!</source>
-        <translation>VAROITUS: synkronoidun tallennuspisteen rikkomista havaittu, mutta ohitettu!</translation>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="+1"/>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Varoitus: Tämä versio on vanhentunut, päivitys tarpeen!</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-52"/>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat on korruptoitunut, pelastusyritys epäonnistui</translation>
     </message>
@@ -3023,9 +3006,9 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Salasana JSON-RPC-yhteyksille</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location line="-47"/>
         <source>Connect through SOCKS5 proxy</source>
-        <translation type="unfinished"/>
+        <translation>Yhdistä SOCKS5-välityspalvelimen kautta</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -3033,7 +3016,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Synkronoi kellonaika muiden solmukohtien kanssa. Poista käytöstä, jos järjestelmäsi aika on tarkka esim. päivittää itsensä NTP-palvelimelta. (oletus: 1)</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
         <source>When creating transactions, ignore inputs with value less than this (default: 0.01)</source>
         <translation>Rahansiirtoja luodessa jätä huomioimatta syötteet joiden arvo on vähemmän kuin tämä (oletus: 0.01)</translation>
     </message>
@@ -3123,7 +3106,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Tuo lohkoja erillisestä blk000?.dat-tiedostosta</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Keep at most &lt;n&gt; MiB of unconnectable blocks in memory (default: %u)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation>Käytä OpenSSL-protokollaa (https) JSON-RPC-yhteyksille</translation>
     </message>
@@ -3140,7 +3128,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
     <message>
         <location line="+5"/>
         <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
-        <translation type="unfinished"/>
+        <translation>Virhe: Ei tuettu socks-peruste löytyi. SOCKS:n version asettaminen ei ole enää mahdollista, vain SOCKS5-välityspalvelimet ovat tuettuja.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3148,9 +3136,9 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Käyttöönottotarkistus epäonnistui. BlackCoin-asiakasohjelma suljetaan.</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+20"/>
         <source>Error loading block database</source>
-        <translation type="unfinished"/>
+        <translation>Virhe ladattessa lohkotietokantaa</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -3158,7 +3146,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Virhe: Lompakko avattu vain osakkuutta varten, rahansiirtoja ei voida luoda.</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+16"/>
         <source>Error: Disk space is low!</source>
         <translation>Virhe: Levytila on vähissä!</translation>
     </message>
@@ -3168,32 +3156,27 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Tämä on esijulkaistu testikäännös - käytä omalla vastuulla - älä käytä louhintaan tai kaupankäyntisovellutuksiin</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers.</source>
-        <translation>VAROITUS: Epäkelpo tarkistuspiste löydetty! Ilmoitetut varojensiirrot eivät välttämättä pidä paikkaansa! Sinun täytyy päivittää asiakasohjelma tai ilmoittaa kehittäjille ongelmasta.</translation>
-    </message>
-    <message>
-        <location line="-174"/>
+        <location line="-168"/>
         <source>This help message</source>
         <translation>Tämä ohjeviesti</translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+104"/>
         <source>Wallet %s resides outside data directory %s.</source>
         <translation>Lompakko %s on datahakemiston %s ulkopuolella.</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Unable to bind to %s on this computer (bind returned error %d, %s)</source>
         <translation>Kytkeytyminen %s tällä tietokonella ei onnistu (kytkeytyminen tulosti virheen %d, %s)</translation>
     </message>
     <message>
-        <location line="-131"/>
+        <location line="-129"/>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
         <translation>Salli DNS kyselyt -addnode, -seednode ja -connect yhteydessä</translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+125"/>
         <source>Loading addresses...</source>
         <translation>Ladataan osoitteita...</translation>
     </message>
@@ -3218,7 +3201,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Virhe ladattaessa wallet.dat-tiedostoa</translation>
     </message>
     <message>
-        <location line="-16"/>
+        <location line="-15"/>
         <source>Invalid -proxy address: &apos;%s&apos;</source>
         <translation>Epäkelpo välityspalvelimen osoite: &apos;%s&apos;</translation>
     </message>
@@ -3243,7 +3226,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>-paytxfee=&lt;amount&gt;: &apos;%s&apos; on virheellinen</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+58"/>
         <source>Sending...</source>
         <translation>Lähetetään...</translation>
     </message>
@@ -3263,17 +3246,17 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Ladataan lohkoindeksiä...</translation>
     </message>
     <message>
-        <location line="-111"/>
+        <location line="-109"/>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Linää solmu mihin liittyä pitääksesi yhteyden auki</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+124"/>
         <source>Unable to bind to %s on this computer. BlackCoin is probably already running.</source>
         <translation>Ei voitu liittää %s tällä tietokoneella. BlackCoin-asiakasohjelma on jo ehkä päällä.</translation>
     </message>
     <message>
-        <location line="-102"/>
+        <location line="-101"/>
         <source>Fee per KB to add to transactions you send</source>
         <translation>Rahansiirtopalkkio kilotavua kohden lähetettäviin rahansiirtoihisi</translation>
     </message>
@@ -3288,12 +3271,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Kuinka monta lohkoa tarkistetaan käynnistyksen yhteydessä (oletus: 500, 0 = kaikki)</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Keep at most &lt;n&gt; unconnectable blocks in memory (default: %u)</source>
-        <translation>Pidä enintään &lt;n&gt; saantikelvotonta lohkoa muistissa (oletus: %u)</translation>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+14"/>
         <source>Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</source>
         <translation>Hyväksyttävät salaukset (oletus: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)</translation>
     </message>
@@ -3318,7 +3296,7 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Virhe alustettaessa lompakon tietokantaympäristöä %s!</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+15"/>
         <source>Loading wallet...</source>
         <translation>Ladataan lompakkoa...</translation>
     </message>
@@ -3343,12 +3321,12 @@ On myös suositeltavaa asettaa alertnotify jolloin olet tiedotettu ongelmista; e
         <translation>Ladattu</translation>
     </message>
     <message>
-        <location line="-161"/>
+        <location line="-159"/>
         <source>To use the %s option</source>
         <translation>Käyttääksesi %s vaihtoehtoa</translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+186"/>
         <source>Error</source>
         <translation>Virhe</translation>
     </message>
