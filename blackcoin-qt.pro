@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = blackcoin-qt
-VERSION = 1.2.0
+VERSION = 1.2.1
 INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
