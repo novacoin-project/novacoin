@@ -414,7 +414,6 @@ OTHER_FILES += \
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     windows:BOOST_LIB_SUFFIX = -mgw44-mt-1_53
-    macx:BOOST_LIB_SUFFIX = -mt
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -422,23 +421,23 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
 }
 
 isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /opt/local/lib/db60/
+    macx:BDB_LIB_PATH = /usr/local/BerkeleyDB.6.1/lib
 }
 
 isEmpty(OPENSSL_LIB_PATH) {
-    macx:OPENSSL_LIB_PATH = /opt/local/lib
+    macx:OPENSSL_LIB_PATH = /usr/local/ssl/lib
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -6.0
+    macx:BDB_LIB_SUFFIX = -6.1
 }
 
 isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /opt/local/include/db60
+    macx:BDB_INCLUDE_PATH = /usr/local/BerkeleyDB.6.1/include
 }
 
 isEmpty(OPENSSL_INCLUDE_PATH) {
-    macx:OPENSSL_INCLUDE_PATH = /opt/local/include/
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/ssl/include
 }
 
 isEmpty(BOOST_LIB_PATH) {
