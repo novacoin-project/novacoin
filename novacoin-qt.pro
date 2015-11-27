@@ -4,16 +4,22 @@ VERSION = 0.7.5
 INCLUDEPATH += src src/json src/qt
 QT += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
 CONFIG += no_include_pwd
 CONFIG += thread
 CONFIG += static
+
+freebsd-g++: QMAKE_TARGET.arch = $$QMAKE_HOST.arch
+linux-g++: QMAKE_TARGET.arch = $$QMAKE_HOST.arch
+linux-g++-32: QMAKE_TARGET.arch = i686
+linux-g++-64: QMAKE_TARGET.arch = x86_64
+win32-g++-cross: QMAKE_TARGET.arch = $$TARGET_PLATFORM
 
 # for boost 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
 # use: BOOST_THREAD_LIB_SUFFIX=_win32-...
-# or when linking against a specific BerkelyDB version: BDB_LIB_SUFFIX=-4.8
+# or when linking against a specific BerkelyDB version: BDB_LIB_SUFFIX=-6.1
 
 # Dependency library locations can be customized with:
 #    BOOST_INCLUDE_PATH, BOOST_LIB_PATH, BDB_INCLUDE_PATH,
@@ -26,8 +32,6 @@ CONFIG += static
 #BDB_LIB_PATH=C:/deps/db-6.0.20/build_unix
 #OPENSSL_INCLUDE_PATH=C:/deps/openssl-1.0.1j/include
 #OPENSSL_LIB_PATH=C:/deps/openssl-1.0.1j
-#MINIUPNPC_INCLUDE_PATH=C:/deps/
-#MINIUPNPC_LIB_PATH=C:/deps/miniupnpc
 #QRENCODE_INCLUDE_PATH=C:/deps/qrencode-3.4.4
 #QRENCODE_LIB_PATH=C:/deps/qrencode-3.4.4/.libs
 
@@ -37,8 +41,9 @@ UI_DIR = build
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
-    # Mac: compile for maximum compatibility (10.5, 32-bit)
-    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+    macx:QMAKE_CXXFLAGS += -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -mmacosx-version-min=10.7
+    macx:QMAKE_CFLAGS += -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -mmacosx-version-min=10.7
+    macx:QMAKE_OBJECTIVE_CFLAGS += -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -mmacosx-version-min=10.7
 
     !windows:!macx {
         # Linux: static link
@@ -57,31 +62,6 @@ QMAKE_LFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
 
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 win32:QMAKE_LFLAGS += -static-libgcc -static-libstdc++
-
-# use: qmake "USE_QRCODE=1"
-# libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
-contains(USE_QRCODE, 1) {
-    message(Building with QRCode support)
-    DEFINES += USE_QRCODE
-    LIBS += -lqrencode
-}
-
-# use: qmake "USE_UPNP=1" ( enabled by default; default)
-#  or: qmake "USE_UPNP=0" (disabled by default)
-#  or: qmake "USE_UPNP=-" (not supported)
-# miniupnpc (http://miniupnp.free.fr/files/) must be installed for support
-contains(USE_UPNP, -) {
-    message(Building without UPNP support)
-} else {
-    message(Building with UPNP support)
-    count(USE_UPNP, 0) {
-        USE_UPNP=1
-    }
-    DEFINES += USE_UPNP=$$USE_UPNP STATICLIB MINIUPNP_STATICLIB
-    INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
-    LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
-    win32:LIBS += -liphlpapi
-}
 
 # use: qmake "USE_DBUS=1"
 contains(USE_DBUS, 1) {
@@ -136,12 +116,41 @@ contains(USE_LEVELDB, 1) {
     SOURCES += src/txdb-bdb.cpp
 }
 
+
+# use: qmake "USE_ASM=1"
 contains(USE_ASM, 1) {
-    message(Using optimized scrypt core implementation)
-    SOURCES += src/scrypt-arm.S src/scrypt-x86.S src/scrypt-x86_64.S
+    message(Using assembler scrypt & sha256 implementations)
+    DEFINES += USE_ASM
+
+     contains(QMAKE_TARGET.arch, i386) | contains(QMAKE_TARGET.arch, i586) | contains(QMAKE_TARGET.arch, i686) {
+        message("x86 platform, setting -msse2 & -mssse3 flags")
+
+        QMAKE_CXXFLAGS += -msse2 -mssse3
+        QMAKE_CFLAGS += -msse2 -mssse3
+    }
+
+    contains(QMAKE_TARGET.arch, x86_64) | contains(QMAKE_TARGET.arch, amd64) {
+        message("x86_64 platform, setting -mssse3 flag")
+
+        QMAKE_CXXFLAGS += -mssse3
+        QMAKE_CFLAGS += -mssse3
+    }
+
+
+    SOURCES += src/crypto/scrypt/asm/scrypt-arm.S src/crypto/scrypt/asm/scrypt-x86.S src/crypto/scrypt/asm/scrypt-x86_64.S src/crypto/scrypt/asm/asm-wrapper.cpp
+    SOURCES += src/crypto/sha2/asm/sha2-arm.S src/crypto/sha2/asm/sha2-x86.S src/crypto/sha2/asm/sha2-x86_64.S
 } else {
-    message(Using generic scrypt core implementation)
-    SOURCES += src/scrypt-generic.c
+    # use: qmake "USE_SSE2=1"
+    contains(USE_SSE2, 1) {
+        message(Using SSE2 intrinsic scrypt implementation & generic sha256 implementation)
+        SOURCES += src/crypto/scrypt/intrin/scrypt-sse2.cpp
+        DEFINES += USE_SSE2
+        QMAKE_CXXFLAGS += -msse2 
+        QMAKE_CFLAGS += -msse2
+    } else {
+        message(Using generic scrypt & sha256 implementations)
+        SOURCES += src/crypto/scrypt/generic/scrypt-generic.cpp
+    }
 }
 
 # regenerate src/build.h
@@ -162,18 +171,13 @@ contains(USE_O3, 1) {
     QMAKE_CFLAGS += -O3
 }
 
-*-g++-32 {
-    message("32 platform, adding -msse2 flag")
 
-    QMAKE_CXXFLAGS += -msse2
-    QMAKE_CFLAGS += -msse2
-}
-
-QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter -Wno-unused-local-typedef -Wstack-protector
 
 # Input
 DEPENDPATH += src src/json src/qt
 HEADERS += src/qt/bitcoingui.h \
+    src/qt/intro.h \
     src/qt/transactiontablemodel.h \
     src/qt/addresstablemodel.h \
     src/qt/optionsdialog.h \
@@ -202,17 +206,15 @@ HEADERS += src/qt/bitcoingui.h \
     src/hash.h \
     src/uint256.h \
     src/kernel.h \
+    src/kernel_worker.h \
     src/scrypt.h \
-    src/pbkdf2.h \
     src/serialize.h \
-    src/strlcpy.h \
     src/main.h \
     src/miner.h \
     src/net.h \
     src/ministun.h \
     src/key.h \
     src/db.h \
-    src/tinyformat.h \
     src/txdb.h \
     src/walletdb.h \
     src/script.h \
@@ -259,13 +261,33 @@ HEADERS += src/qt/bitcoingui.h \
     src/ui_interface.h \
     src/qt/rpcconsole.h \
     src/version.h \
+    src/ntp.h \
     src/netbase.h \
     src/clientversion.h \
     src/qt/multisigaddressentry.h \
     src/qt/multisiginputentry.h \
-    src/qt/multisigdialog.h
+    src/qt/multisigdialog.h \
+    src/qt/secondauthdialog.h \
+    src/qt/qrcodedialog.h
+
+contains(USE_EXTJS, 1) {
+    message(Building with ExtJS modules)
+    DEFINES += USE_EXTJS
+    HEADERS += $$PWD/src/extjs/extfs.h
+    INCLUDEPATH += src/extjs
+    LIBS += $$PWD/src/extjs/libExtJS.a
+
+    genextjs.commands = cd $$PWD/src/extjs && CXX=$$QMAKE_CXX $(MAKE) all
+    genextjs.target = $$PWD/src/extjs/libExtJS.a
+    genextjs.depends = FORCE
+
+    PRE_TARGETDEPS += $$PWD/src/extjs/libExtJS.a
+    QMAKE_EXTRA_TARGETS += genextjs
+    QMAKE_CLEAN += $$PWD/src/extjs/libExtJS.a; cd $$PWD/src/extjs ; $(MAKE) clean
+}
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
+    src/qt/intro.cpp \
     src/qt/transactiontablemodel.cpp \
     src/qt/addresstablemodel.cpp \
     src/qt/optionsdialog.cpp \
@@ -287,6 +309,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/sync.cpp \
     src/util.cpp \
     src/netbase.cpp \
+    src/ntp.cpp \
     src/key.cpp \
     src/script.cpp \
     src/main.cpp \
@@ -334,16 +357,19 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/rpcconsole.cpp \
     src/noui.cpp \
     src/kernel.cpp \
-    src/scrypt.cpp \
-    src/pbkdf2.cpp \
+    src/kernel_worker.cpp \
     src/qt/multisigaddressentry.cpp \
     src/qt/multisiginputentry.cpp \
-    src/qt/multisigdialog.cpp
+    src/qt/multisigdialog.cpp \
+    src/qt/secondauthdialog.cpp \
+    src/qt/qrcodedialog.cpp \
+    src/base58.cpp
 
 RESOURCES += \
     src/qt/bitcoin.qrc
 
 FORMS += \
+    src/qt/forms/intro.ui \
     src/qt/forms/coincontroldialog.ui \
     src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/addressbookpage.ui \
@@ -358,13 +384,9 @@ FORMS += \
     src/qt/forms/optionsdialog.ui \
     src/qt/forms/multisigaddressentry.ui \
     src/qt/forms/multisiginputentry.ui \
-    src/qt/forms/multisigdialog.ui
-
-contains(USE_QRCODE, 1) {
-HEADERS += src/qt/qrcodedialog.h
-SOURCES += src/qt/qrcodedialog.cpp
-FORMS += src/qt/forms/qrcodedialog.ui
-}
+    src/qt/forms/multisigdialog.ui \
+    src/qt/forms/secondauthdialog.ui \
+    src/qt/forms/qrcodedialog.ui
 
 CODECFORTR = UTF-8
 
@@ -391,8 +413,8 @@ OTHER_FILES += \
 
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
-    macx:BOOST_LIB_SUFFIX = -mt
     windows:BOOST_LIB_SUFFIX = -mgw44-mt-1_53
+    macx:BOOST_LIB_SUFFIX = -mt
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -400,23 +422,31 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
 }
 
 isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /opt/local/lib/db48
+    macx:BDB_LIB_PATH = /opt/local/lib/db60/
+}
+
+isEmpty(OPENSSL_LIB_PATH) {
+    macx:OPENSSL_LIB_PATH = /opt/local/lib
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -4.8
+    macx:BDB_LIB_SUFFIX = -6.0
 }
 
 isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /opt/local/include/db48
+    macx:BDB_INCLUDE_PATH = /opt/local/include/db60
+}
+
+isEmpty(OPENSSL_INCLUDE_PATH) {
+    macx:OPENSSL_INCLUDE_PATH = /opt/local/include/
 }
 
 isEmpty(BOOST_LIB_PATH) {
-    macx:BOOST_LIB_PATH = /opt/local/lib
+    macx:BOOST_LIB_PATH = /usr/local/lib
 }
 
 isEmpty(BOOST_INCLUDE_PATH) {
-    macx:BOOST_INCLUDE_PATH = /opt/local/include
+    macx:BOOST_INCLUDE_PATH = /usr/local/include
 }
 
 windows:DEFINES += WIN32
@@ -453,17 +483,27 @@ macx:QMAKE_CXXFLAGS_THREAD += -pthread
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
-LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
+LIBS += -lqrencode -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
 LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
-windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
+windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX -Wl,-Bstatic -lpthread -Wl,-Bdynamic
 
 contains(RELEASE, 1) {
     !windows:!macx {
         # Linux: turn dynamic linking back on for c/c++ runtime libraries
         LIBS += -Wl,-Bdynamic
     }
+}
+
+linux-* {
+    # We may need some linuxism here
+    LIBS += -ldl
+}
+
+netbsd-*|freebsd-*|openbsd-* {
+    # libexecinfo is required for back trace
+    LIBS += -lexecinfo
 }
 
 system($$QMAKE_LRELEASE -silent $$PWD/src/qt/locale/translations.pro)
