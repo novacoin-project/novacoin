@@ -2,12 +2,13 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-USE_UPNP:=0
+USE_LEVELDB:=0
 USE_IPV6:=1
+ARCH:=$(uname -m)
 
 LINK:=$(CXX)
 
-DEFS=-DBOOST_SPIRIT_THREADSAFE
+DEFS=-DBOOST_SPIRIT_THREADSAFE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 
 DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/obj $(BOOST_INCLUDE_PATH) $(BDB_INCLUDE_PATH) $(OPENSSL_INCLUDE_PATH))
 LIBS = $(addprefix -L,$(BOOST_LIB_PATH) $(BDB_LIB_PATH) $(OPENSSL_LIB_PATH))
@@ -33,14 +34,6 @@ LIBS += \
    -l crypto \
    -l execinfo
 
-ifndef USE_UPNP
-	override USE_UPNP = -
-endif
-ifneq (${USE_UPNP}, -)
-	LIBS += -l miniupnpc
-	DEFS += -DUSE_UPNP=$(USE_UPNP)
-endif
-
 ifneq (${USE_IPV6}, -)
 	DEFS += -DUSE_IPV6=$(USE_IPV6)
 endif
@@ -48,7 +41,6 @@ endif
 LIBS+= \
  -Wl,-B$(LMODE2) \
    -l z \
-   -l dl \
    -l pthread
 
 
@@ -88,9 +80,22 @@ LIBS+= \
 
 DEBUGFLAGS=-g
 
+ifeq (${ARCH}, i386)
+    EXT_OPTIONS=-msse2 -mssse3
+endif
+
+ifeq (${ARCH}, amd64)
+    EXT_OPTIONS=-mssse3
+endif
+
+xOPT_LEVEL=-O2
+ifeq (${USE_O3}, 1)
+    xOPT_LEVEL=-O3
+endif
+
 # CXXFLAGS can be specified on the make command line, so we use xCXXFLAGS that only
 # adds some defaults in front. Unfortunately, CXXFLAGS=... $(CXXFLAGS) does not work.
-xCXXFLAGS=-O0 -msse2 -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter \
+xCXXFLAGS=$(xOPT_LEVEL) $(EXT_OPTIONS) -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter \
     $(DEBUGFLAGS) $(DEFS) $(HARDENING) $(CXXFLAGS)
 
 # LDFLAGS can be specified on the make command line, so we use xLDFLAGS that only
@@ -104,6 +109,7 @@ OBJS= \
     obj/netbase.o \
     obj/addrman.o \
     obj/crypter.o \
+    obj/base58.o \
     obj/key.o \
     obj/db.o \
     obj/init.o \
@@ -112,6 +118,7 @@ OBJS= \
     obj/main.o \
     obj/miner.o \
     obj/net.o \
+    obj/ntp.o \
     obj/stun.o \
     obj/protocol.o \
     obj/bitcoinrpc.o \
@@ -128,8 +135,7 @@ OBJS= \
     obj/walletdb.o \
     obj/noui.o \
     obj/kernel.o \
-    obj/pbkdf2.o \
-    obj/scrypt.o
+    obj/kernel_worker.o
 
 all: novacoind
 
@@ -142,7 +148,7 @@ DEFS += $(addprefix -I,$(CURDIR)/leveldb/include) -DUSE_LEVELDB
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
 OBJS += obj/txdb-leveldb.o
 leveldb/libleveldb.a:
-	@echo "Building LevelDB ..."; cd leveldb; make libleveldb.a libmemenv.a; cd ..;
+	@echo "Building LevelDB ..."; cd leveldb; gmake libleveldb.a libmemenv.a; cd ..;
 obj/txdb-leveldb.o: leveldb/libleveldb.a
 endif
 ifneq (${USE_LEVELDB}, 1)
@@ -150,22 +156,49 @@ OBJS += obj/txdb-bdb.o
 endif
 
 ifeq (${USE_ASM}, 1)
-OBJS += obj/scrypt-arm.o obj/scrypt-x86.o obj/scrypt-x86_64.o
 
-obj/scrypt-x86.o: scrypt-x86.S
+DEFS += -DUSE_ASM
+
+# Assembler implementation
+OBJS += crypto/scrypt/asm/obj/scrypt-arm.o crypto/scrypt/asm/obj/scrypt-x86.o crypto/scrypt/asm/obj/scrypt-x86_64.o crypto/scrypt/asm/obj/asm-wrapper.o
+OBJS += crypto/sha2/asm/obj/sha2-arm.o crypto/sha2/asm/obj/sha2-x86.o crypto/sha2/asm/obj/sha2-x86_64.o
+
+crypto/scrypt/asm/obj/scrypt-x86.o: crypto/scrypt/asm/scrypt-x86.S
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 
-obj/scrypt-x86_64.o: scrypt-x86_64.S
+crypto/scrypt/asm/obj/scrypt-x86_64.o: crypto/scrypt/asm/scrypt-x86_64.S
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 
-obj/scrypt-arm.o: scrypt-arm.S
+crypto/scrypt/asm/obj/scrypt-arm.o: crypto/scrypt/asm/scrypt-arm.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/asm-wrapper.o: crypto/scrypt/asm/asm-wrapper.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/sha2/asm/obj/sha2-x86.o: crypto/sha2/asm/sha2-x86.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/sha2/asm/obj/sha2-x86_64.o: crypto/sha2/asm/sha2-x86_64.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/sha2/asm/obj/sha2-arm.o: crypto/sha2/asm/sha2-arm.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+else
+ifeq  (${USE_SSE2}, 1)
+# Intrinsic implementation
+DEFS += -DUSE_SSE2
+OBJS += crypto/scrypt/intrin/obj/scrypt-sse2.o
+
+crypto/scrypt/intrin/obj/scrypt-sse2.o: crypto/scrypt/intrin/scrypt-sse2.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+else
+# Generic implementation
+OBJS += crypto/scrypt/generic/obj/scrypt-generic.o
+
+crypto/scrypt/generic/obj/scrypt-generic.o: crypto/scrypt/generic/scrypt-generic.cpp
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 endif
-ifneq (${USE_ASM}, 1)
-OBJS += obj/scrypt-generic.o
-
-obj/scrypt-generic.o: scrypt-generic.c
-	$(CC) -c $(xCXXFLAGS) -MMD -o $@ $<
 endif
 
 # auto-generated dependencies:
@@ -190,6 +223,19 @@ clean:
 	-rm -f novacoind
 	-rm -f obj/*.o
 	-rm -f obj/*.P
+	-rm -f obj/*.d
+	-rm -f crypto/scrypt/asm/obj/*.o
+	-rm -f crypto/scrypt/asm/obj/*.P
+	-rm -f crypto/scrypt/asm/obj/*.d
+	-rm -f crypto/scrypt/intrin/obj/*.o
+	-rm -f crypto/scrypt/intrin/obj/*.P
+	-rm -f crypto/scrypt/intrin/obj/*.d
+	-rm -f crypto/scrypt/generic/obj/*.o
+	-rm -f crypto/scrypt/generic/obj/*.P
+	-rm -f crypto/scrypt/generic/obj/*.d
+	-rm -f crypto/sha2/asm/obj/*.o
+	-rm -f crypto/sha2/asm/obj/*.P
+	-rm -f crypto/sha2/asm/obj/*.d
 	-rm -f obj/build.h
 
 FORCE:

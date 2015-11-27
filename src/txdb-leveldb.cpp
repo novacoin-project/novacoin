@@ -27,7 +27,7 @@ leveldb::DB *txdb; // global pointer for LevelDB object instance
 
 static leveldb::Options GetOptions() {
     leveldb::Options options;
-    int nCacheSizeMB = GetArg("-dbcache", 25);
+    int nCacheSizeMB = GetArgInt("-dbcache", 25);
     options.block_cache = leveldb::NewLRUCache(nCacheSizeMB * 1048576);
     options.filter_policy = leveldb::NewBloomFilterPolicy(10);
     return options;
@@ -56,7 +56,7 @@ void init_blockindex(leveldb::Options& options, bool fRemoveOld = false) {
     }
 
     filesystem::create_directory(directory);
-    LogPrintf("Opening LevelDB in %s\n", directory.string().c_str());
+    printf("Opening LevelDB in %s\n", directory.string().c_str());
     leveldb::Status status = leveldb::DB::Open(options, directory.string(), &txdb);
     if (!status.ok()) {
         throw runtime_error(strprintf("init_blockindex(): error opening database environment %s", status.ToString().c_str()));
@@ -88,11 +88,11 @@ CTxDB::CTxDB(const char* pszMode)
     if (Exists(string("version")))
     {
         ReadVersion(nVersion);
-        LogPrintf("Transaction index version is %d\n", nVersion);
+        printf("Transaction index version is %d\n", nVersion);
 
         if (nVersion < DATABASE_VERSION)
         {
-            LogPrintf("Required index version is %d, removing old database\n", DATABASE_VERSION);
+            printf("Required index version is %d, removing old database\n", DATABASE_VERSION);
 
             // Leveldb instance destruction
             delete txdb;
@@ -117,7 +117,7 @@ CTxDB::CTxDB(const char* pszMode)
         fReadOnly = fTmp;
     }
 
-    LogPrintStr("Opened LevelDB successfully\n");
+    printf("Opened LevelDB successfully\n");
 }
 
 void CTxDB::Close()
@@ -146,7 +146,7 @@ bool CTxDB::TxnCommit()
     delete activeBatch;
     activeBatch = NULL;
     if (!status.ok()) {
-        LogPrintf("LevelDB batch commit failure: %s\n", status.ToString().c_str());
+        printf("LevelDB batch commit failure: %s\n", status.ToString().c_str());
         return false;
     }
     return true;
@@ -423,7 +423,7 @@ bool CTxDB::LoadBlockIndex()
         // NovaCoin: calculate stake modifier checksum
         pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
         if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
-            return error("CTxDB::LoadBlockIndex() : Failed stake modifier checkpoint height=%d, modifier=0x%016"PRI64x, pindex->nHeight, pindex->nStakeModifier);
+            return error("CTxDB::LoadBlockIndex() : Failed stake modifier checkpoint height=%d, modifier=0x%016" PRIx64, pindex->nHeight, pindex->nStakeModifier);
     }
 
     // Load hashBestChain pointer to end of best chain
@@ -439,14 +439,14 @@ bool CTxDB::LoadBlockIndex()
     nBestHeight = pindexBest->nHeight;
     nBestChainTrust = pindexBest->nChainTrust;
 
-    LogPrintf("LoadBlockIndex(): hashBestChain=%s  height=%d  trust=%s  date=%s\n",
+    printf("LoadBlockIndex(): hashBestChain=%s  height=%d  trust=%s  date=%s\n",
       hashBestChain.ToString().substr(0,20).c_str(), nBestHeight, CBigNum(nBestChainTrust).ToString().c_str(),
       DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 
     // NovaCoin: load hashSyncCheckpoint
     if (!ReadSyncCheckpoint(Checkpoints::hashSyncCheckpoint))
         return error("CTxDB::LoadBlockIndex() : hashSyncCheckpoint not loaded");
-    LogPrintf("LoadBlockIndex(): synchronized checkpoint %s\n", Checkpoints::hashSyncCheckpoint.ToString().c_str());
+    printf("LoadBlockIndex(): synchronized checkpoint %s\n", Checkpoints::hashSyncCheckpoint.ToString().c_str());
 
     // Load bnBestInvalidTrust, OK if it doesn't exist
     CBigNum bnBestInvalidTrust;
@@ -454,13 +454,13 @@ bool CTxDB::LoadBlockIndex()
     nBestInvalidTrust = bnBestInvalidTrust.getuint256();
 
     // Verify blocks in the best chain
-    int nCheckLevel = GetArg("-checklevel", 1);
-    int nCheckDepth = GetArg( "-checkblocks", 2500);
+    int nCheckLevel = GetArgInt("-checklevel", 1);
+    int nCheckDepth = GetArgInt( "-checkblocks", 2500);
     if (nCheckDepth == 0)
         nCheckDepth = 1000000000; // suffices until the year 19000
     if (nCheckDepth > nBestHeight)
         nCheckDepth = nBestHeight;
-    LogPrintf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
+    printf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
     CBlockIndex* pindexFork = NULL;
     map<pair<unsigned int, unsigned int>, CBlockIndex*> mapBlockPos;
     for (CBlockIndex* pindex = pindexBest; pindex && pindex->pprev; pindex = pindex->pprev)
@@ -474,7 +474,7 @@ bool CTxDB::LoadBlockIndex()
         // check level 7: verify block signature too
         if (nCheckLevel>0 && !block.CheckBlock(true, true, (nCheckLevel>6)))
         {
-            LogPrintf("LoadBlockIndex() : *** found bad block at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str());
+            printf("LoadBlockIndex() : *** found bad block at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str());
             pindexFork = pindex->pprev;
         }
         // check level 2: verify transaction index validity
@@ -495,13 +495,13 @@ bool CTxDB::LoadBlockIndex()
                         CTransaction txFound;
                         if (!txFound.ReadFromDisk(txindex.pos))
                         {
-                            LogPrintf("LoadBlockIndex() : *** cannot read mislocated transaction %s\n", hashTx.ToString().c_str());
+                            printf("LoadBlockIndex() : *** cannot read mislocated transaction %s\n", hashTx.ToString().c_str());
                             pindexFork = pindex->pprev;
                         }
                         else
                             if (txFound.GetHash() != hashTx) // not a duplicate tx
                             {
-                                LogPrintf("LoadBlockIndex(): *** invalid tx position for %s\n", hashTx.ToString().c_str());
+                                printf("LoadBlockIndex(): *** invalid tx position for %s\n", hashTx.ToString().c_str());
                                 pindexFork = pindex->pprev;
                             }
                     }
@@ -516,7 +516,7 @@ bool CTxDB::LoadBlockIndex()
                                 pair<unsigned int, unsigned int> posFind = make_pair(txpos.nFile, txpos.nBlockPos);
                                 if (!mapBlockPos.count(posFind))
                                 {
-                                    LogPrintf("LoadBlockIndex(): *** found bad spend at %d, hashBlock=%s, hashTx=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str(), hashTx.ToString().c_str());
+                                    printf("LoadBlockIndex(): *** found bad spend at %d, hashBlock=%s, hashTx=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str(), hashTx.ToString().c_str());
                                     pindexFork = pindex->pprev;
                                 }
                                 // check level 6: check whether spent txouts were spent by a valid transaction that consume them
@@ -525,12 +525,12 @@ bool CTxDB::LoadBlockIndex()
                                     CTransaction txSpend;
                                     if (!txSpend.ReadFromDisk(txpos))
                                     {
-                                        LogPrintf("LoadBlockIndex(): *** cannot read spending transaction of %s:%i from disk\n", hashTx.ToString().c_str(), nOutput);
+                                        printf("LoadBlockIndex(): *** cannot read spending transaction of %s:%i from disk\n", hashTx.ToString().c_str(), nOutput);
                                         pindexFork = pindex->pprev;
                                     }
                                     else if (!txSpend.CheckTransaction())
                                     {
-                                        LogPrintf("LoadBlockIndex(): *** spending transaction of %s:%i is invalid\n", hashTx.ToString().c_str(), nOutput);
+                                        printf("LoadBlockIndex(): *** spending transaction of %s:%i is invalid\n", hashTx.ToString().c_str(), nOutput);
                                         pindexFork = pindex->pprev;
                                     }
                                     else
@@ -541,7 +541,7 @@ bool CTxDB::LoadBlockIndex()
                                                 fFound = true;
                                         if (!fFound)
                                         {
-                                            LogPrintf("LoadBlockIndex(): *** spending transaction of %s:%i does not spend it\n", hashTx.ToString().c_str(), nOutput);
+                                            printf("LoadBlockIndex(): *** spending transaction of %s:%i does not spend it\n", hashTx.ToString().c_str(), nOutput);
                                             pindexFork = pindex->pprev;
                                         }
                                     }
@@ -560,7 +560,7 @@ bool CTxDB::LoadBlockIndex()
                           if (ReadTxIndex(txin.prevout.hash, txindex))
                               if (txindex.vSpent.size()-1 < txin.prevout.n || txindex.vSpent[txin.prevout.n].IsNull())
                               {
-                                  LogPrintf("LoadBlockIndex(): *** found unspent prevout %s:%i in %s\n", txin.prevout.hash.ToString().c_str(), txin.prevout.n, hashTx.ToString().c_str());
+                                  printf("LoadBlockIndex(): *** found unspent prevout %s:%i in %s\n", txin.prevout.hash.ToString().c_str(), txin.prevout.n, hashTx.ToString().c_str());
                                   pindexFork = pindex->pprev;
                               }
                      }
@@ -571,7 +571,7 @@ bool CTxDB::LoadBlockIndex()
     if (pindexFork && !fRequestShutdown)
     {
         // Reorg back to the fork
-        LogPrintf("LoadBlockIndex() : *** moving best chain pointer back to block %d\n", pindexFork->nHeight);
+        printf("LoadBlockIndex() : *** moving best chain pointer back to block %d\n", pindexFork->nHeight);
         CBlock block;
         if (!block.ReadFromDisk(pindexFork))
             return error("LoadBlockIndex() : block.ReadFromDisk failed");

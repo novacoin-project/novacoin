@@ -19,12 +19,16 @@ public:
     enum OptionID {
         StartAtStartup,    // bool
         MinimizeToTray,    // bool
-        MapPortUPnP,       // bool
         MinimizeOnClose,   // bool
         ProxyUse,          // bool
         ProxyIP,           // QString
         ProxyPort,         // int
         ProxySocksVersion, // int
+        TorUse,            // bool
+        TorIP,             // QString
+        TorPort,           // int
+        TorOnly,           // bool
+        TorName,           // QString
         Fee,               // qint64
         DisplayUnit,       // BitcoinUnits::Unit
         DisplayAddresses,  // bool
@@ -36,9 +40,6 @@ public:
     };
 
     void Init();
-
-    /* Migrate settings from wallet.dat after app initialization */
-    bool Upgrade(); /* returns true if settings upgraded */
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;

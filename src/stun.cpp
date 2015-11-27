@@ -29,7 +29,8 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
+#include <inttypes.h>
+#include <limits>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -41,15 +42,16 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #endif
-#ifndef _MSC_VER
+#ifndef WIN32
 #include <unistd.h>
-#else
-#include <io.h>
 #endif
 #include <time.h>
 #include <errno.h>
 
 #include "ministun.h"
+
+extern int GetRandInt(int nMax);
+extern uint64_t GetRand(uint64_t nMax);
 
 /*---------------------------------------------------------------------*/
 
@@ -336,15 +338,20 @@ static int stun_send(int s, struct sockaddr_in *dst, struct stun_header *resp)
 }
 
 /* helper function to generate a random request id */
-static uint64_t randfiller;
+static uint64_t randfiller = GetRand(std::numeric_limits<uint64_t>::max());
 static void stun_req_id(struct stun_header *req)
 {
     const uint64_t *S_block = (const uint64_t *)StunSrvList;
+    req->id.id[0] = GetRandInt(std::numeric_limits<int32_t>::max());
+    req->id.id[1] = GetRandInt(std::numeric_limits<int32_t>::max());
+    req->id.id[2] = GetRandInt(std::numeric_limits<int32_t>::max());
+    req->id.id[3] = GetRandInt(std::numeric_limits<int32_t>::max());
+
     req->id.id[0] |= 0x55555555;
     req->id.id[1] &= 0x55555555;
     req->id.id[2] |= 0x55555555;
     req->id.id[3] &= 0x55555555;
-    register char x = 20;
+    char x = 20;
     do {
         uint32_t s_elm = S_block[(uint8_t)randfiller];
         randfiller ^= (randfiller << 5) | (randfiller >> (64 - 5));
@@ -449,7 +456,7 @@ static int StunRequest2(int sock, struct sockaddr_in *server, struct sockaddr_in
 
     req = (struct stun_header *)reqdata;
     stun_req_id(req);
-    int reqlen = 0;
+    unsigned short reqlen = 0;
     req->msgtype = 0;
     req->msglen = 0;
     req->msglen = htons(reqlen);
@@ -509,10 +516,10 @@ static int StunRequest(const char *host, uint16_t port, struct sockaddr_in *mapp
     int rc = -3;
     if(bind(sock, (struct sockaddr*)&client, sizeof(client)) >= 0)
         rc = StunRequest2(sock, &server, mapped);
-#ifndef _MSC_VER
+#ifndef WIN32
     close(sock);
 #else
-    _close(sock);
+    closesocket(sock);
 #endif
     return rc;
 } // StunRequest

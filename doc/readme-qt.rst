@@ -8,13 +8,25 @@ Debian
 -------
 
 First, make sure that the required packages for Qt4 development of your
-distribution are installed, for Debian and Ubuntu these are:
+distribution are installed, these are
+
+::
+
+for Debian and Ubuntu  <= 11.10 :
 
 ::
 
     apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev \
         libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
         libssl-dev libdb4.8++-dev
+
+for Ubuntu >= 12.04 (please read the 'Berkely DB version warning' below):
+
+::
+
+    apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev \
+        libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
+        libssl-dev libdb++-dev
 
 then execute the following:
 
@@ -59,7 +71,7 @@ Mac OS X
 ::
 
 	sudo port selfupdate
-	sudo port install boost db48 miniupnpc
+	sudo port install boost db48
 
 - Open the .pro file in Qt Creator and build as normal (cmd-B)
 
@@ -70,29 +82,41 @@ Mac OS X
 Build configuration options
 ============================
 
-UPNnP port forwarding
----------------------
+LevelDB transaction index
+--------------------------
 
-To use UPnP for port forwarding behind a NAT router (recommended, as more connections overall allow for a faster and more stable novacoin experience), pass the following argument to qmake:
+To use LevelDB for transaction index, pass the following argument to qmake:
 
 ::
 
-    qmake "USE_UPNP=1"
+    qmake "USE_LEVELDB=1"
 
-(in **Qt Creator**, you can find the setting for additional qmake arguments under "Projects" -> "Build Settings" -> "Build Steps", then click "Details" next to **qmake**)
+No additional external dependencies are required. If you're running this on your current sources tree then don't forget to run
 
-This requires miniupnpc for UPnP port mapping.  It can be downloaded from
-http://miniupnp.tuxfamily.org/files/.  UPnP support is not compiled in by default.
+::
 
-Set USE_UPNP to a different value to control this:
+    make distclean
 
-+------------+--------------------------------------------------------------------------+
-| USE_UPNP=- | no UPnP support, miniupnpc not required;                                 |
-+------------+--------------------------------------------------------------------------+
-| USE_UPNP=0 | (the default) built with UPnP, support turned off by default at runtime; |
-+------------+--------------------------------------------------------------------------+
-| USE_UPNP=1 | build with UPnP support turned on by default at runtime.                 |
-+------------+--------------------------------------------------------------------------+
+prior to running qmake.
+
+Assembler implementation of scrypt hashing
+------------------------------------------
+
+To use optimized scrypt implementation instead of generic scrypt module, pass the following argument to qmake:
+
+::
+
+    qmake "USE_ASM=1"
+
+
+If you're using clang compiler then you need to unroll macroses before compiling. Following commands will do this for you:
+
+::
+
+    cd src/
+    ../contrib/clang/nomacro.pl
+
+No additional external dependencies required. Note that only x86, x86_64 and ARM processors are supported.
 
 Notification support for recent (k)ubuntu versions
 ---------------------------------------------------
@@ -107,32 +131,20 @@ FreeDesktop notification interface through DBUS using the following qmake option
 Generation of QR codes
 -----------------------
 
-libqrencode may be used to generate QRCode images for payment requests. 
-It can be downloaded from http://fukuchi.org/works/qrencode/index.html.en, or installed via your package manager. Pass the USE_QRCODE 
-flag to qmake to control this:
-
-+--------------+--------------------------------------------------------------------------+
-| USE_QRCODE=0 | (the default) No QRCode support - libarcode not required                 |
-+--------------+--------------------------------------------------------------------------+
-| USE_QRCODE=1 | QRCode support enabled                                                   |
-+--------------+--------------------------------------------------------------------------+
-
+libqrencode is used to generate QRCode images for payment requests.
+It can be downloaded from http://fukuchi.org/works/qrencode/index.html.en, or installed via your package manager.
 
 Berkely DB version warning
 ==========================
 
 A warning for people using the *static binary* version of Novacoin on a Linux/UNIX-ish system (tl;dr: **Berkely DB databases are not forward compatible**).
 
-The static binary version of Novacoin is linked against libdb4.8 (see also `this Debian issue`_).
+The static binary version of Novacoin is linked against libdb5.3.
 
-Now the nasty thing is that databases from 5.X are not compatible with 4.X.
-
-If the globally installed development package of Berkely DB installed on your system is 5.X, any source you
+If the globally installed development package of Berkely DB installed on your system is 5.X, for example, any source you
 build yourself will be linked against that. The first time you run with a 5.X version the database will be upgraded,
 and 4.X cannot open the new format. This means that you cannot go back to the old statically linked version without
 significant hassle!
-
-.. _`this Debian issue`: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=621425
 
 Ubuntu 11.10 warning
 ====================

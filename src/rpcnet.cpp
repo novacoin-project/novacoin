@@ -8,6 +8,7 @@
 #include "db.h"
 #include "walletdb.h"
 #include "net.h"
+#include "ntp.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -36,6 +37,69 @@ static void CopyNodeStats(std::vector<CNodeStats>& vstats)
     }
 }
 
+struct addrManItemSort {
+    bool operator()(const CAddrInfo &leftItem, const CAddrInfo &rightItem) {
+        int64_t nTime = GetTime();
+        return leftItem.GetChance(nTime) > rightItem.GetChance(nTime);
+    }
+};
+
+Value getaddrmaninfo(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw runtime_error(
+            "getaddrmaninfo [networkType]\n"
+            "Returns a dump of addrman data.");
+
+    // Get a full list of "online" address items
+    vector<CAddrInfo> vAddr = addrman.GetOnlineAddr();
+
+    // Sort by the GetChance result backwardly
+    sort(vAddr.begin(), vAddr.end(), addrManItemSort());
+
+    string strFilterNetType = "";
+    if (params.size() == 1)
+        strFilterNetType = params[0].get_str();
+
+    Array ret;
+    BOOST_FOREACH(const CAddrInfo &addr, vAddr) {
+        if (!addr.IsRoutable() || addr.IsLocal())
+            continue;
+
+        Object addrManItem;
+        addrManItem.push_back(Pair("address", addr.ToString()));
+
+        string strNetType;
+        switch(addr.GetNetwork())
+        {
+            case NET_TOR:
+                strNetType = "tor";
+            break;
+//            case NET_I2P:
+//                strNetType = "i2p";
+//            break;
+            case NET_IPV6:
+                strNetType = "ipv6";
+            break;
+            default:
+            case NET_IPV4:
+                strNetType = "ipv4";
+
+        }
+
+        if (strFilterNetType.size() != 0 && strNetType != strFilterNetType)
+            continue;
+
+        addrManItem.push_back(Pair("chance", addr.GetChance(GetTime())));
+        addrManItem.push_back(Pair("type", strNetType));
+        addrManItem.push_back(Pair("time", (int64_t)addr.nTime));
+
+        ret.push_back(addrManItem);
+    }
+
+    return ret;
+}
+
 Value getpeerinfo(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -52,16 +116,16 @@ Value getpeerinfo(const Array& params, bool fHelp)
         Object obj;
 
         obj.push_back(Pair("addr", stats.addrName));
-        obj.push_back(Pair("services", strprintf("%08"PRI64x, stats.nServices)));
-        obj.push_back(Pair("lastsend", (boost::int64_t)stats.nLastSend));
-        obj.push_back(Pair("lastrecv", (boost::int64_t)stats.nLastRecv));
-        obj.push_back(Pair("bytessent", (boost::int64_t)stats.nSendBytes));
-        obj.push_back(Pair("bytesrecv", (boost::int64_t)stats.nRecvBytes));
-        obj.push_back(Pair("conntime", (boost::int64_t)stats.nTimeConnected));
+        obj.push_back(Pair("services", strprintf("%08" PRIx64, stats.nServices)));
+        obj.push_back(Pair("lastsend", (int64_t)stats.nLastSend));
+        obj.push_back(Pair("lastrecv", (int64_t)stats.nLastRecv));
+        obj.push_back(Pair("bytessent", (int64_t)stats.nSendBytes));
+        obj.push_back(Pair("bytesrecv", (int64_t)stats.nRecvBytes));
+        obj.push_back(Pair("conntime", (int64_t)stats.nTimeConnected));
         obj.push_back(Pair("version", stats.nVersion));
         obj.push_back(Pair("subver", stats.strSubVer));
         obj.push_back(Pair("inbound", stats.fInbound));
-        obj.push_back(Pair("releasetime", (boost::int64_t)stats.nReleaseTime));
+        obj.push_back(Pair("releasetime", (int64_t)stats.nReleaseTime));
         obj.push_back(Pair("startingheight", stats.nStartingHeight));
         obj.push_back(Pair("banscore", stats.nMisbehavior));
         if (stats.fSyncNode)
@@ -72,10 +136,140 @@ Value getpeerinfo(const Array& params, bool fHelp)
     return ret;
 }
 
-extern CCriticalSection cs_mapAlerts;
-extern map<uint256, CAlert> mapAlerts;
- 
-// ppcoin: send alert.  
+Value addnode(const Array& params, bool fHelp)
+{
+    string strCommand;
+    if (params.size() == 2)
+        strCommand = params[1].get_str();
+    if (fHelp || params.size() != 2 ||
+        (strCommand != "onetry" && strCommand != "add" && strCommand != "remove"))
+        throw runtime_error(
+            "addnode <node> <add|remove|onetry>\n"
+            "Attempts add or remove <node> from the addnode list or try a connection to <node> once.");
+
+    string strNode = params[0].get_str();
+
+    if (strCommand == "onetry")
+    {
+        CAddress addr;
+        OpenNetworkConnection(addr, NULL, strNode.c_str());
+        return Value::null;
+    }
+
+    LOCK(cs_vAddedNodes);
+    vector<string>::iterator it = vAddedNodes.begin();
+    for(; it != vAddedNodes.end(); it++)
+        if (strNode == *it)
+            break;
+
+    if (strCommand == "add")
+    {
+        if (it != vAddedNodes.end())
+            throw JSONRPCError(-23, "Error: Node already added");
+        vAddedNodes.push_back(strNode);
+    }
+    else if(strCommand == "remove")
+    {
+        if (it == vAddedNodes.end())
+            throw JSONRPCError(-24, "Error: Node has not been added.");
+        vAddedNodes.erase(it);
+    }
+
+    return Value::null;
+}
+
+Value getaddednodeinfo(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw runtime_error(
+            "getaddednodeinfo <dns> [node]\n"
+            "Returns information about the given added node, or all added nodes\n"
+            "(note that onetry addnodes are not listed here)\n"
+            "If dns is false, only a list of added nodes will be provided,\n"
+            "otherwise connected information will also be available.");
+
+    bool fDns = params[0].get_bool();
+
+    list<string> laddedNodes(0);
+    if (params.size() == 1)
+    {
+        LOCK(cs_vAddedNodes);
+        BOOST_FOREACH(string& strAddNode, vAddedNodes)
+            laddedNodes.push_back(strAddNode);
+    }
+    else
+    {
+        string strNode = params[1].get_str();
+        LOCK(cs_vAddedNodes);
+        BOOST_FOREACH(string& strAddNode, vAddedNodes)
+            if (strAddNode == strNode)
+            {
+                laddedNodes.push_back(strAddNode);
+                break;
+            }
+        if (laddedNodes.size() == 0)
+            throw JSONRPCError(-24, "Error: Node has not been added.");
+        }
+
+        if (!fDns)
+        {
+            Object ret;
+            BOOST_FOREACH(string& strAddNode, laddedNodes)
+                ret.push_back(Pair("addednode", strAddNode));
+            return ret;
+        }
+
+        Array ret;
+
+        list<pair<string, vector<CService> > > laddedAddreses(0);
+        BOOST_FOREACH(string& strAddNode, laddedNodes)
+        {
+            vector<CService> vservNode(0);
+            if(Lookup(strAddNode.c_str(), vservNode, GetDefaultPort(), fNameLookup, 0))
+                laddedAddreses.push_back(make_pair(strAddNode, vservNode));
+            else
+            {
+                Object obj;
+                obj.push_back(Pair("addednode", strAddNode));
+                obj.push_back(Pair("connected", false));
+                Array addresses;
+                obj.push_back(Pair("addresses", addresses));
+            }
+        }
+
+    LOCK(cs_vNodes);
+    for (list<pair<string, vector<CService> > >::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++)
+    {
+        Object obj;
+        obj.push_back(Pair("addednode", it->first));
+
+        Array addresses;
+        bool fConnected = false;
+        BOOST_FOREACH(CService& addrNode, it->second)
+        {
+            bool fFound = false;
+            Object node;
+            node.push_back(Pair("address", addrNode.ToString()));
+            BOOST_FOREACH(CNode* pnode, vNodes)
+                if (pnode->addr == addrNode)
+                {
+                    fFound = true;
+                    fConnected = true;
+                    node.push_back(Pair("connected", pnode->fInbound ? "inbound" : "outbound"));
+                    break;
+                }
+            if (!fFound)
+                node.push_back(Pair("connected", "false"));
+            addresses.push_back(node);
+        }
+        obj.push_back(Pair("connected", fConnected));
+        obj.push_back(Pair("addresses", addresses));
+        ret.push_back(obj);
+    }
+
+    return ret;
+}
+
 // There is a known deadlock situation with ThreadMessageHandler
 // ThreadMessageHandler: holds cs_vSend and acquiring cs_main in SendMessages()
 // ThreadRPCServer: holds cs_main and acquiring cs_vSend in alert.RelayTo()/PushMessage()/BeginMessage()
@@ -147,91 +341,68 @@ Value getnettotals(const Array& params, bool fHelp)
             "and current time.");
 
     Object obj;
-    obj.push_back(Pair("totalbytesrecv", static_cast< boost::uint64_t>(CNode::GetTotalBytesRecv())));
-    obj.push_back(Pair("totalbytessent", static_cast<boost::uint64_t>(CNode::GetTotalBytesSent())));
-    obj.push_back(Pair("timemillis", static_cast<boost::int64_t>(GetTimeMillis())));
+    obj.push_back(Pair("totalbytesrecv", static_cast<uint64_t>(CNode::GetTotalBytesRecv())));
+    obj.push_back(Pair("totalbytessent", static_cast<uint64_t>(CNode::GetTotalBytesSent())));
+    obj.push_back(Pair("timemillis", static_cast<int64_t>(GetTimeMillis())));
     return obj;
 }
 
-static Array GetNetworksInfo()
+/*
+05:53:45 ntptime
+05:53:48
 {
-    Array networks;
-    for(int n=0; n<NET_MAX; ++n)
-    {
-        enum Network network = static_cast<enum Network>(n);
-        if(network == NET_UNROUTABLE)
-            continue;
-        proxyType proxy;
-        Object obj;
-        GetProxy(network, proxy);
-        obj.push_back(Pair("name", GetNetworkName(network)));
-        obj.push_back(Pair("limited", IsLimited(network)));
-        obj.push_back(Pair("reachable", IsReachable(network)));
-        //Please merge: https://github.com/bitcoin/bitcoin/commit/67a42f929b1434f647c63922fd02dc2b93b28060
-        //obj.push_back(Pair("proxy", proxy.IsValid() ? proxy.ToStringIPPort() : string()));
-        networks.push_back(obj);
-    }
-    return networks;
+"epoch" : 1442494427,
+"time" : "2015-09-17 12:53:47 UTC"
 }
 
-Value getnetworkinfo(const Array& params, bool fHelp)
+05:53:56 ntptime time.windows.com
+05:53:57
 {
-    if (fHelp || params.size() != 0)
+"epoch" : 1442494436,
+"time" : "2015-09-17 12:53:56 UTC"
+}
+
+05:54:33 ntptime time-a.nist.gov
+05:54:34
+{
+"epoch" : 1442494473,
+"time" : "2015-09-17 12:54:33 UTC"
+}*/
+
+Value ntptime(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
         throw runtime_error(
-            "getnetworkinfo\n"
-            "Returns an object containing various state info regarding P2P networking.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/Satoshi:x.x.x/\",     (string) the server subversion string\n"
-            "  \"protocolversion\": xxxxx,              (numeric) the protocol version\n"
-            "  \"localservices\": \"xxxxxxxxxxxxxxxx\", (string) the services we offer to the network\n"
-            "  \"timeoffset\": xxxxx,                   (numeric) the time offset\n"
-            "  \"connections\": xxxxx,                  (numeric) the number of connections\n"
-            "  \"networks\": [                          (array) information per network\n"
-            "  {\n"
-            "    \"name\": \"xxx\",                     (string) network (ipv4, ipv6 or onion)\n"
-            "    \"limited\": true|false,               (boolean) is the network limited using -onlynet?\n"
-            "    \"reachable\": true|false,             (boolean) is the network reachable?\n"
-//            "    \"proxy\": \"host:port\"               (string) the proxy that is used for this network, or empty if none\n"
-            "  }\n"
-            "  ,...\n"
-            "  ],\n"
-//            "  \"relayfee\": x.xxxxxxxx,                (numeric) minimum relay fee for non-free transactions in btc/kb\n"
-            "  \"localaddresses\": [                    (array) list of local addresses\n"
-            "  {\n"
-            "    \"address\": \"xxxx\",                 (string) network address\n"
-            "    \"port\": xxx,                         (numeric) network port\n"
-            "    \"score\": xxx                         (numeric) relative score\n"
-            "  }\n"
-            "  ,...\n"
-            "  ]\n"
-            "}\n"
-            "\nExamples:\n"
-        );
+            "ntptime [ntpserver]\n"
+            "Returns current time from specific or random NTP server.");
+
+    int64_t nTime;
+    if (params.size() > 0) {
+        string strHostName = params[0].get_str();
+        nTime = NtpGetTime(strHostName);
+    }
+    else {
+        CNetAddr ip;
+        nTime = NtpGetTime(ip);
+    }
 
     Object obj;
-    obj.push_back(Pair("version",       CLIENT_VERSION));
-    obj.push_back(Pair("subversion",
-        FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>())));
-    obj.push_back(Pair("protocolversion",PROTOCOL_VERSION));
-    obj.push_back(Pair("localservices",       strprintf("%016x", nLocalServices)));
-    obj.push_back(Pair("timeoffset",    (int64_t)GetTimeOffset()));
-    obj.push_back(Pair("connections",   (int)vNodes.size()));
-    obj.push_back(Pair("networks",      GetNetworksInfo()));
-    //obj.push_back(Pair("relayfee",      ValueFromAmount(::minRelayTxFee.GetFeePerK())));
-    Array localAddresses;
-    {
-        LOCK(cs_mapLocalHost);
-        BOOST_FOREACH(const PAIRTYPE(CNetAddr, LocalServiceInfo) &item, mapLocalHost)
-        {
-            Object rec;
-            rec.push_back(Pair("address", item.first.ToString()));
-            rec.push_back(Pair("port", item.second.nPort));
-            rec.push_back(Pair("score", item.second.nScore));
-            localAddresses.push_back(rec);
+    switch (nTime) {
+    case -1:
+        throw runtime_error("Socket initialization error");
+    case -2:
+        throw runtime_error("Switching socket mode to non-blocking failed");
+    case -3:
+        throw runtime_error("Unable to send data");
+    case -4:
+        throw runtime_error("Receive timed out");
+    default:
+        if (nTime > 0 && nTime != 2085978496) {
+            obj.push_back(Pair("epoch", nTime));
+            obj.push_back(Pair("time", DateTimeStrFormat(nTime)));
         }
+        else throw runtime_error("Unexpected response");
     }
-    obj.push_back(Pair("localaddresses", localAddresses));
+
     return obj;
 }

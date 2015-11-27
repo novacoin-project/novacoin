@@ -23,7 +23,7 @@ CMessageHeader::CMessageHeader()
     memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
     memset(pchCommand, 0, sizeof(pchCommand));
     pchCommand[1] = 1;
-    nMessageSize = -1;
+    nMessageSize = std::numeric_limits<uint32_t>::max();
     nChecksum = 0;
 }
 
@@ -66,7 +66,7 @@ bool CMessageHeader::IsValid() const
     // Message size
     if (nMessageSize > MAX_SIZE)
     {
-        LogPrintf("CMessageHeader::IsValid() : (%s, %u bytes) nMessageSize > MAX_SIZE\n", GetCommand().c_str(), nMessageSize);
+        printf("CMessageHeader::IsValid() : (%s, %u bytes) nMessageSize > MAX_SIZE\n", GetCommand().c_str(), nMessageSize);
         return false;
     }
 
@@ -80,7 +80,7 @@ CAddress::CAddress() : CService()
     Init();
 }
 
-CAddress::CAddress(CService ipIn, uint64 nServicesIn) : CService(ipIn)
+CAddress::CAddress(CService ipIn, uint64_t nServicesIn) : CService(ipIn)
 {
     Init();
     nServices = nServicesIn;
@@ -145,6 +145,6 @@ std::string CInv::ToString() const
 
 void CInv::print() const
 {
-    LogPrintf("CInv(%s)\n", ToString().c_str());
+    printf("CInv(%s)\n", ToString().c_str());
 }
 

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Index</title>
+
+    <script type="text/javascript" src="/ext-all-debug.js"></script>
+    <script type="text/javascript" src="/ux-debug.js"></script>
+
+    <!-- Common Styles for the examples -->
+    <link rel="stylesheet" type="text/css" href="/classic/theme-triton/resources/theme-triton-all-debug_1.css"/>
+    <link rel="stylesheet" type="text/css" href="/classic/theme-triton/resources/theme-triton-all-debug_2.css"/>
+    <link rel="stylesheet" type="text/css" href="/ux/ux-all-debug.css"/>
+
+    <script type="text/javascript">
+        var request_id = 0;
+    </script>
+
+    <!-- Forms -->
+    <script type="text/javascript" src="/forms/info.js"></script>
+    <script type="text/javascript" src="/forms/peerinfo.js"></script>
+    <script type="text/javascript" src="/forms/addresses.js"></script>
+
+    <style type="text/css">
+        .x-panel-body p {
+            margin: 10px;
+            font-size: 12px;
+        }
+    </style>
+    <script type="text/javascript">
+        Ext.onReady(function(){
+            var mainPanel = Ext.create('Ext.tab.Panel', {
+                title : 'Novacoin console',
+                layout:'fit',
+                items : [],
+                renderTo : 'main'
+            });
+
+            mainPanel.add(InfoForm);
+            loadInfo();
+            mainPanel.add(peergrid);
+            mainPanel.add(addressesgrid);
+        });
+    </script>
+</head>
+<body>
+    <div id="main"></div>
+</body>
+</html>

@@ -53,8 +53,8 @@ std::string CUnsignedAlert::ToString() const
     return strprintf(
         "CAlert(\n"
         "    nVersion     = %d\n"
-        "    nRelayUntil  = %"PRI64d"\n"
-        "    nExpiration  = %"PRI64d"\n"
+        "    nRelayUntil  = %" PRId64 "\n"
+        "    nExpiration  = %" PRId64 "\n"
         "    nID          = %d\n"
         "    nCancel      = %d\n"
         "    setCancel    = %s\n"
@@ -70,18 +70,18 @@ std::string CUnsignedAlert::ToString() const
         nExpiration,
         nID,
         nCancel,
-        strSetCancel,
+        strSetCancel.c_str(),
         nMinVer,
         nMaxVer,
-        strSetSubVer,
+        strSetSubVer.c_str(),
         nPriority,
-        strComment,
-        strStatusBar);
+        strComment.c_str(),
+        strStatusBar.c_str());
 }
 
 void CUnsignedAlert::print() const
 {
-    LogPrintf("%s", ToString());
+    printf("%s", ToString().c_str());
 }
 
 void CAlert::SetNull()
@@ -210,13 +210,13 @@ bool CAlert::ProcessAlert()
             const CAlert& alert = (*mi).second;
             if (Cancels(alert))
             {
-                LogPrintf("cancelling alert %d\n", alert.nID);
+                printf("cancelling alert %d\n", alert.nID);
                 uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
             }
             else if (!alert.IsInEffect())
             {
-                LogPrintf("expiring alert %d\n", alert.nID);
+                printf("expiring alert %d\n", alert.nID);
                 uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
             }
@@ -230,7 +230,7 @@ bool CAlert::ProcessAlert()
             const CAlert& alert = item.second;
             if (alert.Cancels(*this))
             {
-                LogPrintf("alert already cancelled by %d\n", alert.nID);
+                printf("alert already cancelled by %d\n", alert.nID);
                 return false;
             }
         }
@@ -242,6 +242,6 @@ bool CAlert::ProcessAlert()
             uiInterface.NotifyAlertChanged(GetHash(), CT_NEW);
     }
 
-    LogPrintf("accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
+    printf("accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
     return true;
 }

@@ -24,10 +24,10 @@ private:
     CNetAddr source;
 
     // last successful connection by us
-    int64 nLastSuccess;
+    int64_t nLastSuccess;
 
     // last try whatsoever by us:
-    // int64 CAddress::nLastTry
+    // int64_t CAddress::nLastTry
 
     // connection attempts since last successful attempt
     int nAttempts;
@@ -86,10 +86,10 @@ public:
     }
 
     // Determine whether the statistics about this entry are bad enough so that it can just be deleted
-    bool IsTerrible(int64 nNow = GetAdjustedTime()) const;
+    bool IsTerrible(int64_t nNow = GetAdjustedTime()) const;
 
     // Calculate the relative chance this entry should be given when selecting nodes to connect to
-    double GetChance(int64 nNow = GetAdjustedTime()) const;
+    double GetChance(int64_t nNow = GetAdjustedTime()) const;
 
 };
 
@@ -220,13 +220,13 @@ protected:
     void MakeTried(CAddrInfo& info, int nId, int nOrigin);
 
     // Mark an entry "good", possibly moving it from "new" to "tried".
-    void Good_(const CService &addr, int64 nTime);
+    void Good_(const CService &addr, int64_t nTime);
 
     // Add an entry to the "new" table.
-    bool Add_(const CAddress &addr, const CNetAddr& source, int64 nTimePenalty);
+    bool Add_(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty);
 
     // Mark an entry as attempted to connect.
-    void Attempt_(const CService &addr, int64 nTime);
+    void Attempt_(const CService &addr, int64_t nTime);
 
     // Select an address to connect to.
     // nUnkBias determines how much to favor new addresses over tried ones (min=0, max=100)
@@ -239,9 +239,10 @@ protected:
 
     // Select several addresses at once.
     void GetAddr_(std::vector<CAddress> &vAddr);
+    void GetOnlineAddr_(std::vector<CAddrInfo> &vAddr);
 
     // Mark an entry as currently-connected-to.
-    void Connected_(const CService &addr, int64 nTime);
+    void Connected_(const CService &addr, int64_t nTime);
 
 public:
 
@@ -569,7 +570,7 @@ public:
     // Return the number of (unique) addresses in all tables.
     int size()
     {
-        return vRandom.size();
+        return (int) vRandom.size();
     }
 
     // Consistency check
@@ -580,13 +581,13 @@ public:
             LOCK(cs);
             int err;
             if ((err=Check_()))
-                LogPrintf("ADDRMAN CONSISTENCY CHECK FAILED!!! err=%i\n", err);
+                printf("ADDRMAN CONSISTENCY CHECK FAILED!!! err=%i\n", err);
         }
 #endif
     }
 
     // Add a single address.
-    bool Add(const CAddress &addr, const CNetAddr& source, int64 nTimePenalty = 0)
+    bool Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
         bool fRet = false;
         {
@@ -596,12 +597,12 @@ public:
             Check();
         }
         if (fRet)
-            LogPrintf("Added %s from %s: %i tried, %i new\n", addr.ToStringIPPort().c_str(), source.ToString().c_str(), nTried, nNew);
+            printf("Added %s from %s: %i tried, %i new\n", addr.ToStringIPPort().c_str(), source.ToString().c_str(), nTried, nNew);
         return fRet;
     }
 
     // Add multiple addresses.
-    bool Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, int64 nTimePenalty = 0)
+    bool Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
         int nAdd = 0;
         {
@@ -612,12 +613,12 @@ public:
             Check();
         }
         if (nAdd)
-            LogPrintf("Added %i addresses from %s: %i tried, %i new\n", nAdd, source.ToString().c_str(), nTried, nNew);
+            printf("Added %i addresses from %s: %i tried, %i new\n", nAdd, source.ToString().c_str(), nTried, nNew);
         return nAdd > 0;
     }
 
     // Mark an entry as accessible.
-    void Good(const CService &addr, int64 nTime = GetAdjustedTime())
+    void Good(const CService &addr, int64_t nTime = GetAdjustedTime())
     {
         {
             LOCK(cs);
@@ -628,7 +629,7 @@ public:
     }
 
     // Mark an entry as connection attempted to.
-    void Attempt(const CService &addr, int64 nTime = GetAdjustedTime())
+    void Attempt(const CService &addr, int64_t nTime = GetAdjustedTime())
     {
         {
             LOCK(cs);
@@ -665,8 +666,20 @@ public:
         return vAddr;
     }
 
+    std::vector<CAddrInfo> GetOnlineAddr()
+    {
+        Check();
+        std::vector<CAddrInfo> vAddr;
+        {
+            LOCK(cs);
+            GetOnlineAddr_(vAddr);
+        }
+        Check();
+        return vAddr;
+    }
+
     // Mark an entry as currently-connected-to.
-    void Connected(const CService &addr, int64 nTime = GetAdjustedTime())
+    void Connected(const CService &addr, int64_t nTime = GetAdjustedTime())
     {
         {
             LOCK(cs);

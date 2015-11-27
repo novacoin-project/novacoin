@@ -106,6 +106,11 @@ OverviewPage::OverviewPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QFont balance = QApplication::font();
+    balance.setPointSize(balance.pointSize() * 1.5);
+    balance.setBold(true);
+    ui->label_5->setFont(balance);
+
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
@@ -141,11 +146,12 @@ void OverviewPage::setBalance(qint64 total, qint64 watchOnly, qint64 stake, qint
     currentStake = stake;
     currentUnconfirmedBalance = unconfirmedBalance;
     currentImmatureBalance = immatureBalance;
-    ui->labelBalanceTotal->setText(BitcoinUnits::formatWithUnit(unit, total));
+    ui->labelAvailable->setText(BitcoinUnits::formatWithUnit(unit, total));
     ui->labelBalanceWatchOnly->setText(BitcoinUnits::formatWithUnit(unit, watchOnly));
     ui->labelStake->setText(BitcoinUnits::formatWithUnit(unit, stake));
     ui->labelUnconfirmed->setText(BitcoinUnits::formatWithUnit(unit, unconfirmedBalance));
     ui->labelImmature->setText(BitcoinUnits::formatWithUnit(unit, immatureBalance));
+    ui->labelTotal->setText(BitcoinUnits::formatWithUnit(unit, total+stake+unconfirmedBalance+immatureBalance));
 
     // only show immature (newly mined) balance if it's non-zero, so as not to complicate things
     // for the non-mining users
@@ -156,6 +162,14 @@ void OverviewPage::setBalance(qint64 total, qint64 watchOnly, qint64 stake, qint
     // only show watch-only balance if it's non-zero, so as not to complicate things
     // for users
     bool showWatchOnly = watchOnly != 0;
+    ui->labelBalanceWatchOnly->setVisible(showWatchOnly);
+    ui->labelBalanceWatchOnlyText->setVisible(showWatchOnly);
+   
+}
+
+// show/hide watch-only labels
+void OverviewPage::updateWatchOnlyLabels(bool showWatchOnly)
+{
     ui->labelBalanceWatchOnly->setVisible(showWatchOnly);
     ui->labelBalanceWatchOnlyText->setVisible(showWatchOnly);
 }
@@ -190,6 +204,9 @@ void OverviewPage::setModel(WalletModel *model)
         connect(model, SIGNAL(numTransactionsChanged(int)), this, SLOT(setNumTransactions(int)));
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+
+        updateWatchOnlyLabels(model->haveWatchOnly());
+        connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
     }
 
     // update the display unit, to not use the default ("BTC")

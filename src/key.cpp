@@ -194,6 +194,7 @@ CKey::CKey(const CKey& b)
     if (pkey == NULL)
         throw key_error("CKey::CKey(const CKey&) : EC_KEY_dup failed");
     fSet = b.fSet;
+    fCompressedPubKey = b.fCompressedPubKey;
 }
 
 CKey& CKey::operator=(const CKey& b)
@@ -201,6 +202,7 @@ CKey& CKey::operator=(const CKey& b)
     if (!EC_KEY_copy(pkey, b.pkey))
         throw key_error("CKey::operator=(const CKey&) : EC_KEY_copy failed");
     fSet = b.fSet;
+    fCompressedPubKey = b.fCompressedPubKey;
     return (*this);
 }
 
@@ -222,6 +224,32 @@ bool CKey::IsCompressed() const
 bool CKey::CheckSignatureElement(const unsigned char *vch, int len, bool half) {
     return CompareBigEndian(vch, len, vchZero, 0) > 0 &&
         CompareBigEndian(vch, len, half ? vchMaxModHalfOrder : vchMaxModOrder, 32) <= 0;
+}
+
+bool CKey::ReserealizeSignature(std::vector<unsigned char>& vchSig)
+{
+    if (vchSig.empty())
+        return false;
+
+    unsigned char *pos = &vchSig[0];
+    ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&pos, vchSig.size());
+    if (sig == NULL)
+        return false;
+
+    bool ret = false;
+    int nSize = i2d_ECDSA_SIG(sig, NULL);
+    if (nSize > 0) {
+        vchSig.resize(nSize); // grow or shrink as needed
+
+        pos = &vchSig[0];
+        i2d_ECDSA_SIG(sig, &pos);
+
+        ret = true;
+    }
+
+    ECDSA_SIG_free(sig);
+
+    return ret;
 }
 
 void CKey::MakeNewKey(bool fCompressed)
@@ -385,8 +413,8 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
     int nBitsS = BN_num_bits(sig->s);
     if (nBitsR <= 256 && nBitsS <= 256)
     {
-        int nRecId = -1;
-        for (int i=0; i<4; i++)
+        int8_t nRecId = -1;
+        for (int8_t i=0; i<4; i++)
         {
             CKey keyRec;
             keyRec.fSet = true;
@@ -449,11 +477,34 @@ bool CKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>& v
 
 bool CKey::Verify(uint256 hash, const std::vector<unsigned char>& vchSig)
 {
-    // -1 = error, 0 = bad sig, 1 = good
-    if (ECDSA_verify(0, (unsigned char*)&hash, sizeof(hash), &vchSig[0], vchSig.size(), pkey) != 1)
+    if (vchSig.empty())
         return false;
 
-    return true;
+    // New versions of OpenSSL will reject non-canonical DER signatures. de/re-serialize first.
+    unsigned char *norm_der = NULL;
+    ECDSA_SIG *norm_sig = ECDSA_SIG_new();
+    const unsigned char* sigptr = &vchSig[0];
+    assert(norm_sig);
+    if (d2i_ECDSA_SIG(&norm_sig, &sigptr, vchSig.size()) == NULL)
+    {
+        /* As of OpenSSL 1.0.0p d2i_ECDSA_SIG frees and nulls the pointer on
+        * error. But OpenSSL's own use of this function redundantly frees the
+        * result. As ECDSA_SIG_free(NULL) is a no-op, and in the absence of a
+        * clear contract for the function behaving the same way is more
+        * conservative.
+        */
+        ECDSA_SIG_free(norm_sig);
+        return false;
+    }
+    int derlen = i2d_ECDSA_SIG(norm_sig, &norm_der);
+    ECDSA_SIG_free(norm_sig);
+    if (derlen <= 0)
+        return false;
+
+    // -1 = error, 0 = bad sig, 1 = good
+    bool ret = ECDSA_verify(0, (unsigned char*)&hash, sizeof(hash), norm_der, derlen, pkey) == 1;
+    OPENSSL_free(norm_der);
+    return ret;
 }
 
 bool CKey::VerifyCompact(uint256 hash, const std::vector<unsigned char>& vchSig)

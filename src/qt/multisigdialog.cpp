@@ -2,6 +2,7 @@
 #include <QDialog>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QKeyEvent>
 #include <vector>
 
 #include "addresstablemodel.h"
@@ -24,7 +25,7 @@
 #include "txdb-bdb.h"
 #endif
 
-MultisigDialog::MultisigDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MultisigDialog), model(0)
+MultisigDialog::MultisigDialog(QWidget *parent) : QWidget(parent), ui(new Ui::MultisigDialog), model(0)
 {
     ui->setupUi(this);
 
@@ -45,13 +46,32 @@ MultisigDialog::MultisigDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Mu
 
     addInput();
     addOutput();
-    updateAmounts();
 
     connect(ui->addInputButton, SIGNAL(clicked()), this, SLOT(addInput()));
     connect(ui->addOutputButton, SIGNAL(clicked()), this, SLOT(addOutput()));
 
     ui->signTransactionButton->setEnabled(false);
     ui->sendTransactionButton->setEnabled(false);
+}
+
+void MultisigDialog::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    if (!model)
+        return;
+
+    updateAmounts();
+}
+
+void MultisigDialog::hideEvent(QHideEvent *event)
+{
+    QWidget::hideEvent(event);
+
+    if (!model)
+        return;
+
+    clear();
 }
 
 MultisigDialog::~MultisigDialog()
@@ -145,11 +165,31 @@ void MultisigDialog::on_createAddressButton_clicked()
         pubkeys[i].SetPubKey(vchPubKey);
     }
 
-    if((required == 0) || (required > pubkeys.size()))
+    if(pubkeys.size() > 16)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Number of addresses involved in the address creation > %1\nReduce the number").arg(16), QMessageBox::Ok);
         return;
+    }
 
+    if(required == 0)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Number of required signatures is 0\nNumber of required signatures must be between 1 and number of keys involved in the creation of address."), QMessageBox::Ok);
+        return;
+    }
+
+    if(required > pubkeys.size())
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Number of required signatures > Number of keys involved in the creation of address."), QMessageBox::Ok);
+        return;
+    }
+    
     CScript script;
     script.SetMultisig(required, pubkeys);
+    if (script.size() > MAX_SCRIPT_ELEMENT_SIZE)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Redeem script exceeds size limit: %1 > %2\nReduce the number of addresses involved in the address creation.").arg(script.size()).arg(MAX_SCRIPT_ELEMENT_SIZE), QMessageBox::Ok);
+        return;
+    }
     CScriptID scriptID = script.GetID();
     CBitcoinAddress address(scriptID);
 
@@ -273,7 +313,7 @@ void MultisigDialog::on_createTransactionButton_clicked()
                 CBitcoinAddress address(recipient.address.toStdString());
                 CScript scriptPubKey;
                 scriptPubKey.SetDestination(address.Get());
-                int64 amount = recipient.amount;
+                int64_t amount = recipient.amount;
                 CTxOut output(amount, scriptPubKey);
                 transaction.vout.push_back(output);
             }
@@ -309,6 +349,7 @@ void MultisigDialog::on_transaction_textChanged()
     }
     catch(std::exception &e)
     {
+        (void)e;
         return;
     }
 
@@ -379,13 +420,14 @@ void MultisigDialog::on_signTransactionButton_clicked()
     }
     catch(std::exception &e)
     {
+        (void)e;
         return;
     }
     CTransaction mergedTx(tx);
 
     // Fetch previous transactions (inputs)
     std::map<COutPoint, CScript> mapPrevOut;
-    for(int i = 0; i < mergedTx.vin.size(); i++)
+    for(unsigned int i = 0; i < mergedTx.vin.size(); i++)
     {
         CTransaction tempTx;
         MapPrevTx mapPrevTx;
@@ -426,7 +468,7 @@ void MultisigDialog::on_signTransactionButton_clicked()
 
     // Sign what we can
     bool fComplete = true;
-    for(int i = 0; i < mergedTx.vin.size(); i++)
+    for(unsigned int i = 0; i < mergedTx.vin.size(); i++)
     {
         CTxIn& txin = mergedTx.vin[i];
         if(mapPrevOut.count(txin.prevout) == 0)
@@ -468,13 +510,13 @@ void MultisigDialog::on_copySignedTransactionButton_clicked()
 
 void MultisigDialog::on_sendTransactionButton_clicked()
 {
-    int64 transactionSize = ui->signedTransaction->text().size() / 2;
+    int64_t transactionSize = ui->signedTransaction->text().size() / 2;
     if(transactionSize == 0)
         return;
 
     // Check the fee
-    int64 fee = (int64 ) (ui->fee->text().toDouble() * COIN);
-    int64 minFee = MIN_TX_FEE * (1 + (int64) transactionSize / 1000);
+    int64_t fee = (int64_t ) (ui->fee->text().toDouble() * COIN);
+    int64_t minFee = MIN_TX_FEE * (1 + (int64_t) transactionSize / 1000);
     if(fee < minFee)
     {
         QMessageBox::StandardButton ret = QMessageBox::question(this, tr("Confirm send transaction"), tr("The fee of the transaction (%1 NVC) is smaller than the expected fee (%2 NVC). Do you want to send the transaction anyway?").arg((double) fee / COIN).arg((double) minFee / COIN), QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
@@ -498,6 +540,7 @@ void MultisigDialog::on_sendTransactionButton_clicked()
     }
     catch(std::exception &e)
     {
+        (void)e;
         return;
     }
     uint256 txHash = tx.GetHash();
@@ -571,7 +614,7 @@ void MultisigDialog::removeEntry(SendCoinsEntry *entry)
 void MultisigDialog::updateAmounts()
 {
     // Update inputs amount
-    int64 inputsAmount = 0;
+    int64_t inputsAmount = 0;
     for(int i = 0; i < ui->inputs->count(); i++)
     {
         MultisigInputEntry *entry = qobject_cast<MultisigInputEntry *>(ui->inputs->itemAt(i)->widget());
@@ -583,7 +626,7 @@ void MultisigDialog::updateAmounts()
     ui->inputsAmount->setText(inputsAmountStr);
 
     // Update outputs amount
-    int64 outputsAmount = 0;
+    int64_t outputsAmount = 0;
     for(int i = 0; i < ui->outputs->count(); i++)
     {
         SendCoinsEntry *entry = qobject_cast<SendCoinsEntry *>(ui->outputs->itemAt(i)->widget());
@@ -595,8 +638,23 @@ void MultisigDialog::updateAmounts()
     ui->outputsAmount->setText(outputsAmountStr);
 
     // Update Fee amount
-    int64 fee = inputsAmount - outputsAmount;
+    int64_t fee = inputsAmount - outputsAmount;
     QString feeStr;
     feeStr.sprintf("%.6f", (double) fee / COIN);
     ui->fee->setText(feeStr);
+}
+
+void MultisigDialog::keyPressEvent(QKeyEvent *event)
+{
+#ifdef ANDROID
+    if(windowType() != Qt::Widget && event->key() == Qt::Key_Back)
+    {
+        close();
+    }
+#else
+    if(windowType() != Qt::Widget && event->key() == Qt::Key_Escape)
+    {
+        close();
+    }
+#endif
 }

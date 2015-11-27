@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>OptionsDialog</class>
- <widget class="QDialog" name="OptionsDialog">
+ <widget class="QWidget" name="OptionsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>540</width>
+    <width>550</width>
     <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Options</string>
-  </property>
-  <property name="modal">
-   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -33,7 +30,7 @@
        <item>
         <widget class="QLabel" name="transactionFeeInfoLabel">
          <property name="text">
-          <string>Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1 kB. Fee 0.01 recommended.</string>
+          <string>Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1 kB. Fee 0.001 recommended.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -60,6 +57,13 @@
          </item>
          <item>
           <widget class="BitcoinAmountField" name="transactionFee"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>per kilobyte</string>
+           </property>
+          </widget>
          </item>
          <item>
           <spacer name="horizontalSpacer_Main">
@@ -103,8 +107,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>40</height>
+           <width>17</width>
+           <height>153</height>
           </size>
          </property>
         </spacer>
@@ -116,16 +120,6 @@
        <string>&amp;Network</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_Network">
-       <item>
-        <widget class="QCheckBox" name="mapPortUpnp">
-         <property name="toolTip">
-          <string>Automatically open the NovaCoin client port on the router. This only works when your router supports UPnP and it is enabled.</string>
-         </property>
-         <property name="text">
-          <string>Map port using &amp;UPnP</string>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QCheckBox" name="connectSocks">
          <property name="toolTip">
@@ -226,6 +220,110 @@
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="connectTor">
+         <property name="text">
+          <string>Connect through &amp;Tor:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_Tor">
+         <item>
+          <widget class="QLabel" name="torIpLabel">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Tor IP:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QValidatedLineEdit" name="torIp">
+           <property name="maximumSize">
+            <size>
+             <width>115</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="torPortLabel">
+           <property name="text">
+            <string>Port:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="torPort">
+           <property name="maximumSize">
+            <size>
+             <width>55</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="TorOnly">
+           <property name="text">
+            <string>Use Tor only</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="torNameLabel">
+           <property name="text">
+            <string>Tor name:</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="buddy">
+            <cstring>torName</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="torName"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer_Network">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -258,7 +356,7 @@
        <item>
         <widget class="QCheckBox" name="minimizeOnClose">
          <property name="toolTip">
-          <string>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Quit in the menu.</string>
+          <string>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</string>
          </property>
          <property name="text">
           <string>M&amp;inimize on close</string>

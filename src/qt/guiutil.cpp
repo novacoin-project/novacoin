@@ -23,8 +23,13 @@
 #include <QDesktopServices>
 #include <QThread>
 
+#ifndef Q_MOC_RUN
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#if BOOST_FILESYSTEM_VERSION >= 3
+#include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+#endif
+#endif
 
 #ifdef WIN32
 #ifdef _WIN32_WINNT
@@ -44,7 +49,32 @@
 #include "shellapi.h"
 #endif
 
+#if BOOST_FILESYSTEM_VERSION >= 3
+static boost::filesystem::detail::utf8_codecvt_facet utf8;
+#endif
+
 namespace GUIUtil {
+
+#if BOOST_FILESYSTEM_VERSION >= 3
+boost::filesystem::path qstringToBoostPath(const QString &path)
+{
+    return boost::filesystem::path(path.toStdString(), utf8);
+}
+QString boostPathToQString(const boost::filesystem::path &path)
+{
+    return QString::fromStdString(path.string(utf8));
+}
+#else
+#warning Conversion between boost path and QString can use invalid character encoding with boost_filesystem v2 and older
+boost::filesystem::path qstringToBoostPath(const QString &path)
+{
+    return boost::filesystem::path(path.toStdString());
+}
+QString boostPathToQString(const boost::filesystem::path &path)
+{
+    return QString::fromStdString(path.string());
+}
+#endif
 
 QString dateTimeStr(const QDateTime &date)
 {
@@ -263,6 +293,15 @@ void openDebugLogfile()
         QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(pathDebug.string())));
 }
 
+void openConfigfile()
+{
+    boost::filesystem::path pathConfig = GetConfigFile();
+
+    /* Open novacoin.conf with the associated application */
+    if (boost::filesystem::exists(pathConfig))
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(pathConfig.string())));
+}
+
 ToolTipToRichTextFilter::ToolTipToRichTextFilter(int size_threshold, QObject *parent) :
     QObject(parent), size_threshold(size_threshold)
 {
@@ -447,10 +486,15 @@ HelpMessageBox::HelpMessageBox(QWidget *parent) :
         "  -splash                " + tr("Show splash screen on startup (default: 1)") + "\n";
 
     setWindowTitle(tr("NovaCoin-Qt"));
+    setFont(bitcoinAddressFont());
     setTextFormat(Qt::PlainText);
     // setMinimumWidth is ignored for QMessageBox so put in non-breaking spaces to make it wider.
     setText(header + QString(QChar(0x2003)).repeated(50));
     setDetailedText(coreOptions + "\n" + uiOptions);
+    addButton("OK", QMessageBox::RejectRole);   //кнопка OK будет справа от кнопки "Скрыть подробности"
+    //addButton("OK", QMessageBox::NoRole);     //кнопка OK будет слева от кнопки "Скрыть подробности"
+    setMouseTracking(true);
+    setSizeGripEnabled(true);   
 }
 
 void HelpMessageBox::printToConsole()

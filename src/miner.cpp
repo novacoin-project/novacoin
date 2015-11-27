@@ -7,6 +7,7 @@
 #include "txdb.h"
 #include "miner.h"
 #include "kernel.h"
+#include "kernel_worker.h"
 
 using namespace std;
 
@@ -15,7 +16,9 @@ using namespace std;
 // BitcoinMiner
 //
 
-extern unsigned int nMinerSleep;
+int64_t nReserveBalance = 0;
+static unsigned int nMaxStakeSearchInterval = 60;
+uint64_t nStakeInputsMapSize = 0;
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
 {
@@ -70,17 +73,17 @@ public:
 
     void print() const
     {
-        LogPrintf("COrphan(hash=%s, dPriority=%.1f, dFeePerKb=%.1f)\n",
+        printf("COrphan(hash=%s, dPriority=%.1f, dFeePerKb=%.1f)\n",
                ptx->GetHash().ToString().substr(0,10).c_str(), dPriority, dFeePerKb);
         BOOST_FOREACH(uint256 hash, setDependsOn)
-            LogPrintf("   setDependsOn %s\n", hash.ToString().substr(0,10).c_str());
+            printf("   setDependsOn %s\n", hash.ToString().substr(0,10).c_str());
     }
 };
 
 
-uint64 nLastBlockTx = 0;
-uint64 nLastBlockSize = 0;
-int64 nLastCoinStakeSearchInterval = 0;
+uint64_t nLastBlockTx = 0;
+uint64_t nLastBlockSize = 0;
+uint32_t nLastCoinStakeSearchInterval = 0;
  
 // We want to sort transactions by priority and fee, so:
 typedef boost::tuple<double, double, CTransaction*> TxPriority;
@@ -106,30 +109,42 @@ public:
     }
 };
 
-// CreateNewBlock: create new block (without proof-of-work/proof-of-stake)
-CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
+// CreateNewBlock: create new block (without proof-of-work/with provided coinstake)
+CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
 {
+    bool fProofOfStake = txCoinStake != NULL;
+
     // Create new block
     auto_ptr<CBlock> pblock(new CBlock());
     if (!pblock.get())
         return NULL;
 
     // Create coinbase tx
-    CTransaction txNew;
-    txNew.vin.resize(1);
-    txNew.vin[0].prevout.SetNull();
-    txNew.vout.resize(1);
+    CTransaction txCoinBase;
+    txCoinBase.vin.resize(1);
+    txCoinBase.vin[0].prevout.SetNull();
+    txCoinBase.vout.resize(1);
 
     if (!fProofOfStake)
     {
         CReserveKey reservekey(pwallet);
-        txNew.vout[0].scriptPubKey.SetDestination(reservekey.GetReservedKey().GetID());
+        txCoinBase.vout[0].scriptPubKey.SetDestination(reservekey.GetReservedKey().GetID());
+
+        // Add our coinbase tx as first transaction
+        pblock->vtx.push_back(txCoinBase);
     }
     else
-        txNew.vout[0].SetEmpty();
+    {
+        // Coinbase output must be empty for Proof-of-Stake block
+        txCoinBase.vout[0].SetEmpty();
 
-    // Add our coinbase tx as first transaction
-    pblock->vtx.push_back(txNew);
+        // Syncronize timestamps
+        pblock->nTime = txCoinBase.nTime = txCoinStake->nTime;
+
+        // Add coinbase and coinstake transactions
+        pblock->vtx.push_back(txCoinBase);
+        pblock->vtx.push_back(*txCoinStake);
+    }
 
     // Largest block you're willing to create:
     unsigned int nBlockMaxSize = GetArg("-blockmaxsize", MAX_BLOCK_SIZE_GEN/2);
@@ -151,7 +166,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
     // a transaction spammer can cheaply fill blocks using
     // 1-satoshi-fee transactions. It should be set above the real
     // cost to you of processing a transaction.
-    int64 nMinTxFee = MIN_TX_FEE;
+    int64_t nMinTxFee = MIN_TX_FEE;
     if (mapArgs.count("-mintxfee"))
         ParseMoney(mapArgs["-mintxfee"], nMinTxFee);
 
@@ -160,7 +175,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
     pblock->nBits = GetNextTargetRequired(pindexPrev, fProofOfStake);
 
     // Collect memory pool transactions into the block
-    int64 nFees = 0;
+    int64_t nFees = 0;
     {
         LOCK2(cs_main, mempool.cs);
         CBlockIndex* pindexPrev = pindexBest;
@@ -181,7 +196,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
 
             COrphan* porphan = NULL;
             double dPriority = 0;
-            int64 nTotalIn = 0;
+            int64_t nTotalIn = 0;
             bool fMissingInputs = false;
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
             {
@@ -195,7 +210,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
                     // or other transactions in the memory pool.
                     if (!mempool.mapTx.count(txin.prevout.hash))
                     {
-                        LogPrintf("ERROR: mempool transaction missing input\n");
+                        printf("ERROR: mempool transaction missing input\n");
                         if (fDebug) assert("mempool transaction missing input" == 0);
                         fMissingInputs = true;
                         if (porphan)
@@ -215,7 +230,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
                     nTotalIn += mempool.mapTx[txin.prevout.hash].vout[txin.prevout.n].nValue;
                     continue;
                 }
-                int64 nValueIn = txPrev.vout[txin.prevout.n].nValue;
+                int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
                 nTotalIn += nValueIn;
 
                 int nConf = txindex.GetDepthInMainChain();
@@ -243,8 +258,8 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
 
         // Collect transactions into block
         map<uint256, CTxIndex> mapTestPool;
-        uint64 nBlockSize = 1000;
-        uint64 nBlockTx = 0;
+        uint64_t nBlockSize = 1000;
+        uint64_t nBlockTx = 0;
         int nBlockSigOps = 100;
         bool fSortedByFee = (nBlockPrioritySize <= 0);
 
@@ -272,11 +287,8 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
                 continue;
 
             // Timestamp limit
-            if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[0].nTime))
+            if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > txCoinStake->nTime))
                 continue;
-
-            // Simplify transaction fee - allow free = false
-            int64 nMinFee = tx.GetMinFee(nBlockSize, true, GMF_BLOCK, nTxSize);
 
             // Skip free transactions if we're past the minimum block size:
             if (fSortedByFee && (dFeePerKb < nMinTxFee) && (nBlockSize + nTxSize >= nBlockMinSize))
@@ -300,10 +312,13 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
             if (!tx.FetchInputs(txdb, mapTestPoolTmp, false, true, mapInputs, fInvalid))
                 continue;
 
-            int64 nTxFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
+            // Transaction fee
+            int64_t nTxFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
+            int64_t nMinFee = tx.GetMinFee(nBlockSize, true, GMF_BLOCK, nTxSize);
             if (nTxFees < nMinFee)
                 continue;
 
+            // Sigops accumulation
             nTxSigOps += tx.GetP2SHSigOpCount(mapInputs);
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
@@ -322,7 +337,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
 
             if (fDebug && GetBoolArg("-printpriority"))
             {
-                LogPrintf("priority %.1f feeperkb %.1f txid %s\n",
+                printf("priority %.1f feeperkb %.1f txid %s\n",
                        dPriority, dFeePerKb, tx.GetHash().ToString().c_str());
             }
 
@@ -348,21 +363,25 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;
 
-        if (fDebug && GetBoolArg("-printpriority"))
-            LogPrintf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
-
         if (!fProofOfStake)
         {
-            bool fProtocol048 = fTestNet || VALIDATION_SWITCH_TIME < pblock->nTime;
-            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits, fProtocol048 ? nFees : 0);
+            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits, nFees);
+
+            if (fDebug)
+                printf("CreateNewBlock(): PoW reward %" PRIu64 "\n", pblock->vtx[0].vout[0].nValue);
         }
+
+        if (fDebug && GetBoolArg("-printpriority"))
+            printf("CreateNewBlock(): total size %" PRIu64 "\n", nBlockSize);
 
         // Fill in header
         pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
-        pblock->nTime          = max(pindexPrev->GetMedianTimePast()+1, pblock->GetMaxTransactionTime());
-        pblock->nTime          = max(pblock->GetBlockTime(), PastDrift(pindexPrev->GetBlockTime()));
         if (!fProofOfStake)
+        {
+            pblock->nTime          = max(pindexPrev->GetMedianTimePast()+1, pblock->GetMaxTransactionTime());
+            pblock->nTime          = max(pblock->GetBlockTime(), PastDrift(pindexPrev->GetBlockTime()));
             pblock->UpdateTime(pindexPrev);
+        }
         pblock->nNonce         = 0;
     }
 
@@ -447,9 +466,9 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         return error("CheckWork() : proof-of-work not meeting target");
 
     //// debug print
-    LogPrintf("CheckWork() : new proof-of-work block found  \n  hash: %s  \ntarget: %s\n", hashBlock.GetHex().c_str(), hashTarget.GetHex().c_str());
+    printf("CheckWork() : new proof-of-work block found  \n  hash: %s  \ntarget: %s\n", hashBlock.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
-    LogPrintf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
+    printf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
 
     // Found a solution
     {
@@ -487,9 +506,9 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
         return error("CheckStake() : proof-of-stake checking failed");
 
     //// debug print
-    LogPrintf("CheckStake() : new proof-of-stake block found  \n  hash: %s \nproofhash: %s  \ntarget: %s\n", hashBlock.GetHex().c_str(), proofHash.GetHex().c_str(), hashTarget.GetHex().c_str());
+    printf("CheckStake() : new proof-of-stake block found  \n  hash: %s \nproofhash: %s  \ntarget: %s\n", hashBlock.GetHex().c_str(), proofHash.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
-    LogPrintf("out %s\n", FormatMoney(pblock->vtx[1].GetValueOut()).c_str());
+    printf("out %s\n", FormatMoney(pblock->vtx[1].GetValueOut()).c_str());
 
     // Found a solution
     {
@@ -511,56 +530,268 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
     return true;
 }
 
-void StakeMiner(CWallet *pwallet)
+// Precalculated SHA256 contexts and metadata
+// (txid, vout.n) => (kernel, (tx.nTime, nAmount))
+typedef std::map<std::pair<uint256, unsigned int>, std::pair<std::vector<unsigned char>, std::pair<uint32_t, uint64_t> > > MidstateMap;
+
+// Fill the inputs map with precalculated contexts and metadata
+bool FillMap(CWallet *pwallet, uint32_t nUpperTime, MidstateMap &inputsMap)
+{
+    // Choose coins to use
+    int64_t nBalance = pwallet->GetBalance();
+
+    if (nBalance <= nReserveBalance)
+        return false;
+
+    uint32_t nTime = GetAdjustedTime();
+
+    CTxDB txdb("r");
+    {
+        LOCK2(cs_main, pwallet->cs_wallet);
+
+        CoinsSet setCoins;
+        int64_t nValueIn = 0;
+        if (!pwallet->SelectCoinsSimple(nBalance - nReserveBalance, MIN_TX_FEE, MAX_MONEY, nUpperTime, nCoinbaseMaturity * 10, setCoins, nValueIn))
+            return error("FillMap() : SelectCoinsSimple failed");
+
+        if (setCoins.empty())
+            return false;
+
+        CBlock block;
+        CTxIndex txindex;
+
+        for(CoinsSet::const_iterator pcoin = setCoins.begin(); pcoin != setCoins.end(); pcoin++)
+        {
+            pair<uint256, uint32_t> key = make_pair(pcoin->first->GetHash(), pcoin->second);
+
+            // Skip existent inputs
+            if (inputsMap.find(key) != inputsMap.end())
+                continue;
+
+            // Trying to parse scriptPubKey
+            txnouttype whichType;
+            vector<valtype> vSolutions;
+            if (!Solver(pcoin->first->vout[pcoin->second].scriptPubKey, whichType, vSolutions))
+                continue;
+
+            // Only support pay to public key and pay to address
+            if (whichType != TX_PUBKEY && whichType != TX_PUBKEYHASH)
+                continue;
+
+            // Load transaction index item
+            if (!txdb.ReadTxIndex(pcoin->first->GetHash(), txindex))
+                continue;
+
+            // Read block header
+            if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
+                continue;
+
+            // Only load coins meeting min age requirement
+            if (nStakeMinAge + block.nTime > nTime - nMaxStakeSearchInterval)
+                continue;
+
+            // Get stake modifier
+            uint64_t nStakeModifier = 0;
+            if (!GetKernelStakeModifier(block.GetHash(), nStakeModifier))
+                continue;
+
+            // Build static part of kernel
+            CDataStream ssKernel(SER_GETHASH, 0);
+            ssKernel << nStakeModifier;
+            ssKernel << block.nTime << (txindex.pos.nTxPos - txindex.pos.nBlockPos) << pcoin->first->nTime << pcoin->second;
+
+            // (txid, vout.n) => (kernel, (tx.nTime, nAmount))
+            inputsMap[key] = make_pair(std::vector<unsigned char>(ssKernel.begin(), ssKernel.end()), make_pair(pcoin->first->nTime, pcoin->first->vout[pcoin->second].nValue));
+        }
+
+        nStakeInputsMapSize = inputsMap.size();
+
+        if (fDebug)
+            printf("FillMap() : Map of %" PRIu64 " precalculated contexts has been created by stake miner\n", nStakeInputsMapSize);
+    }
+
+    return true;
+}
+
+// Scan inputs map in order to find a solution
+bool ScanMap(const MidstateMap &inputsMap, uint32_t nBits, MidstateMap::key_type &LuckyInput, std::pair<uint256, uint32_t> &solution)
+{
+    static uint32_t nLastCoinStakeSearchTime = GetAdjustedTime(); // startup timestamp
+    uint32_t nSearchTime = GetAdjustedTime();
+
+    if (inputsMap.size() > 0 && nSearchTime > nLastCoinStakeSearchTime)
+    {
+        // Scanning interval (begintime, endtime)
+        std::pair<uint32_t, uint32_t> interval;
+
+        interval.first = nSearchTime;
+        interval.second = nSearchTime - min(nSearchTime-nLastCoinStakeSearchTime, nMaxStakeSearchInterval);
+
+        // (txid, nout) => (kernel, (tx.nTime, nAmount))
+        for(MidstateMap::const_iterator input = inputsMap.begin(); input != inputsMap.end(); input++)
+        {
+            unsigned char *kernel = (unsigned char *) &input->second.first[0];
+
+            // scan(State, Bits, Time, Amount, ...)
+            if (ScanKernelBackward(kernel, nBits, input->second.second.first, input->second.second.second, interval, solution))
+            {
+                // Solution found
+                LuckyInput = input->first; // (txid, nout)
+
+                return true;
+            }
+        }
+
+        // Inputs map iteration can be big enough to consume few seconds while scanning.
+        // We're using dynamical calculation of scanning interval in order to compensate this delay.
+        nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
+        nLastCoinStakeSearchTime = nSearchTime;
+    }
+
+    // No solutions were found
+    return false;
+}
+
+// Stake miner thread
+void ThreadStakeMiner(void* parg)
 {
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
     // Make this thread recognisable as the mining thread
     RenameThread("novacoin-miner");
+    CWallet* pwallet = (CWallet*)parg;
 
-    // Each thread has its own counter
-    unsigned int nExtraNonce = 0;
+    MidstateMap inputsMap;
+    if (!FillMap(pwallet, GetAdjustedTime(), inputsMap))
+        return;
 
-    while (true)
+    bool fTrySync = true;
+
+    CBlockIndex* pindexPrev = pindexBest;
+    uint32_t nBits = GetNextTargetRequired(pindexPrev, true);
+
+    printf("ThreadStakeMinter started\n");
+
+    try
     {
-        if (fShutdown)
-            return;
+        vnThreadsRunning[THREAD_MINTER]++;
 
-        while (pwallet->IsLocked())
+        MidstateMap::key_type LuckyInput;
+        std::pair<uint256, uint32_t> solution;
+
+        // Main miner loop
+        do
         {
-            Sleep(1000);
             if (fShutdown)
-                return;
-        }
+                goto _endloop;
 
-        while (vNodes.empty() || IsInitialBlockDownload())
-        {
-            Sleep(1000);
-            if (fShutdown)
-                return;
-        }
+            while (pwallet->IsLocked())
+            {
+                Sleep(1000);
+                if (fShutdown)
+                    goto _endloop; // Don't be afraid to use a goto if that's the best option.
+            }
 
-        //
-        // Create new block
-        //
-        CBlockIndex* pindexPrev = pindexBest;
+            while (vNodes.empty() || IsInitialBlockDownload())
+            {
+                fTrySync = true;
 
-        auto_ptr<CBlock> pblock(CreateNewBlock(pwallet, true));
-        if (!pblock.get())
-            return;
-        IncrementExtraNonce(pblock.get(), pindexPrev, nExtraNonce);
+                Sleep(1000);
+                if (fShutdown)
+                    goto _endloop;
+            }
 
-        // Trying to sign a block
-        if (pblock->SignBlock(*pwallet))
-        {
-            SetThreadPriority(THREAD_PRIORITY_NORMAL);
-            CheckStake(pblock.get(), *pwallet);
-            SetThreadPriority(THREAD_PRIORITY_LOWEST);
+            if (fTrySync)
+            {
+                // Don't try mine blocks unless we're at the top of chain and have at least three p2p connections.
+                fTrySync = false;
+                if (vNodes.size() < 3 || nBestHeight < GetNumBlocksOfPeers())
+                {
+                    Sleep(1000);
+                    continue;
+                }
+            }
+
+            if (ScanMap(inputsMap, nBits, LuckyInput, solution))
+            {
+                SetThreadPriority(THREAD_PRIORITY_NORMAL);
+
+                // Remove lucky input from the map
+                inputsMap.erase(inputsMap.find(LuckyInput));
+
+                CKey key;
+                CTransaction txCoinStake;
+
+                // Create new coinstake transaction
+                if (!pwallet->CreateCoinStake(LuckyInput.first, LuckyInput.second, solution.second, nBits, txCoinStake, key))
+                {
+                    string strMessage = _("Warning: Unable to create coinstake transaction, see debug.log for the details. Mining thread has been stopped.");
+                    strMiscWarning = strMessage;
+                    printf("*** %s\n", strMessage.c_str());
+
+                    break;
+                }
+
+                // Now we have new coinstake, it's time to create the block ...
+                CBlock* pblock;
+                pblock = CreateNewBlock(pwallet, &txCoinStake);
+                if (!pblock)
+                {
+                    string strMessage = _("Warning: Unable to allocate memory for the new block object. Mining thread has been stopped.");
+                    strMiscWarning = strMessage;
+                    printf("*** %s\n", strMessage.c_str());
+
+                    break;
+                }
+
+                unsigned int nExtraNonce = 0;
+                IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
+
+                // ... and sign it
+                if (!key.Sign(pblock->GetHash(), pblock->vchBlockSig))
+                {
+                    string strMessage = _("Warning: Proof-of-Stake miner is unable to sign the block (locked wallet?). Mining thread has been stopped.");
+                    strMiscWarning = strMessage;
+                    printf("*** %s\n", strMessage.c_str());
+
+                    break;
+                }
+
+                CheckStake(pblock, *pwallet);
+                SetThreadPriority(THREAD_PRIORITY_LOWEST);
+                Sleep(500);
+            }
+
+            if (pindexPrev != pindexBest)
+            {
+                // The best block has been changed, we need to refill the map
+                if (FillMap(pwallet, GetAdjustedTime(), inputsMap))
+                {
+                    pindexPrev = pindexBest;
+                    nBits = GetNextTargetRequired(pindexPrev, true);
+                }
+                else
+                {
+                    // Clear existent data if FillMap failed
+                    inputsMap.clear();
+                }
+            }
+
             Sleep(500);
-        }
-        else
-            Sleep(nMinerSleep);
 
-        continue;
+            _endloop:
+                (void)0; // do nothing
+        }
+        while(!fShutdown);
+
+        vnThreadsRunning[THREAD_MINTER]--;
     }
+    catch (std::exception& e) {
+        vnThreadsRunning[THREAD_MINTER]--;
+        PrintException(&e, "ThreadStakeMinter()");
+    } catch (...) {
+        vnThreadsRunning[THREAD_MINTER]--;
+        PrintException(NULL, "ThreadStakeMinter()");
+    }
+    printf("ThreadStakeMinter exiting, %d threads remaining\n", vnThreadsRunning[THREAD_MINTER]);
 }

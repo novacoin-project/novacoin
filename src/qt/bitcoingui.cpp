@@ -9,6 +9,7 @@
 #include "addressbookpage.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
+#include "secondauthdialog.h"
 #include "multisigdialog.h"
 #include "optionsdialog.h"
 #include "aboutdialog.h"
@@ -70,11 +71,15 @@
 #include <iostream>
 
 extern bool fWalletUnlockMintOnly;
+extern uint64_t nStakeInputsMapSize;
 
 BitcoinGUI::BitcoinGUI(QWidget *parent):
     QMainWindow(parent),
     clientModel(0),
     walletModel(0),
+    signVerifyMessageDialog(0),
+    secondAuthDialog(0),
+    multisigPage(0),
     encryptWalletAction(0),
     lockWalletAction(0),
     unlockWalletAction(0),
@@ -83,7 +88,9 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     aboutQtAction(0),
     trayIcon(0),
     notificator(0),
-    rpcConsole(0)
+    rpcConsole(0),
+    aboutDialog(0),
+    optionsDialog(0)
 {
     resize(850, 550);
     setWindowTitle(tr("NovaCoin") + " - " + tr("Wallet"));
@@ -130,9 +137,11 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 
     sendCoinsPage = new SendCoinsDialog(this);
 
-    signVerifyMessageDialog = new SignVerifyMessageDialog(this);
+    signVerifyMessageDialog = new SignVerifyMessageDialog(0);
 
-    multisigPage = new MultisigDialog(this);
+    secondAuthDialog = new SecondAuthDialog(0);
+
+    multisigPage = new MultisigDialog(0);
 
     centralWidget = new QStackedWidget(this);
     centralWidget->addWidget(overviewPage);
@@ -197,8 +206,12 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     // Double-clicking on a transaction on the transaction history page shows details
     connect(transactionView, SIGNAL(doubleClicked(QModelIndex)), transactionView, SLOT(showDetails()));
 
-    rpcConsole = new RPCConsole(this);
+    rpcConsole = new RPCConsole(0);
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
+    connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(raise()));
+
+    aboutDialog = new AboutDialog(0);
+    optionsDialog = new OptionsDialog(0);
 
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
     connect(addressBookPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
@@ -215,6 +228,13 @@ BitcoinGUI::~BitcoinGUI()
 #ifdef Q_OS_MAC
     delete appMenuBar;
 #endif
+
+    delete rpcConsole;
+    delete aboutDialog;
+    delete optionsDialog;
+    delete multisigPage;
+    delete secondAuthDialog;
+    delete signVerifyMessageDialog;
 }
 
 void BitcoinGUI::createActions()
@@ -258,6 +278,7 @@ void BitcoinGUI::createActions()
     tabGroup->addAction(addressBookAction);
 
     multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
+    multisigAction->setStatusTip(tr("Open window for working with multisig addresses"));
     tabGroup->addAction(multisigAction);
 
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -276,53 +297,57 @@ void BitcoinGUI::createActions()
     connect(multisigAction, SIGNAL(triggered()), this, SLOT(gotoMultisigPage()));
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
-    quitAction->setToolTip(tr("Quit application"));
+    quitAction->setStatusTip(tr("Quit application"));
     quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     quitAction->setMenuRole(QAction::QuitRole);
     aboutAction = new QAction(QIcon(":/icons/bitcoin"), tr("&About NovaCoin"), this);
-    aboutAction->setToolTip(tr("Show information about NovaCoin"));
+    aboutAction->setStatusTip(tr("Show information about NovaCoin"));
     aboutAction->setMenuRole(QAction::AboutRole);
 #if QT_VERSION < 0x050000
     aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
 #else
     aboutQtAction = new QAction(QIcon(":/qt-project.org/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
 #endif
-    aboutQtAction->setToolTip(tr("Show information about Qt"));
+    aboutQtAction->setStatusTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
     optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
-    optionsAction->setToolTip(tr("Modify configuration options for NovaCoin"));
+    optionsAction->setStatusTip(tr("Modify configuration options for NovaCoin"));
     optionsAction->setMenuRole(QAction::PreferencesRole);
     toggleHideAction = new QAction(QIcon(":/icons/bitcoin"), tr("&Show / Hide"), this);
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
-    encryptWalletAction->setToolTip(tr("Encrypt or decrypt wallet"));
+    encryptWalletAction->setStatusTip(tr("Encrypt or decrypt wallet"));
     encryptWalletAction->setCheckable(true);
     backupWalletAction = new QAction(QIcon(":/icons/filesave"), tr("&Backup Wallet..."), this);
-    backupWalletAction->setToolTip(tr("Backup wallet to another location"));
+    backupWalletAction->setStatusTip(tr("Backup wallet to another location"));
     dumpWalletAction = new QAction(QIcon(":/icons/dump"), tr("&Dump Wallet..."), this);
     dumpWalletAction->setStatusTip(tr("Dump keys to a text file"));
     importWalletAction = new QAction(QIcon(":/icons/import"), tr("&Import Wallet..."), this);
     importWalletAction->setStatusTip(tr("Import keys into a wallet"));
     changePassphraseAction = new QAction(QIcon(":/icons/key"), tr("&Change Passphrase..."), this);
-    changePassphraseAction->setToolTip(tr("Change the passphrase used for wallet encryption"));
+    changePassphraseAction->setStatusTip(tr("Change the passphrase used for wallet encryption"));
     signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &message..."), this);
+    signMessageAction->setStatusTip(tr("Sign messages with your Novacoin addresses to prove you own them"));
     verifyMessageAction = new QAction(QIcon(":/icons/transaction_0"), tr("&Verify message..."), this);
+    verifyMessageAction->setStatusTip(tr("Verify messages to ensure they were signed with specified Novacoin addresses"));
+    secondAuthAction = new QAction(QIcon(":/icons/key"), tr("Second &auth..."), this);
+    secondAuthAction->setStatusTip(tr("Second auth with your Novacoin addresses"));
 
     lockWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Lock wallet"), this);
-    lockWalletAction->setToolTip(tr("Lock wallet"));
+    lockWalletAction->setStatusTip(tr("Lock wallet"));
     lockWalletAction->setCheckable(true);
 
     unlockWalletAction = new QAction(QIcon(":/icons/lock_open"), tr("Unlo&ck wallet"), this);
-    unlockWalletAction->setToolTip(tr("Unlock wallet"));
+    unlockWalletAction->setStatusTip(tr("Unlock wallet"));
     unlockWalletAction->setCheckable(true);
 
     unlockWalletMiningAction = new QAction(QIcon(":/icons/mining_active"), tr("Unlo&ck wallet for mining"), this);
-    unlockWalletMiningAction->setToolTip(tr("Unlock wallet for mining"));
+    unlockWalletMiningAction->setStatusTip(tr("Unlock wallet for mining"));
     unlockWalletMiningAction->setCheckable(true);
 
     exportAction = new QAction(QIcon(":/icons/export"), tr("&Export..."), this);
-    exportAction->setToolTip(tr("Export the data in the current tab to a file"));
+    exportAction->setStatusTip(tr("Export the data in the current tab to a file"));
     openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Debug window"), this);
-    openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
+    openRPCConsoleAction->setStatusTip(tr("Open debugging and diagnostic console"));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
@@ -339,6 +364,7 @@ void BitcoinGUI::createActions()
     connect(changePassphraseAction, SIGNAL(triggered()), this, SLOT(changePassphrase()));
     connect(signMessageAction, SIGNAL(triggered()), this, SLOT(gotoSignMessageTab()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(gotoVerifyMessageTab()));
+    connect(secondAuthAction, SIGNAL(triggered()), this, SLOT(gotoSecondAuthPage()));
 }
 
 void BitcoinGUI::createMenuBar()
@@ -360,6 +386,7 @@ void BitcoinGUI::createMenuBar()
     file->addAction(exportAction);
     file->addAction(signMessageAction);
     file->addAction(verifyMessageAction);
+    file->addAction(secondAuthAction);
     file->addAction(multisigAction);
     file->addSeparator();
     file->addAction(quitAction);
@@ -460,6 +487,7 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
+        secondAuthDialog->setModel(walletModel);
         multisigPage->setModel(walletModel);
 
         setEncryptionStatus(walletModel->getEncryptionStatus());
@@ -503,6 +531,7 @@ void BitcoinGUI::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(signMessageAction);
     trayIconMenu->addAction(verifyMessageAction);
+    trayIconMenu->addAction(secondAuthAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(optionsAction);
     trayIconMenu->addAction(openRPCConsoleAction);
@@ -529,16 +558,17 @@ void BitcoinGUI::optionsClicked()
 {
     if(!clientModel || !clientModel->getOptionsModel())
         return;
-    OptionsDialog dlg;
-    dlg.setModel(clientModel->getOptionsModel());
-    dlg.exec();
+
+    optionsDialog->setModel(clientModel->getOptionsModel());
+    optionsDialog->setWindowModality(Qt::ApplicationModal);
+    optionsDialog->show();
 }
 
 void BitcoinGUI::aboutClicked()
 {
-    AboutDialog dlg;
-    dlg.setModel(clientModel);
-    dlg.exec();
+    aboutDialog->setModel(clientModel);
+    aboutDialog->setWindowModality(Qt::ApplicationModal);
+    aboutDialog->show();
 }
 
 void BitcoinGUI::setNumConnections(int count)
@@ -603,6 +633,9 @@ void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
         progressBarLabel->setVisible(true);
         progressBar->setVisible(false);
     }
+
+    tooltip = tr("Current PoW difficulty is %1.").arg(clientModel->getDifficulty(false)) + QString("<br>") + tooltip;
+    tooltip = tr("Current PoS difficulty is %1.").arg(clientModel->getDifficulty(true)) + QString("<br>") + tooltip;
 
     QDateTime lastBlockDate = clientModel->getLastBlockDate();
     int secs = lastBlockDate.secsTo(QDateTime::currentDateTime());
@@ -686,47 +719,16 @@ void BitcoinGUI::updateMining()
         return;
     }
 
-    float nKernelsRate = 0, nCoinDaysRate = 0;
-    walletModel->getStakeStats(nKernelsRate, nCoinDaysRate);
-
-    if (nKernelsRate > 0)
+    if (nStakeInputsMapSize > 0)
     {
         labelMiningIcon->setPixmap(QIcon(":/icons/mining_active").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
 
-        uint64 nNetworkWeight = clientModel->getPoSKernelPS();
-/*
-        double dDifficulty = clientModel->getDifficulty(true);
-        QString msg;
+        uint64_t nNetworkWeight = clientModel->getPoSKernelPS();
 
-        int nApproxTime = 4294967297 * dDifficulty / nTotalWeight;
-
-        if (nApproxTime < 60)
-            msg = tr("%n second(s)", "", nApproxTime);
-        else if (nApproxTime < 60*60)
-            msg = tr("%n minute(s)", "", nApproxTime / 60);
-        else if (nApproxTime < 24*60*60)
-            msg = tr("%n hour(s)", "", nApproxTime / 3600);
-        else
-            msg = tr("%n day(s)", "", nApproxTime / 86400);
-
-        labelMiningIcon->setToolTip(tr("Stake miner is active\nYour current stake weight is %1\nNetwork weight is %2\nAverage block generation time is %3").arg(nTotalWeight).arg(dNetworkWeight).arg(msg));
-*/
-
-        labelMiningIcon->setToolTip(tr("Stake miner is active\nKernel rate is %1 k/s\nCD rate is %2 CD/s\nNetwork weight is %3").arg(nKernelsRate).arg(nCoinDaysRate).arg(nNetworkWeight));
+        labelMiningIcon->setToolTip(QString("<nobr>")+tr("Stake miner is active<br>%1 inputs being used for mining<br>Network weight is %3").arg(nStakeInputsMapSize).arg(nNetworkWeight)+QString("<\nobr>"));
     }
     else
         labelMiningIcon->setToolTip(tr("No suitable inputs were found"));
-}
-
-void BitcoinGUI::error(const QString &title, const QString &message, bool modal)
-{
-    // Report errors from network/worker thread
-    if(modal)
-    {
-        QMessageBox::critical(this, title, message, QMessageBox::Ok, QMessageBox::Ok);
-    } else {
-        notificator->notify(Notificator::Critical, title, message);
-    }
 }
 
 void BitcoinGUI::message(const QString &title, const QString &message, unsigned int style, const QString &detail)
@@ -809,6 +811,9 @@ void BitcoinGUI::closeEvent(QCloseEvent *event)
         }
 #endif
     }
+    // close rpcConsole in case it was open to make some space for the shutdown window
+    rpcConsole->close();
+
     QMainWindow::closeEvent(event);
 }
 
@@ -937,10 +942,18 @@ void BitcoinGUI::gotoVerifyMessageTab(QString addr)
         signVerifyMessageDialog->setAddress_VM(addr);
 }
 
+void BitcoinGUI::gotoSecondAuthPage(QString addr)
+{
+    secondAuthDialog->show();
+    secondAuthDialog->raise();
+    secondAuthDialog->activateWindow();
+}
+
 void BitcoinGUI::gotoMultisigPage()
 {
     multisigPage->show();
-    multisigPage->setFocus();
+    multisigPage->raise();
+    multisigPage->activateWindow();
 }
 
 void BitcoinGUI::dragEnterEvent(QDragEnterEvent *event)
@@ -1003,7 +1016,7 @@ void BitcoinGUI::setEncryptionStatus(int status)
         labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
-        encryptWalletAction->setEnabled(false); // TODO: decrypt currently not supported
+        encryptWalletAction->setEnabled(true);
 
         lockWalletAction->setEnabled(true);
         lockWalletAction->setChecked(false);
@@ -1022,7 +1035,7 @@ void BitcoinGUI::setEncryptionStatus(int status)
         labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>locked</b>"));
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
-        encryptWalletAction->setEnabled(false); // TODO: decrypt currently not supported
+        encryptWalletAction->setEnabled(true);
 
         lockWalletAction->setChecked(true);
         unlockWalletAction->setChecked(false);
@@ -1096,7 +1109,7 @@ void BitcoinGUI::dumpWallet()
     QString filename = QFileDialog::getSaveFileName(this, tr("Dump Wallet"), saveDir, tr("Wallet dump (*.txt)"));
     if(!filename.isEmpty()) {
         if(!walletModel->dumpWallet(filename)) {
-            error(tr("Dump failed"),
+            message(tr("Dump failed"),
                          tr("An error happened while trying to save the keys to your location.\n"
                             "Keys were not saved.")
                       ,CClientUIInterface::MSG_ERROR);
@@ -1129,7 +1142,7 @@ void BitcoinGUI::importWallet()
     QString filename = QFileDialog::getOpenFileName(this, tr("Import Wallet"), openDir, tr("Wallet dump (*.txt)"));
     if(!filename.isEmpty()) {
         if(!walletModel->importWallet(filename)) {
-            error(tr("Import Failed"),
+            message(tr("Import Failed"),
                          tr("An error happened while trying to import the keys.\n"
                             "Some or all keys from:\n %1,\n were not imported into your wallet.")
                          .arg(filename)
@@ -1177,18 +1190,29 @@ void BitcoinGUI::showNormalIfMinimized(bool fToggleHidden)
     // activateWindow() (sometimes) helps with keyboard focus on Windows
     if (isHidden())
     {
+        // Make sure the window is not minimized
+        setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+        // Then show it
         show();
+        raise();
         activateWindow();
     }
     else if (isMinimized())
     {
         showNormal();
+        raise();
         activateWindow();
     }
     else if (GUIUtil::isObscured(this))
     {
         raise();
         activateWindow();
+        if(fToggleHidden)
+        {
+            Sleep(1);
+            if (GUIUtil::isObscured(this))
+                hide();
+        }
     }
     else if(fToggleHidden)
         hide();
@@ -1197,4 +1221,15 @@ void BitcoinGUI::showNormalIfMinimized(bool fToggleHidden)
 void BitcoinGUI::toggleHidden()
 {
     showNormalIfMinimized(true);
+}
+
+void BitcoinGUI::error(const QString &title, const QString &message, bool modal)
+{
+    // Report errors from network/worker thread
+    if(modal)
+    {
+        QMessageBox::critical(this, title, message, QMessageBox::Ok, QMessageBox::Ok);
+    } else {
+        notificator->notify(Notificator::Critical, title, message);
+    }
 }

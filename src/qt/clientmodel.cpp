@@ -9,13 +9,12 @@
 #include "ui_interface.h"
 
 #include <QDateTime>
-#include <QDebug>
 #include <QTimer>
 
 extern double GetPoSKernelPS();
 extern double GetDifficulty(const CBlockIndex* blockindex);
 
-static const int64 nClientStartupTime = GetTime();
+static const int64_t nClientStartupTime = GetTime();
 
 ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
     QObject(parent), optionsModel(optionsModel),
@@ -49,9 +48,18 @@ double ClientModel::getDifficulty(bool fProofofStake)
        return GetDifficulty(GetLastBlockIndex(pindexBest,false));
 }
 
-int ClientModel::getNumConnections() const
+int ClientModel::getNumConnections(uint8_t flags) const
 {
-    return vNodes.size();
+    LOCK(cs_vNodes);
+    if (flags == CONNECTIONS_ALL) // Shortcut if we want total
+        return (int)(vNodes.size());
+
+    int nNum = 0;
+    BOOST_FOREACH(CNode* pnode, vNodes)
+    if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
+        nNum++;
+
+    return nNum;
 }
 
 int ClientModel::getNumBlocks() const
@@ -186,8 +194,7 @@ static void NotifyNumConnectionsChanged(ClientModel *clientmodel, int newNumConn
 
 static void NotifyAlertChanged(ClientModel *clientmodel, const uint256 &hash, ChangeType status)
 {
-    QString strHash = QString::fromStdString(hash.GetHex());
-    qDebug() << "NotifyAlertChanged " + strHash + " status=" + QString::number(status) + "\n";
+    OutputDebugStringF("NotifyAlertChanged %s status=%i\n", hash.GetHex().c_str(), status);
     QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection,
                               Q_ARG(QString, QString::fromStdString(hash.GetHex())),
                               Q_ARG(int, status));

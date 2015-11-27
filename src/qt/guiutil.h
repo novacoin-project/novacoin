@@ -4,6 +4,11 @@
 #include <QString>
 #include <QObject>
 #include <QMessageBox>
+#include <QWidget>
+#include <QEvent>
+#include <QTextEdit>
+
+#include <boost/filesystem.hpp>
 
 QT_BEGIN_NAMESPACE
 class QFont;
@@ -19,6 +24,11 @@ class SendCoinsRecipient;
  */
 namespace GUIUtil
 {
+     /* Convert QString to OS specific boost path through UTF-8 */
+    boost::filesystem::path qstringToBoostPath(const QString &path);
+     /* Convert OS specific boost path to QString through UTF-8 */
+    QString boostPathToQString(const boost::filesystem::path &path);
+
     // Create human-readable string from date
     QString dateTimeStr(const QDateTime &datetime);
     QString dateTimeStr(qint64 nTime);
@@ -73,7 +83,8 @@ namespace GUIUtil
 
     // Open debug.log
     void openDebugLogfile();
-
+    // Open novacoin.conf
+    void openConfigfile();
     /** Qt event filter that intercepts ToolTipChange events, and replaces the tooltip with a rich text
       representation if needed. This assures that Qt can word-wrap long tooltip messages.
       Tooltips longer than the provided size threshold (in characters) are wrapped.
@@ -113,6 +124,21 @@ namespace GUIUtil
         QString header;
         QString coreOptions;
         QString uiOptions;
+
+        virtual bool event(QEvent *e)
+        {
+            bool res = QMessageBox::event(e);
+            if (e->type() == QEvent::MouseMove || e->type() == QEvent::MouseButtonPress)
+            {
+                setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+                if (QWidget *textEdit = findChild<QTextEdit *>())
+                {
+                    textEdit->setMaximumHeight(QWIDGETSIZE_MAX);
+                }
+            }
+
+            return res;
+        }
     };
     /* Convert seconds into a QString with days, hours, mins, secs */
     QString formatDurationStr(int secs);

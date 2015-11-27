@@ -32,6 +32,7 @@
 #include <QDesktopServices>
 #include <QSignalMapper>
 #include <QUrl>
+#include <QEventLoop>
 
 TransactionView::TransactionView(QWidget *parent) :
     QWidget(parent), model(0), transactionProxyModel(0),
@@ -178,8 +179,8 @@ void TransactionView::setModel(WalletModel *model, bool fShoudAddThirdPartyURL)
         transactionProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         transactionProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-//        transactionProxyModel->setSortRole(Qt::EditRole);
-        transactionProxyModel->setSortRole(TransactionTableModel::DateRole);
+        transactionProxyModel->setSortRole(Qt::EditRole);
+//        transactionProxyModel->setSortRole(TransactionTableModel::DateRole);
 
         transactionView->setModel(transactionProxyModel);
         transactionView->setAlternatingRowColors(true);
@@ -202,7 +203,7 @@ void TransactionView::setModel(WalletModel *model, bool fShoudAddThirdPartyURL)
         transactionView->horizontalHeader()->setSectionResizeMode(TransactionTableModel::ToAddress, QHeaderView::Stretch);
 #endif
         transactionView->horizontalHeader()->resizeSection(
-                TransactionTableModel::Amount, 100);
+                TransactionTableModel::Amount, 130);
 
         if (model->getOptionsModel() && fShoudAddThirdPartyURL)
         {
@@ -415,7 +416,13 @@ void TransactionView::showDetails()
     if(!selection.isEmpty())
     {
         TransactionDescDialog dlg(selection.at(0));
-        dlg.exec();
+        dlg.setWindowModality(Qt::ApplicationModal);
+        dlg.show();
+
+        // This loop will wait for the window is closed
+        QEventLoop loop;
+        connect(&dlg, SIGNAL(stopExec()), &loop, SLOT(quit()));
+        loop.exec();
     }
 }
 

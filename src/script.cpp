@@ -270,10 +270,7 @@ bool IsCanonicalPubKey(const valtype &vchPubKey, unsigned int flags) {
     return true;
 }
 
-bool IsCanonicalSignature(const valtype &vchSig, unsigned int flags) {
-    if (!(flags & SCRIPT_VERIFY_STRICTENC))
-        return true;
-
+bool IsDERSignature(const valtype &vchSig, bool fWithHashType, bool fCheckLow) {
     // See https://bitcointalk.org/index.php?topic=8392.msg127623#msg127623
     // A canonical signature exists of: <30> <total len> <02> <len R> <R> <02> <len S> <S> <hashtype>
     // Where R and S are not negative (their first byte has its highest bit not set), and not
@@ -283,18 +280,20 @@ bool IsCanonicalSignature(const valtype &vchSig, unsigned int flags) {
         return error("Non-canonical signature: too short");
     if (vchSig.size() > 73)
         return error("Non-canonical signature: too long");
-    unsigned char nHashType = vchSig[vchSig.size() - 1] & (~(SIGHASH_ANYONECANPAY));
-    if (nHashType < SIGHASH_ALL || nHashType > SIGHASH_SINGLE)
-        return error("Non-canonical signature: unknown hashtype byte");
     if (vchSig[0] != 0x30)
         return error("Non-canonical signature: wrong type");
-    if (vchSig[1] != vchSig.size()-3)
+    if (vchSig[1] != vchSig.size() - (fWithHashType ? 3 : 2))
         return error("Non-canonical signature: wrong length marker");
+    if (fWithHashType) {
+        unsigned char nHashType = vchSig[vchSig.size() - 1] & (~(SIGHASH_ANYONECANPAY));
+        if (nHashType < SIGHASH_ALL || nHashType > SIGHASH_SINGLE)
+            return error("Non-canonical signature: unknown hashtype byte");
+    }
     unsigned int nLenR = vchSig[3];
     if (5 + nLenR >= vchSig.size())
         return error("Non-canonical signature: S length misplaced");
     unsigned int nLenS = vchSig[5+nLenR];
-    if ((unsigned long)(nLenR+nLenS+7) != vchSig.size())
+    if ((unsigned long)(nLenR + nLenS + (fWithHashType ? 7 : 6)) != vchSig.size())
         return error("Non-canonical signature: R+S length mismatch");
 
     const unsigned char *R = &vchSig[4];
@@ -317,12 +316,25 @@ bool IsCanonicalSignature(const valtype &vchSig, unsigned int flags) {
     if (nLenS > 1 && (S[0] == 0x00) && !(S[1] & 0x80))
         return error("Non-canonical signature: S value excessively padded");
 
-    if (flags & SCRIPT_VERIFY_LOW_S) {
+    if (fCheckLow) {
+        unsigned int nLenR = vchSig[3];
+        unsigned int nLenS = vchSig[5+nLenR];
+        const unsigned char *S = &vchSig[6+nLenR];
+        // If the S value is above the order of the curve divided by two, its
+        // complement modulo the order could have been used instead, which is
+        // one byte shorter when encoded correctly.
         if (!CKey::CheckSignatureElement(S, nLenS, true))
             return error("Non-canonical signature: S value is unnecessarily high");
     }
 
     return true;
+}
+
+bool IsCanonicalSignature(const valtype &vchSig, unsigned int flags) {
+    if (!(flags & SCRIPT_VERIFY_STRICTENC))
+        return true;
+
+    return IsDERSignature(vchSig, true, (flags & SCRIPT_VERIFY_LOW_S) != 0);
 }
 
 bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType)
@@ -575,7 +587,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                 case OP_DEPTH:
                 {
                     // -- stacksize
-                    CBigNum bn(stack.size());
+                    CBigNum bn((uint16_t) stack.size());
                     stack.push_back(bn.getvch());
                 }
                 break;
@@ -625,7 +637,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
                     if (stack.size() < 2)
                         return false;
-                    int n = CastToBigNum(stacktop(-1)).getint();
+                    int n = CastToBigNum(stacktop(-1)).getint32();
                     popstack(stack);
                     if (n < 0 || n >= (int)stack.size())
                         return false;
@@ -673,7 +685,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // (in -- in size)
                     if (stack.size() < 1)
                         return false;
-                    CBigNum bn(stacktop(-1).size());
+                    CBigNum bn((uint16_t) stacktop(-1).size());
                     stack.push_back(bn.getvch());
                 }
                 break;
@@ -901,7 +913,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     if ((int)stack.size() < i)
                         return false;
 
-                    int nKeysCount = CastToBigNum(stacktop(-i)).getint();
+                    int nKeysCount = CastToBigNum(stacktop(-i)).getint32();
                     if (nKeysCount < 0 || nKeysCount > 20)
                         return false;
                     nOpCount += nKeysCount;
@@ -912,7 +924,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     if ((int)stack.size() < i)
                         return false;
 
-                    int nSigsCount = CastToBigNum(stacktop(-i)).getint();
+                    int nSigsCount = CastToBigNum(stacktop(-i)).getint32();
                     if (nSigsCount < 0 || nSigsCount > nKeysCount)
                         return false;
                     int isig = ++i;
@@ -1013,7 +1025,7 @@ uint256 SignatureHash(CScript scriptCode, const CTransaction& txTo, unsigned int
 {
     if (nIn >= txTo.vin.size())
     {
-        LogPrintf("ERROR: SignatureHash() : nIn=%d out of range\n", nIn);
+        printf("ERROR: SignatureHash() : nIn=%d out of range\n", nIn);
         return 1;
     }
     CTransaction txTmp(txTo);
@@ -1044,7 +1056,7 @@ uint256 SignatureHash(CScript scriptCode, const CTransaction& txTo, unsigned int
         unsigned int nOut = nIn;
         if (nOut >= txTmp.vout.size())
         {
-            LogPrintf("ERROR: SignatureHash() : nOut=%d out of range\n", nOut);
+            printf("ERROR: SignatureHash() : nOut=%d out of range\n", nOut);
             return 1;
         }
         txTmp.vout.resize(nOut+1);
@@ -1103,12 +1115,12 @@ public:
         // (~200 bytes per cache entry times 50,000 entries)
         // Since there are a maximum of 20,000 signature operations per block
         // 50,000 is a reasonable default.
-        int64 nMaxCacheSize = GetArg("-maxsigcachesize", 50000);
+        int64_t nMaxCacheSize = GetArg("-maxsigcachesize", 50000);
         if (nMaxCacheSize <= 0) return;
 
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
 
-        while (static_cast<int64>(setValid.size()) > nMaxCacheSize)
+        while (static_cast<int64_t>(setValid.size()) > nMaxCacheSize)
         {
             // Evict a random entry. Random because that helps
             // foil would-be DoS attackers who might try to pre-generate
@@ -1527,6 +1539,7 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
 class CAffectedKeysVisitor : public boost::static_visitor<void> {
 private:
     const CKeyStore &keystore;
+    CAffectedKeysVisitor& operator=(CAffectedKeysVisitor const&);
     std::vector<CKeyID> &vKeys;
 
 public:
@@ -1707,7 +1720,7 @@ static CScript CombineMultisig(CScript scriptPubKey, const CTransaction& txTo, u
     // Build a map of pubkey -> signature by matching sigs to pubkeys:
     assert(vSolutions.size() > 1);
     unsigned int nSigsRequired = vSolutions.front()[0];
-    unsigned int nPubKeys = vSolutions.size()-2;
+    unsigned int nPubKeys = (unsigned int)(vSolutions.size()-2);
     map<valtype, valtype> sigs;
     BOOST_FOREACH(const valtype& sig, allsigs)
     {
@@ -1923,5 +1936,5 @@ void CScript::SetMultisig(int nRequired, const std::vector<CKey>& keys)
     *this << EncodeOP_N(nRequired);
     BOOST_FOREACH(const CKey& key, keys)
         *this << key.GetPubKey();
-    *this << EncodeOP_N(keys.size()) << OP_CHECKMULTISIG;
+    *this << EncodeOP_N((int)(keys.size())) << OP_CHECKMULTISIG;
 }

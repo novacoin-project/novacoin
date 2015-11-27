@@ -6,7 +6,6 @@
 #include "base58.h"
 
 #include <QFont>
-#include <QDebug>
 #include <QColor>
 
 const QString AddressTableModel::Send = "S";
@@ -91,7 +90,7 @@ public:
         case CT_NEW:
             if(inModel)
             {
-                qWarning() << "Warning: AddressTablePriv::updateEntry: Got CT_NOW, but entry is already in model\n";
+                OutputDebugStringF("Warning: AddressTablePriv::updateEntry: Got CT_NOW, but entry is already in model\n");
                 break;
             }
             parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex);
@@ -101,7 +100,7 @@ public:
         case CT_UPDATED:
             if(!inModel)
             {
-                qWarning() << "Warning: AddressTablePriv::updateEntry: Got CT_UPDATED, but entry is not in model\n";
+                OutputDebugStringF("Warning: AddressTablePriv::updateEntry: Got CT_UPDATED, but entry is not in model\n");
                 break;
             }
             lower->type = newEntryType;
@@ -111,7 +110,7 @@ public:
         case CT_DELETED:
             if(!inModel)
             {
-                qWarning() << "Warning: AddressTablePriv::updateEntry: Got CT_DELETED, but entry is not in model\n";
+                OutputDebugStringF("Warning: AddressTablePriv::updateEntry: Got CT_DELETED, but entry is not in model\n");
                 break;
             }
             parent->beginRemoveRows(QModelIndex(), lowerIndex, upperIndex-1);

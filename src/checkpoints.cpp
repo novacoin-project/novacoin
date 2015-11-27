@@ -25,14 +25,11 @@ namespace Checkpoints
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
         ( 0,     std::make_pair(hashGenesisBlock, 1360105017) )
-        ( 9690,  std::make_pair(uint256("0x00000000026561450859c46868099e0df6068a538f038cb18988fd8d47dcdaf5"), 1362791423) )
         ( 13560, std::make_pair(uint256("0xa1591a0fcbf11f282d671581edb9f0aadcd06fee69761081e0a3245914c13729"), 1364674052) )
-        ( 37092, std::make_pair(uint256("0x0000000000a38c2f98556f46793b453e92d8fab2d31c0b93fd08bcf78e56099d"), 1376677203) )
-        ( 44200, std::make_pair(uint256("0xc9bda7232a18b9c1f5ff974a9e5566b2d1879ceb8fc0e9e61fba9038a25b8447"), 1380145962) )
-        ( 65000, std::make_pair(uint256("0xfb2b51a2fd65062c98a7a6053cde46aeaefebb95ba2f680e85a29ee25b1dcf05"), 1388526385) )
-        ( 68600, std::make_pair(uint256("0xb646b0562080ab9411f85d4b2a1ca8b197c67ae170c5e328406871b44233cb06"), 1389867276) )
-        ( 92161, std::make_pair(uint256("0x000000000079090eb31e7fa55487e4e666466253e68b213f44b7977ea7a2eeec"), 1398919969) )
-        ( 98661, std::make_pair(uint256("0x48328dfc0eaffc659723739c6202854d1624449340193bdea3e71ece4ccdd43f"), 1401469019) )
+        ( 143990, std::make_pair(uint256("0x00000000001ff5c3940a9f73ad4a990f64955179bde0f743c76dbf0031429efc"), 1418953493) )
+        ( 149000, std::make_pair(uint256("0x7a24acfcadcf43054e7f7d9f273522c0dfc5791ba4006e0273e7521a8d36c525"), 1420872125) )
+        ( 160000, std::make_pair(uint256("0x000000000001cb1133043d38d077c0e93f66c8b2566779f10f182137d1e34a68"), 1425150237) )
+        ( 200000, std::make_pair(uint256("0x0000000000029f8bbf66e6ea6f3e5db55009404aae0fe395a53dd33142b2bff2"), 1441127233) )
     ;
 
     // TestNet has no checkpoints
@@ -57,7 +54,7 @@ namespace Checkpoints
         return checkpoints.rbegin()->first;
     }
 
-    int GetLastCheckpointTime()
+    unsigned int GetLastCheckpointTime()
     {
         MapCheckpoints& checkpoints = (fTestNet ? mapCheckpointsTestnet : mapCheckpoints);
 
@@ -194,7 +191,7 @@ namespace Checkpoints
             hashPendingCheckpoint = 0;
             checkpointMessage = checkpointMessagePending;
             checkpointMessagePending.SetNull();
-            LogPrintf("AcceptPendingSyncCheckpoint : sync-checkpoint at %s\n", hashSyncCheckpoint.ToString().c_str());
+            printf("AcceptPendingSyncCheckpoint : sync-checkpoint at %s\n", hashSyncCheckpoint.ToString().c_str());
             // relay the checkpoint
             if (!checkpointMessage.IsNull())
             {
@@ -265,7 +262,7 @@ namespace Checkpoints
         if (mapBlockIndex.count(hash) && !mapBlockIndex[hash]->IsInMainChain())
         {
             // checkpoint block accepted but not yet in main chain
-            LogPrintf("ResetSyncCheckpoint: SetBestChain to hardened checkpoint %s\n", hash.ToString().c_str());
+            printf("ResetSyncCheckpoint: SetBestChain to hardened checkpoint %s\n", hash.ToString().c_str());
             CTxDB txdb;
             CBlock block;
             if (!block.ReadFromDisk(mapBlockIndex[hash]))
@@ -285,7 +282,7 @@ namespace Checkpoints
             // checkpoint block not yet accepted
             hashPendingCheckpoint = hash;
             checkpointMessagePending.SetNull();
-            LogPrintf("ResetSyncCheckpoint: pending for sync-checkpoint %s\n", hashPendingCheckpoint.ToString().c_str());
+            printf("ResetSyncCheckpoint: pending for sync-checkpoint %s\n", hashPendingCheckpoint.ToString().c_str());
         }
 
         BOOST_REVERSE_FOREACH(const MapCheckpoints::value_type& i, mapCheckpoints)
@@ -295,7 +292,7 @@ namespace Checkpoints
             {
                 if (!WriteSyncCheckpoint(hash))
                     return error("ResetSyncCheckpoint: failed to write sync checkpoint %s", hash.ToString().c_str());
-                LogPrintf("ResetSyncCheckpoint: sync-checkpoint reset to %s\n", hashSyncCheckpoint.ToString().c_str());
+                printf("ResetSyncCheckpoint: sync-checkpoint reset to %s\n", hashSyncCheckpoint.ToString().c_str());
                 return true;
             }
         }
@@ -348,7 +345,7 @@ namespace Checkpoints
 
         if(!checkpoint.ProcessSyncCheckpoint(NULL))
         {
-            LogPrintf("WARNING: SendSyncCheckpoint: Failed to process checkpoint.\n");
+            printf("WARNING: SendSyncCheckpoint: Failed to process checkpoint.\n");
             return false;
         }
 
@@ -405,7 +402,7 @@ bool CSyncCheckpoint::ProcessSyncCheckpoint(CNode* pfrom)
         // We haven't received the checkpoint chain, keep the checkpoint as pending
         Checkpoints::hashPendingCheckpoint = hashCheckpoint;
         Checkpoints::checkpointMessagePending = *this;
-        LogPrintf("ProcessSyncCheckpoint: pending for sync-checkpoint %s\n", hashCheckpoint.ToString().c_str());
+        printf("ProcessSyncCheckpoint: pending for sync-checkpoint %s\n", hashCheckpoint.ToString().c_str());
         // Ask this guy to fill in what we're missing
         if (pfrom)
         {
@@ -444,6 +441,6 @@ bool CSyncCheckpoint::ProcessSyncCheckpoint(CNode* pfrom)
     Checkpoints::checkpointMessage = *this;
     Checkpoints::hashPendingCheckpoint = 0;
     Checkpoints::checkpointMessagePending.SetNull();
-    LogPrintf("ProcessSyncCheckpoint: sync-checkpoint at %s\n", hashCheckpoint.ToString().c_str());
+    printf("ProcessSyncCheckpoint: sync-checkpoint at %s\n", hashCheckpoint.ToString().c_str());
     return true;
 }

@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 #include <map>
+#include <openssl/crypto.h> // for OPENSSL_cleanse()
 
 #ifdef WIN32
 #ifdef _WIN32_WINNT
@@ -143,7 +144,7 @@ public:
     bool Lock(const void *addr, size_t len)
     {
 #ifdef WIN32
-        return VirtualLock(const_cast<void*>(addr), len);
+        return VirtualLock(const_cast<void*>(addr), len) != 0;
 #else
         return mlock(addr, len) == 0;
 #endif
@@ -154,7 +155,7 @@ public:
     bool Unlock(const void *addr, size_t len)
     {
 #ifdef WIN32
-        return VirtualUnlock(const_cast<void*>(addr), len);
+        return VirtualUnlock(const_cast<void*>(addr), len) != 0;
 #else
         return munlock(addr, len) == 0;
 #endif
@@ -212,7 +213,7 @@ struct secure_allocator : public std::allocator<T>
     {
         if (p != NULL)
         {
-            memset(p, 0, sizeof(T) * n);
+            OPENSSL_cleanse(p, sizeof(T) * n);
             LockedPageManager::instance.UnlockRange(p, sizeof(T) * n);
         }
         std::allocator<T>::deallocate(p, n);
@@ -246,7 +247,7 @@ struct zero_after_free_allocator : public std::allocator<T>
     void deallocate(T* p, std::size_t n)
     {
         if (p != NULL)
-            memset(p, 0, sizeof(T) * n);
+            OPENSSL_cleanse(p, sizeof(T) * n);
         std::allocator<T>::deallocate(p, n);
     }
 };

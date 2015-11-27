@@ -44,12 +44,12 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out, bool fIncludeH
     out.push_back(Pair("addresses", a));
 }
 
-void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
+void TxToJSON(const CTransaction& tx, const uint256& hashBlock, Object& entry)
 {
     entry.push_back(Pair("txid", tx.GetHash().GetHex()));
     entry.push_back(Pair("version", tx.nVersion));
-    entry.push_back(Pair("time", (boost::int64_t)tx.nTime));
-    entry.push_back(Pair("locktime", (boost::int64_t)tx.nLockTime));
+    entry.push_back(Pair("time", (int64_t)tx.nTime));
+    entry.push_back(Pair("locktime", (int64_t)tx.nLockTime));
     Array vin;
     BOOST_FOREACH(const CTxIn& txin, tx.vin)
     {
@@ -59,13 +59,13 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
         else
         {
             in.push_back(Pair("txid", txin.prevout.hash.GetHex()));
-            in.push_back(Pair("vout", (boost::int64_t)txin.prevout.n));
+            in.push_back(Pair("vout", (int64_t)txin.prevout.n));
             Object o;
             o.push_back(Pair("asm", txin.scriptSig.ToString()));
             o.push_back(Pair("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end())));
             in.push_back(Pair("scriptSig", o));
         }
-        in.push_back(Pair("sequence", (boost::int64_t)txin.nSequence));
+        in.push_back(Pair("sequence", (int64_t)txin.nSequence));
         vin.push_back(in);
     }
     entry.push_back(Pair("vin", vin));
@@ -75,9 +75,9 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
         const CTxOut& txout = tx.vout[i];
         Object out;
         out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
-        out.push_back(Pair("n", (boost::int64_t)i));
+        out.push_back(Pair("n", (int64_t)i));
         Object o;
-        ScriptPubKeyToJSON(txout.scriptPubKey, o, false);
+        ScriptPubKeyToJSON(txout.scriptPubKey, o, true);
         out.push_back(Pair("scriptPubKey", o));
         vout.push_back(out);
     }
@@ -93,8 +93,8 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
             if (pindex->IsInMainChain())
             {
                 entry.push_back(Pair("confirmations", 1 + nBestHeight - pindex->nHeight));
-                entry.push_back(Pair("time", (boost::int64_t)pindex->nTime));
-                entry.push_back(Pair("blocktime", (boost::int64_t)pindex->nTime));
+                entry.push_back(Pair("time", (int64_t)pindex->nTime));
+                entry.push_back(Pair("blocktime", (int64_t)pindex->nTime));
             }
             else
                 entry.push_back(Pair("confirmations", 0));
@@ -191,7 +191,7 @@ Value listunspent(const Array& params, bool fHelp)
                 continue;
         }
 
-        int64 nValue = out.tx->vout[out.i].nValue;
+        int64_t nValue = out.tx->vout[out.i].nValue;
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
         Object entry;
         entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
@@ -209,7 +209,7 @@ Value listunspent(const Array& params, bool fHelp)
             CTxDestination address;
             if (ExtractDestination(pk, address))
             {
-                const CScriptID& hash = boost::get<const CScriptID&>(address);
+                const CScriptID& hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
                 if (pwalletMain->GetCScript(hash, redeemScript))
                     entry.push_back(Pair("redeemScript", HexStr(redeemScript.begin(), redeemScript.end())));
@@ -228,7 +228,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-            "createrawtransaction [{\"txid\":txid,\"vout\":n},...] {address:amount,...}\n"
+            "createrawtransaction '[{\"txid\":txid,\"vout\":n},...]' '{address:amount,...}'\n"
             "Create a transaction spending given inputs\n"
             "(array of objects containing transaction id and output number),\n"
             "sending to given address(es).\n"
@@ -278,7 +278,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
 
         CScript scriptPubKey;
         scriptPubKey.SetDestination(address.Get());
-        int64 nAmount = AmountFromValue(s.value_);
+        int64_t nAmount = AmountFromValue(s.value_);
 
         CTxOut out(nAmount, scriptPubKey);
         rawTx.vout.push_back(out);
@@ -304,7 +304,7 @@ Value decoderawtransaction(const Array& params, bool fHelp)
     try {
         ssData >> tx;
     }
-    catch (std::exception &e) {
+    catch (const std::exception&) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }
 
@@ -341,7 +341,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 4)
         throw runtime_error(
-            "signrawtransaction <hex string> [{\"txid\":txid,\"vout\":n,\"scriptPubKey\":hex,\"redeemScript\":hex},...] [<privatekey1>,...] [sighashtype=\"ALL\"]\n"
+            "signrawtransaction <hex string> '[{\"txid\":txid,\"vout\":n,\"scriptPubKey\":hex,\"redeemScript\":hex},...]' '[<privatekey1>,...]' [sighashtype=\"ALL\"]\n"
             "Sign inputs for raw transaction (serialized, hex-encoded).\n"
             "Second optional argument (may be null) is an array of previous transaction outputs that\n"
             "this transaction depends on but may not yet be in the blockchain.\n"
@@ -366,7 +366,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
             ssData >> tx;
             txVariants.push_back(tx);
         }
-        catch (std::exception &e) {
+        catch (const std::exception&) {
             throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
         }
     }
@@ -560,7 +560,7 @@ Value sendrawtransaction(const Array& params, bool fHelp)
     try {
         ssData >> tx;
     }
-    catch (std::exception &e) {
+    catch (const std::exception&) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }
     uint256 hashTx = tx.GetHash();
@@ -610,7 +610,9 @@ Value createmultisig(const Array& params, bool fHelp)
     if ((int)keys.size() < nRequired)
         throw runtime_error(
             strprintf("not enough keys supplied "
-                      "(got %"PRIszu" keys, but need at least %d to redeem)", keys.size(), nRequired));
+                      "(got %" PRIszu " keys, but need at least %d to redeem)", keys.size(), nRequired));
+    if (keys.size() > 16)
+        throw runtime_error("Number of addresses involved in the multisignature address creation > 16\nReduce the number");
     std::vector<CKey> pubkeys;
     pubkeys.resize(keys.size());
     for (unsigned int i = 0; i < keys.size(); i++)
@@ -649,6 +651,10 @@ Value createmultisig(const Array& params, bool fHelp)
     // Construct using pay-to-script-hash:
     CScript inner;
     inner.SetMultisig(nRequired, pubkeys);
+
+    if (inner.size() > MAX_SCRIPT_ELEMENT_SIZE)
+        throw runtime_error(
+            strprintf("redeemScript exceeds size limit: %" PRIszu " > %d", inner.size(), MAX_SCRIPT_ELEMENT_SIZE));
 
     CScriptID innerID = inner.GetID();
     CBitcoinAddress address(innerID);

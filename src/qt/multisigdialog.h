@@ -1,7 +1,7 @@
 #ifndef MULTISIGDIALOG_H
 #define MULTISIGDIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 
 #include "multisigaddressentry.h"
 #include "multisiginputentry.h"
@@ -14,13 +14,16 @@ namespace Ui
     class MultisigDialog;
 }
 
-class MultisigDialog : public QDialog
+class MultisigDialog : public QWidget
 {
     Q_OBJECT;
+  protected:
+    void keyPressEvent(QKeyEvent *);
 
   public:
     explicit MultisigDialog(QWidget *parent);
     MultisigDialog();
+    ~MultisigDialog();
     void setModel(WalletModel *model);
 
   public slots:
@@ -33,9 +36,10 @@ class MultisigDialog : public QDialog
   private:
     Ui::MultisigDialog *ui;
     WalletModel *model;
-    ~MultisigDialog();
 
   private slots:
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
     void on_createAddressButton_clicked();
     void on_copyMultisigAddressButton_clicked();
     void on_copyRedeemScriptButton_clicked();

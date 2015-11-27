@@ -1,7 +1,7 @@
 #ifndef RPCCONSOLE_H
 #define RPCCONSOLE_H
 
-#include <QDialog>
+#include <QWidget>
 
 namespace Ui {
     class RPCConsole;
@@ -9,7 +9,7 @@ namespace Ui {
 class ClientModel;
 
 /** Local Bitcoin RPC console. */
-class RPCConsole: public QDialog
+class RPCConsole: public QWidget
 {
     Q_OBJECT
 
@@ -29,12 +29,15 @@ public:
 
 protected:
     virtual bool eventFilter(QObject* obj, QEvent *event);
+    void keyPressEvent(QKeyEvent *);
 
 private slots:
     void on_lineEdit_returnPressed();
     void on_tabWidget_currentChanged(int index);
     /** open the debug.log from the current datadir */
     void on_openDebugLogfileButton_clicked();
+    /** open the novacoin.conf from the current datadir */
+    void on_openConfigurationfileButton_clicked();
     /** change the time range of the network traffic graph */
     void on_sldGraphRange_valueChanged(int value);
     /** update traffic statistics */

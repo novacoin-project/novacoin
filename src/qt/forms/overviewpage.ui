@@ -31,13 +31,12 @@
            <widget class="QLabel" name="label_5">
             <property name="font">
              <font>
-              <pointsize>11</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
             <property name="text">
-             <string>Wallet</string>
+             <string>Balances</string>
             </property>
            </widget>
           </item>
@@ -84,14 +83,17 @@
            <number>12</number>
           </property>
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="labelAvailableText">
+            <property name="toolTip">
+             <string>Your current available balance</string>
+            </property>
             <property name="text">
-             <string>Balance:</string>
+             <string>Available:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="labelBalanceTotal">
+           <widget class="QLabel" name="labelAvailable">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -102,10 +104,13 @@
              <cursorShape>IBeamCursor</cursorShape>
             </property>
             <property name="toolTip">
-             <string>Your current balance</string>
+             <string>Your current available balance</string>
             </property>
             <property name="text">
              <string notr="true">0 NVC</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -113,42 +118,16 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="labelBalanceWatchOnlyText">
-            <property name="text">
-             <string>Unspendable:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="labelBalanceWatchOnly">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="cursor">
-             <cursorShape>IBeamCursor</cursorShape>
-            </property>
-            <property name="toolTip">
-             <string>Your unspendable balance</string>
-            </property>
-            <property name="text">
-             <string notr="true">0 NVC</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
            <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string>Total of coins that was staked, and do not yet count toward the current balance</string>
+            </property>
             <property name="text">
              <string>Stake:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QLabel" name="labelStake">
             <property name="font">
              <font>
@@ -165,19 +144,25 @@
             <property name="text">
              <string notr="true">0 NVC</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_3">
+            <property name="toolTip">
+             <string>Total of transactions that have yet to be confirmed, and do not yet count toward the current balance</string>
+            </property>
             <property name="text">
              <string>Unconfirmed:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QLabel" name="labelUnconfirmed">
             <property name="font">
              <font>
@@ -194,19 +179,25 @@
             <property name="text">
              <string notr="true">0 NVC</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="labelImmatureText">
+            <property name="toolTip">
+             <string>Mined balance that has not yet matured</string>
+            </property>
             <property name="text">
              <string>Immature:</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="1">
            <widget class="QLabel" name="labelImmature">
             <property name="font">
              <font>
@@ -220,19 +211,105 @@
             <property name="text">
              <string notr="true">0 NVC</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="4" column="0">
+           <widget class="QLabel" name="labelBalanceWatchOnlyText">
+            <property name="toolTip">
+             <string>Your unspendable balance</string>
+            </property>
+            <property name="text">
+             <string>Unspendable:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="labelBalanceWatchOnly">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>IBeamCursor</cursorShape>
+            </property>
+            <property name="toolTip">
+             <string>Your unspendable balance</string>
+            </property>
+            <property name="text">
+             <string notr="true">0 NVC</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="Line" name="line">
+            <property name="maximumSize">
+             <size>
+              <width>230</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="labelTotalText">
+            <property name="toolTip">
+             <string>Your current total balance</string>
+            </property>
+            <property name="text">
+             <string>Total:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="labelTotal">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Your current total balance</string>
+            </property>
+            <property name="text">
+             <string notr="true">0 NVC</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
            <widget class="QLabel" name="label_2">
+            <property name="toolTip">
+             <string>Total number of transactions in wallet</string>
+            </property>
             <property name="text">
              <string>Number of transactions:</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="7" column="1">
            <widget class="QLabel" name="labelNumTransactions">
             <property name="toolTip">
              <string>Total number of transactions in wallet</string>

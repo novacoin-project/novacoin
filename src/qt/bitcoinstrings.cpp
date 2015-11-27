@@ -10,7 +10,7 @@ QT_TRANSLATE_NOOP("bitcoin-core", ""
 "%s, you must set a rpcpassword in the configuration file:\n"
 " %s\n"
 "It is recommended you use the following random password:\n"
-"rpcuser=bitcoinrpc\n"
+"rpcuser=novacoinrpc\n"
 "rpcpassword=%s\n"
 "(you do not need to remember this password)\n"
 "If the file does not exist, create it with owner-readable-only file "
@@ -162,8 +162,6 @@ QT_TRANSLATE_NOOP("bitcoin-core", "Unknown network specified in -onlynet: '%s'")
 QT_TRANSLATE_NOOP("bitcoin-core", "Upgrade wallet to latest format"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Usage:"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Use OpenSSL (https) for JSON-RPC connections"),
-QT_TRANSLATE_NOOP("bitcoin-core", "Use UPnP to map the listening port (default: 0)"),
-QT_TRANSLATE_NOOP("bitcoin-core", "Use UPnP to map the listening port (default: 1 when listening)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Use proxy to reach tor hidden services (default: same as -proxy)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Use the test network"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Username for JSON-RPC connections"),
@@ -172,4 +170,13 @@ QT_TRANSLATE_NOOP("bitcoin-core", "Wallet needed to be rewritten: restart NovaCo
 QT_TRANSLATE_NOOP("bitcoin-core", "Warning: Disk space is low!"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Warning: This version is obsolete, upgrade required!"),
 QT_TRANSLATE_NOOP("bitcoin-core", "wallet.dat corrupt, salvage failed"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Specify wallet file (within data directory)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Use in-memory logging for block index database (default: 1)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Find peers using DNS lookup (default: 1)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Sync checkpoints policy (default: strict)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Require a confirmations for change (default: 0)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Enforce transaction scripts to use canonical PUSH operators (default: 1)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Set the number of script verification threads (1-16, 0=auto, default: 0)"),
+QT_TRANSLATE_NOOP("bitcoin-core", "When creating transactions, ignore inputs with value less than this (default: %s)"),
 };
