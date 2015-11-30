@@ -2145,16 +2145,6 @@ void PushGetBlocks(CNode* pnode, CBlockIndex* pindexBegin, uint256 hashEnd)
     pnode->PushMessage("getblocks", CBlockLocator(pindexBegin), hashEnd);
 }
 
-bool static ReserealizeBlockSignature(CBlock* pblock)
-{
-    if (pblock->IsProofOfWork()) {
-        pblock->vchBlockSig.clear();
-        return true;
-    }
-
-    return CKey::ReserealizeSignature(pblock->vchBlockSig);
-}
-
 bool static IsCanonicalBlockSignature(CBlock* pblock)
 {
     if (pblock->IsProofOfWork()) {
@@ -2194,14 +2184,12 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         }
     }
 
-    // Block signature can be malleated in such a way that it increases block size up to maximum allowed by protocol
     if (!IsCanonicalBlockSignature(pblock)) {
         if (pfrom && pfrom->nVersion >= CANONICAL_BLOCK_SIG_VERSION) {
             pfrom->Misbehaving(100);
-            return error("ProcessBlock(): bad block signature encoding");
-        } else if (!ReserealizeBlockSignature(pblock)) {
-            LogPrintf("WARNING: ProcessBlock() : ReserealizeBlockSignature FAILED\n");
         }
+
+        return error("ProcessBlock(): bad block signature encoding");
     }
 
     // Preliminary checks
