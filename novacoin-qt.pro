@@ -270,6 +270,22 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/secondauthdialog.h \
     src/qt/qrcodedialog.h
 
+contains(USE_EXTJS, 1) {
+    message(Building with ExtJS modules)
+    DEFINES += USE_EXTJS
+    HEADERS += $$PWD/src/extjs/extfs.h
+    INCLUDEPATH += src/extjs
+    LIBS += $$PWD/src/extjs/libExtJS.a
+
+    genextjs.commands = cd $$PWD/src/extjs && CXX=$$QMAKE_CXX $(MAKE) all
+    genextjs.target = $$PWD/src/extjs/libExtJS.a
+    genextjs.depends = FORCE
+
+    PRE_TARGETDEPS += $$PWD/src/extjs/libExtJS.a
+    QMAKE_EXTRA_TARGETS += genextjs
+    QMAKE_CLEAN += $$PWD/src/extjs/libExtJS.a; cd $$PWD/src/extjs ; $(MAKE) clean
+}
+
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/intro.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -398,6 +414,7 @@ OTHER_FILES += \
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     windows:BOOST_LIB_SUFFIX = -mgw44-mt-1_53
+    macx:BOOST_LIB_SUFFIX = -mt
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -405,23 +422,23 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
 }
 
 isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /usr/local/BerkeleyDB.6.1/lib
+    macx:BDB_LIB_PATH = /opt/local/lib/db60/
 }
 
 isEmpty(OPENSSL_LIB_PATH) {
-    macx:OPENSSL_LIB_PATH = /usr/local/ssl/lib
+    macx:OPENSSL_LIB_PATH = /opt/local/lib
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -6.1
+    macx:BDB_LIB_SUFFIX = -6.0
 }
 
 isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /usr/local/BerkeleyDB.6.1/include
+    macx:BDB_INCLUDE_PATH = /opt/local/include/db60
 }
 
 isEmpty(OPENSSL_INCLUDE_PATH) {
-    macx:OPENSSL_INCLUDE_PATH = /usr/local/ssl/include
+    macx:OPENSSL_INCLUDE_PATH = /opt/local/include/
 }
 
 isEmpty(BOOST_LIB_PATH) {
