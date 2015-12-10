@@ -86,7 +86,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0x12630d16a97f24b287c8c2594dda5fb98c9e6c70fc61d44191931ea2aa08dc90"));
 
         vSeeds.push_back(CDNSSeedData("rat4.blackcoin.co", "seed.blackcoin.co"));
-        vSeeds.push_back(CDNSSeedData("6.syllabear.us.to", "bcseed.syllabear.us.to"));
+        vSeeds.push_back(CDNSSeedData("syllabear.tk", "bcseed.syllabear.tk"));
 
         base58Prefixes[PUBKEY_ADDRESS] = list_of(25);
         base58Prefixes[SCRIPT_ADDRESS] = list_of(85);
