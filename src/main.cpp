@@ -2145,13 +2145,13 @@ void PushGetBlocks(CNode* pnode, CBlockIndex* pindexBegin, uint256 hashEnd)
     pnode->PushMessage("getblocks", CBlockLocator(pindexBegin), hashEnd);
 }
 
-bool static IsCanonicalBlockSignature(CBlock* pblock)
+bool static IsCanonicalBlockSignature(CBlock* pblock, bool checkLowS)
 {
     if (pblock->IsProofOfWork()) {
         return pblock->vchBlockSig.empty();
     }
 
-    return IsDERSignature(pblock->vchBlockSig, false);
+    return checkLowS ? IsLowDERSignature(pblock->vchBlockSig, false) : IsDERSignature(pblock->vchBlockSig, false);
 }
 
 bool ProcessBlock(CNode* pfrom, CBlock* pblock)
@@ -2184,12 +2184,22 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         }
     }
 
-    if (!IsCanonicalBlockSignature(pblock)) {
+    if (!IsCanonicalBlockSignature(pblock, false)) {
         if (pfrom && pfrom->nVersion >= CANONICAL_BLOCK_SIG_VERSION) {
             pfrom->Misbehaving(100);
         }
 
         return error("ProcessBlock(): bad block signature encoding");
+    }
+
+    if (!IsCanonicalBlockSignature(pblock, true)) {
+        if (pfrom && pfrom->nVersion >= CANONICAL_BLOCK_SIG_LOW_S_VERSION) {
+            pfrom->Misbehaving(100);
+            return error("ProcessBlock(): bad block signature encoding (low-s)");
+        }
+
+        if (!EnsureLowS(pblock->vchBlockSig))
+            return error("ProcessBlock(): EnsureLowS failed");
     }
 
     // Preliminary checks
@@ -2771,6 +2781,13 @@ void static ProcessGetData(CNode* pfrom)
                 {
                     CBlock block;
                     block.ReadFromDisk((*mi).second);
+
+                    // previous versions could accept sigs with high s
+                    if (!IsCanonicalBlockSignature(&block, true)) {
+                        bool ret = EnsureLowS(block.vchBlockSig);
+                        assert(ret);
+                    }
+
                     pfrom->PushMessage("block", block);
 
                     // Trigger them to send a getblocks request for the next batch of inventory

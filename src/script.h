@@ -710,6 +710,7 @@ public:
 
 
 bool IsDERSignature(const valtype &vchSig, bool haveHashType = true);
+bool IsLowDERSignature(const valtype &vchSig, bool haveHashType = true);
 bool IsCompressedOrUncompressedPubKey(const valtype &vchPubKey);
 bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& script, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType);
 bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet);
