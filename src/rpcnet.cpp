@@ -24,15 +24,15 @@ Value getconnectioncount(const Array& params, bool fHelp)
     return (int)vNodes.size();
 }
 
-static void CopyNodeStats(std::vector<CNodeStats>& vstats)
+static void CopyNodeStats(vector<CNodeStats>& vstats)
 {
     vstats.clear();
 
     LOCK(cs_vNodes);
     vstats.reserve(vNodes.size());
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it) {
         CNodeStats stats;
-        pnode->copyStats(stats);
+        (*it)->copyStats(stats);
         vstats.push_back(stats);
     }
 }
@@ -250,12 +250,12 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
             bool fFound = false;
             Object node;
             node.push_back(Pair("address", addrNode.ToString()));
-            BOOST_FOREACH(CNode* pnode, vNodes)
-                if (pnode->addr == addrNode)
+            for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+                if ((*it)->addr == addrNode)
                 {
                     fFound = true;
                     fConnected = true;
-                    node.push_back(Pair("connected", pnode->fInbound ? "inbound" : "outbound"));
+                    node.push_back(Pair("connected", (*it)->fInbound ? "inbound" : "outbound"));
                     break;
                 }
             if (!fFound)
@@ -316,8 +316,8 @@ Value sendalert(const Array& params, bool fHelp)
     // Relay alert
     {
         LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-            alert.RelayTo(pnode);
+        for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+            alert.RelayTo(*it);
     }
 
     Object result;

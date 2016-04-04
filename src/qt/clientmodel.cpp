@@ -55,8 +55,8 @@ int ClientModel::getNumConnections(uint8_t flags) const
         return (int)(vNodes.size());
 
     int nNum = 0;
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
+    for (std::vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+    if (flags & ((*it)->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
         nNum++;
 
     return nNum;

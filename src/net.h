@@ -686,8 +686,8 @@ inline void RelayInventory(const CInv& inv)
     // Put on lists to offer to the other nodes
     {
         LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-            pnode->PushInventory(inv);
+        for (std::vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+            (*it)->PushInventory(inv);
     }
 }
 
