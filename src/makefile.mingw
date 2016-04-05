@@ -148,7 +148,7 @@ endif
 
 
 obj/%.o: %.cpp $(HEADERS)
-	g++ -c $(CFLAGS) -o $@ $<
+	g++ -c $(CFLAGS) -std=c++11 -o $@ $<
 
 novacoind.exe: $(OBJS:obj/%=obj/%)
 	g++ $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
