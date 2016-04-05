@@ -204,7 +204,7 @@ Value scaninput(const Array& params, bool fHelp)
             CDataStream ssKernel(SER_GETHASH, 0);
             ssKernel << nStakeModifier;
             ssKernel << block.nTime << (txindex.pos.nTxPos - txindex.pos.nBlockPos) << tx.nTime << nOut;
-            CDataStream::const_iterator itK = ssKernel.begin();
+            auto itK = ssKernel.begin();
 
             std::vector<std::pair<uint256, uint32_t> > result;
             if (ScanKernelForward((unsigned char *)&itK[0], nBits, tx.nTime, tx.vout[nOut].nValue, interval, result))

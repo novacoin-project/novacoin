@@ -270,7 +270,7 @@ public:
                     MapUnkIds mapUnkIds;
                     int
                         nIds = 0;
-                    for (std::map<int, CAddrInfo>::iterator it = am->mapInfo.begin(); it != am->mapInfo.end(); it++)
+                    for (auto it = am->mapInfo.begin(); it != am->mapInfo.end(); it++)
                     {
                         if (nIds == nNew)
                             break; // this means nNew was wrong, oh ow
@@ -286,7 +286,7 @@ public:
                         }
                     }
                     nIds = 0;
-                    for (std::map<int, CAddrInfo>::iterator it = am->mapInfo.begin(); it != am->mapInfo.end(); it++)
+                    for (auto it = am->mapInfo.begin(); it != am->mapInfo.end(); it++)
                     {
                         if (nIds == nTried) 
                             break; /* this means nTried was wrong, oh ow */
@@ -301,7 +301,7 @@ public:
                         }
                     }
                     for (
-                         std::vector<std::set<int> >::iterator it = am->vvNew.begin(); 
+                         auto it = am->vvNew.begin(); 
                          it != am->vvNew.end(); 
                          it++
                         )
@@ -313,7 +313,7 @@ public:
                             nSize = int( vNew.size() );
 
                         READWRITE(nSize);
-                        for (std::set<int>::iterator it2 = vNew.begin(); it2 != vNew.end(); it2++)
+                        for (auto it2 = vNew.begin(); it2 != vNew.end(); it2++)
                         {
                         int 
                             nIndex = mapUnkIds[*it2];
@@ -471,7 +471,7 @@ public:
         {
             LOCK(cs);
             Check();
-            for (std::vector<CAddress>::const_iterator it = vAddr.begin(); it != vAddr.end(); it++)
+            for (auto it = vAddr.begin(); it != vAddr.end(); it++)
                 nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
             Check();
         }

@@ -133,7 +133,7 @@ CWalletDB::ReorderTransactions(CWallet* pwallet)
     typedef multimap<int64_t, TxPair > TxItems;
     TxItems txByTime;
 
-    for (map<uint256, CWalletTx>::iterator it = pwallet->mapWallet.begin(); it != pwallet->mapWallet.end(); ++it)
+    for (auto it = pwallet->mapWallet.begin(); it != pwallet->mapWallet.end(); ++it)
     {
         CWalletTx* wtx = &((*it).second);
         txByTime.insert(make_pair(wtx->nTimeReceived, TxPair(wtx, (CAccountingEntry*)0)));
@@ -148,7 +148,7 @@ CWalletDB::ReorderTransactions(CWallet* pwallet)
     int64_t& nOrderPosNext = pwallet->nOrderPosNext;
     nOrderPosNext = 0;
     std::vector<int64_t> nOrderPosOffsets;
-    for (TxItems::iterator it = txByTime.begin(); it != txByTime.end(); ++it)
+    for (auto it = txByTime.begin(); it != txByTime.end(); ++it)
     {
         CWalletTx *const pwtx = (*it).second.first;
         CAccountingEntry *const pacentry = (*it).second.second;
@@ -795,7 +795,7 @@ bool DumpWallet(CWallet* pwallet, const string& strDest)
 
     // sort time/key pairs
     std::vector<std::pair<int64_t, CBitcoinAddress> > vAddresses;
-    for (std::map<CBitcoinAddress, int64_t>::const_iterator it = mapAddresses.begin(); it != mapAddresses.end(); it++) {
+    for (auto it = mapAddresses.begin(); it != mapAddresses.end(); it++) {
         vAddresses.push_back(std::make_pair(it->second, it->first));
     }
     mapAddresses.clear();
@@ -814,7 +814,7 @@ bool DumpWallet(CWallet* pwallet, const string& strDest)
     file << strprintf("#   mined on %s\n", EncodeDumpTime(pindexBest->nTime).c_str());
     file << "\n";
 
-    for (std::vector<std::pair<int64_t, CBitcoinAddress> >::const_iterator it = vAddresses.begin(); it != vAddresses.end(); it++) {
+    for (auto it = vAddresses.begin(); it != vAddresses.end(); it++) {
         const CBitcoinAddress &addr = it->second;
         std::string strTime = EncodeDumpTime(it->first);
         std::string strAddr = addr.ToString();

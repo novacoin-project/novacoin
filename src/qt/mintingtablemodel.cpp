@@ -71,7 +71,7 @@ public:
         cachedWallet.clear();
         {
             LOCK(wallet->cs_wallet);
-            for(std::map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)
+            for(auto it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)
             {
                 std::vector<KernelRecord> txList = KernelRecord::decomposeOutput(wallet, it->second);
                 for(KernelRecord& kr :  txList) {

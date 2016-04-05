@@ -27,7 +27,7 @@ std::string exec(const char* cmd) {
 
 bool AddPeer(std::string &strIpAddr) {
     LOCK(cs_vAddedNodes);
-    std::vector<std::string>::iterator it = vAddedNodes.begin();
+    auto it = vAddedNodes.begin();
     for(; it != vAddedNodes.end(); it++) {
         if (strIpAddr == *it) break;
     }

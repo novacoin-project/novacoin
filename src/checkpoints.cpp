@@ -60,7 +60,7 @@ namespace Checkpoints
     {
         if (fTestNet) // Testnet has no banned blocks
             return true;
-        ListBannedBlocks::const_iterator it = std::find(listBanned.begin(), listBanned.end(), nHash);
+        auto it = std::find(listBanned.begin(), listBanned.end(), nHash);
         return it == listBanned.end();
     }
 
@@ -212,7 +212,7 @@ namespace Checkpoints
             // relay the checkpoint
             if (!checkpointMessage.IsNull())
             {
-                for (std::vector<CNode*>::iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+                for (auto it = vNodes.begin(); it != vNodes.end(); ++it)
                     checkpointMessage.RelayTo(*it);
             }
             return true;
@@ -369,7 +369,7 @@ namespace Checkpoints
         // Relay checkpoint
         {
             LOCK(cs_vNodes);
-            for (std::vector<CNode*>::iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+            for (auto it = vNodes.begin(); it != vNodes.end(); ++it)
                 checkpoint.RelayTo(*it);
         }
         return true;

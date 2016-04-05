@@ -80,12 +80,12 @@ double CAddrInfo::GetChance(int64_t nNow) const
 
 CAddrInfo* CAddrMan::Find(const CNetAddr& addr, int *pnId)
 {
-    std::map<CNetAddr, int>::iterator it = mapAddr.find(addr);
+    auto it = mapAddr.find(addr);
     if (it == mapAddr.end())
         return NULL;
     if (pnId)
         *pnId = (*it).second;
-    std::map<int, CAddrInfo>::iterator it2 = mapInfo.find((*it).second);
+    auto it2 = mapInfo.find((*it).second);
     if (it2 != mapInfo.end())
         return &(*it2).second;
     return NULL;
@@ -153,7 +153,7 @@ int CAddrMan::ShrinkNew(int nUBucket)
     std::set<int> &vNew = vvNew[nUBucket];
 
     // first look for deletable items
-    for (std::set<int>::iterator it = vNew.begin(); it != vNew.end(); it++)
+    for (auto it = vNew.begin(); it != vNew.end(); it++)
     {
         assert(mapInfo.count(*it));
         CAddrInfo &info = mapInfo[*it];
@@ -176,7 +176,7 @@ int CAddrMan::ShrinkNew(int nUBucket)
     int n[4] = {GetRandInt(vNew.size()), GetRandInt(vNew.size()), GetRandInt(vNew.size()), GetRandInt(vNew.size())};
     int nI = 0;
     int nOldest = -1;
-    for (std::set<int>::iterator it = vNew.begin(); it != vNew.end(); it++)
+    for (auto it = vNew.begin(); it != vNew.end(); it++)
     {
         if (nI == n[0] || nI == n[1] || nI == n[2] || nI == n[3])
         {
@@ -206,7 +206,7 @@ void CAddrMan::MakeTried(CAddrInfo& info, int nId, int nOrigin)
     assert(vvNew[nOrigin].count(nId) == 1);
 
     // remove the entry from all new buckets
-    for (std::vector<std::set<int> >::iterator it = vvNew.begin(); it != vvNew.end(); it++)
+    for (auto it = vvNew.begin(); it != vvNew.end(); it++)
     {
         if ((*it).erase(nId))
             info.nRefCount--;
@@ -419,7 +419,7 @@ CAddress CAddrMan::Select_(int nUnkBias)
             std::set<int> &vNew = vvNew[nUBucket];
             if (vNew.size() == 0) continue;
             int nPos = GetRandInt(vNew.size());
-            std::set<int>::iterator it = vNew.begin();
+            auto it = vNew.begin();
             while (nPos--)
                 it++;
             assert(mapInfo.count(*it) == 1);
@@ -439,7 +439,7 @@ int CAddrMan::Check_()
 
     if (vRandom.size() != nTried + nNew) return -7;
 
-    for (std::map<int, CAddrInfo>::iterator it = mapInfo.begin(); it != mapInfo.end(); it++)
+    for (auto it = mapInfo.begin(); it != mapInfo.end(); it++)
     {
         int n = (*it).first;
         CAddrInfo &info = (*it).second;
@@ -466,7 +466,7 @@ int CAddrMan::Check_()
     for (int n=0; n<vvTried.size(); n++)
     {
         std::vector<int> &vTried = vvTried[n];
-        for (std::vector<int>::iterator it = vTried.begin(); it != vTried.end(); it++)
+        for (auto it = vTried.begin(); it != vTried.end(); it++)
         {
             if (!setTried.count(*it)) return -11;
             setTried.erase(*it);
@@ -476,7 +476,7 @@ int CAddrMan::Check_()
     for (int n=0; n<vvNew.size(); n++)
     {
         std::set<int> &vNew = vvNew[n];
-        for (std::set<int>::iterator it = vNew.begin(); it != vNew.end(); it++)
+        for (auto it = vNew.begin(); it != vNew.end(); it++)
         {
             if (!mapNew.count(*it)) return -12;
             if (--mapNew[*it] == 0)
@@ -509,7 +509,7 @@ void CAddrMan::GetAddr_(std::vector<CAddress> &vAddr)
 
 void CAddrMan::GetOnlineAddr_(std::vector<CAddrInfo> &vAddr)
 {
-    for (std::map<int, CAddrInfo>::const_iterator it = mapInfo.begin(); it != mapInfo.end(); it++)
+    for (auto it = mapInfo.begin(); it != mapInfo.end(); it++)
     {
         CAddrInfo addr = it->second;
         bool fCurrentlyOnline = (GetAdjustedTime() - addr.nTime < nOneDay);

@@ -343,7 +343,7 @@ CRPCTable::CRPCTable()
 
 const CRPCCommand *CRPCTable::operator[](string name) const
 {
-    map<string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
+    auto it = mapCommands.find(name);
     if (it == mapCommands.end())
         return NULL;
     return (*it).second;
