@@ -11,7 +11,7 @@
 # include <arpa/inet.h>
 #endif
 
-static const std::vector<const std::string> vpszTypeName = { "ERROR", "tx", "block" };
+static const std::vector<const char*> vpszTypeName = { "ERROR", "tx", "block" };
 
 CMessageHeader::CMessageHeader() : nMessageSize(std::numeric_limits<uint32_t>::max()), nChecksum(0)
 {
@@ -96,7 +96,7 @@ const char* CInv::GetCommand() const
 {
     if (!IsKnownType())
         throw std::out_of_range(strprintf("CInv::GetCommand() : type=%d unknown type", type));
-    return vpszTypeName[type].c_str();
+    return vpszTypeName[type];
 }
 
 std::string CInv::ToString() const
