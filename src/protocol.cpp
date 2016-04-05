@@ -11,8 +11,7 @@
 # include <arpa/inet.h>
 #endif
 
-static const std::string forfill[] = { "ERROR", "tx", "block" }; //TODO: Replace with initializer list constructor when c++11 comes
-static const std::vector<std::string> vpszTypeName(forfill, forfill + 3);
+static const std::vector<const std::string> vpszTypeName = { "ERROR", "tx", "block" };
 
 CMessageHeader::CMessageHeader() : nMessageSize(std::numeric_limits<uint32_t>::max()), nChecksum(0)
 {
