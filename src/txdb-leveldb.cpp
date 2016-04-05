@@ -214,7 +214,7 @@ bool CTxDB::AddTxIndex(const CTransaction& tx, const CDiskTxPos& pos, int nHeigh
     assert(!fClient);
 
     // Add to tx index
-    uint256 hash = tx.GetHash();
+    auto hash = tx.GetHash();
     CTxIndex txindex(pos, tx.vout.size());
     return Write(make_pair(string("tx"), hash), txindex);
 }
@@ -222,7 +222,7 @@ bool CTxDB::AddTxIndex(const CTransaction& tx, const CDiskTxPos& pos, int nHeigh
 bool CTxDB::EraseTxIndex(const CTransaction& tx)
 {
     assert(!fClient);
-    uint256 hash = tx.GetHash();
+    auto hash = tx.GetHash();
 
     return Erase(make_pair(string("tx"), hash));
 }
@@ -365,7 +365,7 @@ bool CTxDB::LoadBlockIndex()
         CDiskBlockIndex diskindex;
         ssValue >> diskindex;
 
-        uint256 blockHash = diskindex.GetBlockHash();
+        auto blockHash = diskindex.GetBlockHash();
 
         // Construct block index object
         CBlockIndex* pindexNew    = InsertBlockIndex(blockHash);
@@ -480,11 +480,11 @@ bool CTxDB::LoadBlockIndex()
         // check level 2: verify transaction index validity
         if (nCheckLevel>1)
         {
-            pair<unsigned int, unsigned int> pos = make_pair(pindex->nFile, pindex->nBlockPos);
+            auto pos = make_pair(pindex->nFile, pindex->nBlockPos);
             mapBlockPos[pos] = pindex;
             for(const auto &tx :  block.vtx)
             {
-                uint256 hashTx = tx.GetHash();
+                auto hashTx = tx.GetHash();
                 CTxIndex txindex;
                 if (ReadTxIndex(hashTx, txindex))
                 {
@@ -513,7 +513,7 @@ bool CTxDB::LoadBlockIndex()
                         {
                             if (!txpos.IsNull())
                             {
-                                pair<unsigned int, unsigned int> posFind = make_pair(txpos.nFile, txpos.nBlockPos);
+                                auto posFind = make_pair(txpos.nFile, txpos.nBlockPos);
                                 if (!mapBlockPos.count(posFind))
                                 {
                                     printf("LoadBlockIndex(): *** found bad spend at %d, hashBlock=%s, hashTx=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str(), hashTx.ToString().c_str());

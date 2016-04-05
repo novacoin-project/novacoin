@@ -45,7 +45,7 @@ enum Network ParseNetwork(std::string net) {
 }
 
 void SplitHostPort(std::string in, uint16_t &portOut, std::string &hostOut) {
-    size_t colon = in.find_last_of(':');
+    auto colon = in.find_last_of(':');
     // if a : is found, and it either follows a [...], or no other : is in the string, treat it as port separator
     bool fHaveColon = colon != in.npos;
     bool fBracketed = fHaveColon && (in[0]=='[' && in[colon-1]==']'); // if there is a colon, and in[0]=='[', colon is not 0, so in[colon-1] is safe
@@ -140,7 +140,7 @@ bool Lookup(const char *pszName, std::vector<CService>& vAddr, uint16_t portDefa
 {
     if (pszName[0] == 0)
         return false;
-    uint16_t port = portDefault;
+    auto port = portDefault;
     std::string hostname = "";
     SplitHostPort(std::string(pszName), port, hostname);
 
@@ -513,7 +513,7 @@ bool ConnectSocket(const CService &addrDest, SOCKET& hSocketRet, int nTimeout)
 bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, uint16_t portDefault, int nTimeout)
 {
     string strDest;
-    uint16_t port = portDefault;
+    auto port = portDefault;
     SplitHostPort(string(pszDest), port, strDest);
 
     SOCKET hSocket = INVALID_SOCKET;
@@ -917,7 +917,7 @@ std::vector<unsigned char> CNetAddr::GetGroup() const
 
 uint64_t CNetAddr::GetHash() const
 {
-    uint256 hash = Hash(&ip[0], &ip[16]);
+    auto hash = Hash(&ip[0], &ip[16]);
     uint64_t nRet;
     memcpy(&nRet, &hash, sizeof(nRet));
     return nRet;

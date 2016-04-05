@@ -56,7 +56,7 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
 
 string AccountFromValue(const Value& value)
 {
-    string strAccount = value.get_str();
+    auto strAccount = value.get_str();
     if (strAccount == "*")
         throw JSONRPCError(RPC_WALLET_INVALID_ACCOUNT_NAME, "Invalid account name");
     return strAccount;
@@ -85,7 +85,7 @@ Value getinfo(const Array& params, bool fHelp)
     timestamping.push_back(Pair("systemclock", GetTime()));
     timestamping.push_back(Pair("adjustedtime", GetAdjustedTime()));
 
-    int64_t nNtpOffset = GetNtpOffset(),
+    auto nNtpOffset = GetNtpOffset(),
             nP2POffset = GetNodesOffset();
 
     timestamping.push_back(Pair("ntpoffset", nNtpOffset != INT64_MAX ? nNtpOffset : Value::null));
@@ -188,7 +188,7 @@ Value getaccountaddress(const Array& params, bool fHelp)
             "Returns the current NovaCoin address for receiving payments to this account.");
 
     // Parse the account first so we don't generate a key if there's an error
-    string strAccount = AccountFromValue(params[0]);
+    auto strAccount = AccountFromValue(params[0]);
 
     Value ret;
 
@@ -218,7 +218,7 @@ Value setaccount(const Array& params, bool fHelp)
     // Detect when changing the account of an address that is the 'unused current key' of another account:
     if (pwalletMain->mapAddressBook.count(address))
     {
-        string strOldAccount = pwalletMain->mapAddressBook[address];
+        auto strOldAccount = pwalletMain->mapAddressBook[address];
         if (address == GetAccountAddress(strOldAccount))
             GetAccountAddress(strOldAccount, true);
     }
@@ -255,7 +255,7 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
             "getaddressesbyaccount <account>\n"
             "Returns the list of addresses for the given account.");
 
-    string strAccount = AccountFromValue(params[0]);
+    auto strAccount = AccountFromValue(params[0]);
 
     // Find all addresses that have the given account
     Array ret;
@@ -284,13 +284,13 @@ Value mergecoins(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
     // Total amount
-    int64_t nAmount = AmountFromValue(params[0]);
+    auto nAmount = AmountFromValue(params[0]);
 
     // Min input amount
-    int64_t nMinValue = AmountFromValue(params[1]);
+    auto nMinValue = AmountFromValue(params[1]);
 
     // Output amount
-    int64_t nOutputValue = AmountFromValue(params[2]);
+    auto nOutputValue = AmountFromValue(params[2]);
 
     if (nAmount < nMinimumInputValue)
         throw JSONRPCError(-101, "Send amount too small");
@@ -325,7 +325,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
 
     // Parse address
     CScript scriptPubKey;
-    string strAddress = params[0].get_str();
+    auto strAddress = params[0].get_str();
 
     CBitcoinAddress address(strAddress);
     if (address.IsValid())
@@ -334,7 +334,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
 
     // Amount
-    int64_t nAmount = AmountFromValue(params[1]);
+    auto nAmount = AmountFromValue(params[1]);
 
     if (nAmount < nMinimumInputValue)
         throw JSONRPCError(-101, "Send amount too small");
@@ -349,7 +349,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
-    string strError = pwalletMain->SendMoney(scriptPubKey, nAmount, wtx);
+    auto strError = pwalletMain->SendMoney(scriptPubKey, nAmount, wtx);
     if (!strError.empty())
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
@@ -396,8 +396,8 @@ Value signmessage(const Array& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
-    string strAddress = params[0].get_str();
-    string strMessage = params[1].get_str();
+    auto strAddress = params[0].get_str();
+    auto strMessage = params[1].get_str();
 
     CBitcoinAddress addr(strAddress);
     if (!addr.IsValid())
@@ -429,9 +429,9 @@ Value verifymessage(const Array& params, bool fHelp)
             "verifymessage <novacoinaddress> <signature> <message>\n"
             "Verify a signed message");
 
-    string strAddress  = params[0].get_str();
-    string strSign     = params[1].get_str();
-    string strMessage  = params[2].get_str();
+    auto strAddress  = params[0].get_str();
+    auto strSign     = params[1].get_str();
+    auto strMessage  = params[2].get_str();
 
     CBitcoinAddress addr(strAddress);
     if (!addr.IsValid())
@@ -467,7 +467,7 @@ Value getreceivedbyaddress(const Array& params, bool fHelp)
                 "Returns the total amount received by <novacoinaddress> in transactions with at least [minconf] confirmations.");
 
     // Bitcoin address
-    CBitcoinAddress address = CBitcoinAddress(params[0].get_str());
+    auto address = CBitcoinAddress(params[0].get_str());
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
     if (!IsMine(*pwalletMain,address))
@@ -522,7 +522,7 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
         nMinDepth = params[1].get_int();
 
     // Get the set of pub keys assigned to account
-    string strAccount = AccountFromValue(params[0]);
+    auto strAccount = AccountFromValue(params[0]);
     set<CBitcoinAddress> setAddress;
     GetAccountAddresses(strAccount, setAddress);
 
@@ -603,7 +603,7 @@ Value getbalance(const Array& params, bool fHelp)
         // Calculate total balance a different way from GetBalance()
         // (GetBalance() sums up all unspent TxOuts)
         // getbalance and getbalance '*' 0 should return the same number.
-        int64_t nBalance = 0;
+        auto nBalance = 0;
         for (auto it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
         {
             const CWalletTx& wtx = (*it).second;
@@ -630,9 +630,9 @@ Value getbalance(const Array& params, bool fHelp)
         return  ValueFromAmount(nBalance);
     }
 
-    string strAccount = AccountFromValue(params[0]);
+    auto strAccount = AccountFromValue(params[0]);
 
-    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, filter);
+    auto nBalance = GetAccountBalance(strAccount, nMinDepth, filter);
 
     return ValueFromAmount(nBalance);
 }
@@ -645,9 +645,9 @@ Value movecmd(const Array& params, bool fHelp)
             "move <fromaccount> <toaccount> <amount> [minconf=1] [comment]\n"
             "Move from one account in your wallet to another.");
 
-    string strFrom = AccountFromValue(params[0]);
-    string strTo = AccountFromValue(params[1]);
-    int64_t nAmount = AmountFromValue(params[2]);
+    auto strFrom = AccountFromValue(params[0]);
+    auto strTo = AccountFromValue(params[1]);
+    auto nAmount = AmountFromValue(params[2]);
 
     if (nAmount < nMinimumInputValue)
         throw JSONRPCError(-101, "Send amount too small");
@@ -663,7 +663,7 @@ Value movecmd(const Array& params, bool fHelp)
     if (!walletdb.TxnBegin())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
 
-    int64_t nNow = GetAdjustedTime();
+    auto nNow = GetAdjustedTime();
 
     // Debit
     CAccountingEntry debit;
@@ -700,11 +700,11 @@ Value sendfrom(const Array& params, bool fHelp)
             "<amount> is a real and is rounded to the nearest " + FormatMoney(nMinimumInputValue)
             + HelpRequiringPassphrase());
 
-    string strAccount = AccountFromValue(params[0]);
+    auto strAccount = AccountFromValue(params[0]);
 
     // Parse address
     CScript scriptPubKey;
-    string strAddress = params[0].get_str();
+    auto strAddress = params[0].get_str();
 
     CBitcoinAddress address(strAddress);
     if (address.IsValid())
@@ -713,7 +713,7 @@ Value sendfrom(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
 
 
-    int64_t nAmount = AmountFromValue(params[2]);
+    auto nAmount = AmountFromValue(params[2]);
 
     if (nAmount < nMinimumInputValue)
         throw JSONRPCError(-101, "Send amount too small");
@@ -732,12 +732,12 @@ Value sendfrom(const Array& params, bool fHelp)
     EnsureWalletIsUnlocked();
 
     // Check funds
-    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, MINE_SPENDABLE);
+    auto nBalance = GetAccountBalance(strAccount, nMinDepth, MINE_SPENDABLE);
     if (nAmount > nBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
     // Send
-    string strError = pwalletMain->SendMoney(scriptPubKey, nAmount, wtx);
+    auto strError = pwalletMain->SendMoney(scriptPubKey, nAmount, wtx);
     if (!strError.empty())
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
@@ -753,8 +753,8 @@ Value sendmany(const Array& params, bool fHelp)
             "amounts are double-precision floating point numbers"
             + HelpRequiringPassphrase());
 
-    string strAccount = AccountFromValue(params[0]);
-    Object sendTo = params[1].get_obj();
+    auto strAccount = AccountFromValue(params[0]);
+    auto sendTo = params[1].get_obj();
     int nMinDepth = 1;
     if (params.size() > 2)
         nMinDepth = params[2].get_int();
@@ -783,7 +783,7 @@ Value sendmany(const Array& params, bool fHelp)
 
         CScript scriptPubKey;
         scriptPubKey.SetAddress(address);
-        int64_t nAmount = AmountFromValue(s.value_);
+        auto nAmount = AmountFromValue(s.value_);
 
         if (nAmount < nMinimumInputValue)
             throw JSONRPCError(-101, "Send amount too small");
@@ -796,7 +796,7 @@ Value sendmany(const Array& params, bool fHelp)
     EnsureWalletIsUnlocked();
 
     // Check funds
-    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, MINE_SPENDABLE);
+    auto nBalance = GetAccountBalance(strAccount, nMinDepth, MINE_SPENDABLE);
     if (totalAmount > nBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
@@ -806,7 +806,7 @@ Value sendmany(const Array& params, bool fHelp)
     bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired);
     if (!fCreated)
     {
-        int64_t nTotal = pwalletMain->GetBalance(), nWatchOnly = pwalletMain->GetWatchOnlyBalance();
+        auto nTotal = pwalletMain->GetBalance(), nWatchOnly = pwalletMain->GetWatchOnlyBalance();
         if (totalAmount + nFeeRequired > nTotal - nWatchOnly)
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
         throw JSONRPCError(RPC_WALLET_ERROR, "Transaction creation failed");
@@ -961,7 +961,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
             if (!ExtractDestination(txout.scriptPubKey, address) || !IsMine(*pwalletMain, address))
                 continue;
 
-            tallyitem& item = mapTally[address];
+            auto& item = mapTally[address];
             item.nAmount += txout.nValue;
             item.nConf = min(item.nConf, nDepth);
         }
@@ -988,7 +988,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
 
         if (fByAccounts)
         {
-            tallyitem& item = mapAccountTally[strAccount];
+            auto& item = mapAccountTally[strAccount];
             item.nAmount += nAmount;
             item.nConf = min(item.nConf, nConf);
         }
@@ -1007,7 +1007,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
     {
         for (auto it = mapAccountTally.begin(); it != mapAccountTally.end(); ++it)
         {
-            int64_t nAmount = (*it).second.nAmount;
+            auto nAmount = (*it).second.nAmount;
             int nConf = (*it).second.nConf;
             Object obj;
             obj.push_back(Pair("account",       (*it).first));
@@ -1195,7 +1195,7 @@ Value listtransactions(const Array& params, bool fHelp)
     Array ret;
 
     std::list<CAccountingEntry> acentries;
-    CWallet::TxItems txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
+    auto txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
 
     // iterate backwards until we have nCount items to return:
     for (auto it = txOrdered.rbegin(); it != txOrdered.rend(); ++it)
@@ -1215,9 +1215,9 @@ Value listtransactions(const Array& params, bool fHelp)
         nFrom = ret.size();
     if ((nFrom + nCount) > (int)ret.size())
         nCount = ret.size() - nFrom;
-    Array::iterator first = ret.begin();
+    auto first = ret.begin();
     std::advance(first, nFrom);
-    Array::iterator last = ret.begin();
+    auto last = ret.begin();
     std::advance(last, nFrom+nCount);
 
     if (last != ret.end()) ret.erase(last, ret.end());
@@ -1322,7 +1322,7 @@ Value listsinceblock(const Array& params, bool fHelp)
 
     for (auto it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); it++)
     {
-        CWalletTx tx = (*it).second;
+        auto tx = (*it).second;
 
         if (depth == -1 || tx.GetDepthInMainChain() < depth)
             ListTransactions(tx, "*", 0, true, transactions, filter);
@@ -1376,10 +1376,10 @@ Value gettransaction(const Array& params, bool fHelp)
 
         TxToJSON(wtx, 0, entry);
 
-        int64_t nCredit = wtx.GetCredit(filter);
-        int64_t nDebit = wtx.GetDebit(filter);
-        int64_t nNet = nCredit - nDebit;
-        int64_t nFee = (wtx.IsFromMe(filter) ? wtx.GetValueOut() - nDebit : 0);
+        auto nCredit = wtx.GetCredit(filter);
+        auto nDebit = wtx.GetDebit(filter);
+        auto nNet = nCredit - nDebit;
+        auto nFee = (wtx.IsFromMe(filter) ? wtx.GetValueOut() - nDebit : 0);
 
         entry.push_back(Pair("amount", ValueFromAmount(nNet - nFee)));
         if (wtx.IsFromMe(filter))
@@ -1429,7 +1429,7 @@ Value backupwallet(const Array& params, bool fHelp)
             "backupwallet <destination>\n"
             "Safely copies wallet.dat to destination, which can be a directory or a path with filename.");
 
-    string strDest = params[0].get_str();
+    auto strDest = params[0].get_str();
     if (!BackupWallet(*pwalletMain, strDest))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: Wallet backup failed!");
 
@@ -1505,7 +1505,7 @@ void ThreadCleanWalletPassphrase(void* parg)
     // Make this thread recognisable as the wallet relocking thread
     RenameThread("novacoin-lock-wa");
 
-    int64_t nMyWakeTime = GetTimeMillis() + *((int64_t*)parg) * 1000;
+    auto nMyWakeTime = GetTimeMillis() + *((int64_t*)parg) * 1000;
 
     ENTER_CRITICAL_SECTION(cs_nWalletUnlockTime);
 
@@ -1517,7 +1517,7 @@ void ThreadCleanWalletPassphrase(void* parg)
         {
             if (nWalletUnlockTime==0)
                 break;
-            int64_t nToSleep = nWalletUnlockTime - GetTimeMillis();
+            auto nToSleep = nWalletUnlockTime - GetTimeMillis();
             if (nToSleep <= 0)
                 break;
 
@@ -1751,10 +1751,10 @@ Value validateaddress(const Array& params, bool fHelp)
         }
         else
         {
-            string currentAddress = address.ToString();
-            CTxDestination dest = address.Get();
+            auto currentAddress = address.ToString();
+            auto dest = address.Get();
             ret.push_back(Pair("address", currentAddress));
-            isminetype mine = pwalletMain ? IsMine(*pwalletMain, address) : MINE_NO;
+            auto mine = pwalletMain ? IsMine(*pwalletMain, address) : MINE_NO;
             ret.push_back(Pair("ismine", mine != MINE_NO));
             if (mine != MINE_NO) {
                 ret.push_back(Pair("watchonly", mine == MINE_WATCH_ONLY));
@@ -1786,7 +1786,7 @@ Value reservebalance(const Array& params, bool fHelp)
         {
             if (params.size() == 1)
                 throw runtime_error("must provide amount to reserve balance.\n");
-            int64_t nAmount = AmountFromValue(params[1]);
+            auto nAmount = AmountFromValue(params[1]);
             nAmount = (nAmount / CENT) * CENT;  // round to cent
             if (nAmount < 0)
                 throw runtime_error("amount cannot be negative.\n");
@@ -1906,13 +1906,13 @@ Value makekeypair(const Array& params, bool fHelp)
     CKey key;
     key.MakeNewKey(true);
 
-    CPrivKey vchPrivKey = key.GetPrivKey();
+    auto vchPrivKey = key.GetPrivKey();
     Object result;
     result.push_back(Pair("PrivateKey", HexStr<CPrivKey::iterator>(vchPrivKey.begin(), vchPrivKey.end())));
 
     bool fCompressed;
-    CSecret vchSecret = key.GetSecret(fCompressed);
-    CPubKey vchPubKey = key.GetPubKey();
+    auto vchSecret = key.GetSecret(fCompressed);
+    auto vchPubKey = key.GetPubKey();
     result.push_back(Pair("Secret", HexStr<CSecret::iterator>(vchSecret.begin(), vchSecret.end())));
     result.push_back(Pair("PublicKey", HexStr(vchPubKey.begin(), vchPubKey.end())));
     return result;
@@ -1930,13 +1930,13 @@ Value newmalleablekey(const Array& params, bool fHelp)
     if (params.size() > 0)
         strAccount = AccountFromValue(params[0]);
 
-    CMalleableKeyView keyView = pwalletMain->GenerateNewMalleableKey();
+    auto keyView = pwalletMain->GenerateNewMalleableKey();
 
     CMalleableKey mKey;
     if (!pwalletMain->GetMalleableKey(keyView, mKey))
         throw runtime_error("Unable to generate new malleable key");
 
-    CMalleablePubKey mPubKey = mKey.GetMalleablePubKey();
+    auto mPubKey = mKey.GetMalleablePubKey();
     CBitcoinAddress address(mPubKey);
 
     pwalletMain->SetAddressBookName(address, strAccount);
@@ -1961,7 +1961,7 @@ Value adjustmalleablekey(const Array& params, bool fHelp)
     malleableKey.SetString(params[0].get_str());
 
     CKey privKeyVariant;
-    CPubKey vchPubKeyVariant = CPubKey(ParseHex(params[1].get_str()));
+    auto vchPubKeyVariant = CPubKey(ParseHex(params[1].get_str()));
 
     CPubKey R(ParseHex(params[2].get_str()));
 
@@ -1971,7 +1971,7 @@ Value adjustmalleablekey(const Array& params, bool fHelp)
 
     Object result;
     bool fCompressed;
-    CSecret vchPrivKeyVariant = privKeyVariant.GetSecret(fCompressed);
+    auto vchPrivKeyVariant = privKeyVariant.GetSecret(fCompressed);
 
     result.push_back(Pair("PrivateKey", CBitcoinSecret(vchPrivKeyVariant, fCompressed).ToString()));
 
@@ -1985,7 +1985,7 @@ Value adjustmalleablepubkey(const Array& params, bool fHelp)
             "adjustmalleablepubkey <Malleable address, key view or public key pair>\n"
             "Calculate new public key using provided data.\n");
 
-    string strData = params[0].get_str();
+    auto strData = params[0].get_str();
     CMalleablePubKey malleablePubKey;
 
     do

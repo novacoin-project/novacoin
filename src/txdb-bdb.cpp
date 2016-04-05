@@ -249,7 +249,7 @@ bool CTxDB::LoadBlockIndex()
         // check level 2: verify transaction index validity
         if (nCheckLevel>1)
         {
-            pair<unsigned int, unsigned int> pos = make_pair(pindex->nFile, pindex->nBlockPos);
+            auto pos = make_pair(pindex->nFile, pindex->nBlockPos);
             mapBlockPos[pos] = pindex;
             for(const auto &tx :  block.vtx)
             {

@@ -86,19 +86,19 @@ Value scaninput(const Array& params, bool fHelp)
 
     RPCTypeCheck(params, boost::assign::list_of(obj_type));
 
-    Object scanParams = params[0].get_obj();
+    auto scanParams = params[0].get_obj();
 
     const Value& txid_v = find_value(scanParams, "txid");
     if (txid_v.type() != str_type)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing txid key");
 
-    string txid = txid_v.get_str();
+    auto txid = txid_v.get_str();
     if (!IsHex(txid))
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex txid");
 
     uint256 hash(txid);
     int32_t nDays = 90;
-    uint32_t nBits = GetNextTargetRequired(pindexBest, true);
+    auto nBits = GetNextTargetRequired(pindexBest, true);
 
     const Value& diff_v = find_value(scanParams, "difficulty");
     if (diff_v.type() == real_type || diff_v.type() == int_type)
@@ -133,7 +133,7 @@ Value scaninput(const Array& params, bool fHelp)
         const Value& inputs_v = find_value(scanParams, "vout");
         if (inputs_v.type() == array_type)
         {
-            Array inputs = inputs_v.get_array();
+            auto inputs = inputs_v.get_array();
             for(const Value &v_out: inputs)
             {
                 int nOut = v_out.get_int();
@@ -295,9 +295,9 @@ Value getworkex(const Array& params, bool fHelp)
         char phash1[64];
         FormatHashBuffers(pblock, pmidstate, pdata, phash1);
 
-        uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+        auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
-        CTransaction coinbaseTx = pblock->vtx[0];
+        auto coinbaseTx = pblock->vtx[0];
         std::vector<uint256> merkle = pblock->GetMerkleBranch(0);
 
         Object result;
@@ -434,7 +434,7 @@ Value getwork(const Array& params, bool fHelp)
         char phash1[64];
         FormatHashBuffers(pblock, pmidstate, pdata, phash1);
 
-        uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+        auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
         Object result;
         result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
@@ -598,7 +598,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
     Object aux;
     aux.push_back(Pair("flags", HexStr(COINBASE_FLAGS.begin(), COINBASE_FLAGS.end())));
 
-    uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+    auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
     static Array aMutable;
     if (aMutable.empty())

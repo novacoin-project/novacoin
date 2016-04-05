@@ -383,7 +383,7 @@ bool AppInit2()
     nPingInterval = max<int64_t>(10 * 60, GetArg("-keepalive", 30 * 60));
 
     CheckpointsMode = Checkpoints::STRICT;
-    std::string strCpMode = GetArg("-cppolicy", "strict");
+    auto strCpMode = GetArg("-cppolicy", "strict");
 
     if(strCpMode == "strict") {
         CheckpointsMode = Checkpoints::STRICT;
@@ -508,7 +508,7 @@ bool AppInit2()
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
-    std::string strDataDir = GetDataDir().string();
+    auto strDataDir = GetDataDir().string();
     strWalletFileName = GetArg("-wallet", "wallet.dat");
 
     // strWalletFileName must be a plain filename without a directory
@@ -810,11 +810,11 @@ bool AppInit2()
 
     if (mapArgs.count("-printblock"))
     {
-        string strMatch = mapArgs["-printblock"];
+        auto strMatch = mapArgs["-printblock"];
         int nFound = 0;
         for (map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.begin(); mi != mapBlockIndex.end(); ++mi)
         {
-            uint256 hash = (*mi).first;
+            auto hash = (*mi).first;
             if (strncmp(hash.ToString().c_str(), strMatch.c_str(), strMatch.size()) == 0)
             {
                 CBlockIndex* pindex = (*mi).second;
@@ -902,7 +902,7 @@ bool AppInit2()
         if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultKey.GetID(), ""))
             strErrors << _("Cannot write default address") << "\n";
 
-        CMalleableKeyView keyView = pwalletMain->GenerateNewMalleableKey();
+        auto keyView = pwalletMain->GenerateNewMalleableKey();
         CMalleableKey mKey;
         if (!pwalletMain->GetMalleableKey(keyView, mKey))
             strErrors << _("Unable to generate new malleable key");

@@ -200,7 +200,7 @@ void static AdvertizeLocal()
     {
         if (pnode->fSuccessfullyConnected)
         {
-            CAddress addrLocal = GetLocalAddress(&pnode->addr);
+            auto addrLocal = GetLocalAddress(&pnode->addr);
             if (addrLocal.IsRoutable() && (CService)addrLocal != pnode->addrLocal)
             {
                 pnode->PushAddress(addrLocal);
@@ -239,7 +239,7 @@ void AdvertiseLocal(CNode *pnode)
 {
     if (!fNoListen && pnode->fSuccessfullyConnected)
     {
-        CAddress addrLocal = GetLocalAddress(&pnode->addr);
+        auto addrLocal = GetLocalAddress(&pnode->addr);
         // If discovery is enabled, sometimes give our peer the address it
         // tells us that it sees us as in case it has a better idea of our
         // address than we do.
@@ -347,7 +347,7 @@ extern int GetExternalIPbySTUN(uint64_t rnd, struct sockaddr_in *mapped, const c
 bool GetMyExternalIP(CNetAddr& ipRet)
 {
     struct sockaddr_in mapped;
-    uint64_t rnd = std::numeric_limits<uint64_t>::max();
+    auto rnd = std::numeric_limits<uint64_t>::max();
     const char *srv;
     int rc = GetExternalIPbySTUN(rnd, &mapped, &srv);
     if(rc >= 0) {
@@ -506,7 +506,7 @@ void CNode::Cleanup()
 
 void CNode::PushVersion()
 {
-    int64_t nTime = GetAdjustedTime();
+    auto nTime = GetAdjustedTime();
     CAddress addrYou, addrMe;
 
     bool fHidden = false;
@@ -554,7 +554,7 @@ bool CNode::IsBanned(CNetAddr ip)
         std::map<CNetAddr, int64_t>::iterator i = setBanned.find(ip);
         if (i != setBanned.end())
         {
-            int64_t t = (*i).second;
+            auto t = (*i).second;
             if (GetTime() < t)
                 fResult = true;
         }
@@ -573,7 +573,7 @@ bool CNode::Misbehaving(int howmuch)
     nMisbehavior += howmuch;
     if (nMisbehavior >= GetArgInt("-banscore", 100))
     {
-        int64_t banTime = GetTime()+GetArg("-bantime", nOneDay);  // Default 24-hour ban
+        auto banTime = GetTime()+GetArg("-bantime", nOneDay);  // Default 24-hour ban
         printf("Misbehaving: %s (%d -> %d) DISCONNECTING\n", addr.ToString().c_str(), nMisbehavior-howmuch, nMisbehavior);
         {
             LOCK(cs_setBanned);
@@ -1020,7 +1020,7 @@ void ThreadDNSAddressSeed2(void* parg)
                 {
                     for(CNetAddr& ip :  vaddr)
                     {
-                        CAddress addr = CAddress(CService(ip, GetDefaultPort()));
+                        auto addr = CAddress(CService(ip, GetDefaultPort()));
                         addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
                         vAdd.push_back(addr);
                         found++;
@@ -1085,7 +1085,7 @@ const char* pchTorSeed[] =
 
 void DumpAddresses()
 {
-    int64_t nStart = GetTimeMillis();
+    auto nStart = GetTimeMillis();
 
     CAddrDB adb;
     adb.Write(addrman);
@@ -1189,7 +1189,7 @@ void ThreadOpenConnections2(void* parg)
     }
 
     // Initiate network connections
-    int64_t nStart = GetTime();
+    auto nStart = GetTime();
     for ( ; ; )
     {
         ProcessOneShot();
@@ -1258,13 +1258,13 @@ void ThreadOpenConnections2(void* parg)
             }
         }
 
-        int64_t nANow = GetAdjustedTime();
+        auto nANow = GetAdjustedTime();
 
         int nTries = 0;
         for ( ; ; )
         {
             // use an nUnkBias between 10 (no outgoing connections) and 90 (8 outgoing connections)
-            CAddress addr = addrman.Select(10 + min(nOutbound,8)*10);
+            auto addr = addrman.Select(10 + min(nOutbound,8)*10);
 
             // if we selected an invalid address, restart
             if (!addr.IsValid() || setConnected.count(addr.GetGroup()) || IsLocal(addr))
@@ -1784,7 +1784,7 @@ bool StopNode()
     printf("StopNode()\n");
     fShutdown = true;
     nTransactionsUpdated++;
-    int64_t nStart = GetTime();
+    auto nStart = GetTime();
     {
         LOCK(cs_main);
         ThreadScriptCheckQuit();

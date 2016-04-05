@@ -609,7 +609,7 @@ public:
 
     bool ReadFromDisk(CDiskTxPos pos, FILE** pfileRet=NULL)
     {
-        CAutoFile filein = CAutoFile(OpenBlockFile(pos.nFile, 0, pfileRet ? "rb+" : "rb"), SER_DISK, CLIENT_VERSION);
+        auto filein = CAutoFile(OpenBlockFile(pos.nFile, 0, pfileRet ? "rb+" : "rb"), SER_DISK, CLIENT_VERSION);
         if (!filein)
             return error("CTransaction::ReadFromDisk() : OpenBlockFile failed");
 
@@ -1057,7 +1057,7 @@ public:
     bool WriteToDisk(unsigned int& nFileRet, unsigned int& nBlockPosRet)
     {
         // Open history file to append
-        CAutoFile fileout = CAutoFile(AppendBlockFile(nFileRet), SER_DISK, CLIENT_VERSION);
+        auto fileout = CAutoFile(AppendBlockFile(nFileRet), SER_DISK, CLIENT_VERSION);
         if (!fileout)
             return error("CBlock::WriteToDisk() : AppendBlockFile failed");
 
@@ -1085,7 +1085,7 @@ public:
         SetNull();
 
         // Open history file to read
-        CAutoFile filein = CAutoFile(OpenBlockFile(nFile, nBlockPos, "rb"), SER_DISK, CLIENT_VERSION);
+        auto filein = CAutoFile(OpenBlockFile(nFile, nBlockPos, "rb"), SER_DISK, CLIENT_VERSION);
         if (!filein)
             return error("CBlock::ReadFromDisk() : OpenBlockFile failed");
         if (!fReadTransactions)

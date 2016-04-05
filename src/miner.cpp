@@ -334,7 +334,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
             }
 
             // Add transactions that depend on this one to the priority queue
-            uint256 hash = tx.GetHash();
+            auto hash = tx.GetHash();
             if (mapDependers.count(hash))
             {
                 for(COrphan* porphan :  mapDependers[hash])
@@ -448,8 +448,8 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
 
 bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 {
-    uint256 hashBlock = pblock->GetHash();
-    uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+    auto hashBlock = pblock->GetHash();
+    auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
     if(!pblock->IsProofOfWork())
         return error("CheckWork() : %s is not a proof-of-work block", hashBlock.GetHex().c_str());
@@ -488,7 +488,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 bool CheckStake(CBlock* pblock, CWallet& wallet)
 {
     uint256 proofHash = 0, hashTarget = 0;
-    uint256 hashBlock = pblock->GetHash();
+    auto hashBlock = pblock->GetHash();
 
     if(!pblock->IsProofOfStake())
         return error("CheckStake() : %s is not a proof-of-stake block", hashBlock.GetHex().c_str());
@@ -530,7 +530,7 @@ typedef std::map<std::pair<uint256, unsigned int>, std::pair<std::vector<unsigne
 bool FillMap(CWallet *pwallet, uint32_t nUpperTime, MidstateMap &inputsMap)
 {
     // Choose coins to use
-    int64_t nBalance = pwallet->GetBalance();
+    auto nBalance = pwallet->GetBalance();
 
     if (nBalance <= nReserveBalance)
         return false;
@@ -552,9 +552,9 @@ bool FillMap(CWallet *pwallet, uint32_t nUpperTime, MidstateMap &inputsMap)
         CBlock block;
         CTxIndex txindex;
 
-        for(CoinsSet::const_iterator pcoin = setCoins.begin(); pcoin != setCoins.end(); pcoin++)
+        for(auto pcoin = setCoins.begin(); pcoin != setCoins.end(); pcoin++)
         {
-            pair<uint256, uint32_t> key = make_pair(pcoin->first->GetHash(), pcoin->second);
+            auto key = make_pair(pcoin->first->GetHash(), pcoin->second);
 
             // Skip existent inputs
             if (inputsMap.find(key) != inputsMap.end())
@@ -660,7 +660,7 @@ void ThreadStakeMiner(void* parg)
     bool fTrySync = true;
 
     CBlockIndex* pindexPrev = pindexBest;
-    uint32_t nBits = GetNextTargetRequired(pindexPrev, true);
+    auto nBits = GetNextTargetRequired(pindexPrev, true);
 
     printf("ThreadStakeMinter started\n");
 

@@ -66,7 +66,7 @@ void RPCTypeCheck(const Array& params,
         const Value& v = params[i];
         if (!((v.type() == t) || (fAllowNull && (v.type() == null_type))))
         {
-            string err = strprintf("Expected type %s, got %s",
+            auto err = strprintf("Expected type %s, got %s",
                                    Value_type_name[t], Value_type_name[v.type()]);
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
@@ -86,7 +86,7 @@ void RPCTypeCheck(const Object& o,
 
         if (!((v.type() == t.second) || (fAllowNull && (v.type() == null_type))))
         {
-            string err = strprintf("Expected type %s for %s, got %s",
+            auto err = strprintf("Expected type %s for %s, got %s",
                                    Value_type_name[t.second], t.first.c_str(), Value_type_name[v.type()]);
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
@@ -98,7 +98,7 @@ int64_t AmountFromValue(const Value& value)
     double dAmount = value.get_real();
     if (dAmount <= 0.0 || dAmount > MAX_MONEY)
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
-    int64_t nAmount = roundint64(dAmount * COIN);
+    auto nAmount = roundint64(dAmount * COIN);
     if (!MoneyRange(nAmount))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
     return nAmount;
@@ -168,7 +168,7 @@ string CRPCTable::help(string strCommand) const
     for (map<string, const CRPCCommand*>::const_iterator mi = mapCommands.begin(); mi != mapCommands.end(); ++mi)
     {
         const CRPCCommand *pcmd = mi->second;
-        string strMethod = mi->first;
+        auto strMethod = mi->first;
         // We already filter duplicates, but these deprecated screw up the sort order
         if (strMethod.find("label") != string::npos)
             continue;
@@ -184,7 +184,7 @@ string CRPCTable::help(string strCommand) const
         catch (std::exception& e)
         {
             // Help text is returned in an exception
-            string strHelp = string(e.what());
+            auto strHelp = string(e.what());
             if (strCommand.empty())
                 if (strHelp.find('\n') != string::npos)
                     strHelp = strHelp.substr(0, strHelp.find('\n'));
@@ -450,10 +450,10 @@ int ReadHTTPHeader(std::basic_istream<char>& stream, map<string, string>& mapHea
         string::size_type nColon = str.find(":");
         if (nColon != string::npos)
         {
-            string strHeader = str.substr(0, nColon);
+            auto strHeader = str.substr(0, nColon);
             boost::trim(strHeader);
             boost::to_lower(strHeader);
-            string strValue = str.substr(nColon+1);
+            auto strValue = str.substr(nColon+1);
             boost::trim(strValue);
             mapHeadersRet[strHeader] = strValue;
             if (strHeader == "content-length")
@@ -485,7 +485,7 @@ int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRe
         strMessageRet = string(vch.begin(), vch.end());
     }
 
-    string sConHdr = mapHeadersRet["connection"];
+    auto sConHdr = mapHeadersRet["connection"];
 
     if ((sConHdr != "close") && (sConHdr != "keep-alive"))
     {
@@ -500,11 +500,11 @@ int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRe
 
 bool HTTPAuthorized(map<string, string>& mapHeaders)
 {
-    string strAuth = mapHeaders["authorization"];
+    auto strAuth = mapHeaders["authorization"];
     if (strAuth.substr(0,6) != "Basic ")
         return false;
-    string strUserPass64 = strAuth.substr(6); boost::trim(strUserPass64);
-    string strUserPass = DecodeBase64(strUserPass64);
+    auto strUserPass64 = strAuth.substr(6); boost::trim(strUserPass64);
+    auto strUserPass = DecodeBase64(strUserPass64);
     return TimingResistantEqual(strUserPass, strRPCUserColonPass);
 }
 
@@ -541,7 +541,7 @@ Object JSONRPCReplyObj(const Value& result, const Value& error, const Value& id)
 
 string JSONRPCReply(const Value& result, const Value& error, const Value& id)
 {
-    Object reply = JSONRPCReplyObj(result, error, id);
+    auto reply = JSONRPCReplyObj(result, error, id);
     return write_string(Value(reply), false) + "\n";
 }
 
@@ -552,7 +552,7 @@ void ErrorReply(std::ostream& stream, const Object& objError, const Value& id)
     int code = find_value(objError, "code").get_int();
     if (code == RPC_INVALID_REQUEST) nStatus = HTTP_BAD_REQUEST;
     else if (code == RPC_METHOD_NOT_FOUND) nStatus = HTTP_NOT_FOUND;
-    string strReply = JSONRPCReply(Value::null, objError, id);
+    auto strReply = JSONRPCReply(Value::null, objError, id);
     stream << HTTPReply(nStatus, strReply, false) << std::flush;
 }
 
@@ -825,7 +825,7 @@ void ThreadRPCServer2(void* parg)
         if (filesystem::exists(pathPKFile)) context.use_private_key_file(pathPKFile.string(), ssl::context::pem);
         else printf("ThreadRPCServer ERROR: missing server private key file %s\n", pathPKFile.string().c_str());
 
-        string strCiphers = GetArg("-rpcsslciphers", "TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH");
+        auto strCiphers = GetArg("-rpcsslciphers", "TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH");
         SSL_CTX_set_cipher_list(context.impl(), strCiphers.c_str());
     }
 
@@ -926,7 +926,7 @@ void JSONRequest::parse(const Value& valRequest)
     id = find_value(request, "id");
 
     // Parse method
-    Value valMethod = find_value(request, "method");
+    auto valMethod = find_value(request, "method");
     if (valMethod.type() == null_type)
         throw JSONRPCError(RPC_INVALID_REQUEST, "Missing method");
     if (valMethod.type() != str_type)
@@ -936,7 +936,7 @@ void JSONRequest::parse(const Value& valRequest)
         printf("ThreadRPCServer method=%s\n", strMethod.c_str());
 
     // Parse params
-    Value valParams = find_value(request, "params");
+    auto valParams = find_value(request, "params");
     if (valParams.type() == array_type)
         params = valParams.get_array();
     else if (valParams.type() == null_type)
@@ -953,7 +953,7 @@ static Object JSONRPCExecOne(const Value& req)
     try {
         jreq.parse(req);
 
-        Value result = tableRPC.execute(jreq.strMethod, jreq.params);
+        auto result = tableRPC.execute(jreq.strMethod, jreq.params);
         rpc_result = JSONRPCReplyObj(result, Value::null, jreq.id);
     }
     catch (Object& objError)
@@ -1044,7 +1044,7 @@ void ThreadRPCServer3(void* parg)
             if (valRequest.type() == obj_type) {
                 jreq.parse(valRequest);
 
-                Value result = tableRPC.execute(jreq.strMethod, jreq.params);
+                auto result = tableRPC.execute(jreq.strMethod, jreq.params);
 
                 // Send reply
                 strReply = JSONRPCReply(result, Value::null, jreq.id);
@@ -1084,7 +1084,7 @@ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_s
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
 
     // Observe safe mode
-    string strWarning = GetWarnings("rpc");
+    auto strWarning = GetWarnings("rpc");
     if (!strWarning.empty() && !GetBoolArg("-disablesafemode") &&
         !pcmd->okSafeMode)
         throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, string("Safe mode: ") + strWarning);
@@ -1130,13 +1130,13 @@ Object CallRPC(const string& strMethod, const Array& params)
         throw runtime_error("couldn't connect to server");
 
     // HTTP basic authentication
-    string strUserPass64 = EncodeBase64(mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"]);
+    auto strUserPass64 = EncodeBase64(mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"]);
     map<string, string> mapRequestHeaders;
     mapRequestHeaders["Authorization"] = string("Basic ") + strUserPass64;
 
     // Send request
-    string strRequest = JSONRPCRequest(strMethod, params, 1);
-    string strPost = HTTPPost(strRequest, mapRequestHeaders);
+    auto strRequest = JSONRPCRequest(strMethod, params, 1);
+    auto strPost = HTTPPost(strRequest, mapRequestHeaders);
     stream << strPost << std::flush;
 
     // Receive reply
@@ -1173,7 +1173,7 @@ void ConvertTo(Value& value, bool fAllowNull=false)
     {
         // reinterpret string as unquoted json value
         Value value2;
-        string strJSON = value.get_str();
+        auto strJSON = value.get_str();
         if (!read_string(strJSON, value2))
             throw runtime_error(string("Error parsing JSON:")+strJSON);
         ConvertTo<T>(value2, fAllowNull);
@@ -1192,7 +1192,7 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     for(const auto &param :  strParams)
         params.push_back(param);
 
-    size_t n = params.size();
+    auto n = params.size();
 
     //
     // Special case non-string parameter types
@@ -1276,18 +1276,18 @@ int CommandLineRPC(int argc, char *argv[])
         // Method
         if (argc < 2)
             throw runtime_error("too few parameters");
-        string strMethod = argv[1];
+        auto strMethod = argv[1];
 
         // Parameters default to strings
         std::vector<std::string> strParams(&argv[2], &argv[argc]);
-        Array params = RPCConvertValues(strMethod, strParams);
+        auto params = RPCConvertValues(strMethod, strParams);
 
         // Execute
-        Object reply = CallRPC(strMethod, params);
+        auto reply = CallRPC(strMethod, params);
 
         // Parse reply
-        const Value& result = find_value(reply, "result");
-        const Value& error  = find_value(reply, "error");
+        const auto& result = find_value(reply, "result");
+        const auto& error  = find_value(reply, "error");
 
         if (error.type() != null_type)
         {
