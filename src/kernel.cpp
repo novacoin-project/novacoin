@@ -430,6 +430,10 @@ bool ScanKernelForward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxT
         using namespace boost;
 
         auto nThreads = std::thread::hardware_concurrency();
+        if (nThreads == 0) {
+           nThreads = 1;
+           printf("Warning: hardware_concurrency() failed in %s:%d\n", __FILE__, __LINE__);
+        }
         auto vWorkers = vector<KernelWorker>(nThreads);
         auto nPart = (SearchInterval.second - SearchInterval.first) / nThreads;
         thread_group group;
