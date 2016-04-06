@@ -22,12 +22,12 @@ uint64_t nStakeInputsMapSize = 0;
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
 {
-    unsigned char* pdata = (unsigned char*)pbuffer;
-    unsigned int blocks = 1 + ((len + 8) / 64);
-    unsigned char* pend = pdata + 64 * blocks;
+    auto pdata = (unsigned char*)pbuffer;
+    auto blocks = 1 + ((len + 8) / 64);
+    auto pend = pdata + 64 * blocks;
     memset(pdata + len, 0, 64 * blocks - len);
     pdata[len] = 0x80;
-    unsigned int bits = len * 8;
+    auto bits = len * 8;
     pend[-1] = (bits >> 0) & 0xff;
     pend[-2] = (bits >> 8) & 0xff;
     pend[-3] = (bits >> 16) & 0xff;
@@ -78,7 +78,7 @@ uint64_t nLastBlockSize = 0;
 uint32_t nLastCoinStakeSearchInterval = 0;
  
 // We want to sort transactions by priority and fee, so:
-typedef boost::tuple<double, double, CTransaction*> TxPriority;
+typedef tuple<double, double, CTransaction*> TxPriority;
 class TxPriorityCompare
 {
     bool byFee;
@@ -88,15 +88,15 @@ public:
     {
         if (byFee)
         {
-            if (a.get<1>() == b.get<1>())
-                return a.get<0>() < b.get<0>();
-            return a.get<1>() < b.get<1>();
+            if (get<1>(a) == get<1>(b))
+                return get<0>(a) < get<0>(b);
+            return get<1>(a) < get<1>(b);
         }
         else
         {
-            if (a.get<0>() == b.get<0>())
-                return a.get<1>() < b.get<1>();
-            return a.get<0>() < b.get<0>();
+            if (get<0>(a) == get<0>(b))
+                return get<1>(a) < get<1>(b);
+            return get<0>(a) < get<0>(b);
         }
     }
 };
@@ -139,30 +139,30 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
     }
 
     // Largest block you're willing to create:
-    unsigned int nBlockMaxSize = GetArgUInt("-blockmaxsize", MAX_BLOCK_SIZE_GEN/2);
+    auto nBlockMaxSize = GetArgUInt("-blockmaxsize", MAX_BLOCK_SIZE_GEN/2);
     // Limit to betweeen 1K and MAX_BLOCK_SIZE-1K for sanity:
-    nBlockMaxSize = std::max(1000u, std::min(MAX_BLOCK_SIZE-1000u, nBlockMaxSize));
+    nBlockMaxSize = max(1000u, min(MAX_BLOCK_SIZE-1000u, nBlockMaxSize));
 
     // How much of the block should be dedicated to high-priority transactions,
     // included regardless of the fees they pay
-    unsigned int nBlockPrioritySize = GetArgUInt("-blockprioritysize", 27000);
-    nBlockPrioritySize = std::min(nBlockMaxSize, nBlockPrioritySize);
+    auto nBlockPrioritySize = GetArgUInt("-blockprioritysize", 27000);
+    nBlockPrioritySize = min(nBlockMaxSize, nBlockPrioritySize);
 
     // Minimum block size you want to create; block will be filled with free transactions
     // until there are no more or the block reaches this size:
-    unsigned int nBlockMinSize = GetArgUInt("-blockminsize", 0);
-    nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
+    auto nBlockMinSize = GetArgUInt("-blockminsize", 0);
+    nBlockMinSize = min(nBlockMaxSize, nBlockMinSize);
 
     // Fee-per-kilobyte amount considered the same as "free"
     // Be careful setting this: if you set it to zero then
     // a transaction spammer can cheaply fill blocks using
     // 1-satoshi-fee transactions. It should be set above the real
     // cost to you of processing a transaction.
-    int64_t nMinTxFee = MIN_TX_FEE;
+    auto nMinTxFee = MIN_TX_FEE;
     if (mapArgs.count("-mintxfee"))
         ParseMoney(mapArgs["-mintxfee"], nMinTxFee);
 
-    CBlockIndex* pindexPrev = pindexBest;
+    auto pindexPrev = pindexBest;
 
     pblock->nBits = GetNextTargetRequired(pindexPrev, fProofOfStake);
 
@@ -180,9 +180,9 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
         // This vector will be sorted into a priority queue:
         vector<TxPriority> vecPriority;
         vecPriority.reserve(mempool.mapTx.size());
-        for (map<uint256, CTransaction>::iterator mi = mempool.mapTx.begin(); mi != mempool.mapTx.end(); ++mi)
+        for (auto mi = mempool.mapTx.begin(); mi != mempool.mapTx.end(); ++mi)
         {
-            CTransaction& tx = (*mi).second;
+            auto& tx = (*mi).second;
             if (tx.IsCoinBase() || tx.IsCoinStake() || !tx.IsFinal())
                 continue;
 
@@ -190,7 +190,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
             double dPriority = 0;
             int64_t nTotalIn = 0;
             bool fMissingInputs = false;
-            for(const CTxIn& txin :  tx.vin)
+            for(const auto& txin :  tx.vin)
             {
                 // Read prev transaction
                 CTransaction txPrev;
@@ -222,7 +222,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
                     nTotalIn += mempool.mapTx[txin.prevout.hash].vout[txin.prevout.n].nValue;
                     continue;
                 }
-                int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
+                auto nValueIn = txPrev.vout[txin.prevout.n].nValue;
                 nTotalIn += nValueIn;
 
                 int nConf = txindex.GetDepthInMainChain();
@@ -231,13 +231,13 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
             if (fMissingInputs) continue;
 
             // Priority is sum(valuein * age) / txsize
-            unsigned int nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
+            auto nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
             dPriority /= nTxSize;
 
             // This is a more accurate fee-per-kilobyte than is used by the client code, because the
             // client code rounds up the size to the nearest 1K. That's good, because it gives an
             // incentive to create smaller transactions.
-            double dFeePerKb =  double(nTotalIn-tx.GetValueOut()) / (double(nTxSize)/1000.0);
+            auto dFeePerKb =  double(nTotalIn-tx.GetValueOut()) / (double(nTxSize)/1000.0);
 
             if (porphan)
             {
@@ -256,25 +256,25 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
         bool fSortedByFee = (nBlockPrioritySize <= 0);
 
         TxPriorityCompare comparer(fSortedByFee);
-        std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
+        make_heap(vecPriority.begin(), vecPriority.end(), comparer);
 
         while (!vecPriority.empty())
         {
             // Take highest priority transaction off the priority queue:
-            double dPriority = vecPriority.front().get<0>();
-            double dFeePerKb = vecPriority.front().get<1>();
-            CTransaction& tx = *(vecPriority.front().get<2>());
+            auto dPriority = get<0>(vecPriority.front());
+            auto dFeePerKb = get<1>(vecPriority.front());
+            auto& tx = *(get<2>(vecPriority.front()));
 
-            std::pop_heap(vecPriority.begin(), vecPriority.end(), comparer);
+            pop_heap(vecPriority.begin(), vecPriority.end(), comparer);
             vecPriority.pop_back();
 
             // Size limits
-            unsigned int nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
+            auto nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
             if (nBlockSize + nTxSize >= nBlockMaxSize)
                 continue;
 
             // Legacy limits on sigOps:
-            unsigned int nTxSigOps = tx.GetLegacySigOpCount();
+            auto nTxSigOps = tx.GetLegacySigOpCount();
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
 
@@ -293,7 +293,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
             {
                 fSortedByFee = true;
                 comparer = TxPriorityCompare(fSortedByFee);
-                std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
+                make_heap(vecPriority.begin(), vecPriority.end(), comparer);
             }
 
             // Connecting shouldn't fail due to dependency on other memory pool transactions
@@ -305,8 +305,8 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
                 continue;
 
             // Transaction fee
-            int64_t nTxFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
-            int64_t nMinFee = tx.GetMinFee(nBlockSize, true, GMF_BLOCK, nTxSize);
+            auto nTxFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
+            auto nMinFee = tx.GetMinFee(nBlockSize, true, GMF_BLOCK, nTxSize);
             if (nTxFees < nMinFee)
                 continue;
 
@@ -337,7 +337,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
             auto hash = tx.GetHash();
             if (mapDependers.count(hash))
             {
-                for(COrphan* porphan :  mapDependers[hash])
+                for(auto porphan :  mapDependers[hash])
                 {
                     if (!porphan->setDependsOn.empty())
                     {
@@ -345,7 +345,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
                         if (porphan->setDependsOn.empty())
                         {
                             vecPriority.push_back(TxPriority(porphan->dPriority, porphan->dFeePerKb, porphan->ptx));
-                            std::push_heap(vecPriority.begin(), vecPriority.end(), comparer);
+                            push_heap(vecPriority.begin(), vecPriority.end(), comparer);
                         }
                     }
                 }
@@ -524,7 +524,7 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
 
 // Precalculated SHA256 contexts and metadata
 // (txid, vout.n) => (kernel, (tx.nTime, nAmount))
-typedef std::map<std::pair<uint256, unsigned int>, std::pair<std::vector<unsigned char>, std::pair<uint32_t, uint64_t> > > MidstateMap;
+typedef map<pair<uint256, unsigned int>, pair<vector<unsigned char>, pair<uint32_t, uint64_t> > > MidstateMap;
 
 // Fill the inputs map with precalculated contexts and metadata
 bool FillMap(CWallet *pwallet, uint32_t nUpperTime, MidstateMap &inputsMap)
@@ -593,7 +593,7 @@ bool FillMap(CWallet *pwallet, uint32_t nUpperTime, MidstateMap &inputsMap)
             ssKernel << block.nTime << (txindex.pos.nTxPos - txindex.pos.nBlockPos) << pcoin->first->nTime << pcoin->second;
 
             // (txid, vout.n) => (kernel, (tx.nTime, nAmount))
-            inputsMap[key] = make_pair(std::vector<unsigned char>(ssKernel.begin(), ssKernel.end()), make_pair(pcoin->first->nTime, pcoin->first->vout[pcoin->second].nValue));
+            inputsMap[key] = { vector<unsigned char>(ssKernel.begin(), ssKernel.end()), { pcoin->first->nTime, pcoin->first->vout[pcoin->second].nValue } };
         }
 
         nStakeInputsMapSize = inputsMap.size();
@@ -606,7 +606,7 @@ bool FillMap(CWallet *pwallet, uint32_t nUpperTime, MidstateMap &inputsMap)
 }
 
 // Scan inputs map in order to find a solution
-bool ScanMap(const MidstateMap &inputsMap, uint32_t nBits, MidstateMap::key_type &LuckyInput, std::pair<uint256, uint32_t> &solution)
+bool ScanMap(const MidstateMap &inputsMap, uint32_t nBits, MidstateMap::key_type &LuckyInput, pair<uint256, uint32_t> &solution)
 {
     static uint32_t nLastCoinStakeSearchTime = GetAdjustedTime(); // startup timestamp
     uint32_t nSearchTime = GetAdjustedTime();
@@ -614,15 +614,12 @@ bool ScanMap(const MidstateMap &inputsMap, uint32_t nBits, MidstateMap::key_type
     if (inputsMap.size() > 0 && nSearchTime > nLastCoinStakeSearchTime)
     {
         // Scanning interval (begintime, endtime)
-        std::pair<uint32_t, uint32_t> interval;
-
-        interval.first = nSearchTime;
-        interval.second = nSearchTime - min(nSearchTime-nLastCoinStakeSearchTime, nMaxStakeSearchInterval);
+        pair<uint32_t, uint32_t> interval = { nSearchTime, nSearchTime - min(nSearchTime-nLastCoinStakeSearchTime, nMaxStakeSearchInterval) };
 
         // (txid, nout) => (kernel, (tx.nTime, nAmount))
-        for(MidstateMap::const_iterator input = inputsMap.begin(); input != inputsMap.end(); input++)
+        for(auto input = inputsMap.begin(); input != inputsMap.end(); input++)
         {
-            unsigned char *kernel = (unsigned char *) &input->second.first[0];
+            auto kernel = (unsigned char *) &input->second.first[0];
 
             // scan(State, Bits, Time, Amount, ...)
             if (ScanKernelBackward(kernel, nBits, input->second.second.first, input->second.second.second, interval, solution))
@@ -651,7 +648,7 @@ void ThreadStakeMiner(void* parg)
 
     // Make this thread recognisable as the mining thread
     RenameThread("novacoin-miner");
-    CWallet* pwallet = (CWallet*)parg;
+    auto pwallet = (CWallet*)parg;
 
     MidstateMap inputsMap;
     if (!FillMap(pwallet, GetAdjustedTime(), inputsMap))
@@ -659,7 +656,7 @@ void ThreadStakeMiner(void* parg)
 
     bool fTrySync = true;
 
-    CBlockIndex* pindexPrev = pindexBest;
+    auto pindexPrev = pindexBest;
     auto nBits = GetNextTargetRequired(pindexPrev, true);
 
     printf("ThreadStakeMinter started\n");
@@ -669,7 +666,7 @@ void ThreadStakeMiner(void* parg)
         vnThreadsRunning[THREAD_MINTER]++;
 
         MidstateMap::key_type LuckyInput;
-        std::pair<uint256, uint32_t> solution;
+        pair<uint256, uint32_t> solution;
 
         // Main miner loop
         do
@@ -725,8 +722,7 @@ void ThreadStakeMiner(void* parg)
                 }
 
                 // Now we have new coinstake, it's time to create the block ...
-                CBlock* pblock;
-                pblock = CreateNewBlock(pwallet, &txCoinStake);
+                auto pblock = CreateNewBlock(pwallet, &txCoinStake);
                 if (!pblock)
                 {
                     string strMessage = _("Warning: Unable to allocate memory for the new block object. Mining thread has been stopped.");
@@ -778,7 +774,7 @@ void ThreadStakeMiner(void* parg)
 
         vnThreadsRunning[THREAD_MINTER]--;
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         vnThreadsRunning[THREAD_MINTER]--;
         PrintException(&e, "ThreadStakeMinter()");
     } catch (...) {

@@ -2,10 +2,6 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#include <boost/tuple/tuple.hpp>
-
-using namespace std;
-using namespace boost;
 
 #include "script.h"
 #include "keystore.h"
@@ -14,6 +10,8 @@ using namespace boost;
 #include "main.h"
 #include "sync.h"
 #include "util.h"
+
+using namespace std;
 
 bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubKey, const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, int flags);
 
@@ -1230,8 +1228,8 @@ class CSignatureCache
 {
 private:
      // sigdata_type is (signature hash, signature, public key):
-    typedef boost::tuple<uint256, std::vector<unsigned char>, CPubKey > sigdata_type;
-    std::set< sigdata_type> setValid;
+    typedef tuple<uint256, std::vector<unsigned char>, CPubKey > sigdata_type;
+    set< sigdata_type> setValid;
     boost::shared_mutex cs_sigcache;
 
 public:
@@ -1241,7 +1239,7 @@ public:
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
 
         sigdata_type k(hash, vchSig, pubKey);
-        std::set<sigdata_type>::iterator mi = setValid.find(k);
+        auto mi = setValid.find(k);
         if (mi != setValid.end())
             return true;
         return false;
@@ -1266,8 +1264,7 @@ public:
             // than our cache size.
             auto randomHash = GetRandHash();
             std::vector<unsigned char> unused;
-            std::set<sigdata_type>::iterator it =
-                setValid.lower_bound(sigdata_type(randomHash, unused, unused));
+            auto it = setValid.lower_bound(sigdata_type(randomHash, unused, unused));
             if (it == setValid.end())
                 it = setValid.begin();
             setValid.erase(*it);
@@ -1359,10 +1356,10 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
     }
 
     // Scan templates
-    const CScript& script1 = scriptPubKey;
+    const auto& script1 = scriptPubKey;
     for(const auto& tplate : mTemplates)
     {
-        const CScript& script2 = tplate.second;
+        const auto& script2 = tplate.second;
         vSolutionsRet.clear();
 
         opcodetype opcode1, opcode2;
@@ -1380,8 +1377,8 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
                 if (typeRet == TX_MULTISIG)
                 {
                     // Additional checks for TX_MULTISIG:
-                    unsigned char m = vSolutionsRet.front()[0];
-                    unsigned char n = vSolutionsRet.back()[0];
+                    auto m = vSolutionsRet.front()[0];
+                    auto n = vSolutionsRet.back()[0];
                     if (m < 1 || n < 1 || m > n || vSolutionsRet.size()-2 != n)
                         return false;
                 }
@@ -1498,9 +1495,9 @@ bool SignN(const vector<valtype>& multisigdata, const CKeyStore& keystore, const
 {
     int nSigned = 0;
     int nRequired = multisigdata.front()[0];
-    for (unsigned int i = 1; i < multisigdata.size()-1 && nSigned < nRequired; i++)
+    for (uint32_t i = 1; i < multisigdata.size()-1 && nSigned < nRequired; i++)
     {
-        const valtype& pubkey = multisigdata[i];
+        const auto& pubkey = multisigdata[i];
         auto keyID = CPubKey(pubkey).GetID();
         if (Sign1(keyID, keystore, hash, nHashType, scriptSigRet))
             ++nSigned;
@@ -1605,8 +1602,8 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
 
 unsigned int HaveKeys(const vector<valtype>& pubkeys, const CKeyStore& keystore)
 {
-    unsigned int nResult = 0;
-    for(const valtype& pubkey :  pubkeys)
+    uint32_t nResult = 0;
+    for(const auto& pubkey :  pubkeys)
     {
         auto keyID = CPubKey(pubkey).GetID();
         if (keystore.HaveKey(keyID))
@@ -1626,14 +1623,6 @@ public:
     bool operator()(const CKeyID &keyID) const { return keystore->HaveKey(keyID); }
     bool operator()(const CScriptID &scriptID) const { return keystore->HaveCScript(scriptID); }
 };
-
-/*
-isminetype IsMine(const CKeyStore &keystore, const CTxDestination& dest)
-{
-    CScript script;
-    script.SetDestination(dest);
-    return IsMine(keystore, script);
-}*/
 
 isminetype IsMine(const CKeyStore &keystore, const CBitcoinAddress& dest)
 {
@@ -1869,7 +1858,7 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const C
         // an empty stack and the EvalScript above would return false.
         assert(!stackCopy.empty());
 
-        const valtype& pubKeySerialized = stackCopy.back();
+        const auto& pubKeySerialized = stackCopy.back();
         CScript pubKey2(pubKeySerialized.begin(), pubKeySerialized.end());
         popstack(stackCopy);
 
@@ -1907,8 +1896,7 @@ bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CTransa
         auto hash2 = SignatureHash(subscript, txTo, nIn, nHashType);
 
         txnouttype subType;
-        bool fSolved =
-            Solver(keystore, subscript, hash2, nHashType, txin.scriptSig, subType) && subType != TX_SCRIPTHASH;
+        bool fSolved = Solver(keystore, subscript, hash2, nHashType, txin.scriptSig, subType) && subType != TX_SCRIPTHASH;
         // Append serialized subscript whether or not it is completely signed:
         txin.scriptSig << static_cast<valtype>(subscript);
         if (!fSolved) return false;
@@ -1924,7 +1912,7 @@ bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CTrans
     auto& txin = txTo.vin[nIn];
     assert(txin.prevout.n < txFrom.vout.size());
     assert(txin.prevout.hash == txFrom.GetHash());
-    const CTxOut& txout = txFrom.vout[txin.prevout.n];
+    const auto& txout = txFrom.vout[txin.prevout.n];
 
     return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, nHashType);
 }
@@ -1932,7 +1920,7 @@ bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CTrans
 static CScript PushAll(const vector<valtype>& values)
 {
     CScript result;
-    for(const valtype& v :  values)
+    for(const auto& v :  values)
         result << v;
     return result;
 }
@@ -1943,12 +1931,12 @@ static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& 
 {
     // Combine all the signatures we've got:
     set<valtype> allsigs;
-    for(const valtype& v :  sigs1)
+    for(const auto& v :  sigs1)
     {
         if (!v.empty())
             allsigs.insert(v);
     }
-    for(const valtype& v :  sigs2)
+    for(const auto& v :  sigs2)
     {
         if (!v.empty())
             allsigs.insert(v);
@@ -1956,14 +1944,15 @@ static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& 
 
     // Build a map of pubkey -> signature by matching sigs to pubkeys:
     assert(vSolutions.size() > 1);
-    unsigned int nSigsRequired = vSolutions.front()[0];
-    unsigned int nPubKeys = (unsigned int)(vSolutions.size()-2);
+    auto nSigsRequired = (uint32_t)vSolutions.front()[0];
+    auto nPubKeys = (uint32_t)(vSolutions.size()-2);
+
     map<valtype, valtype> sigs;
-    for(const valtype& sig :  allsigs)
+    for(const auto& sig :  allsigs)
     {
         for (unsigned int i = 0; i < nPubKeys; i++)
         {
-            const valtype& pubkey = vSolutions[i+1];
+            const auto& pubkey = vSolutions[i+1];
             if (sigs.count(pubkey))
                 continue; // Already got a sig for this pubkey
 
@@ -1975,9 +1964,9 @@ static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& 
         }
     }
     // Now build a merged CScript:
-    unsigned int nSigsHave = 0;
+    uint32_t nSigsHave = 0;
     CScript result; result << OP_0; // pop-one-too-many workaround
-    for (unsigned int i = 0; i < nPubKeys && nSigsHave < nSigsRequired; i++)
+    for (uint32_t i = 0; i < nPubKeys && nSigsHave < nSigsRequired; i++)
     {
         if (sigs.count(vSolutions[i+1]))
         {
@@ -1986,7 +1975,7 @@ static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& 
         }
     }
     // Fill any missing with OP_0:
-    for (unsigned int i = nSigsHave; i < nSigsRequired; i++)
+    for (auto i = nSigsHave; i < nSigsRequired; i++)
         result << OP_0;
 
     return result;
@@ -2055,9 +2044,9 @@ CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction& txTo,
 
 unsigned int CScript::GetSigOpCount(bool fAccurate) const
 {
-    unsigned int n = 0;
+    uint32_t n = 0;
     auto pc = begin();
-    opcodetype lastOpcode = OP_INVALIDOPCODE;
+    auto lastOpcode = OP_INVALIDOPCODE;
     while (pc < end())
     {
         opcodetype opcode;

@@ -12,7 +12,6 @@
 #include "bitcoinrpc.h"
 
 #include <boost/format.hpp>
-#include <boost/assign/list_of.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 
 using namespace json_spirit;
@@ -84,7 +83,7 @@ Value scaninput(const Array& params, bool fHelp)
             "    days - time window, 90 days by default.\n"
         );
 
-    RPCTypeCheck(params, boost::assign::list_of(obj_type));
+    RPCTypeCheck(params, { obj_type });
 
     auto scanParams = params[0].get_obj();
 

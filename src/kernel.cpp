@@ -425,39 +425,34 @@ bool CheckStakeKernelHash(uint32_t nBits, const CBlock& blockFrom, uint32_t nTxP
 // Scan given kernel for solution
 bool ScanKernelForward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, vector<pair<uint256, uint32_t> > &solutions)
 {
-    // TODO: custom threads amount
-
-    uint32_t nThreads = boost::thread::hardware_concurrency();
-    uint32_t nPart = (SearchInterval.second - SearchInterval.first) / nThreads;
-
-
-    KernelWorker *workers = new KernelWorker[nThreads];
-
-    boost::thread_group group;
-    for(size_t i = 0; i < nThreads; i++)
-    {
-        uint32_t nBegin = SearchInterval.first + nPart * i;
-        uint32_t nEnd = SearchInterval.first + nPart * (i + 1);
-        workers[i] = KernelWorker(kernel, nBits, nInputTxTime, nValueIn, nBegin, nEnd);
-        boost::function<void()> workerFnc = boost::bind(&KernelWorker::Do, &workers[i]);
-        group.create_thread(workerFnc);
-    }
-
-    group.join_all();
     solutions.clear();
-
-    for(size_t i = 0; i < nThreads; i++)
     {
-        vector<pair<uint256, uint32_t> > ws = workers[i].GetSolutions();
-        solutions.insert(solutions.end(), ws.begin(), ws.end());
-    }
+        using namespace boost;
 
-    delete [] workers;
+        auto nThreads = thread::hardware_concurrency();
+        auto vWorkers = vector<KernelWorker>(nThreads);
+        auto nPart = (SearchInterval.second - SearchInterval.first) / nThreads;
+        thread_group group;
 
-    if (solutions.size() == 0)
-    {
-        // no solutions
-        return false;
+        for(size_t i = 0; i < vWorkers.size(); i++)
+        {
+            auto nBegin = SearchInterval.first + nPart * i;
+            auto nEnd = SearchInterval.first + nPart * (i + 1);
+
+            vWorkers[i] = KernelWorker(kernel, nBits, nInputTxTime, nValueIn, nBegin, nEnd);
+            auto workerFnc = bind(&KernelWorker::Do, &vWorkers[i]);
+            group.create_thread(workerFnc);
+        }
+
+        group.join_all();
+
+        for(auto& worker : vWorkers)
+        {
+            auto ws = worker.GetSolutions();
+            solutions.insert(solutions.end(), ws.begin(), ws.end());
+        }
+
+        return (solutions.size() != 0);
     }
 
     return true;
@@ -516,7 +511,6 @@ uint32_t GetStakeModifierChecksum(const CBlockIndex* pindex)
 bool CheckStakeModifierCheckpoints(int nHeight, uint32_t nStakeModifierChecksum)
 {
     auto& checkpoints = (fTestNet ? mapStakeModifierCheckpointsTestNet : mapStakeModifierCheckpoints);
-
     if (checkpoints.count(nHeight))
         return nStakeModifierChecksum == checkpoints[nHeight];
     return true;

@@ -3,8 +3,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <boost/assign/list_of.hpp>
-
 #include "base58.h"
 #include "bitcoinrpc.h"
 #include "txdb.h"
@@ -15,7 +13,6 @@
 
 using namespace std;
 using namespace boost;
-using namespace boost::assign;
 using namespace json_spirit;
 
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out, bool fIncludeHex)
@@ -169,7 +166,7 @@ Value listunspent(const Array& params, bool fHelp)
             "Results are an array of Objects, each of which has:\n"
             "{txid, vout, scriptPubKey, amount, confirmations}");
 
-    RPCTypeCheck(params, list_of(int_type)(int_type)(array_type));
+    RPCTypeCheck(params, { int_type, int_type, array_type });
 
     int nMinDepth = 1;
     if (params.size() > 0)
@@ -258,7 +255,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
             "Note that the transaction's inputs are not signed, and\n"
             "it is not stored in the wallet or transmitted to the network.");
 
-    RPCTypeCheck(params, list_of(array_type)(obj_type));
+    RPCTypeCheck(params, { array_type, obj_type });
 
     Array inputs = params[0].get_array();
     Object sendTo = params[1].get_obj();
@@ -267,16 +264,15 @@ Value createrawtransaction(const Array& params, bool fHelp)
 
     for(Value& input :  inputs)
     {
-        const Object& o = input.get_obj();
-
-        const Value& txid_v = find_value(o, "txid");
+        const auto& o = input.get_obj();
+        const auto& txid_v = find_value(o, "txid");
         if (txid_v.type() != str_type)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing txid key");
-        string txid = txid_v.get_str();
+        auto txid = txid_v.get_str();
         if (!IsHex(txid))
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex txid");
 
-        const Value& vout_v = find_value(o, "vout");
+        const auto& vout_v = find_value(o, "vout");
         if (vout_v.type() != int_type)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing vout key");
         int nOutput = vout_v.get_int();
@@ -309,7 +305,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
         else
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid output destination: ")+s.name_);
 
-        int64_t nAmount = AmountFromValue(s.value_);
+        auto nAmount = AmountFromValue(s.value_);
 
         CTxOut out(nAmount, scriptPubKey);
         rawTx.vout.push_back(out);
@@ -336,9 +332,9 @@ Value decoderawtransaction(const Array& params, bool fHelp)
             "decoderawtransaction <hex string>\n"
             "Return a JSON object representing the serialized, hex-encoded transaction.");
 
-    RPCTypeCheck(params, list_of(str_type));
+    RPCTypeCheck(params, { str_type });
 
-    vector<unsigned char> txData(ParseHex(params[0].get_str()));
+    auto txData = ParseHex(params[0].get_str());
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
     CTransaction tx;
     try {
@@ -361,12 +357,12 @@ Value decodescript(const Array& params, bool fHelp)
             "decodescript <hex string>\n"
             "Decode a hex-encoded script.");
 
-    RPCTypeCheck(params, list_of(str_type));
+    RPCTypeCheck(params, { str_type });
 
     Object r;
     CScript script;
     if (params[0].get_str().size() > 0){
-        vector<unsigned char> scriptData(ParseHexV(params[0], "argument"));
+        auto scriptData = ParseHexV(params[0], "argument");
         script = CScript(scriptData.begin(), scriptData.end());
     } else {
         // Empty scripts are valid
@@ -394,9 +390,9 @@ Value signrawtransaction(const Array& params, bool fHelp)
             "  complete : 1 if transaction has a complete set of signature (0 if not)"
             + HelpRequiringPassphrase());
 
-    RPCTypeCheck(params, list_of(str_type)(array_type)(array_type)(str_type), true);
+    RPCTypeCheck(params, { str_type, array_type, array_type, str_type }, true);
 
-    vector<unsigned char> txData(ParseHex(params[0].get_str()));
+    auto txData = ParseHex(params[0].get_str());
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
     vector<CTransaction> txVariants;
     while (!ssData.empty())
@@ -434,9 +430,9 @@ Value signrawtransaction(const Array& params, bool fHelp)
         tempTx.FetchInputs(txdb, unused, false, false, mapPrevTx, fInvalid);
 
         // Copy results into mapPrevOut:
-        for(const CTxIn& txin :  tempTx.vin)
+        for(const auto& txin :  tempTx.vin)
         {
-            const uint256& prevHash = txin.prevout.hash;
+            const auto& prevHash = txin.prevout.hash;
             if (mapPrevTx.count(prevHash) && mapPrevTx[prevHash].second.vout.size()>txin.prevout.n)
                 mapPrevOut[txin.prevout] = mapPrevTx[prevHash].second.vout[txin.prevout.n].scriptPubKey;
         }
@@ -447,8 +443,8 @@ Value signrawtransaction(const Array& params, bool fHelp)
     if (params.size() > 2 && params[2].type() != null_type)
     {
         fGivenKeys = true;
-        Array keys = params[2].get_array();
-        for(Value k :  keys)
+        auto keys = params[2].get_array();
+        for(auto k :  keys)
         {
             CBitcoinSecret vchSecret;
             bool fGood = vchSecret.SetString(k.get_str());
@@ -456,7 +452,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key");
             CKey key;
             bool fCompressed;
-            CSecret secret = vchSecret.GetSecret(fCompressed);
+            auto secret = vchSecret.GetSecret(fCompressed);
             key.SetSecret(secret, fCompressed);
             tempKeystore.AddKey(key);
         }
@@ -467,17 +463,17 @@ Value signrawtransaction(const Array& params, bool fHelp)
     // Add previous txouts given in the RPC call:
     if (params.size() > 1 && params[1].type() != null_type)
     {
-        Array prevTxs = params[1].get_array();
-        for(Value& p :  prevTxs)
+        auto prevTxs = params[1].get_array();
+        for(auto& p :  prevTxs)
         {
             if (p.type() != obj_type)
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "expected object with {\"txid'\",\"vout\",\"scriptPubKey\"}");
 
-            Object prevOut = p.get_obj();
+            auto prevOut = p.get_obj();
 
-            RPCTypeCheck(prevOut, map_list_of("txid", str_type)("vout", int_type)("scriptPubKey", str_type));
+            RPCTypeCheck(prevOut, { {"txid", str_type}, {"vout", int_type}, {"scriptPubKey", str_type} });
 
-            string txidHex = find_value(prevOut, "txid").get_str();
+            auto txidHex = find_value(prevOut, "txid").get_str();
             if (!IsHex(txidHex))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "txid must be hexadecimal");
             uint256 txid;
@@ -487,12 +483,11 @@ Value signrawtransaction(const Array& params, bool fHelp)
             if (nOut < 0)
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "vout must be positive");
 
-            string pkHex = find_value(prevOut, "scriptPubKey").get_str();
+            auto pkHex = find_value(prevOut, "scriptPubKey").get_str();
             if (!IsHex(pkHex))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "scriptPubKey must be hexadecimal");
-            vector<unsigned char> pkData(ParseHex(pkHex));
+            auto pkData = ParseHex(pkHex);
             CScript scriptPubKey(pkData.begin(), pkData.end());
-
             COutPoint outpoint(txid, nOut);
             if (mapPrevOut.count(outpoint))
             {
@@ -510,14 +505,13 @@ Value signrawtransaction(const Array& params, bool fHelp)
 
             // if redeemScript given and not using the local wallet (private keys
             // given), add redeemScript to the tempKeystore so it can be signed:
-            Value v = find_value(prevOut, "redeemScript");
             if (fGivenKeys && scriptPubKey.IsPayToScriptHash())
             {
-                RPCTypeCheck(prevOut, map_list_of("txid", str_type)("vout", int_type)("scriptPubKey", str_type)("redeemScript",str_type));
-                Value v = find_value(prevOut, "redeemScript");
+                RPCTypeCheck(prevOut, { {"txid", str_type}, {"vout", int_type}, {"scriptPubKey", str_type}, {"redeemScript",str_type} });
+                auto v = find_value(prevOut, "redeemScript");
                 if (!(v == Value::null))
                 {
-                    vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));
+                    auto rsData = ParseHexV(v, "redeemScript");
                     CScript redeemScript(rsData.begin(), rsData.end());
                     tempKeystore.AddCScript(redeemScript);
                 }
@@ -525,21 +519,21 @@ Value signrawtransaction(const Array& params, bool fHelp)
         }
     }
 
-    const CKeyStore& keystore = (fGivenKeys ? tempKeystore : *pwalletMain);
+    const auto& keystore = (fGivenKeys ? tempKeystore : *pwalletMain);
 
     int nHashType = SIGHASH_ALL;
     if (params.size() > 3 && params[3].type() != null_type)
     {
         static map<string, int> mapSigHashValues =
-            {
+        {
             {"ALL", int(SIGHASH_ALL)},
             {"ALL|ANYONECANPAY", int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)},
             {"NONE", int(SIGHASH_NONE)},
             {"NONE|ANYONECANPAY", int(SIGHASH_NONE|SIGHASH_ANYONECANPAY)},
             {"SINGLE", int(SIGHASH_SINGLE)},
             {"SINGLE|ANYONECANPAY", int(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY)}
-            };
-        string strHashType = params[3].get_str();
+        };
+        auto strHashType = params[3].get_str();
         if (mapSigHashValues.count(strHashType))
             nHashType = mapSigHashValues[strHashType];
         else
@@ -551,13 +545,13 @@ Value signrawtransaction(const Array& params, bool fHelp)
     // Sign what we can:
     for (unsigned int i = 0; i < mergedTx.vin.size(); i++)
     {
-        CTxIn& txin = mergedTx.vin[i];
+        auto& txin = mergedTx.vin[i];
         if (mapPrevOut.count(txin.prevout) == 0)
         {
             fComplete = false;
             continue;
         }
-        const CScript& prevPubKey = mapPrevOut[txin.prevout];
+        const auto& prevPubKey = mapPrevOut[txin.prevout];
 
         txin.scriptSig.clear();
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
@@ -589,10 +583,10 @@ Value sendrawtransaction(const Array& params, bool fHelp)
             "sendrawtransaction <hex string>\n"
             "Submits raw transaction (serialized, hex-encoded) to local node and network.");
 
-    RPCTypeCheck(params, list_of(str_type));
+    RPCTypeCheck(params, { str_type });
 
     // parse hex string from parameter
-    vector<unsigned char> txData(ParseHex(params[0].get_str()));
+    auto txData = ParseHex(params[0].get_str());
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
     CTransaction tx;
 
@@ -603,7 +597,7 @@ Value sendrawtransaction(const Array& params, bool fHelp)
     catch (const std::exception&) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }
-    uint256 hashTx = tx.GetHash();
+    auto hashTx = tx.GetHash();
 
     // See if the transaction is already in a block
     // or in the memory pool:
@@ -641,7 +635,7 @@ Value createmultisig(const Array& params, bool fHelp)
     }
 
     int nRequired = params[0].get_int();
-    const Array& keys = params[1].get_array();
+    const auto& keys = params[1].get_array();
 
     // Gather public keys
     if (nRequired < 1)
@@ -656,7 +650,7 @@ Value createmultisig(const Array& params, bool fHelp)
     pubkeys.resize(keys.size());
     for (unsigned int i = 0; i < keys.size(); i++)
     {
-        const std::string& ks = keys[i].get_str();
+        const auto& ks = keys[i].get_str();
 
         // Case 1: Bitcoin address and we have full public key:
         CBitcoinAddress address(ks);
@@ -697,7 +691,7 @@ Value createmultisig(const Array& params, bool fHelp)
         throw runtime_error(
             strprintf("redeemScript exceeds size limit: %" PRIszu " > %d", inner.size(), MAX_SCRIPT_ELEMENT_SIZE));
 
-    CScriptID innerID = inner.GetID();
+    auto innerID = inner.GetID();
     CBitcoinAddress address(innerID);
 
     Object result;

@@ -11,7 +11,7 @@ using namespace std;
 KernelWorker::KernelWorker(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, uint32_t nIntervalBegin, uint32_t nIntervalEnd) 
         : kernel(kernel), nBits(nBits), nInputTxTime(nInputTxTime), bnValueIn(nValueIn), nIntervalBegin(nIntervalBegin), nIntervalEnd(nIntervalEnd)
     {
-        solutions = vector<std::pair<uint256,uint32_t> >();
+        solutions = vector<pair<uint256,uint32_t> >();
     }
 
 void KernelWorker::Do_generic()
@@ -21,7 +21,7 @@ void KernelWorker::Do_generic()
     // Compute maximum possible target to filter out majority of obviously insufficient hashes
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
-    uint256 nMaxTarget = (bnTargetPerCoinDay * bnValueIn * nStakeMaxAge / COIN / nOneDay).getuint256();
+    auto nMaxTarget = (bnTargetPerCoinDay * bnValueIn * nStakeMaxAge / COIN / nOneDay).getuint256();
 
     SHA256_CTX ctx, workerCtx;
     // Init new sha256 context and update it
@@ -36,7 +36,7 @@ void KernelWorker::Do_generic()
 
     // Search forward in time from the given timestamp
     // Stopping search in case of shutting down
-    for (uint32_t nTimeTx=nIntervalBegin, nMaxTarget32 = nMaxTarget.Get32(7); nTimeTx<nIntervalEnd && !fShutdown; nTimeTx++)
+    for (auto nTimeTx=nIntervalBegin, nMaxTarget32 = nMaxTarget.Get32(7); nTimeTx<nIntervalEnd && !fShutdown; nTimeTx++)
     {
         // Complete first hashing iteration
         uint256 hash1;
@@ -73,7 +73,7 @@ vector<pair<uint256,uint32_t> >& KernelWorker::GetSolutions()
 
 // Scan given kernel for solutions
 
-bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, std::pair<uint32_t, uint32_t> &SearchInterval, std::pair<uint256, uint32_t> &solution)
+bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, pair<uint256, uint32_t> &solution)
 {
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
@@ -81,7 +81,7 @@ bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTx
     CBigNum bnValueIn(nValueIn);
 
     // Get maximum possible target to filter out the majority of obviously insufficient hashes
-    uint256 nMaxTarget = (bnTargetPerCoinDay * bnValueIn * nStakeMaxAge / COIN / nOneDay).getuint256();
+    auto nMaxTarget = (bnTargetPerCoinDay * bnValueIn * nStakeMaxAge / COIN / nOneDay).getuint256();
 
     SHA256_CTX ctx, workerCtx;
     // Init new sha256 context and update it
