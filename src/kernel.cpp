@@ -5,47 +5,42 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <boost/assign/list_of.hpp>
-
 #include "kernel.h"
 #include "kernel_worker.h"
 #include "txdb.h"
 
-extern unsigned int nStakeMaxAge;
-extern unsigned int nStakeTargetSpacing;
+extern uint32_t nStakeMaxAge;
+extern uint32_t nStakeTargetSpacing;
 
 using namespace std;
 
-
 // Protocol switch time for fixed kernel modifier interval
-unsigned int nModifierSwitchTime  = 1413763200;    // Mon, 20 Oct 2014 00:00:00 GMT
-unsigned int nModifierTestSwitchTime = 1397520000; // Tue, 15 Apr 2014 00:00:00 GMT
+uint32_t nModifierSwitchTime  = 1413763200;    // Mon, 20 Oct 2014 00:00:00 GMT
+uint32_t nModifierTestSwitchTime = 1397520000; // Tue, 15 Apr 2014 00:00:00 GMT
 
 // Note: user must upgrade before the protocol switch deadline, otherwise it's required to
 //   re-download the blockchain. The timestamp of upgrade is recorded in the blockchain 
 //   database.
-unsigned int nModifierUpgradeTime = 0;
-
-typedef std::map<int, unsigned int> MapModifierCheckpoints;
+uint32_t nModifierUpgradeTime = 0;
 
 // Hard checkpoints of stake modifiers to ensure they are deterministic
-static std::map<int, unsigned int> mapStakeModifierCheckpoints =
-    boost::assign::map_list_of
-        ( 0, 0x0e00670bu )
-        ( 12661, 0x5d84115du )
-        (143990, 0x9c592c78u )
-        (149000, 0x48f2bdc4u )
-        (160000, 0x789df0f0u )
-        (200000, 0x01ec1503u )
-        (221047, 0x0b39ef50u )
-        (243100, 0xe928d83au )
-    ;
+static map<int, uint32_t> mapStakeModifierCheckpoints =
+{
+    {      0, 0x0e00670bu },
+    {  12661, 0x5d84115du },
+    { 143990, 0x9c592c78u },
+    { 149000, 0x48f2bdc4u },
+    { 160000, 0x789df0f0u },
+    { 200000, 0x01ec1503u },
+    { 221047, 0x0b39ef50u },
+    { 243100, 0xe928d83au },
+};
 
 // Hard checkpoints of stake modifiers to ensure they are deterministic (testNet)
-static std::map<int, unsigned int> mapStakeModifierCheckpointsTestNet =
-    boost::assign::map_list_of
-        ( 0, 0x0e00670bu )
-    ;
+static map<int, uint32_t> mapStakeModifierCheckpointsTestNet =
+{
+    { 0, 0x0e00670bu }
+};
 
 // Pregenerated entropy bits table (from genesis to #9689)
 //
@@ -144,17 +139,17 @@ static bool SelectBlockFromCandidates(vector<pair<int64_t, uint256> >& vSortedBy
     {
         if (!mapBlockIndex.count(item.second))
             return error("SelectBlockFromCandidates: failed to find block index for candidate block %s", item.second.ToString().c_str());
-        const CBlockIndex* pindex = mapBlockIndex[item.second];
+        auto pindex = mapBlockIndex[item.second];
         if (fSelected && pindex->GetBlockTime() > nSelectionIntervalStop)
             break;
         if (mapSelectedBlocks.count(pindex->GetBlockHash()) > 0)
             continue;
         // compute the selection hash by hashing its proof-hash and the
         // previous proof-of-stake modifier
-        uint256 hashProof = pindex->IsProofOfStake()? pindex->hashProofOfStake : pindex->GetBlockHash();
+        auto hashProof = pindex->IsProofOfStake()? pindex->hashProofOfStake : pindex->GetBlockHash();
         CDataStream ss(SER_GETHASH, 0);
         ss << hashProof << nStakeModifierPrev;
-        uint256 hashSelection = Hash(ss.begin(), ss.end());
+        auto hashSelection = Hash(ss.begin(), ss.end());
         // the selection hash is divided by 2**32 so that proof-of-stake block
         // is always favored over proof-of-work block. this is to preserve
         // the energy efficiency property
@@ -194,7 +189,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64_t& nStake
 {
     nStakeModifier = 0;
     fGeneratedStakeModifier = false;
-    const CBlockIndex* pindexPrev = pindexCurrent->pprev;
+    auto pindexPrev = pindexCurrent->pprev;
     if (!pindexPrev)
     {
         fGeneratedStakeModifier = true;
@@ -241,9 +236,9 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64_t& nStake
     // Sort candidate blocks by timestamp
     vector<pair<int64_t, uint256> > vSortedByTimestamp;
     vSortedByTimestamp.reserve(64 * nModifierInterval / nStakeTargetSpacing);
-    int64_t nSelectionInterval = GetStakeModifierSelectionInterval();
-    int64_t nSelectionIntervalStart = (pindexPrev->GetBlockTime() / nModifierInterval) * nModifierInterval - nSelectionInterval;
-    const CBlockIndex* pindex = pindexPrev;
+    auto nSelectionInterval = GetStakeModifierSelectionInterval();
+    auto nSelectionIntervalStart = (pindexPrev->GetBlockTime() / nModifierInterval) * nModifierInterval - nSelectionInterval;
+    const auto *pindex = pindexPrev;
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart)
     {
         vSortedByTimestamp.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
@@ -255,7 +250,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64_t& nStake
 
     // Select 64 blocks from candidate blocks to generate stake modifier
     uint64_t nStakeModifierNew = 0;
-    int64_t nSelectionIntervalStop = nSelectionIntervalStart;
+    auto nSelectionIntervalStop = nSelectionIntervalStart;
     map<uint256, const CBlockIndex*> mapSelectedBlocks;
     for (int nRound=0; nRound<min(64, (int)vSortedByTimestamp.size()); nRound++)
     {
@@ -311,11 +306,11 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifi
     nStakeModifier = 0;
     if (!mapBlockIndex.count(hashBlockFrom))
         return error("GetKernelStakeModifier() : block not indexed");
-    const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
+    auto pindexFrom = mapBlockIndex[hashBlockFrom];
     nStakeModifierHeight = pindexFrom->nHeight;
     nStakeModifierTime = pindexFrom->GetBlockTime();
-    int64_t nStakeModifierSelectionInterval = GetStakeModifierSelectionInterval();
-    const CBlockIndex* pindex = pindexFrom;
+    auto nStakeModifierSelectionInterval = GetStakeModifierSelectionInterval();
+    auto pindex = pindexFrom;
     // loop to find the stake modifier later by a selection interval
     while (nStakeModifierTime < pindexFrom->GetBlockTime() + nStakeModifierSelectionInterval)
     {
@@ -379,11 +374,9 @@ bool CheckStakeKernelHash(uint32_t nBits, const CBlock& blockFrom, uint32_t nTxP
 
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
-    int64_t nValueIn = txPrev.vout[prevout.n].nValue;
-
-    uint256 hashBlockFrom = blockFrom.GetHash();
-
-    CBigNum bnCoinDayWeight = CBigNum(nValueIn) * GetWeight((int64_t)txPrev.nTime, (int64_t)nTimeTx) / COIN / nOneDay;
+    auto nValueIn = txPrev.vout[prevout.n].nValue;
+    auto hashBlockFrom = blockFrom.GetHash();
+    auto bnCoinDayWeight = CBigNum(nValueIn) * GetWeight((int64_t)txPrev.nTime, (int64_t)nTimeTx) / COIN / nOneDay;
     targetProofOfStake = (bnCoinDayWeight * bnTargetPerCoinDay).getuint256();
 
     // Calculate hash
@@ -430,7 +423,7 @@ bool CheckStakeKernelHash(uint32_t nBits, const CBlock& blockFrom, uint32_t nTxP
 }
 
 // Scan given kernel for solution
-bool ScanKernelForward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, std::pair<uint32_t, uint32_t> &SearchInterval, std::vector<std::pair<uint256, uint32_t> > &solutions)
+bool ScanKernelForward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, vector<pair<uint256, uint32_t> > &solutions)
 {
     // TODO: custom threads amount
 
@@ -455,7 +448,7 @@ bool ScanKernelForward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxT
 
     for(size_t i = 0; i < nThreads; i++)
     {
-        std::vector<std::pair<uint256, uint32_t> > ws = workers[i].GetSolutions();
+        vector<pair<uint256, uint32_t> > ws = workers[i].GetSolutions();
         solutions.insert(solutions.end(), ws.begin(), ws.end());
     }
 
@@ -477,7 +470,7 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
         return error("CheckProofOfStake() : called on non-coinstake %s", tx.GetHash().ToString().c_str());
 
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
-    const CTxIn& txin = tx.vin[0];
+    const auto& txin = tx.vin[0];
 
     // First try finding the previous transaction in database
     CTxDB txdb("r");
@@ -514,7 +507,7 @@ uint32_t GetStakeModifierChecksum(const CBlockIndex* pindex)
     if (pindex->pprev)
         ss << pindex->pprev->nStakeModifierChecksum;
     ss << pindex->nFlags << pindex->hashProofOfStake << pindex->nStakeModifier;
-    uint256 hashChecksum = Hash(ss.begin(), ss.end());
+    auto hashChecksum = Hash(ss.begin(), ss.end());
     hashChecksum >>= (256 - 32);
     return static_cast<uint32_t>(hashChecksum.Get64());
 }
@@ -522,7 +515,7 @@ uint32_t GetStakeModifierChecksum(const CBlockIndex* pindex)
 // Check stake modifier hard checkpoints
 bool CheckStakeModifierCheckpoints(int nHeight, uint32_t nStakeModifierChecksum)
 {
-    MapModifierCheckpoints& checkpoints = (fTestNet ? mapStakeModifierCheckpointsTestNet : mapStakeModifierCheckpoints);
+    auto& checkpoints = (fTestNet ? mapStakeModifierCheckpointsTestNet : mapStakeModifierCheckpoints);
 
     if (checkpoints.count(nHeight))
         return nStakeModifierChecksum == checkpoints[nHeight];

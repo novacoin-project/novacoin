@@ -32,7 +32,7 @@ void KernelWorker::Do_generic()
 
     // Sha256 result buffer
     uint32_t hashProofOfStake[8];
-    uint256 *pnHashProofOfStake = (uint256 *)&hashProofOfStake;
+    auto pnHashProofOfStake = (uint256 *)&hashProofOfStake;
 
     // Search forward in time from the given timestamp
     // Stopping search in case of shutting down
@@ -53,11 +53,11 @@ void KernelWorker::Do_generic()
         if (hashProofOfStake[7] > nMaxTarget32)
             continue;
 
-        CBigNum bnCoinDayWeight = bnValueIn * GetWeight((int64_t)nInputTxTime, (int64_t)nTimeTx) / COIN / nOneDay;
-        CBigNum bnTargetProofOfStake = bnCoinDayWeight * bnTargetPerCoinDay;
+        auto bnCoinDayWeight = bnValueIn * GetWeight((int64_t)nInputTxTime, (int64_t)nTimeTx) / COIN / nOneDay;
+        auto bnTargetProofOfStake = bnCoinDayWeight * bnTargetPerCoinDay;
 
         if (bnTargetProofOfStake >= CBigNum(*pnHashProofOfStake))
-            solutions.push_back(std::pair<uint256,uint32_t>(*pnHashProofOfStake, nTimeTx));
+            solutions.push_back(make_pair(*pnHashProofOfStake, nTimeTx));
     }
 }
 
@@ -92,7 +92,7 @@ bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTx
 
     // Search backward in time from the given timestamp
     // Stopping search in case of shutting down
-    for (uint32_t nTimeTx=SearchInterval.first; nTimeTx>SearchInterval.second && !fShutdown; nTimeTx--)
+    for (auto nTimeTx=SearchInterval.first; nTimeTx>SearchInterval.second && !fShutdown; nTimeTx--)
     {
         // Complete first hashing iteration
         uint256 hash1;
@@ -110,8 +110,8 @@ bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTx
         if (hashProofOfStake > nMaxTarget)
             continue;
 
-        CBigNum bnCoinDayWeight = bnValueIn * GetWeight((int64_t)nInputTxTime, (int64_t)nTimeTx) / COIN / nOneDay;
-        CBigNum bnTargetProofOfStake = bnCoinDayWeight * bnTargetPerCoinDay;
+        auto bnCoinDayWeight = bnValueIn * GetWeight((int64_t)nInputTxTime, (int64_t)nTimeTx) / COIN / nOneDay;
+        auto bnTargetProofOfStake = bnCoinDayWeight * bnTargetPerCoinDay;
 
         if (bnTargetProofOfStake >= CBigNum(hashProofOfStake))
         {
