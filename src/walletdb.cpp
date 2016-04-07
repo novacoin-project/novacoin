@@ -891,13 +891,13 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
        std::string strLabel;
        bool fLabel = true;
        for (unsigned int nStr = 2; nStr < vstr.size(); nStr++) {
-           if (boost::algorithm::starts_with(vstr[nStr], "#"))
+           if (vstr[nStr].compare(0,1, "#") == 0)
                break;
            if (vstr[nStr] == "change=1")
                fLabel = false;
            if (vstr[nStr] == "reserve=1")
                fLabel = false;
-           if (boost::algorithm::starts_with(vstr[nStr], "label=")) {
+           if (vstr[nStr].compare(0,6, "label=") == 0) {
                strLabel = DecodeDumpString(vstr[nStr].substr(6));
                fLabel = true;
            }

@@ -22,7 +22,6 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
-#include <boost/algorithm/string/predicate.hpp> // for startswith() and endswith()
 
 using namespace std;
 
@@ -128,7 +127,7 @@ bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nM
     std::string strHost(pszName);
     if (strHost.empty())
         return false;
-    if (boost::algorithm::starts_with(strHost, "[") && boost::algorithm::ends_with(strHost, "]"))
+    if ((strHost.compare(0,1, "[") == 0) && (strHost.compare(strHost.length()-1,1, "]") == 0))
     {
         strHost = strHost.substr(1, strHost.size() - 2);
     }
