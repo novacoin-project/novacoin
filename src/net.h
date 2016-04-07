@@ -21,6 +21,8 @@
 #include "addrman.h"
 #include "hash.h"
 
+using namespace std;
+
 class CRequestTracker;
 class CNode;
 class CBlockIndex;
@@ -33,8 +35,8 @@ const uint16_t nPortZero = 0;
 inline uint64_t ReceiveBufferSize() { return 1000*GetArg("-maxreceivebuffer", 5*1000); }
 inline uint64_t SendBufferSize() { return 1000*GetArg("-maxsendbuffer", 1*1000); }
 
-void AddOneShot(std::string strDest);
-bool RecvLine(SOCKET hSocket, std::string& strLine);
+void AddOneShot(string strDest);
+bool RecvLine(SOCKET hSocket, string& strLine);
 bool GetMyExternalIP(CNetAddr& ipRet);
 void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);
@@ -43,7 +45,7 @@ CNode* ConnectNode(CAddress addrConnect, const char *strDest = NULL, int64_t nTi
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
 void MapPort();
 unsigned short GetListenPort();
-bool BindListenPort(const CService &bindAddr, std::string& strError=REF(std::string()));
+bool BindListenPort(const CService &bindAddr, string& strError=REF(string()));
 void StartNode(void* parg);
 bool StopNode();
 
@@ -130,14 +132,14 @@ extern CAddress addrSeenByPeer;
 extern boost::array<int, THREAD_MAX> vnThreadsRunning;
 extern CAddrMan addrman;
 
-extern std::vector<CNode*> vNodes;
+extern vector<CNode*> vNodes;
 extern CCriticalSection cs_vNodes;
-extern std::vector<std::string> vAddedNodes;
+extern vector<string> vAddedNodes;
 extern CCriticalSection cs_vAddedNodes;
-extern std::map<CInv, CDataStream> mapRelay;
-extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
+extern map<CInv, CDataStream> mapRelay;
+extern deque<pair<int64_t, CInv> > vRelayExpiration;
 extern CCriticalSection cs_mapRelay;
-extern std::map<CInv, int64_t> mapAlreadyAskedFor;
+extern map<CInv, int64_t> mapAlreadyAskedFor;
 
 
 
@@ -149,9 +151,9 @@ public:
     int64_t nLastSend;
     int64_t nLastRecv;
     int64_t nTimeConnected;
-    std::string addrName;
+    string addrName;
     int32_t nVersion;
-    std::string strSubVer;
+    string strSubVer;
     bool fInbound;
     int64_t nReleaseTime;
     int32_t nStartingHeight;
@@ -185,10 +187,10 @@ public:
     int32_t nHeaderStart;
     uint32_t nMessageStart;
     CAddress addr;
-    std::string addrName;
+    string addrName;
     CService addrLocal;
     int32_t nVersion;
-    std::string strSubVer;
+    string strSubVer;
     bool fOneShot;
     bool fClient;
     bool fInbound;
@@ -201,13 +203,13 @@ protected:
 
     // Denial-of-service detection/prevention
     // Key is IP address, value is banned-until-time
-    static std::map<CNetAddr, int64_t> setBanned;
+    static map<CNetAddr, int64_t> setBanned;
     static CCriticalSection cs_setBanned;
     int nMisbehavior;
 
 public:
     int64_t nReleaseTime;
-    std::map<uint256, CRequestTracker> mapRequests;
+    map<uint256, CRequestTracker> mapRequests;
     CCriticalSection cs_mapRequests;
     uint256 hashContinue;
     CBlockIndex* pindexLastGetBlocksBegin;
@@ -216,10 +218,10 @@ public:
     bool fStartSync;
 
     // flood relay
-    std::vector<CAddress> vAddrToSend;
-    std::set<CAddress> setAddrKnown;
+    vector<CAddress> vAddrToSend;
+    set<CAddress> setAddrKnown;
     bool fGetAddr;
-    std::set<uint256> setKnown;
+    set<uint256> setKnown;
     uint256 hashCheckpointKnown; // ppcoin: known sent sync-checkpoint
     int64_t nNextAddrSend;
     int64_t nNextLocalAddrSend;
@@ -227,11 +229,11 @@ public:
 
     // inventory based relay
     mruset<CInv> setInventoryKnown;
-    std::vector<CInv> vInventoryToSend;
+    vector<CInv> vInventoryToSend;
     CCriticalSection cs_inventory;
-    std::multimap<int64_t, CInv> mapAskFor;
+    multimap<int64_t, CInv> mapAskFor;
 
-    CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn = "", bool fInboundIn=false) : vSend(SER_NETWORK, MIN_PROTO_VERSION), vRecv(SER_NETWORK, MIN_PROTO_VERSION)
+    CNode(SOCKET hSocketIn, CAddress addrIn, string addrNameIn = "", bool fInboundIn=false) : vSend(SER_NETWORK, MIN_PROTO_VERSION), vRecv(SER_NETWORK, MIN_PROTO_VERSION)
     {
         nServices = 0;
         hSocket = hSocketIn;
@@ -242,7 +244,7 @@ public:
         nLastSendEmpty = GetTime();
         nTimeConnected = GetTime();
         nHeaderStart = -1;
-        nMessageStart = std::numeric_limits<uint32_t>::max();
+        nMessageStart = numeric_limits<uint32_t>::max();
         addr = addrIn;
         addrName = addrNameIn.empty() ? addr.ToStringIPPort() : addrNameIn;
         nVersion = 0;
@@ -295,13 +297,13 @@ public:
 
     int GetRefCount()
     {
-        return std::max(nRefCount, 0) + (GetTime() < nReleaseTime ? 1 : 0);
+        return max(nRefCount, 0) + (GetTime() < nReleaseTime ? 1 : 0);
     }
 
     CNode* AddRef(int64_t nTimeout=0)
     {
         if (nTimeout != 0)
-            nReleaseTime = std::max(nReleaseTime, GetTime() + nTimeout);
+            nReleaseTime = max(nReleaseTime, GetTime() + nTimeout);
         else
             nRefCount++;
         return this;
@@ -358,12 +360,12 @@ public:
         int64_t nNow = (GetTime() - 1) * 1000000;
         static int64_t nLastTime;
         ++nLastTime;
-        nNow = std::max(nNow, nLastTime);
+        nNow = max(nNow, nLastTime);
         nLastTime = nNow;
 
         // Each retry is 2 minutes after the last
-        nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
-        mapAskFor.insert(std::make_pair(nRequestTime, inv));
+        nRequestTime = max(nRequestTime + 2 * 60 * 1000000, nNow);
+        mapAskFor.insert({ nRequestTime, inv });
     }
 
 
@@ -386,7 +388,7 @@ public:
             return;
         vSend.resize(nHeaderStart);
         nHeaderStart = -1;
-        nMessageStart = std::numeric_limits<uint32_t>::max();
+        nMessageStart = numeric_limits<uint32_t>::max();
         LEAVE_CRITICAL_SECTION(cs_vSend);
 
         if (fDebug)
@@ -421,7 +423,7 @@ public:
         }
 
         nHeaderStart = -1;
-        nMessageStart = std::numeric_limits<uint32_t>::max();
+        nMessageStart = numeric_limits<uint32_t>::max();
         LEAVE_CRITICAL_SECTION(cs_vSend);
     }
 

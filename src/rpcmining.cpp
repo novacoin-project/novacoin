@@ -286,7 +286,7 @@ Value getworkex(const Array& params, bool fHelp)
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
         // Save
-        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
+        mapNewBlock[pblock->hashMerkleRoot] = { pblock, pblock->vtx[0].vin[0].scriptSig };
 
         // Prebuild hash buffers
         char pmidstate[32];
@@ -425,7 +425,7 @@ Value getwork(const Array& params, bool fHelp)
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
         // Save
-        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
+        mapNewBlock[pblock->hashMerkleRoot] = { pblock, pblock->vtx[0].vin[0].scriptSig };
 
         // Pre-build hash buffers
         char pmidstate[32];

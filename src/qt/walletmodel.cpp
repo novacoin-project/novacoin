@@ -208,7 +208,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         {
             CScript scriptPubKey;
             scriptPubKey.SetAddress(CBitcoinAddress(rcp.address.toStdString()));
-            vecSend.push_back(make_pair(scriptPubKey, rcp.amount));
+            vecSend.push_back({ scriptPubKey, rcp.amount });
         }
 
         CWalletTx wtx;

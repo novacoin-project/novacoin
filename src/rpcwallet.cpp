@@ -790,7 +790,7 @@ Value sendmany(const Array& params, bool fHelp)
 
         totalAmount += nAmount;
 
-        vecSend.push_back(make_pair(scriptPubKey, nAmount));
+        vecSend.push_back({ scriptPubKey, nAmount });
     }
 
     EnsureWalletIsUnlocked();

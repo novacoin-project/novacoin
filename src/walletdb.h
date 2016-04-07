@@ -6,8 +6,9 @@
 #define BITCOIN_WALLETDB_H
 
 #include "db.h"
-//#include "base58.h"
 #include "keystore.h"
+
+using namespace std;
 
 class CKeyPool;
 class CAccount;
@@ -60,36 +61,36 @@ public:
 class CWalletDB : public CDB
 {
 public:
-    CWalletDB(std::string strFilename, const char* pszMode="r+") : CDB(strFilename.c_str(), pszMode)
+    CWalletDB(string strFilename, const char* pszMode="r+") : CDB(strFilename.c_str(), pszMode)
     {
     }
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);
 public:
-    bool WriteName(const std::string& strAddress, const std::string& strName);
+    bool WriteName(const string& strAddress, const string& strName);
 
-    bool EraseName(const std::string& strAddress);
+    bool EraseName(const string& strAddress);
 
     bool WriteTx(uint256 hash, const CWalletTx& wtx)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("tx"), hash), wtx);
+        return Write(make_pair(string("tx"), hash), wtx);
     }
 
     bool EraseTx(uint256 hash)
     {
         nWalletDBUpdated++;
-        return Erase(std::make_pair(std::string("tx"), hash));
+        return Erase(make_pair(string("tx"), hash));
     }
 
     bool WriteKey(const CPubKey& key, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta)
     {
         nWalletDBUpdated++;
-        if(!Write(std::make_pair(std::string("keymeta"), key), keyMeta))
+        if(!Write(make_pair(string("keymeta"), key), keyMeta))
             return false;
 
-        if(!Write(std::make_pair(std::string("key"), key), vchPrivKey, false))
+        if(!Write(make_pair(string("key"), key), vchPrivKey, false))
             return false;
 
         return true;
@@ -98,44 +99,44 @@ public:
     bool WriteMalleableKey(const CMalleableKeyView& keyView, const CSecret& vchSecretH, const CKeyMetadata &keyMeta)
     {
         nWalletDBUpdated++;
-        if(!Write(std::make_pair(std::string("malmeta"), keyView.ToString()), keyMeta))
+        if(!Write(make_pair(string("malmeta"), keyView.ToString()), keyMeta))
             return false;
 
-        if(!Write(std::make_pair(std::string("malpair"), keyView.ToString()), vchSecretH, false))
+        if(!Write(make_pair(string("malpair"), keyView.ToString()), vchSecretH, false))
             return false;
 
         return true;
     }
 
-    bool WriteCryptedMalleableKey(const CMalleableKeyView& keyView, const std::vector<unsigned char>& vchCryptedSecretH, const CKeyMetadata &keyMeta)
+    bool WriteCryptedMalleableKey(const CMalleableKeyView& keyView, const vector<unsigned char>& vchCryptedSecretH, const CKeyMetadata &keyMeta)
     {
         nWalletDBUpdated++;
-        if(!Write(std::make_pair(std::string("malmeta"), keyView.ToString()), keyMeta))
+        if(!Write(make_pair(string("malmeta"), keyView.ToString()), keyMeta))
             return false;
 
-        if(!Write(std::make_pair(std::string("malcpair"), keyView.ToString()), vchCryptedSecretH, false))
+        if(!Write(make_pair(string("malcpair"), keyView.ToString()), vchCryptedSecretH, false))
             return false;
 
-        Erase(std::make_pair(std::string("malpair"), keyView.ToString()));
+        Erase(make_pair(string("malpair"), keyView.ToString()));
 
         return true;
     }
 
 
-    bool WriteCryptedKey(const CPubKey& key, const std::vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta)
+    bool WriteCryptedKey(const CPubKey& key, const vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta)
     {
         nWalletDBUpdated++;
         bool fEraseUnencryptedKey = true;
 
-        if(!Write(std::make_pair(std::string("keymeta"), key), keyMeta))
+        if(!Write(make_pair(string("keymeta"), key), keyMeta))
             return false;
 
-        if (!Write(std::make_pair(std::string("ckey"), key), vchCryptedSecret, false))
+        if (!Write(make_pair(string("ckey"), key), vchCryptedSecret, false))
             return false;
         if (fEraseUnencryptedKey)
         {
-            Erase(std::make_pair(std::string("key"), key));
-            Erase(std::make_pair(std::string("wkey"), key));
+            Erase(make_pair(string("key"), key));
+            Erase(make_pair(string("wkey"), key));
         }
         return true;
     }
@@ -143,104 +144,104 @@ public:
     bool WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("mkey"), nID), kMasterKey, true);
+        return Write(make_pair(string("mkey"), nID), kMasterKey, true);
     }
 
     bool EraseMasterKey(unsigned int nID)
     {
         nWalletDBUpdated++;
-        return Erase(std::make_pair(std::string("mkey"), nID));
+        return Erase(make_pair(string("mkey"), nID));
     }
 
     bool EraseCryptedKey(const CPubKey& key)
     {
-        return Erase(std::make_pair(std::string("ckey"), key));
+        return Erase(make_pair(string("ckey"), key));
     }
 
     bool EraseCryptedMalleableKey(const CMalleableKeyView& keyView)
     {
-        return Erase(std::make_pair(std::string("malcpair"), keyView.ToString()));
+        return Erase(make_pair(string("malcpair"), keyView.ToString()));
     }
 
     bool WriteCScript(const uint160& hash, const CScript& redeemScript)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("cscript"), hash), redeemScript, false);
+        return Write(make_pair(string("cscript"), hash), redeemScript, false);
     }
 
     bool WriteWatchOnly(const CScript &dest)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("watchs"), dest), '1');
+        return Write(make_pair(string("watchs"), dest), '1');
     }
 
     bool EraseWatchOnly(const CScript &dest)
     {
         nWalletDBUpdated++;
-        return Erase(std::make_pair(std::string("watchs"), dest));
+        return Erase(make_pair(string("watchs"), dest));
     }
 
     bool WriteBestBlock(const CBlockLocator& locator)
     {
         nWalletDBUpdated++;
-        return Write(std::string("bestblock"), locator);
+        return Write(string("bestblock"), locator);
     }
 
     bool ReadBestBlock(CBlockLocator& locator)
     {
-        return Read(std::string("bestblock"), locator);
+        return Read(string("bestblock"), locator);
     }
 
     bool WriteOrderPosNext(int64_t nOrderPosNext)
     {
         nWalletDBUpdated++;
-        return Write(std::string("orderposnext"), nOrderPosNext);
+        return Write(string("orderposnext"), nOrderPosNext);
     }
 
     bool WriteDefaultKey(const CPubKey& key)
     {
         nWalletDBUpdated++;
-        return Write(std::string("defaultkey"), key);
+        return Write(string("defaultkey"), key);
     }
 
     bool ReadPool(int64_t nPool, CKeyPool& keypool)
     {
-        return Read(std::make_pair(std::string("pool"), nPool), keypool);
+        return Read(make_pair(string("pool"), nPool), keypool);
     }
 
     bool WritePool(int64_t nPool, const CKeyPool& keypool)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("pool"), nPool), keypool);
+        return Write(make_pair(string("pool"), nPool), keypool);
     }
 
     bool ErasePool(int64_t nPool)
     {
         nWalletDBUpdated++;
-        return Erase(std::make_pair(std::string("pool"), nPool));
+        return Erase(make_pair(string("pool"), nPool));
     }
 
     bool WriteMinVersion(int nVersion)
     {
-        return Write(std::string("minversion"), nVersion);
+        return Write(string("minversion"), nVersion);
     }
 
-    bool ReadAccount(const std::string& strAccount, CAccount& account);
-    bool WriteAccount(const std::string& strAccount, const CAccount& account);
+    bool ReadAccount(const string& strAccount, CAccount& account);
+    bool WriteAccount(const string& strAccount, const CAccount& account);
 private:
     bool WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry);
 public:
     bool WriteAccountingEntry(const CAccountingEntry& acentry);
-    int64_t GetAccountCreditDebit(const std::string& strAccount);
-    void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
+    int64_t GetAccountCreditDebit(const string& strAccount);
+    void ListAccountCreditDebit(const string& strAccount, list<CAccountingEntry>& acentries);
 
     DBErrors ReorderTransactions(CWallet*);
     DBErrors LoadWallet(CWallet* pwallet);
-    DBErrors FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash);
+    DBErrors FindWalletTx(CWallet* pwallet, vector<uint256>& vTxHash);
     DBErrors ZapWalletTx(CWallet* pwallet);
 
-    static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
-    static bool Recover(CDBEnv& dbenv, std::string filename);
+    static bool Recover(CDBEnv& dbenv, string filename, bool fOnlyKeys);
+    static bool Recover(CDBEnv& dbenv, string filename);
 };
 
 #endif // BITCOIN_WALLETDB_H

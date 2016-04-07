@@ -562,13 +562,13 @@ CWallet::TxItems CWallet::OrderedTxItems(list<CAccountingEntry>& acentries, stri
     for (auto it = mapWallet.begin(); it != mapWallet.end(); ++it)
     {
         CWalletTx* wtx = &((*it).second);
-        txOrdered.insert(make_pair(wtx->nOrderPos, TxPair(wtx, (CAccountingEntry*)0)));
+        txOrdered.insert({ wtx->nOrderPos, { wtx, (CAccountingEntry*)0 } });
     }
     acentries.clear();
     walletdb.ListAccountCreditDebit(strAccount, acentries);
     for(auto& entry : acentries)
     {
-        txOrdered.insert(make_pair(entry.nOrderPos, TxPair((CWalletTx*)0, &entry)));
+        txOrdered.insert({ entry.nOrderPos, { (CWalletTx*)0, &entry } });
     }
 
     return txOrdered;
@@ -636,7 +636,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
     {
         LOCK(cs_wallet);
         // Inserts only if not already there, returns tx inserted or tx found
-        auto ret = mapWallet.insert(make_pair(hash, wtxIn));
+        auto ret = mapWallet.insert({ hash, wtxIn });
         auto& wtx = (*ret.first).second;
         wtx.BindWallet(this);
         bool fInsertedNew = ret.second;
@@ -1280,11 +1280,11 @@ void CWalletTx::GetAmounts(int64_t& nGeneratedImmature, int64_t& nGeneratedMatur
 
         // If we are debited by the transaction, add the output as a "sent" entry
         if (nDebit > 0)
-            listSent.push_back(make_pair(address, txout.nValue));
+            listSent.push_back({ address, txout.nValue });
 
         // If we are receiving the output, add it as a "received" entry
         if (fIsMine & filter)
-            listReceived.push_back(make_pair(address, txout.nValue));
+            listReceived.push_back({ address, txout.nValue });
     }
 
 }
@@ -1527,7 +1527,7 @@ vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
         // Don't rebroadcast if newer than nTime:
         if (wtx.nTimeReceived > nTime)
             continue;
-        mapSorted.insert(make_pair(wtx.nTimeReceived, &wtx));
+        mapSorted.insert({ wtx.nTimeReceived, &wtx });
     }
     for(auto& item : mapSorted)
     {
@@ -1848,7 +1848,7 @@ bool CWallet::SelectCoinsMinConf(int64_t nTargetValue, unsigned int nSpendTime, 
             continue;
 
         auto n = pcoin->vout[i].nValue;
-        auto coin = make_pair(n,make_pair(pcoin, i));
+        auto coin = make_pair(n, make_pair(pcoin, i));
 
         if (n == nTargetValue)
         {
@@ -1938,7 +1938,7 @@ bool CWallet::SelectCoins(int64_t nTargetValue, unsigned int nSpendTime, set<pai
             if(!out.fSpendable)
                 continue;
             nValueRet += out.tx->vout[out.i].nValue;
-            setCoinsRet.insert(make_pair(out.tx, out.i));
+            setCoinsRet.insert({ out.tx, out.i });
         }
         return (nValueRet >= nTargetValue);
     }
@@ -1977,7 +1977,7 @@ bool CWallet::SelectCoinsSimple(int64_t nTargetValue, int64_t nMinValue, int64_t
             continue;
 
         auto n = pcoin->vout[i].nValue;
-        auto coin = make_pair(n,make_pair(pcoin, i));
+        auto coin = make_pair(n, make_pair(pcoin, i));
 
         if (n >= nTargetValue)
         {
@@ -2116,7 +2116,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64_t> >& vecSend, 
 bool CWallet::CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl* coinControl)
 {
     vector< pair<CScript, int64_t> > vecSend;
-    vecSend.push_back(make_pair(scriptPubKey, nValue));
+    vecSend.push_back({ scriptPubKey, nValue });
     return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, coinControl);
 }
 

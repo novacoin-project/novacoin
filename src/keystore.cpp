@@ -24,7 +24,7 @@ bool CBasicKeyStore::AddKey(const CKey& key)
     CSecret secret = key.GetSecret(fCompressed);
     {
         LOCK(cs_KeyStore);
-        mapKeys[key.GetPubKey().GetID()] = make_pair(secret, fCompressed);
+        mapKeys[key.GetPubKey().GetID()] = { secret, fCompressed };
     }
     return true;
 }
@@ -229,7 +229,7 @@ bool CCryptoKeyStore::AddCryptedKey(const CPubKey &vchPubKey, const std::vector<
         if (!SetCrypted())
             return false;
 
-        mapCryptedKeys[vchPubKey.GetID()] = make_pair(vchPubKey, vchCryptedSecret);
+        mapCryptedKeys[vchPubKey.GetID()] = { vchPubKey, vchCryptedSecret };
     }
     return true;
 }

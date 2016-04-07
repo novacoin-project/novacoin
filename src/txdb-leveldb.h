@@ -15,6 +15,8 @@
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 
+using namespace std;
+
 // Class that provides access to a LevelDB. Note that this class is frequently
 // instantiated on the stack and then destroyed again, so instantiation has to
 // be very cheap. Unfortunately that means, a CTxDB instance is actually just a
@@ -54,7 +56,7 @@ protected:
     // Returns true and sets (value,false) if activeBatch contains the given key
     // or leaves value alone and sets deleted = true if activeBatch contains a
     // delete for it.
-    bool ScanBatch(const CDataStream &key, std::string *value, bool *deleted) const;
+    bool ScanBatch(const CDataStream &key, string *value, bool *deleted) const;
 
     template<typename K, typename T>
     bool Read(const K& key, T& value)
@@ -62,7 +64,7 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        std::string strValue;
+        string strValue;
 
         bool readFromDb = true;
         if (activeBatch) {
@@ -91,7 +93,7 @@ protected:
                                 SER_DISK, CLIENT_VERSION);
             ssValue >> value;
         }
-        catch (const std::exception&) {
+        catch (const exception&) {
             return false;
         }
         return true;
@@ -147,7 +149,7 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        std::string unused;
+        string unused;
 
         if (activeBatch) {
             bool deleted;
@@ -175,12 +177,12 @@ public:
     bool ReadVersion(int& nVersion)
     {
         nVersion = 0;
-        return Read(std::string("version"), nVersion);
+        return Read(string("version"), nVersion);
     }
 
     bool WriteVersion(int nVersion)
     {
-        return Write(std::string("version"), nVersion);
+        return Write(string("version"), nVersion);
     }
 
     bool ReadTxIndex(uint256 hash, CTxIndex& txindex);
@@ -199,8 +201,8 @@ public:
     bool WriteBestInvalidTrust(CBigNum bnBestInvalidTrust);
     bool ReadSyncCheckpoint(uint256& hashCheckpoint);
     bool WriteSyncCheckpoint(uint256 hashCheckpoint);
-    bool ReadCheckpointPubKey(std::string& strPubKey);
-    bool WriteCheckpointPubKey(const std::string& strPubKey);
+    bool ReadCheckpointPubKey(string& strPubKey);
+    bool WriteCheckpointPubKey(const string& strPubKey);
     bool ReadModifierUpgradeTime(unsigned int& nUpgradeTime);
     bool WriteModifierUpgradeTime(const unsigned int& nUpgradeTime);
     bool LoadBlockIndex();
