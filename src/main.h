@@ -1506,7 +1506,7 @@ public:
 
     explicit CBlockLocator(uint256 hashBlock)
     {
-        std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hashBlock);
+        auto mi = mapBlockIndex.find(hashBlock);
         if (mi != mapBlockIndex.end())
             Set((*mi).second);
     }
@@ -1555,12 +1555,12 @@ public:
         // Retrace how far back it was in the sender's branch
         int nDistance = 0;
         int nStep = 1;
-        for(const uint256& hash :  vHave)
+        for(const auto& hash :  vHave)
         {
-            std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
+            auto mi = mapBlockIndex.find(hash);
             if (mi != mapBlockIndex.end())
             {
-                CBlockIndex* pindex = (*mi).second;
+                auto pindex = (*mi).second;
                 if (pindex->IsInMainChain())
                     return nDistance;
             }
@@ -1574,12 +1574,12 @@ public:
     CBlockIndex* GetBlockIndex()
     {
         // Find the first block the caller has in the main chain
-        for(const uint256& hash :  vHave)
+        for(const auto& hash :  vHave)
         {
-            std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
+            auto mi = mapBlockIndex.find(hash);
             if (mi != mapBlockIndex.end())
             {
-                CBlockIndex* pindex = (*mi).second;
+                auto pindex = (*mi).second;
                 if (pindex->IsInMainChain())
                     return pindex;
             }
@@ -1592,10 +1592,10 @@ public:
         // Find the first block the caller has in the main chain
         for(const uint256& hash :  vHave)
         {
-            std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
+            auto mi = mapBlockIndex.find(hash);
             if (mi != mapBlockIndex.end())
             {
-                CBlockIndex* pindex = (*mi).second;
+                auto pindex = (*mi).second;
                 if (pindex->IsInMainChain())
                     return hash;
             }

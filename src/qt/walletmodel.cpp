@@ -244,7 +244,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         {
             LOCK(wallet->cs_wallet);
 
-            std::map<CBitcoinAddress, std::string>::iterator mi = wallet->mapAddressBook.find(addr);
+            auto mi = wallet->mapAddressBook.find(addr);
 
             // Check if we have a new address or an updated label
             if (mi == wallet->mapAddressBook.end() || mi->second != strLabel)

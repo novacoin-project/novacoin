@@ -157,7 +157,7 @@ Value addnode(const Array& params, bool fHelp)
     }
 
     LOCK(cs_vAddedNodes);
-    vector<string>::iterator it = vAddedNodes.begin();
+    auto it = vAddedNodes.begin();
     for(; it != vAddedNodes.end(); it++)
         if (strNode == *it)
             break;
@@ -194,14 +194,14 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
     if (params.size() == 1)
     {
         LOCK(cs_vAddedNodes);
-        for(string& strAddNode :  vAddedNodes)
+        for(auto& strAddNode :  vAddedNodes)
             laddedNodes.push_back(strAddNode);
     }
     else
     {
         string strNode = params[1].get_str();
         LOCK(cs_vAddedNodes);
-        for(string& strAddNode :  vAddedNodes)
+        for(auto& strAddNode :  vAddedNodes)
             if (strAddNode == strNode)
             {
                 laddedNodes.push_back(strAddNode);
@@ -222,7 +222,7 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
         Array ret;
 
         list<pair<string, vector<CService> > > laddedAddreses(0);
-        for(string& strAddNode :  laddedNodes)
+        for(auto& strAddNode :  laddedNodes)
         {
             vector<CService> vservNode(0);
             if(Lookup(strAddNode.c_str(), vservNode, GetDefaultPort(), fNameLookup, 0))
@@ -238,7 +238,7 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
         }
 
     LOCK(cs_vNodes);
-    for (list<pair<string, vector<CService> > >::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++)
+    for (auto it = laddedAddreses.begin(); it != laddedAddreses.end(); it++)
     {
         Object obj;
         obj.push_back(Pair("addednode", it->first));
@@ -305,7 +305,7 @@ Value sendalert(const Array& params, bool fHelp)
     sMsg << (CUnsignedAlert)alert;
     alert.vchMsg = vector<unsigned char>(sMsg.begin(), sMsg.end());
 
-    vector<unsigned char> vchPrivKey = ParseHex(params[1].get_str());
+    auto vchPrivKey = ParseHex(params[1].get_str());
     key.SetPrivKey(CPrivKey(vchPrivKey.begin(), vchPrivKey.end())); // if key is not correct openssl may crash
     if (!key.Sign(Hash(alert.vchMsg.begin(), alert.vchMsg.end()), alert.vchSig))
         throw runtime_error(
@@ -346,28 +346,6 @@ Value getnettotals(const Array& params, bool fHelp)
     obj.push_back(Pair("timemillis", static_cast<int64_t>(GetTimeMillis())));
     return obj;
 }
-
-/*
-05:53:45 ntptime
-05:53:48
-{
-"epoch" : 1442494427,
-"time" : "2015-09-17 12:53:47 UTC"
-}
-
-05:53:56 ntptime time.windows.com
-05:53:57
-{
-"epoch" : 1442494436,
-"time" : "2015-09-17 12:53:56 UTC"
-}
-
-05:54:33 ntptime time-a.nist.gov
-05:54:34
-{
-"epoch" : 1442494473,
-"time" : "2015-09-17 12:54:33 UTC"
-}*/
 
 Value ntptime(const Array& params, bool fHelp)
 {

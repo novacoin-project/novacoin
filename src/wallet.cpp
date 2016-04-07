@@ -63,7 +63,7 @@ CPubKey CWallet::GenerateNewKey()
         nTimeFirstKey = nCreationTime;
 
     if (!AddKey(key))
-        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+        throw runtime_error("CWallet::GenerateNewKey() : AddKey failed");
     return key.GetPubKey();
 }
 
@@ -85,7 +85,7 @@ CMalleableKeyView CWallet::GenerateNewMalleableKey()
         nTimeFirstKey = nCreationTime;
 
     if (!AddKey(mKey))
-        throw std::runtime_error("CWallet::GenerateNewMalleableKey() : AddKey failed");
+        throw runtime_error("CWallet::GenerateNewMalleableKey() : AddKey failed");
     return CMalleableKeyView(mKey);
 }
 
@@ -114,7 +114,7 @@ bool CWallet::AddKey(const CMalleableKey& mKey)
     return true;
 }
 
-bool CWallet::AddCryptedMalleableKey(const CMalleableKeyView& keyView, const std::vector<unsigned char> &vchCryptedSecretH)
+bool CWallet::AddCryptedMalleableKey(const CMalleableKeyView& keyView, const vector<unsigned char> &vchCryptedSecretH)
 {
     if (!CCryptoKeyStore::AddCryptedMalleableKey(keyView, vchCryptedSecretH))
         return false;
@@ -526,7 +526,7 @@ bool CWallet::DecryptWallet(const SecureString& strWalletPassphrase)
     return true;
 }
 
-bool CWallet::GetPEM(const CKeyID &keyID, const std::string &fileName, const SecureString &strPassKey) const
+bool CWallet::GetPEM(const CKeyID &keyID, const string &fileName, const SecureString &strPassKey) const
 {
     BIO *pemOut = BIO_new_file(fileName.c_str(), "w");
     if (pemOut == NULL)
@@ -550,7 +550,7 @@ int64_t CWallet::IncOrderPosNext(CWalletDB *pwalletdb)
     return nRet;
 }
 
-CWallet::TxItems CWallet::OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount)
+CWallet::TxItems CWallet::OrderedTxItems(list<CAccountingEntry>& acentries, string strAccount)
 {
     CWalletDB walletdb(strWalletFile);
 
@@ -655,7 +655,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
                     {
                         // Tolerate times up to the last timestamp in the wallet not more than 5 minutes into the future
                         int64_t latestTolerated = latestNow + 300;
-                        std::list<CAccountingEntry> acentries;
+                        list<CAccountingEntry> acentries;
                         auto txOrdered = OrderedTxItems(acentries);
                         for (auto it = txOrdered.rbegin(); it != txOrdered.rend(); ++it)
                         {
@@ -683,7 +683,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
                     }
 
                     unsigned int& blocktime = mapBlockIndex[wtxIn.hashBlock]->nTime;
-                    wtx.nTimeSmart = std::max(latestEntry, std::min(blocktime, latestNow));
+                    wtx.nTimeSmart = max(latestEntry, min(blocktime, latestNow));
                 }
                 else
                     printf("AddToWallet() : found %s in block %s not in index\n",
@@ -812,7 +812,7 @@ isminetype CWallet::IsMine(const CTxIn &txin) const
 
 // marks certain txout's as spent
 // returns true if any update took place
-bool CWalletTx::UpdateSpent(const std::vector<char>& vfNewSpent)
+bool CWalletTx::UpdateSpent(const vector<char>& vfNewSpent)
 {
     bool fReturn = false;
     for (unsigned int i = 0; i < vfNewSpent.size(); i++)
@@ -848,7 +848,7 @@ void CWalletTx::BindWallet(CWallet *pwalletIn)
 void CWalletTx::MarkSpent(unsigned int nOut)
 {
     if (nOut >= vout.size())
-        throw std::runtime_error("CWalletTx::MarkSpent() : nOut out of range");
+        throw runtime_error("CWalletTx::MarkSpent() : nOut out of range");
     vfSpent.resize(vout.size());
     if (!vfSpent[nOut])
     {
@@ -860,7 +860,7 @@ void CWalletTx::MarkSpent(unsigned int nOut)
 void CWalletTx::MarkUnspent(unsigned int nOut)
 {
     if (nOut >= vout.size())
-        throw std::runtime_error("CWalletTx::MarkUnspent() : nOut out of range");
+        throw runtime_error("CWalletTx::MarkUnspent() : nOut out of range");
     vfSpent.resize(vout.size());
     if (vfSpent[nOut])
     {
@@ -872,7 +872,7 @@ void CWalletTx::MarkUnspent(unsigned int nOut)
 bool CWalletTx::IsSpent(unsigned int nOut) const
 {
     if (nOut >= vout.size())
-        throw std::runtime_error("CWalletTx::IsSpent() : nOut out of range");
+        throw runtime_error("CWalletTx::IsSpent() : nOut out of range");
     if (nOut >= vfSpent.size())
         return false;
     return (!!vfSpent[nOut]);
@@ -902,7 +902,7 @@ isminetype CWallet::IsMine(const CTxOut& txout) const
 int64_t CWallet::GetCredit(const CTxOut& txout, const isminefilter& filter) const
 {
     if (!MoneyRange(txout.nValue))
-        throw std::runtime_error("CWallet::GetCredit() : value out of range");
+        throw runtime_error("CWallet::GetCredit() : value out of range");
     return (IsMine(txout) & filter ? txout.nValue : 0);
 }
 
@@ -931,7 +931,7 @@ bool CWallet::IsChange(const CTxOut& txout) const
 int64_t CWallet::GetChange(const CTxOut& txout) const
 {
     if (!MoneyRange(txout.nValue))
-        throw std::runtime_error("CWallet::GetChange() : value out of range");
+        throw runtime_error("CWallet::GetChange() : value out of range");
     return (IsChange(txout) ? txout.nValue : 0);
 }
 
@@ -955,7 +955,7 @@ int64_t CWallet::GetDebit(const CTransaction& tx, const isminefilter& filter) co
     {
         nDebit += GetDebit(txin, filter);
         if (!MoneyRange(nDebit))
-            throw std::runtime_error("CWallet::GetDebit() : value out of range");
+            throw runtime_error("CWallet::GetDebit() : value out of range");
     }
     return nDebit;
 }
@@ -967,7 +967,7 @@ int64_t CWallet::GetCredit(const CTransaction& tx, const isminefilter& filter) c
     {
         nCredit += GetCredit(txout, filter);
         if (!MoneyRange(nCredit))
-            throw std::runtime_error("CWallet::GetCredit() : value out of range");
+            throw runtime_error("CWallet::GetCredit() : value out of range");
     }
     return nCredit;
 }
@@ -979,7 +979,7 @@ int64_t CWallet::GetChange(const CTransaction& tx) const
     {
         nChange += GetChange(txout);
         if (!MoneyRange(nChange))
-            throw std::runtime_error("CWallet::GetChange() : value out of range");
+            throw runtime_error("CWallet::GetChange() : value out of range");
     }
     return nChange;
 }
@@ -1180,7 +1180,7 @@ int64_t CWalletTx::GetAvailableCredit(bool fUseCache) const
             const CTxOut &txout = vout[i];
             nCredit += pwallet->GetCredit(txout, MINE_SPENDABLE);
             if (!MoneyRange(nCredit))
-                throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
+                throw runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
         }
     }
 
@@ -1209,7 +1209,7 @@ int64_t CWalletTx::GetAvailableWatchCredit(bool fUseCache) const
             const CTxOut &txout = vout[i];
             nCredit += pwallet->GetCredit(txout, MINE_WATCH_ONLY);
             if (!MoneyRange(nCredit))
-                throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
+                throw runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
         }
     }
 
@@ -1514,9 +1514,9 @@ bool CWalletTx::RelayWalletTransaction()
    return RelayWalletTransaction(txdb);
 }
 
-std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
+vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
 {
-    std::vector<uint256> result;
+    vector<uint256> result;
 
     LOCK(cs_wallet);
     // Sort them in chronological order
@@ -1558,7 +1558,7 @@ void CWallet::ResendWalletTransactions(int64_t nBestBlockTime)
 
     // Rebroadcast unconfirmed txes older than 5 minutes before the last
     // block was found:
-    std::vector<uint256> relayed = ResendWalletTransactionsBefore(nBestBlockTime - 5*60);
+    auto relayed = ResendWalletTransactionsBefore(nBestBlockTime - 5*60);
     if (!relayed.empty())
         printf("CWallet::ResendWalletTransactions: rebroadcast %" PRIszu " unconfirmed transactions\n", relayed.size());
 }
@@ -1824,7 +1824,7 @@ bool CWallet::SelectCoinsMinConf(int64_t nTargetValue, unsigned int nSpendTime, 
 
     // List of values less than target
     pair<int64_t, pair<const CWalletTx*,unsigned int> > coinLowestLarger;
-    coinLowestLarger.first = std::numeric_limits<int64_t>::max();
+    coinLowestLarger.first = numeric_limits<int64_t>::max();
     coinLowestLarger.second.first = NULL;
     vector<pair<int64_t, pair<const CWalletTx*,unsigned int> > > vValue;
     int64_t nTotalLower = 0;
@@ -2834,7 +2834,7 @@ int64_t CWallet::GetOldestKeyPoolTime()
     return keypool.nTime;
 }
 
-std::map<CBitcoinAddress, int64_t> CWallet::GetAddressBalances()
+map<CBitcoinAddress, int64_t> CWallet::GetAddressBalances()
 {
     map<CBitcoinAddress, int64_t> balances;
 
@@ -3107,7 +3107,7 @@ void CWallet::UpdatedTransaction(const uint256 &hashTx)
     }
 }
 
-void CWallet::GetAddresses(std::map<CBitcoinAddress, int64_t> &mapAddresses) const {
+void CWallet::GetAddresses(map<CBitcoinAddress, int64_t> &mapAddresses) const {
     mapAddresses.clear();
 
     // get birth times for keys with metadata
@@ -3131,7 +3131,7 @@ void CWallet::GetAddresses(std::map<CBitcoinAddress, int64_t> &mapAddresses) con
             }
             else {
                 // multisig output affects more than one key
-                std::vector<CKeyID> vAffected;
+                vector<CKeyID> vAffected;
                 ::ExtractAffectedKeys(*this, out.scriptPubKey, vAffected);
 
                 for(auto it3 = vAffected.begin(); it3 != vAffected.end(); it3++) {

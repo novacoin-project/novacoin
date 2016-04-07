@@ -107,7 +107,7 @@ public:
             {
                 const uint256 &hash = updated_sorted.at(update_idx);
                 // Find transaction in wallet
-                std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
+                auto mi = wallet->mapWallet.find(hash);
                 bool inWallet = mi != wallet->mapWallet.end();
                 // Find bounds of this transaction in model
                 QList<KernelRecord>::iterator lower = qLowerBound(
@@ -206,7 +206,7 @@ public:
     {
         {
             LOCK(wallet->cs_wallet);
-            std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
+            auto mi = wallet->mapWallet.find(rec->hash);
             if(mi != wallet->mapWallet.end())
             {
                 return TransactionDesc::toHTML(wallet, mi->second);

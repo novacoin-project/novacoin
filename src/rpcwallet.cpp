@@ -20,7 +20,7 @@ static CCriticalSection cs_nWalletUnlockTime;
 extern int64_t nReserveBalance;
 extern void TxToJSON(const CTransaction& tx, const uint256& hashBlock, json_spirit::Object& entry);
 
-std::string HelpRequiringPassphrase()
+string HelpRequiringPassphrase()
 {
     return pwalletMain->IsCrypted()
         ? "\n\nRequires wallet passphrase to be set with walletpassphrase first"
@@ -241,7 +241,7 @@ Value getaccount(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
 
     string strAccount;
-    map<CBitcoinAddress, string>::iterator mi = pwalletMain->mapAddressBook.find(address);
+    auto mi = pwalletMain->mapAddressBook.find(address);
     if (mi != pwalletMain->mapAddressBook.end() && !(*mi).second.empty())
         strAccount = (*mi).second;
     return strAccount;
@@ -843,11 +843,11 @@ Value addmultisigaddress(const Array& params, bool fHelp)
                       "(got %" PRIszu " keys, but need at least %d to redeem)", keys.size(), nRequired));
     if (keys.size() > 16)
         throw runtime_error("Number of addresses involved in the multisignature address creation > 16\nReduce the number");
-    std::vector<CPubKey> pubkeys;
+    vector<CPubKey> pubkeys;
     pubkeys.resize(keys.size());
     for (unsigned int i = 0; i < keys.size(); i++)
     {
-        const std::string& ks = keys[i].get_str();
+        const auto& ks = keys[i].get_str();
 
         // Case 1: Bitcoin address and we have full public key:
         CBitcoinAddress address(ks);
@@ -910,7 +910,7 @@ Value addredeemscript(const Array& params, bool fHelp)
         strAccount = AccountFromValue(params[1]);
 
     // Construct using pay-to-script-hash:
-    vector<unsigned char> innerData = ParseHexV(params[0], "redeemScript");
+    auto innerData = ParseHexV(params[0], "redeemScript");
     CScript inner(innerData.begin(), innerData.end());
     pwalletMain->AddCScript(inner);
     CBitcoinAddress address(inner.GetID());
@@ -926,7 +926,7 @@ struct tallyitem
     tallyitem()
     {
         nAmount = 0;
-        nConf = std::numeric_limits<int>::max();
+        nConf = numeric_limits<int>::max();
     }
 };
 
@@ -944,9 +944,9 @@ Value ListReceived(const Array& params, bool fByAccounts)
 
     // Tally
     map<CBitcoinAddress, tallyitem> mapTally;
-    for (auto it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
+    for (const auto &wit : pwalletMain->mapWallet)
     {
-        const CWalletTx& wtx = (*it).second;
+        const auto& wtx = wit.second;
 
         if (wtx.IsCoinBase() || wtx.IsCoinStake() || !wtx.IsFinal())
             continue;
@@ -955,7 +955,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
         if (nDepth < nMinDepth)
             continue;
 
-        for(const CTxOut& txout :  wtx.vout)
+        for(const auto& txout :  wtx.vout)
         {
             CTxDestination address;
             if (!ExtractDestination(txout.scriptPubKey, address) || !IsMine(*pwalletMain, address))
@@ -972,14 +972,14 @@ Value ListReceived(const Array& params, bool fByAccounts)
     map<string, tallyitem> mapAccountTally;
     for(const auto& item : pwalletMain->mapAddressBook)
     {
-        const CBitcoinAddress& address = item.first;
-        const string& strAccount = item.second;
+        const auto& address = item.first;
+        const auto& strAccount = item.second;
         auto it = mapTally.find(address);
         if (it == mapTally.end() && !fIncludeEmpty)
             continue;
 
         int64_t nAmount = 0;
-        int nConf = std::numeric_limits<int>::max();
+        int nConf = numeric_limits<int>::max();
         if (it != mapTally.end())
         {
             nAmount = (*it).second.nAmount;
@@ -998,21 +998,21 @@ Value ListReceived(const Array& params, bool fByAccounts)
             obj.push_back(Pair("address",       address.ToString()));
             obj.push_back(Pair("account",       strAccount));
             obj.push_back(Pair("amount",        ValueFromAmount(nAmount)));
-            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf)));
+            obj.push_back(Pair("confirmations", (nConf == numeric_limits<int>::max() ? 0 : nConf)));
             ret.push_back(obj);
         }
     }
 
     if (fByAccounts)
     {
-        for (auto it = mapAccountTally.begin(); it != mapAccountTally.end(); ++it)
+        for (const auto &acc : mapAccountTally)
         {
-            auto nAmount = (*it).second.nAmount;
-            int nConf = (*it).second.nConf;
+            auto nAmount = acc.second.nAmount;
+            int nConf = acc.second.nConf;
             Object obj;
-            obj.push_back(Pair("account",       (*it).first));
+            obj.push_back(Pair("account",       acc.first));
             obj.push_back(Pair("amount",        ValueFromAmount(nAmount)));
-            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf)));
+            obj.push_back(Pair("confirmations", (nConf == numeric_limits<int>::max() ? 0 : nConf)));
             ret.push_back(obj);
         }
     }
@@ -1194,7 +1194,7 @@ Value listtransactions(const Array& params, bool fHelp)
 
     Array ret;
 
-    std::list<CAccountingEntry> acentries;
+    list<CAccountingEntry> acentries;
     auto txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
 
     // iterate backwards until we have nCount items to return:
@@ -1216,14 +1216,14 @@ Value listtransactions(const Array& params, bool fHelp)
     if ((nFrom + nCount) > (int)ret.size())
         nCount = ret.size() - nFrom;
     auto first = ret.begin();
-    std::advance(first, nFrom);
+    advance(first, nFrom);
     auto last = ret.begin();
-    std::advance(last, nFrom+nCount);
+    advance(last, nFrom+nCount);
 
     if (last != ret.end()) ret.erase(last, ret.end());
     if (first != ret.begin()) ret.erase(ret.begin(), first);
 
-    std::reverse(ret.begin(), ret.end()); // Return oldest to newest
+    reverse(ret.begin(), ret.end()); // Return oldest to newest
 
     return ret;
 }
@@ -1403,10 +1403,10 @@ Value gettransaction(const Array& params, bool fHelp)
             else
             {
                 entry.push_back(Pair("blockhash", hashBlock.GetHex()));
-                map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hashBlock);
+                auto mi = mapBlockIndex.find(hashBlock);
                 if (mi != mapBlockIndex.end() && (*mi).second)
                 {
-                    CBlockIndex* pindex = (*mi).second;
+                    auto pindex = (*mi).second;
                     if (pindex->IsInMainChain())
                         entry.push_back(Pair("confirmations", 1 + nBestHeight - pindex->nHeight));
                     else
@@ -1704,7 +1704,7 @@ public:
         if (mine == MINE_SPENDABLE) {
             CScript subscript;
             pwalletMain->GetCScript(scriptID, subscript);
-            std::vector<CTxDestination> addresses;
+            vector<CTxDestination> addresses;
             txnouttype whichType;
             int nRequired;
             ExtractDestinations(subscript, whichType, addresses, nRequired);
@@ -1881,9 +1881,9 @@ Value resendwallettransactions(const Array& params, bool fHelp)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    std::vector<uint256> txids = pwalletMain->ResendWalletTransactionsBefore(GetTime());
+    auto txids = pwalletMain->ResendWalletTransactionsBefore(GetTime());
     Array result;
-    for(const uint256& txid :  txids)
+    for(const auto& txid :  txids)
     {
         result.push_back(txid.ToString());
     }
@@ -2029,7 +2029,7 @@ Value listmalleableviews(const Array& params, bool fHelp)
             "listmalleableviews\n"
             "Get list of views for generated malleable keys.\n");
 
-    std::list<CMalleableKeyView> keyViewList;
+    list<CMalleableKeyView> keyViewList;
     pwalletMain->ListMalleableViews(keyViewList);
 
     Array result;

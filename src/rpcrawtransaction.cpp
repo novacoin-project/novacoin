@@ -12,7 +12,6 @@
 #include "wallet.h"
 
 using namespace std;
-using namespace boost;
 using namespace json_spirit;
 
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out, bool fIncludeHex)
@@ -104,10 +103,10 @@ void TxToJSON(const CTransaction& tx, const uint256& hashBlock, Object& entry)
     if (hashBlock != 0)
     {
         entry.push_back(Pair("blockhash", hashBlock.GetHex()));
-        map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hashBlock);
+        auto mi = mapBlockIndex.find(hashBlock);
         if (mi != mapBlockIndex.end() && (*mi).second)
         {
-            CBlockIndex* pindex = (*mi).second;
+            auto pindex = (*mi).second;
             if (pindex->IsInMainChain())
             {
                 entry.push_back(Pair("confirmations", 1 + nBestHeight - pindex->nHeight));
@@ -340,7 +339,7 @@ Value decoderawtransaction(const Array& params, bool fHelp)
     try {
         ssData >> tx;
     }
-    catch (const std::exception&) {
+    catch (const exception&) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }
 
@@ -402,7 +401,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
             ssData >> tx;
             txVariants.push_back(tx);
         }
-        catch (const std::exception&) {
+        catch (const exception&) {
             throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
         }
     }
@@ -594,7 +593,7 @@ Value sendrawtransaction(const Array& params, bool fHelp)
     try {
         ssData >> tx;
     }
-    catch (const std::exception&) {
+    catch (const exception&) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }
     auto hashTx = tx.GetHash();
@@ -646,7 +645,7 @@ Value createmultisig(const Array& params, bool fHelp)
                       "(got %" PRIszu " keys, but need at least %d to redeem)", keys.size(), nRequired));
     if (keys.size() > 16)
         throw runtime_error("Number of addresses involved in the multisignature address creation > 16\nReduce the number");
-    std::vector<CPubKey> pubkeys;
+    vector<CPubKey> pubkeys;
     pubkeys.resize(keys.size());
     for (unsigned int i = 0; i < keys.size(); i++)
     {

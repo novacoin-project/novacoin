@@ -147,7 +147,7 @@ CWalletDB::ReorderTransactions(CWallet* pwallet)
 
     int64_t& nOrderPosNext = pwallet->nOrderPosNext;
     nOrderPosNext = 0;
-    std::vector<int64_t> nOrderPosOffsets;
+    vector<int64_t> nOrderPosOffsets;
     for (auto it = txByTime.begin(); it != txByTime.end(); ++it)
     {
         CWalletTx *const pwtx = (*it).second.first;
@@ -173,7 +173,7 @@ CWalletDB::ReorderTransactions(CWallet* pwallet)
                     ++nOrderPosOff;
             }
             nOrderPos += nOrderPosOff;
-            nOrderPosNext = std::max(nOrderPosNext, nOrderPos + 1);
+            nOrderPosNext = max(nOrderPosNext, nOrderPos + 1);
 
             if (!nOrderPosOff)
                 continue;
@@ -321,7 +321,7 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         {
             string strKeyView;
 
-            std::vector<unsigned char> vchCryptedSecret;
+            vector<unsigned char> vchCryptedSecret;
             ssKey >> strKeyView;
             ssValue >> vchCryptedSecret;
 
@@ -713,7 +713,7 @@ void ThreadFlushWalletDB(void* parg)
             {
                 // Don't do this if any databases are in use
                 int nRefCount = 0;
-                map<string, int>::iterator mi = bitdb.mapFileUseCount.begin();
+                auto mi = bitdb.mapFileUseCount.begin();
                 while (mi != bitdb.mapFileUseCount.end())
                 {
                     nRefCount += (*mi).second;
@@ -722,7 +722,7 @@ void ThreadFlushWalletDB(void* parg)
 
                 if (nRefCount == 0 && !fShutdown)
                 {
-                    map<string, int>::iterator mi = bitdb.mapFileUseCount.find(strFile);
+                    auto mi = bitdb.mapFileUseCount.find(strFile);
                     if (mi != bitdb.mapFileUseCount.end())
                     {
                         printf("Flushing wallet.dat\n");
@@ -787,19 +787,19 @@ bool DumpWallet(CWallet* pwallet, const string& strDest)
     if (!pwallet->fFileBacked)
         return false;
 
-    std::map<CBitcoinAddress, int64_t> mapAddresses;
-    std::set<CKeyID> setKeyPool;
+    map<CBitcoinAddress, int64_t> mapAddresses;
+    set<CKeyID> setKeyPool;
 
     pwallet->GetAddresses(mapAddresses);
     pwallet->GetAllReserveKeys(setKeyPool);
 
     // sort time/key pairs
-    std::vector<std::pair<int64_t, CBitcoinAddress> > vAddresses;
+    vector<pair<int64_t, CBitcoinAddress> > vAddresses;
     for (auto it = mapAddresses.begin(); it != mapAddresses.end(); it++) {
-        vAddresses.push_back(std::make_pair(it->second, it->first));
+        vAddresses.push_back({ it->second, it->first });
     }
     mapAddresses.clear();
-    std::sort(vAddresses.begin(), vAddresses.end());
+    sort(vAddresses.begin(), vAddresses.end());
 
     // open outputfile as a stream
     ofstream file;
@@ -814,10 +814,10 @@ bool DumpWallet(CWallet* pwallet, const string& strDest)
     file << strprintf("#   mined on %s\n", EncodeDumpTime(pindexBest->nTime).c_str());
     file << "\n";
 
-    for (auto it = vAddresses.begin(); it != vAddresses.end(); it++) {
-        const CBitcoinAddress &addr = it->second;
-        std::string strTime = EncodeDumpTime(it->first);
-        std::string strAddr = addr.ToString();
+    for (const auto& addrItem : vAddresses) {
+        const auto &addr = addrItem.second;
+        const auto strTime = EncodeDumpTime(addrItem.first);
+        const auto strAddr = addr.ToString();
 
         if (addr.IsPair()) {
             // Pubkey pair address
@@ -841,7 +841,7 @@ bool DumpWallet(CWallet* pwallet, const string& strDest)
             CKey key;
             if (!pwallet->GetKey(keyid, key))
                 continue;
-            CSecret secret = key.GetSecret(IsCompressed);
+            auto secret = key.GetSecret(IsCompressed);
             file << CBitcoinSecret(secret, IsCompressed).ToString();
             if (pwallet->mapAddressBook.count(addr))
                 file << strprintf(" %s label=%s # addr=%s\n", strTime.c_str(), EncodeDumpString(pwallet->mapAddressBook[addr]).c_str(), strAddr.c_str());

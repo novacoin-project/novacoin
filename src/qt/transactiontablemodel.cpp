@@ -71,7 +71,7 @@ public:
         cachedWallet.clear();
         {
             LOCK(wallet->cs_wallet);
-            for(std::map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)
+            for(auto it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)
             {
                 if(TransactionRecord::showTransaction(it->second))
                     cachedWallet.append(TransactionRecord::decomposeTransaction(wallet, it->second));
@@ -91,7 +91,7 @@ public:
             LOCK(wallet->cs_wallet);
 
             // Find transaction in wallet
-            std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
+            auto mi = wallet->mapWallet.find(hash);
             bool inWallet = mi != wallet->mapWallet.end();
 
             // Find bounds of this transaction in model
@@ -185,7 +185,7 @@ public:
             {
                 {
                     LOCK(wallet->cs_wallet);
-                    std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
+                    auto mi = wallet->mapWallet.find(rec->hash);
 
                     if(mi != wallet->mapWallet.end())
                     {
@@ -205,7 +205,7 @@ public:
     {
         {
             LOCK(wallet->cs_wallet);
-            std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
+            auto mi = wallet->mapWallet.find(rec->hash);
             if(mi != wallet->mapWallet.end())
             {
                 return TransactionDesc::toHTML(wallet, mi->second);

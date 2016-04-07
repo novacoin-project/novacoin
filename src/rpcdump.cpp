@@ -105,7 +105,7 @@ Value importaddress(const Array& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "It's senseless to import pubkey pair address.");
         script.SetAddress(address);
     } else if (IsHex(params[0].get_str())) {
-        std::vector<unsigned char> data(ParseHex(params[0].get_str()));
+        auto data = ParseHex(params[0].get_str());
         script = CScript(data.begin(), data.end());
     } else
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Novacoin address or script");
@@ -166,7 +166,7 @@ Value removeaddress(const Array& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Pubkey pair addresses aren't supported.");
         script.SetAddress(address);
     } else if (IsHex(params[0].get_str())) {
-        std::vector<unsigned char> data(ParseHex(params[0].get_str()));
+        auto data = ParseHex(params[0].get_str());
         script = CScript(data.begin(), data.end());
     } else
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bitcoin address or script");
@@ -212,7 +212,7 @@ Value dumpprivkey(const Array& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
-    string strAddress = params[0].get_str();
+    auto strAddress = params[0].get_str();
     CBitcoinAddress address;
     if (!address.SetString(strAddress))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
@@ -238,7 +238,7 @@ Value dumppem(const Array& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
-    string strAddress = params[0].get_str();
+    auto strAddress = params[0].get_str();
     SecureString strPassKey;
     strPassKey.reserve(100);
     strPassKey = params[2].get_str().c_str();
@@ -302,7 +302,6 @@ Value importmalleablekey(const Array& params, bool fHelp)
         throw runtime_error (
             "importmalleablekey <Key data>\n"
             "Imports the private key pair into your wallet.\n");
-
 
     EnsureWalletIsUnlocked();
 

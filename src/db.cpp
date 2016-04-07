@@ -474,7 +474,7 @@ void CDBEnv::Flush(bool fShutdown)
         return;
     {
         LOCK(cs_db);
-        map<string, int>::iterator mi = mapFileUseCount.begin();
+        auto mi = mapFileUseCount.begin();
         while (mi != mapFileUseCount.end())
         {
             string strFile = (*mi).first;

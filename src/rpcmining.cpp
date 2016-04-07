@@ -180,7 +180,7 @@ Value scaninput(const Array& params, bool fHelp)
         if (!GetKernelStakeModifier(block.GetHash(), nStakeModifier))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No kernel stake modifier generated yet");
 
-        std::pair<uint32_t, uint32_t> interval;
+        pair<uint32_t, uint32_t> interval;
         interval.first = GetTime();
         // Only count coins meeting min age requirement
         if (nStakeMinAge + block.nTime > interval.first)
@@ -205,7 +205,7 @@ Value scaninput(const Array& params, bool fHelp)
             ssKernel << block.nTime << (txindex.pos.nTxPos - txindex.pos.nBlockPos) << tx.nTime << nOut;
             auto itK = ssKernel.begin();
 
-            std::vector<std::pair<uint256, uint32_t> > result;
+            vector<pair<uint256, uint32_t> > result;
             if (ScanKernelForward((unsigned char *)&itK[0], nBits, tx.nTime, tx.vout[nOut].nValue, interval, result))
             {
                 for(const auto& solution : result)
@@ -297,7 +297,7 @@ Value getworkex(const Array& params, bool fHelp)
         auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
         auto coinbaseTx = pblock->vtx[0];
-        std::vector<uint256> merkle = pblock->GetMerkleBranch(0);
+        auto merkle = pblock->GetMerkleBranch(0);
 
         Object result;
         result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
@@ -491,7 +491,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
             "  \"height\" : height of the next block\n"
             "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.");
 
-    std::string strMode = "template";
+    string strMode = "template";
     if (params.size() > 0)
     {
         const Object& oparam = params[0].get_obj();
@@ -641,7 +641,7 @@ Value submitblock(const Array& params, bool fHelp)
     try {
         ssBlock >> block;
     }
-    catch (const std::exception&) {
+    catch (const exception&) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
     }
 

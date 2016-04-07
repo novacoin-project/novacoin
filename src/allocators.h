@@ -63,7 +63,7 @@ public:
         const size_t end_page = (base_addr + size - 1) & page_mask;
         for(size_t page = start_page; page <= end_page; page += page_size)
         {
-            Histogram::iterator it = histogram.find(page);
+            auto it = histogram.find(page);
             if(it == histogram.end()) // Newly locked page
             {
                 locker.Lock(reinterpret_cast<void*>(page), page_size);
@@ -86,7 +86,7 @@ public:
         const size_t end_page = (base_addr + size - 1) & page_mask;
         for(size_t page = start_page; page <= end_page; page += page_size)
         {
-            Histogram::iterator it = histogram.find(page);
+            auto it = histogram.find(page);
             assert(it != histogram.end()); // Cannot unlock an area that was not locked
             // Decrease counter for page, when it is zero, the page will be unlocked
             it->second -= 1;
