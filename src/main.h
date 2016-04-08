@@ -1019,8 +1019,8 @@ public:
             for (int i = 0; i < nSize; i += 2)
             {
                 int i2 = min(i+1, nSize-1);
-                vMerkleTree.push_back(Hash(BEGIN(vMerkleTree[j+i]),  END(vMerkleTree[j+i]),
-                                           BEGIN(vMerkleTree[j+i2]), END(vMerkleTree[j+i2])));
+                vMerkleTree.push_back(Hash(vMerkleTree[j+i].begin(),  vMerkleTree[j+i].end(),
+                                           vMerkleTree[j+i2].begin(), vMerkleTree[j+i2].end()));
             }
             j += nSize;
         }
