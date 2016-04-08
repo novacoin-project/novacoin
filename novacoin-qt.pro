@@ -363,6 +363,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/secondauthdialog.cpp \
     src/base58.cpp \
     src/cryptogram.cpp \
+    src/uint256.cpp \
     src/ecies.cpp \
     src/ipcollector.cpp
 
