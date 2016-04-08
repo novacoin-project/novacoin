@@ -318,6 +318,37 @@ std::string HelpMessage()
     return strUsage;
 }
 
+bool DropBlockIndex()
+{
+    try
+    {
+#ifdef USE_LEVELDB
+        filesystem::path directory = GetDataDir() / "txleveldb";
+        filesystem::remove_all(directory); // remove directory
+#else
+        filesystem::path indexFile = GetDataDir() / "blkindex.dat";
+        filesystem::remove_all(indexFile); // remove directory
+#endif
+
+        unsigned int nFile = 1;
+        for ( ; ; )
+        {
+            filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);
+            // Break if no such file
+            if( !filesystem::exists( strBlockFile ) )
+                break;
+            filesystem::remove(strBlockFile);
+            nFile++;
+        }
+        return true;
+    }
+    catch(std::exception &e)
+    {
+        // TODO: report error here
+        return false;
+    }
+}
+
 /** Initialize bitcoin.
  *  @pre Parameters should be parsed and config file should be read.
  */
@@ -787,6 +818,7 @@ bool AppInit2()
         } while(false);
 
         if (!fLoaded) {
+            DropBlockIndex();
             // TODO: suggest reindex here
             return InitError(strLoadError);
         }
