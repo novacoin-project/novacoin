@@ -495,8 +495,8 @@ bool CWallet::DecryptWallet(const SecureString& strWalletPassphrase)
             auto mi2 = mapMalleableKeys.begin();
             while (mi2 != mapMalleableKeys.end())
             {
-                const CSecret &vchSecretH = mi2->second;
-                const CMalleableKeyView &keyView = mi2->first;
+                const auto &vchSecretH = mi2->second;
+                const auto &keyView = mi2->first;
                 pwalletdbDecryption->EraseCryptedMalleableKey(keyView);
                 pwalletdbDecryption->WriteMalleableKey(keyView, vchSecretH, mapKeyMetadata[CBitcoinAddress(keyView.GetMalleablePubKey())]);
                 mi2++;

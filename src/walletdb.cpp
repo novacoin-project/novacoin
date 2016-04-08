@@ -910,9 +910,9 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
 
            bool fCompressed;
            CKey key;
-           CSecret secret = vchSecret.GetSecret(fCompressed);
+           auto secret = vchSecret.GetSecret(fCompressed);
            key.SetSecret(secret, fCompressed);
-           CKeyID keyid = key.GetPubKey().GetID();
+           auto keyid = key.GetPubKey().GetID();
            addr = CBitcoinAddress(keyid);
 
            if (pwallet->HaveKey(keyid)) {
@@ -931,7 +931,7 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
            CMalleableKey mKey;
            if (!mKey.SetString(vstr[0]))
                continue;
-           CMalleablePubKey mPubKey = mKey.GetMalleablePubKey();
+           auto mPubKey = mKey.GetMalleablePubKey();
            addr = CBitcoinAddress(mPubKey);
 
            if (pwallet->CheckOwnership(mPubKey)) {

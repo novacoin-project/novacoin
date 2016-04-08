@@ -2180,7 +2180,7 @@ void CScript::SetMultisig(int nRequired, const std::vector<CPubKey>& keys)
     this->clear();
 
     *this << EncodeOP_N(nRequired);
-    for(const CPubKey& key :  keys)
+    for(const auto& key :  keys)
         *this << key;
     *this << EncodeOP_N((int)(keys.size())) << OP_CHECKMULTISIG;
 }

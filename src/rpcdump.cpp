@@ -60,9 +60,9 @@ Value importprivkey(const Array& params, bool fHelp)
 
     CKey key;
     bool fCompressed;
-    CSecret secret = vchSecret.GetSecret(fCompressed);
+    auto secret = vchSecret.GetSecret(fCompressed);
     key.SetSecret(secret, fCompressed);
-    CKeyID keyid = key.GetPubKey().GetID();
+    auto keyid = key.GetPubKey().GetID();
     CBitcoinAddress addr = CBitcoinAddress(keyid);
     {
         LOCK2(cs_main, pwalletMain->cs_wallet);

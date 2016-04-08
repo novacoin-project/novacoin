@@ -548,7 +548,7 @@ bool CKey::IsValid()
         return false;
 
     bool fCompr;
-    CSecret secret = GetSecret(fCompr);
+    auto secret = GetSecret(fCompr);
     CKey key2;
     key2.SetSecret(secret, fCompr);
 

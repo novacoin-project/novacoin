@@ -21,7 +21,7 @@ bool CKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const
 bool CBasicKeyStore::AddKey(const CKey& key)
 {
     bool fCompressed = false;
-    CSecret secret = key.GetSecret(fCompressed);
+    auto secret = key.GetSecret(fCompressed);
     {
         LOCK(cs_KeyStore);
         mapKeys[key.GetPubKey().GetID()] = { secret, fCompressed };
@@ -65,7 +65,7 @@ bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut)
 {
     {
         LOCK(cs_KeyStore);
-        ScriptMap::const_iterator mi = mapScripts.find(hash);
+        auto mi = mapScripts.find(hash);
         if (mi != mapScripts.end())
         {
             redeemScriptOut = (*mi).second;
@@ -149,8 +149,8 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
         CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
         for (; mi != mapCryptedKeys.end(); ++mi)
         {
-            const CPubKey &vchPubKey = (*mi).second.first;
-            const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
+            const auto &vchPubKey = (*mi).second.first;
+            const auto &vchCryptedSecret = (*mi).second.second;
             CSecret vchSecret;
             if(!DecryptSecret(vMasterKeyIn, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
                 return false;
@@ -188,7 +188,7 @@ bool CCryptoKeyStore::AddKey(const CKey& key)
             return false;
 
         std::vector<unsigned char> vchCryptedSecret;
-        CPubKey vchPubKey = key.GetPubKey();
+        auto vchPubKey = key.GetPubKey();
         bool fCompressed;
         if (!EncryptSecret(vMasterKey, key.GetSecret(fCompressed), vchPubKey.GetHash(), vchCryptedSecret))
             return false;
@@ -253,7 +253,7 @@ bool CCryptoKeyStore::CreatePrivKey(const CPubKey &pubKeyVariant, const CPubKey 
         if (!IsCrypted())
             return CBasicKeyStore::CreatePrivKey(pubKeyVariant, R, privKey);
 
-        for (CryptedMalleableKeyMap::const_iterator mi = mapCryptedMalleableKeys.begin(); mi != mapCryptedMalleableKeys.end(); mi++)
+        for (auto mi = mapCryptedMalleableKeys.begin(); mi != mapCryptedMalleableKeys.end(); mi++)
         {
             if (mi->first.CheckKeyVariant(R, pubKeyVariant))
             {
@@ -280,7 +280,7 @@ bool CCryptoKeyStore::GetMalleableKey(const CMalleableKeyView &keyView, CMalleab
         LOCK(cs_KeyStore);
         if (!IsCrypted())
             return CBasicKeyStore::GetMalleableKey(keyView, mKey);
-        CryptedMalleableKeyMap::const_iterator mi = mapCryptedMalleableKeys.find(keyView);
+        auto mi = mapCryptedMalleableKeys.find(keyView);
         if (mi != mapCryptedMalleableKeys.end())
         {
             const CPubKey H = keyView.GetMalleablePubKey().GetH();
@@ -306,7 +306,7 @@ bool CCryptoKeyStore::GetKey(const CKeyID &address, CKey& keyOut) const
         if (!IsCrypted())
             return CBasicKeyStore::GetKey(address, keyOut);
 
-        CryptedKeyMap::const_iterator mi = mapCryptedKeys.find(address);
+        auto mi = mapCryptedKeys.find(address);
         if (mi != mapCryptedKeys.end())
         {
             const CPubKey &vchPubKey = (*mi).second.first;
@@ -331,7 +331,7 @@ bool CCryptoKeyStore::GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) co
         if (!IsCrypted())
             return CKeyStore::GetPubKey(address, vchPubKeyOut);
 
-        CryptedKeyMap::const_iterator mi = mapCryptedKeys.find(address);
+        auto mi = mapCryptedKeys.find(address);
         if (mi != mapCryptedKeys.end())
         {
             vchPubKeyOut = (*mi).second.first;
@@ -354,7 +354,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
             CKey key;
             if (!key.SetSecret(mKey.second.first, mKey.second.second))
                 return false;
-            const CPubKey vchPubKey = key.GetPubKey();
+            const auto vchPubKey = key.GetPubKey();
             std::vector<unsigned char> vchCryptedSecret;
             bool fCompressed;
             if (!EncryptSecret(vMasterKeyIn, key.GetSecret(fCompressed), vchPubKey.GetHash(), vchCryptedSecret))
@@ -366,7 +366,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
 
         for(auto& mKey : mapMalleableKeys)
         {
-            const CPubKey vchPubKeyH = mKey.first.GetMalleablePubKey().GetH();
+            const auto vchPubKeyH = mKey.first.GetMalleablePubKey().GetH();
             std::vector<unsigned char> vchCryptedSecretH;
             if (!EncryptSecret(vMasterKeyIn, mKey.second, vchPubKeyH.GetHash(), vchCryptedSecretH))
                 return false;
@@ -385,11 +385,11 @@ bool CCryptoKeyStore::DecryptKeys(const CKeyingMaterial& vMasterKeyIn)
         if (!IsCrypted())
             return false;
 
-        CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
+        auto mi = mapCryptedKeys.begin();
         for (; mi != mapCryptedKeys.end(); ++mi)
         {
-            const CPubKey &vchPubKey = (*mi).second.first;
-            const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
+            const auto &vchPubKey = (*mi).second.first;
+            const auto &vchCryptedSecret = (*mi).second.second;
             CSecret vchSecret;
             if(!DecryptSecret(vMasterKeyIn, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
                 return false;
@@ -404,10 +404,10 @@ bool CCryptoKeyStore::DecryptKeys(const CKeyingMaterial& vMasterKeyIn)
 
         mapCryptedKeys.clear();
 
-        CryptedMalleableKeyMap::const_iterator mi2 = mapCryptedMalleableKeys.begin();
+        auto mi2 = mapCryptedMalleableKeys.begin();
         for(; mi2 != mapCryptedMalleableKeys.end(); ++mi2)
         {
-            const CPubKey vchPubKeyH = mi2->first.GetMalleablePubKey().GetH();
+            const auto vchPubKeyH = mi2->first.GetMalleablePubKey().GetH();
 
             CSecret vchSecretH;
             if(!DecryptSecret(vMasterKeyIn, mi2->second, vchPubKeyH.GetHash(), vchSecretH))

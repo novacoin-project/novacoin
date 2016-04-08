@@ -47,7 +47,7 @@ Value decryptdata(const Array& params, bool fHelp)
         if (!vchSecret.SetString(params[0].get_str()))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Provided private key is inconsistent.");
         bool fCompressed;
-        CSecret secret = vchSecret.GetSecret(fCompressed);
+        auto secret = vchSecret.GetSecret(fCompressed);
         key.SetSecret(secret, fCompressed);
     }
 
@@ -95,7 +95,7 @@ Value decryptmessage(const Array& params, bool fHelp)
         if (!vchSecret.SetString(params[0].get_str()))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Provided private key is inconsistent.");
         bool fCompressed;
-        CSecret secret = vchSecret.GetSecret(fCompressed);
+        auto secret = vchSecret.GetSecret(fCompressed);
         key.SetSecret(secret, fCompressed);
     }
 
