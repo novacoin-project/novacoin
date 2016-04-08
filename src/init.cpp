@@ -327,7 +327,7 @@ bool DropBlockIndex()
         filesystem::remove_all(directory); // remove directory
 #else
         filesystem::path indexFile = GetDataDir() / "blkindex.dat";
-        filesystem::remove_all(indexFile); // remove directory
+        filesystem::remove(indexFile); // remove index file
 #endif
 
         unsigned int nFile = 1;
