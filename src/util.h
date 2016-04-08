@@ -126,7 +126,7 @@ T* alignup(T* p)
 #define MAX_PATH            1024
 inline void Sleep(int64_t n)
 {
-    this_thread::sleep_for(std::chrono::seconds(n));
+    this_thread::sleep_for(std::chrono::milliseconds(n));
 }
 #endif
 
