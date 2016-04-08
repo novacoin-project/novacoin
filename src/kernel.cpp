@@ -429,7 +429,7 @@ bool ScanKernelForward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxT
     {
         using namespace boost;
 
-        auto nThreads = thread::hardware_concurrency();
+        auto nThreads = std::thread::hardware_concurrency();
         auto vWorkers = vector<KernelWorker>(nThreads);
         auto nPart = (SearchInterval.second - SearchInterval.first) / nThreads;
         thread_group group;

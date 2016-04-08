@@ -17,6 +17,8 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #ifndef Q_MOC_RUN
 #include <boost/thread.hpp>
@@ -124,9 +126,7 @@ T* alignup(T* p)
 #define MAX_PATH            1024
 inline void Sleep(int64_t n)
 {
-    /*Boost has a year 2038 problem— if the request sleep time is past epoch+2^31 seconds the sleep returns instantly.
-      So we clamp our sleeps here to 10 years and hope that boost is fixed by 2028.*/
-    boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(n>315576000000LL?315576000000LL:n));
+    this_thread::sleep_for(std::chrono::seconds(n));
 }
 #endif
 
