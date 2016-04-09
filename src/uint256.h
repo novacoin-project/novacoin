@@ -345,12 +345,12 @@ public:
         return (GetHex());
     }
 
-    unsigned char* begin()
+    unsigned char* begin() const
     {
         return (unsigned char*)&pn[0];
     }
 
-    unsigned char* end()
+    unsigned char* end() const
     {
         return (unsigned char*)&pn[WIDTH];
     }
