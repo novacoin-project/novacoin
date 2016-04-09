@@ -13,6 +13,7 @@
 #include "net.h"
 #include "script.h"
 #include "scrypt.h"
+#include "ui_interface.h"
 
 #include <limits>
 #include <list>
@@ -84,7 +85,7 @@ extern const string strMessageMagic;
 extern int64_t nTimeBestReceived;
 extern CCriticalSection cs_setpwalletRegistered;
 extern set<CWallet*> setpwalletRegistered;
-extern unsigned char pchMessageStart[4];
+extern uint8_t pchMessageStart[4];
 extern map<uint256, CBlock*> mapOrphanBlocks;
 
 // Settings
@@ -116,7 +117,7 @@ void PrintBlockTree();
 CBlockIndex* FindBlockByHeight(int nHeight);
 bool ProcessMessages(CNode* pfrom);
 bool SendMessages(CNode* pto);
-bool LoadExternalBlockFile(FILE* fileIn);
+bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface);
 
 // Run an instance of the script checking thread
 void ThreadScriptCheck(void* parg);
@@ -1450,7 +1451,7 @@ public:
 
     uint256 GetBlockHash() const
     {
-        if (fUseFastIndex && (nTime < GetAdjustedTime() - nOneDay) && blockHash != 0)
+        if (fUseFastIndex && blockHash != 0)
             return blockHash;
 
         CBlock block;

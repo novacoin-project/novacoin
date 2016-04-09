@@ -455,7 +455,7 @@ bool CTxDB::LoadBlockIndex()
 
     // Verify blocks in the best chain
     int nCheckLevel = GetArgInt("-checklevel", 1);
-    int nCheckDepth = GetArgInt( "-checkblocks", 2500);
+    int nCheckDepth = GetArgInt( "-checkblocks", 192);
     if (nCheckDepth == 0)
         nCheckDepth = 1000000000; // suffices until the year 19000
     if (nCheckDepth > nBestHeight)

@@ -4091,8 +4091,8 @@ If the file does not exist, create it with owner-readable-only file permissions.
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="105"/>
-        <source>How many blocks to check at startup (default: 2500, 0 = all)</source>
-        <translation>Скільки блоків перевіряти під час запуску (типово: 2500, 0 = всі)</translation>
+        <source>How many blocks to check at startup (default: 192, 0 = all)</source>
+        <translation>Скільки блоків перевіряти під час запуску (типово: 192, 0 = всі)</translation>
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="106"/>

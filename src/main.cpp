@@ -2943,59 +2943,84 @@ void PrintBlockTree()
     }
 }
 
-bool LoadExternalBlockFile(FILE* fileIn)
+bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
 {
     auto nStart = GetTimeMillis();
-
+    vector<uint8_t> pchData(10 * (8+MAX_BLOCK_SIZE));
     int nLoaded = 0;
     {
         LOCK(cs_main);
         try {
             CAutoFile blkdat(fileIn, SER_DISK, CLIENT_VERSION);
-            unsigned int nPos = 0;
+            uint32_t nPos = 0;
             while (nPos != std::numeric_limits<uint32_t>::max() && blkdat.good() && !fRequestShutdown)
             {
-                unsigned char pchData[65536];
-                do {
+                do
+                {
                     fseek(blkdat, nPos, SEEK_SET);
-                    size_t nRead = fread(pchData, 1, sizeof(pchData), blkdat);
+                    auto nRead = fread(&pchData[0], 1, pchData.size(), blkdat);
                     if (nRead <= 8)
                     {
-                        nPos = std::numeric_limits<uint32_t>::max();
+                        nPos = numeric_limits<uint32_t>::max();
                         break;
                     }
-                    void* nFind = memchr(pchData, pchMessageStart[0], nRead+1-sizeof(pchMessageStart));
-                    if (nFind)
+                    auto it = pchData.begin();
+                    while(it != pchData.end() && !fRequestShutdown)
                     {
-                        if (memcmp(nFind, pchMessageStart, sizeof(pchMessageStart))==0)
+                        auto nBlockLength = *reinterpret_cast<const uint32_t*>(&(*(it+4)));
+                        auto SeekToNext = [&pchData, &it, &nPos, &nBlockLength]() {
+                            auto previt = it;
+                            it = search(it+8, pchData.end(), BEGIN(pchMessageStart), END(pchMessageStart));
+                            if (it != pchData.end())
+                                nPos += (it - previt);
+                        };
+                        if (nBlockLength > 0)
                         {
-                            nPos += ((unsigned char*)nFind - pchData) + sizeof(pchMessageStart);
-                            break;
+                            if (nBlockLength > pchData.end() - it)
+                            {
+                                SeekToNext();
+                                break; // We've reached the end of buffer
+                            }
+                            else
+                            {
+                                CBlock block;
+                                try
+                                {
+                                    vector<unsigned char> vchBlockBytes(it+8, it+8+nBlockLength);
+                                    CDataStream blockData(vchBlockBytes, SER_NETWORK, PROTOCOL_VERSION);
+                                    blockData >> block;
+                                }
+                                catch (const std::exception&)
+                                {
+                                    printf("LoadExternalBlockFile() : Deserialize error caught at the position %" PRId64 ", this block may be truncated.", nPos);
+                                    SeekToNext();
+                                    break;
+                                }
+                                if (ProcessBlock(NULL, &block))
+                                    nLoaded++;
+                                it += (8 + nBlockLength);
+                                nPos += (8 + nBlockLength);
+                                {
+                                    static int64_t nLastUpdate = 0;
+                                    if (GetTimeMillis() - nLastUpdate > 1000)
+                                    {
+                                        uiInterface.InitMessage(strprintf(_("%" PRId64 " blocks were read."), nLoaded));
+                                        nLastUpdate = GetTimeMillis();
+                                    }
+                                }
+                            }
                         }
-                        nPos += ((unsigned char*)nFind - pchData) + 1;
-                    }
-                    else
-                        nPos += sizeof(pchData) - sizeof(pchMessageStart) + 1;
-                } while(!fRequestShutdown);
-                if (nPos == std::numeric_limits<uint32_t>::max())
-                    break;
-                fseek(blkdat, nPos, SEEK_SET);
-                unsigned int nSize;
-                blkdat >> nSize;
-                if (nSize > 0 && nSize <= MAX_BLOCK_SIZE)
-                {
-                    CBlock block;
-                    blkdat >> block;
-                    if (ProcessBlock(NULL,&block))
-                    {
-                        nLoaded++;
-                        nPos += 4 + nSize;
+                        else
+                        {
+                            SeekToNext();
+                        }
                     }
                 }
+                while(!fRequestShutdown);
             }
         }
         catch (const std::exception&) {
-            printf("%s() : Deserialize or I/O error caught during load\n",
+            printf("%s() : I/O error caught during load\n",
                    BOOST_CURRENT_FUNCTION);
         }
     }
@@ -3109,7 +3134,7 @@ bool static AlreadyHave(CTxDB& txdb, const CInv& inv)
 // The message start string is designed to be unlikely to occur in normal data.
 // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
 // a large 4-byte int at any alignment.
-unsigned char pchMessageStart[4] = { 0xe4, 0xe8, 0xe9, 0xe5 };
+uint8_t pchMessageStart[4] = { 0xe4, 0xe8, 0xe9, 0xe5 };
 
 bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 {

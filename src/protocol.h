@@ -14,6 +14,7 @@
 #include "netbase.h"
 #include <string>
 #include <limits>
+#include <vector>
 #include "uint256.h"
 
 extern bool fTestNet;
@@ -22,8 +23,7 @@ inline unsigned short GetDefaultPort()
     return static_cast<unsigned short>(fTestNet ? 17777 : 7777);
 }
 
-
-extern unsigned char pchMessageStart[4];
+extern uint8_t pchMessageStart[4];
 
 /** Message header.
  * (4) message start.
