@@ -1066,23 +1066,6 @@ uint32_t pnSeed[] =
     0x4d226805,
 };
 
-const char* pchTorSeed[] = 
-{
-    "seedp4knqnoei57u.onion",
-    "seedr3hhlepyi7fd.onion",
-    "seed3uuomkclbiz4.onion",
-    "seedeh7qck3ouff5.onion",
-    "5rg3vq4jagckeckf.onion",
-    "seedt3sraf53ajiy.onion",
-    "seedg4qyccsg42oq.onion",
-    "novaqrtoywpg7jly.onion",
-    "seed3d5wolqbgrcb.onion",
-    "seed24u5dwph3qw4.onion",
-    "mj26ulzbs2oskgym.onion",
-    "eqon4usunavt76m7.onion",
-    "seedd3aldwpslzl3.onion"
-};
-
 void DumpAddresses()
 {
     auto nStart = GetTimeMillis();
@@ -1229,10 +1212,26 @@ void ThreadOpenConnections2(void* parg)
         // Add Tor nodes if we have connection with onion router
         if (mapArgs.count("-tor"))
         {
-            std::vector<CAddress> vAdd;
-            for (unsigned int i = 0; i < ARRAYLEN(pchTorSeed); i++)
+            const std::vector<std::string> vstrTorSeed =
             {
-                CAddress addr(CService(pchTorSeed[i], GetDefaultPort()));
+                "seedp4knqnoei57u.onion",
+                "seedr3hhlepyi7fd.onion",
+                "seed3uuomkclbiz4.onion",
+                "seedeh7qck3ouff5.onion",
+                "5rg3vq4jagckeckf.onion",
+                "seedt3sraf53ajiy.onion",
+                "seedg4qyccsg42oq.onion",
+                "novaqrtoywpg7jly.onion",
+                "seed3d5wolqbgrcb.onion",
+                "seed24u5dwph3qw4.onion",
+                "mj26ulzbs2oskgym.onion",
+                "eqon4usunavt76m7.onion",
+                "seedd3aldwpslzl3.onion"
+            };
+            std::vector<CAddress> vAdd;
+            for (unsigned int i = 0; i < vstrTorSeed.size(); i++)
+            {
+                CAddress addr(CService(vstrTorSeed[i], GetDefaultPort()));
                 addr.nTime = GetTime()-GetRand(nOneWeek)-nOneWeek;
                 vAdd.push_back(addr);
             }
