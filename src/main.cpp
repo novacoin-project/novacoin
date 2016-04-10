@@ -2947,7 +2947,7 @@ bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
 {
     auto nStart = GetTimeMillis();
     vector<uint8_t> pchData(10 * (8+MAX_BLOCK_SIZE));
-    int nLoaded = 0;
+    int32_t nLoaded = 0;
     {
         LOCK(cs_main);
         try {
@@ -2976,7 +2976,7 @@ bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
                         };
                         if (nBlockLength > 0)
                         {
-                            if (nBlockLength > pchData.end() - it)
+                            if (nBlockLength > distance(it, pchData.end()))
                             {
                                 SeekToNext();
                                 break; // We've reached the end of buffer
@@ -2998,13 +2998,13 @@ bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
                                 }
                                 if (ProcessBlock(NULL, &block))
                                     nLoaded++;
-                                it += (8 + nBlockLength);
+                                advance(it, 8 + nBlockLength);
                                 nPos += (8 + nBlockLength);
                                 {
                                     static int64_t nLastUpdate = 0;
                                     if (GetTimeMillis() - nLastUpdate > 1000)
                                     {
-                                        uiInterface.InitMessage(strprintf(_("%" PRId64 " blocks were read."), nLoaded));
+                                        uiInterface.InitMessage(strprintf(_("%" PRId32 " blocks were read."), nLoaded));
                                         nLastUpdate = GetTimeMillis();
                                     }
                                 }
