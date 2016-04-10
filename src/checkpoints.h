@@ -74,7 +74,7 @@ namespace Checkpoints
 class CUnsignedSyncCheckpoint
 {
 public:
-    int nVersion;
+    int32_t nVersion;
     uint256 hashCheckpoint;      // checkpoint block
 
     IMPLEMENT_SERIALIZE
@@ -94,7 +94,7 @@ public:
     {
         return strprintf(
                 "CSyncCheckpoint(\n"
-                "    nVersion       = %d\n"
+                "    nVersion       = %" PRId32 "\n"
                 "    hashCheckpoint = %s\n"
                 ")\n",
             nVersion,

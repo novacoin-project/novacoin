@@ -190,7 +190,7 @@ public:
         if (IsNull())
             return "null";
         else
-            return strprintf("(nFile=%u, nBlockPos=%u, nTxPos=%u)", nFile, nBlockPos, nTxPos);
+            return strprintf("(nFile=%" PRIu32 ", nBlockPos=%" PRIu32 ", nTxPos=%" PRIu32 ")", nFile, nBlockPos, nTxPos);
     }
 
     void print() const
@@ -246,7 +246,7 @@ public:
 
     string ToString() const
     {
-        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10).c_str(), n);
+        return strprintf("COutPoint(%s, %" PRIu32 ")", hash.ToString().substr(0,10).c_str(), n);
     }
 
     void print() const
@@ -327,7 +327,7 @@ public:
         else
             str += strprintf(", scriptSig=%s", scriptSig.ToString().substr(0,24).c_str());
         if (nSequence != numeric_limits<unsigned int>::max())
-            str += strprintf(", nSequence=%u", nSequence);
+            str += strprintf(", nSequence=%" PRIu32, nSequence);
         str += ")";
         return str;
     }
@@ -965,9 +965,9 @@ public:
         if (nHeight >= 9689 || fTestNet)
         {
             // Take last bit of block hash as entropy bit
-            unsigned int nEntropyBit = (GetHash().Get64()) & (uint64_t)1;
+            auto nEntropyBit = (GetHash().Get32()) & (uint32_t)1;
             if (fDebug && GetBoolArg("-printstakemodifier"))
-                printf("GetStakeEntropyBit: nTime=%u hashBlock=%s nEntropyBit=%u\n", nTime, GetHash().ToString().c_str(), nEntropyBit);
+                printf("GetStakeEntropyBit: nTime=%" PRIu32 " hashBlock=%s nEntropyBit=%" PRIu32 "\n", nTime, GetHash().ToString().c_str(), nEntropyBit);
             return nEntropyBit;
         }
 
@@ -975,9 +975,9 @@ public:
         int nBitNum = nHeight & 0xFF;
         int nItemNum = nHeight / 0xFF;
 
-        unsigned int nEntropyBit = (unsigned int) ((entropyStore[nItemNum] & (uint256(1) << nBitNum)) >> nBitNum).Get64();
+        auto nEntropyBit = ((entropyStore[nItemNum] & (uint256(1) << nBitNum)) >> nBitNum).Get32();
         if (fDebug && GetBoolArg("-printstakemodifier"))
-            printf("GetStakeEntropyBit: from pregenerated table, nHeight=%d nEntropyBit=%u\n", nHeight, nEntropyBit);
+            printf("GetStakeEntropyBit: from pregenerated table, nHeight=%" PRIu32 " nEntropyBit=%" PRIu32 "\n", nHeight, nEntropyBit);
         return nEntropyBit;
     }
 
@@ -996,7 +996,6 @@ public:
     {
         if (IsProofOfStake())
             return { vtx[1].vin[0].prevout, vtx[1].nTime };
-
         return { COutPoint(), (unsigned int)0 };
     }
 
@@ -1004,7 +1003,7 @@ public:
     int64_t GetMaxTransactionTime() const
     {
         int64_t maxTransactionTime = 0;
-        for(const auto& tx :  vtx)
+        for(const auto& tx : vtx)
             maxTransactionTime = max(maxTransactionTime, (int64_t)tx.nTime);
         return maxTransactionTime;
     }
@@ -1116,7 +1115,7 @@ public:
 
     void print() const
     {
-        printf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%" PRIszu ", vchBlockSig=%s)\n",
+        printf("CBlock(hash=%s, ver=%" PRId32 ", hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%" PRIu32 ", nBits=%08x, nNonce=%" PRIu32 ", vtx=%" PRIszu ", vchBlockSig=%s)\n",
             GetHash().ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),

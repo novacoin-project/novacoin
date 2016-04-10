@@ -2992,7 +2992,7 @@ bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
                                 }
                                 catch (const std::exception&)
                                 {
-                                    printf("LoadExternalBlockFile() : Deserialize error caught at the position %" PRId64 ", this block may be truncated.", nPos);
+                                    printf("LoadExternalBlockFile() : Deserialize error caught at the position %" PRIu32 ", this block may be truncated.", nPos);
                                     SeekToNext();
                                     break;
                                 }

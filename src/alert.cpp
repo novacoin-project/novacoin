@@ -44,23 +44,23 @@ void CUnsignedAlert::SetNull()
 std::string CUnsignedAlert::ToString() const
 {
     std::string strSetCancel;
-    for(int n :  setCancel)
-        strSetCancel += strprintf("%d ", n);
+    for(int32_t n :  setCancel)
+        strSetCancel += strprintf("%" PRId32 " ", n);
     std::string strSetSubVer;
     for(std::string str :  setSubVer)
         strSetSubVer += "\"" + str + "\" ";
     return strprintf(
         "CAlert(\n"
-        "    nVersion     = %d\n"
+        "    nVersion     = %" PRId32 "\n"
         "    nRelayUntil  = %" PRId64 "\n"
         "    nExpiration  = %" PRId64 "\n"
-        "    nID          = %d\n"
-        "    nCancel      = %d\n"
+        "    nID          = %" PRId32 "\n"
+        "    nCancel      = %" PRId32 "\n"
         "    setCancel    = %s\n"
-        "    nMinVer      = %d\n"
-        "    nMaxVer      = %d\n"
+        "    nMinVer      = %" PRId32 "\n"
+        "    nMaxVer      = %" PRId32 "\n"
         "    setSubVer    = %s\n"
-        "    nPriority    = %d\n"
+        "    nPriority    = %" PRId32 "\n"
         "    strComment   = \"%s\"\n"
         "    strStatusBar = \"%s\"\n"
         ")\n",
@@ -203,13 +203,13 @@ bool CAlert::ProcessAlert()
             const CAlert& alert = (*mi).second;
             if (Cancels(alert))
             {
-                printf("cancelling alert %d\n", alert.nID);
+                printf("cancelling alert %" PRId32 "\n", alert.nID);
                 uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
             }
             else if (!alert.IsInEffect())
             {
-                printf("expiring alert %d\n", alert.nID);
+                printf("expiring alert %" PRId32 "\n", alert.nID);
                 uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
             }
@@ -223,7 +223,7 @@ bool CAlert::ProcessAlert()
             const CAlert& alert = item.second;
             if (alert.Cancels(*this))
             {
-                printf("alert already cancelled by %d\n", alert.nID);
+                printf("alert already cancelled by %" PRId32 "\n", alert.nID);
                 return false;
             }
         }
@@ -235,6 +235,6 @@ bool CAlert::ProcessAlert()
             uiInterface.NotifyAlertChanged(GetHash(), CT_NEW);
     }
 
-    printf("accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
+    printf("accepted alert %" PRId32 ", AppliesToMe()=%" PRId32 "\n", nID, AppliesToMe());
     return true;
 }

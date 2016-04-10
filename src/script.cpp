@@ -1157,11 +1157,11 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
 
 
 
-uint256 SignatureHash(CScript scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType)
+uint256 SignatureHash(CScript scriptCode, const CTransaction& txTo, uint32_t nIn, int nHashType)
 {
     if (nIn >= txTo.vin.size())
     {
-        printf("ERROR: SignatureHash() : nIn=%d out of range\n", nIn);
+        printf("ERROR: SignatureHash() : nIn=%" PRIu32 " out of range\n", nIn);
         return 1;
     }
     CTransaction txTmp(txTo);
@@ -1189,10 +1189,10 @@ uint256 SignatureHash(CScript scriptCode, const CTransaction& txTo, unsigned int
     else if ((nHashType & 0x1f) == SIGHASH_SINGLE)
     {
         // Only lock-in the txout payee at same index as txin
-        unsigned int nOut = nIn;
+        uint32_t nOut = nIn;
         if (nOut >= txTmp.vout.size())
         {
-            printf("ERROR: SignatureHash() : nOut=%d out of range\n", nOut);
+            printf("ERROR: SignatureHash() : nOut=%" PRIu32 " out of range\n", nOut);
             return 1;
         }
         txTmp.vout.resize(nOut+1);

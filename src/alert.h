@@ -23,16 +23,16 @@ class CNode;
 class CUnsignedAlert
 {
 public:
-    int nVersion;
+    int32_t nVersion;
     int64_t nRelayUntil;      // when newer nodes stop relaying to newer nodes
     int64_t nExpiration;
-    int nID;
-    int nCancel;
-    std::set<int> setCancel;
-    int nMinVer;            // lowest version inclusive
-    int nMaxVer;            // highest version inclusive
+    int32_t nID;
+    int32_t nCancel;
+    std::set<int32_t> setCancel;
+    int32_t nMinVer;            // lowest version inclusive
+    int32_t nMaxVer;            // highest version inclusive
     std::set<std::string> setSubVer;  // empty matches all
-    int nPriority;
+    int32_t nPriority;
 
     // Actions
     std::string strComment;
