@@ -1050,9 +1050,9 @@ public:
         for(const uint256& otherside :  vMerkleBranch)
         {
             if (nIndex & 1)
-                hash = Hash(BEGIN(otherside), END(otherside), BEGIN(hash), END(hash));
+                hash = Hash(otherside.begin(), otherside.end(), hash.begin(), hash.end());
             else
-                hash = Hash(BEGIN(hash), END(hash), BEGIN(otherside), END(otherside));
+                hash = Hash(hash.begin(), hash.end(), otherside.begin(), otherside.end());
             nIndex >>= 1;
         }
         return hash;
