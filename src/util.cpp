@@ -16,7 +16,7 @@
 //           http://clang.debian.net/status.php?version=3.0&key=CANNOT_FIND_FUNCTION
 namespace boost {
     namespace program_options {
-        std::string to_internal(const std::string&);
+        string to_internal(const string&);
     }
 }
 
@@ -77,17 +77,17 @@ bool fReopenDebugLog = false;
 
 // Extended DecodeDumpTime implementation, see this page for details:
 // http://stackoverflow.com/questions/3786201/parsing-of-date-time-from-string-boost
-const std::locale formats[] = {
-    std::locale(std::locale::classic(),new bt::time_input_facet("%Y-%m-%dT%H:%M:%SZ")),
-    std::locale(std::locale::classic(),new bt::time_input_facet("%Y-%m-%d %H:%M:%S")),
-    std::locale(std::locale::classic(),new bt::time_input_facet("%Y/%m/%d %H:%M:%S")),
-    std::locale(std::locale::classic(),new bt::time_input_facet("%d.%m.%Y %H:%M:%S")),
-    std::locale(std::locale::classic(),new bt::time_input_facet("%Y-%m-%d"))
+const locale formats[] = {
+    locale(locale::classic(),new bt::time_input_facet("%Y-%m-%dT%H:%M:%SZ")),
+    locale(locale::classic(),new bt::time_input_facet("%Y-%m-%d %H:%M:%S")),
+    locale(locale::classic(),new bt::time_input_facet("%Y/%m/%d %H:%M:%S")),
+    locale(locale::classic(),new bt::time_input_facet("%d.%m.%Y %H:%M:%S")),
+    locale(locale::classic(),new bt::time_input_facet("%Y-%m-%d"))
 };
 
 const size_t formats_n = sizeof(formats)/sizeof(formats[0]);
 
-std::time_t pt_to_time_t(const bt::ptime& pt)
+time_t pt_to_time_t(const bt::ptime& pt)
 {
     bt::ptime timet_start(boost::gregorian::date(1970,1,1));
     bt::time_duration diff = pt - timet_start;
@@ -138,13 +138,6 @@ public:
 }
 instance_of_cinit;
 
-
-
-
-
-
-
-
 void RandAddSeed()
 {
     // Seed with CPU performance counter
@@ -187,7 +180,7 @@ uint64_t GetRand(uint64_t nMax)
 
     // The range of the random source must be a multiple of the modulus
     // to give every possible output value an equal possibility
-    uint64_t nRange = (std::numeric_limits<uint64_t>::max() / nMax) * nMax;
+    uint64_t nRange = (numeric_limits<uint64_t>::max() / nMax) * nMax;
     uint64_t nRand = 0;
     do
         RAND_bytes((unsigned char*)&nRand, sizeof(nRand));
@@ -206,11 +199,6 @@ uint256 GetRandHash()
     RAND_bytes((unsigned char*)&hash, sizeof(hash));
     return hash;
 }
-
-
-
-
-
 
 static FILE* fileout = NULL;
 
@@ -278,7 +266,7 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
         // accumulate and output a line at a time
         {
             LOCK(cs_OutputDebugStringF);
-            static std::string buffer;
+            static string buffer;
 
             va_list arg_ptr;
             va_start(arg_ptr, pszFormat);
@@ -286,7 +274,7 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
             va_end(arg_ptr);
 
             size_t line_start = 0, line_end;
-            while((line_end = buffer.find('\n', line_start)) != -1)
+            while((line_end = buffer.find('\n', line_start)) != string::npos)
             {
                 OutputDebugStringA(buffer.substr(line_start, line_end - line_start).c_str());
                 line_start = line_end + 1;
@@ -325,7 +313,7 @@ string vstrprintf(const char *format, va_list ap)
         limit *= 2;
         p = new(nothrow) char[limit];
         if (p == NULL)
-            throw std::bad_alloc();
+            throw bad_alloc();
     }
     string str(p, p+ret);
     if (p != buffer)
@@ -342,7 +330,7 @@ string real_strprintf(const char *format, int dummy, ...)
     return str;
 }
 
-string real_strprintf(const std::string &format, int dummy, ...)
+string real_strprintf(const string &format, int dummy, ...)
 {
     va_list arg_ptr;
     va_start(arg_ptr, dummy);
@@ -355,7 +343,7 @@ bool error(const char *format, ...)
 {
     va_list arg_ptr;
     va_start(arg_ptr, format);
-    std::string str = vstrprintf(format, arg_ptr);
+    string str = vstrprintf(format, arg_ptr);
     va_end(arg_ptr);
     printf("ERROR: %s\n", str.c_str());
     return false;
@@ -381,7 +369,6 @@ void ParseString(const string& str, char c, vector<string>& v)
     }
 }
 
-
 string FormatMoney(int64_t n, bool fPlus)
 {
     // Note: not using straight sprintf here because we do NOT want
@@ -404,7 +391,6 @@ string FormatMoney(int64_t n, bool fPlus)
         str.insert(0u, 1, '+');
     return str;
 }
-
 
 bool ParseMoney(const string& str, int64_t& nRet)
 {
@@ -511,7 +497,7 @@ static void InterpretNegativeSetting(string name, map<string, string>& mapSettin
     // interpret -nofoo as -foo=0 (and -nofoo=0 as -foo=1) as long as -foo not set
     if (name.find("-no") == 0)
     {
-        std::string positive("-");
+        string positive("-");
         positive.append(name.begin()+3, name.end());
         if (mapSettingsRet.count(positive) == 0)
         {
@@ -527,10 +513,10 @@ void ParseParameters(int argc, const char* const argv[])
     mapMultiArgs.clear();
     for (int i = 1; i < argc; i++)
     {
-        std::string str(argv[i]);
-        std::string strValue;
+        string str(argv[i]);
+        string strValue;
         size_t is_index = str.find('=');
-        if (is_index != std::string::npos)
+        if (is_index != string::npos)
         {
             strValue = str.substr(is_index+1);
             str = str.substr(0, is_index);
@@ -555,7 +541,7 @@ void ParseParameters(int argc, const char* const argv[])
         //  interpret --foo as -foo (as long as both are not set)
         if (name.find("--") == 0)
         {
-            std::string singleDash(name.begin()+1, name.end());
+            string singleDash(name.begin()+1, name.end());
             if (mapArgs.count(singleDash) == 0)
                 mapArgs[singleDash] = entry.second;
             name = singleDash;
@@ -566,35 +552,35 @@ void ParseParameters(int argc, const char* const argv[])
     }
 }
 
-std::string GetArg(const std::string& strArg, const std::string& strDefault)
+string GetArg(const string& strArg, const string& strDefault)
 {
     if (mapArgs.count(strArg))
         return mapArgs[strArg];
     return strDefault;
 }
 
-int64_t GetArg(const std::string& strArg, int64_t nDefault)
+int64_t GetArg(const string& strArg, int64_t nDefault)
 {
     if (mapArgs.count(strArg))
         return atoi64(mapArgs[strArg]);
     return nDefault;
 }
 
-int32_t GetArgInt(const std::string& strArg, int32_t nDefault)
+int32_t GetArgInt(const string& strArg, int32_t nDefault)
 {
     if (mapArgs.count(strArg))
         return strtol(mapArgs[strArg]);
     return nDefault;
 }
 
-uint32_t GetArgUInt(const std::string& strArg, uint32_t nDefault)
+uint32_t GetArgUInt(const string& strArg, uint32_t nDefault)
 {
     if (mapArgs.count(strArg))
         return strtoul(mapArgs[strArg]);
     return nDefault;
 }
 
-bool GetBoolArg(const std::string& strArg, bool fDefault)
+bool GetBoolArg(const string& strArg, bool fDefault)
 {
     if (mapArgs.count(strArg))
     {
@@ -605,7 +591,7 @@ bool GetBoolArg(const std::string& strArg, bool fDefault)
     return fDefault;
 }
 
-bool SoftSetArg(const std::string& strArg, const std::string& strValue)
+bool SoftSetArg(const string& strArg, const string& strValue)
 {
     if (mapArgs.count(strArg) || mapMultiArgs.count(strArg))
         return false;
@@ -615,12 +601,12 @@ bool SoftSetArg(const std::string& strArg, const std::string& strValue)
     return true;
 }
 
-bool SoftSetBoolArg(const std::string& strArg, bool fValue)
+bool SoftSetBoolArg(const string& strArg, bool fValue)
 {
     if (fValue)
-        return SoftSetArg(strArg, std::string("1"));
+        return SoftSetArg(strArg, string("1"));
     else
-        return SoftSetArg(strArg, std::string("0"));
+        return SoftSetArg(strArg, string("0"));
 }
 
 
@@ -952,13 +938,13 @@ string DecodeBase32(const string& str)
 }
 
 
-int64_t DecodeDumpTime(const std::string& s)
+int64_t DecodeDumpTime(const string& s)
 {
     bt::ptime pt;
 
     for(size_t i=0; i<formats_n; ++i)
     {
-        std::istringstream is(s);
+        istringstream is(s);
         is.imbue(formats[i]);
         is >> pt;
         if(pt != bt::ptime()) break;
@@ -967,12 +953,12 @@ int64_t DecodeDumpTime(const std::string& s)
     return pt_to_time_t(pt);
 }
 
-std::string EncodeDumpTime(int64_t nTime) {
+string EncodeDumpTime(int64_t nTime) {
     return DateTimeStrFormat("%Y-%m-%dT%H:%M:%SZ", nTime);
 }
 
-std::string EncodeDumpString(const std::string &str) {
-    std::stringstream ret;
+string EncodeDumpString(const string &str) {
+    stringstream ret;
     for(unsigned char c :  str) {
         if (c <= 32 || c >= 128 || c == '%') {
             ret << '%' << HexStr(&c, &c + 1);
@@ -983,8 +969,8 @@ std::string EncodeDumpString(const std::string &str) {
     return ret.str();
 }
 
-std::string DecodeDumpString(const std::string &str) {
-    std::stringstream ret;
+string DecodeDumpString(const string &str) {
+    stringstream ret;
     for (unsigned int pos = 0; pos < str.length(); pos++) {
         unsigned char c = str[pos];
         if (c == '%' && pos+2 < str.length()) {
@@ -1027,13 +1013,7 @@ bool WildcardMatch(const string& str, const string& mask)
 }
 
 
-
-
-
-
-
-
-static std::string FormatException(std::exception* pex, const char* pszThread)
+static string FormatException(exception* pex, const char* pszThread)
 {
 #ifdef WIN32
     char pszModule[MAX_PATH] = "";
@@ -1049,15 +1029,15 @@ static std::string FormatException(std::exception* pex, const char* pszThread)
             "UNKNOWN EXCEPTION       \n%s in %s       \n", pszModule, pszThread);
 }
 
-void LogException(std::exception* pex, const char* pszThread)
+void LogException(exception* pex, const char* pszThread)
 {
-    std::string message = FormatException(pex, pszThread);
+    string message = FormatException(pex, pszThread);
     printf("\n%s", message.c_str());
 }
 
-void PrintException(std::exception* pex, const char* pszThread)
+void PrintException(exception* pex, const char* pszThread)
 {
-    std::string message = FormatException(pex, pszThread);
+    string message = FormatException(pex, pszThread);
     printf("\n\n************************\n%s\n", message.c_str());
     fprintf(stderr, "\n\n************************\n%s\n", message.c_str());
     strMiscWarning = message;
@@ -1077,9 +1057,9 @@ void LogStackTrace() {
     }
 }
 
-void PrintExceptionContinue(std::exception* pex, const char* pszThread)
+void PrintExceptionContinue(exception* pex, const char* pszThread)
 {
-    std::string message = FormatException(pex, pszThread);
+    string message = FormatException(pex, pszThread);
     printf("\n\n************************\n%s\n", message.c_str());
     fprintf(stderr, "\n\n************************\n%s\n", message.c_str());
     strMiscWarning = message;
@@ -1241,7 +1221,7 @@ bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest)
     return MoveFileExA(src.string().c_str(), dest.string().c_str(),
                        MOVEFILE_REPLACE_EXISTING) != 0;
 #else
-    int rc = std::rename(src.string().c_str(), dest.string().c_str());
+    int rc = rename(src.string().c_str(), dest.string().c_str());
     return (rc == 0);
 #endif /* WIN32 */
 }
@@ -1294,13 +1274,6 @@ void ShrinkDebugFile()
         }
     }
 }
-
-
-
-
-
-
-
 
 //
 // "Never go to sea with two chronometers; take one or three."
@@ -1363,7 +1336,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
     if (vTimeOffsets.size() >= 5 && vTimeOffsets.size() % 2 == 1)
     {
         int64_t nMedian = vTimeOffsets.median();
-        std::vector<int64_t> vSorted = vTimeOffsets.sorted();
+        vector<int64_t> vSorted = vTimeOffsets.sorted();
         // Only let other nodes change our time by so much
         if (abs64(nMedian) < 70 * 60)
         {
@@ -1417,9 +1390,9 @@ string FormatFullVersion()
 }
 
 // Format the subversion field according to BIP 14 spec (https://en.bitcoin.it/wiki/BIP_0014)
-std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments)
+string FormatSubVersion(const string& name, int nClientVersion, const vector<string>& comments)
 {
-    std::ostringstream ss;
+    ostringstream ss;
     ss << "/";
     ss << name << ":" << FormatVersion(nClientVersion);
     if (!comments.empty())
@@ -1445,7 +1418,7 @@ boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate)
 }
 #endif
 
-void runCommand(std::string strCommand)
+void runCommand(string strCommand)
 {
     int nErr = ::system(strCommand.c_str());
     if (nErr)
@@ -1485,11 +1458,11 @@ bool NewThread(void(*pfn)(void*), void* parg)
     return true;
 }
 
-std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime)
+string DateTimeStrFormat(const char* pszFormat, int64_t nTime)
 {
-    // std::locale takes ownership of the pointer
-    std::locale loc(std::locale::classic(), new boost::posix_time::time_facet(pszFormat));
-    std::stringstream ss;
+    // locale takes ownership of the pointer
+    locale loc(locale::classic(), new boost::posix_time::time_facet(pszFormat));
+    stringstream ss;
     ss.imbue(loc);
     ss << boost::posix_time::from_time_t(nTime);
     return ss.str();
