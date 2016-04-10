@@ -140,6 +140,7 @@ bool GetProxy(enum Network net, proxyType &proxyInfoOut);
 bool IsProxy(const CNetAddr &addr);
 bool SetNameProxy(CService addrProxy, int nSocksVersion = 5);
 bool HaveNameProxy();
+bool LookupHost(const std::string strName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions = 0, bool fAllowLookup = true);
 bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions = 0, bool fAllowLookup = true);
 bool Lookup(const char *pszName, CService& addr, uint16_t portDefault = 0, bool fAllowLookup = true);
 bool Lookup(const char *pszName, std::vector<CService>& vAddr, uint16_t portDefault = 0, bool fAllowLookup = true, unsigned int nMaxSolutions = 0);

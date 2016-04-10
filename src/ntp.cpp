@@ -285,7 +285,7 @@ bool InitWithHost(const std::string &strHostName, SOCKET &sockfd, socklen_t &ser
     sockfd = INVALID_SOCKET;
 
     std::vector<CNetAddr> vIP;
-    bool fRet = LookupHost(strHostName.c_str(), vIP, 10, true);
+    bool fRet = LookupHost(strHostName, vIP, 10, true);
     if (!fRet) {
         return false;
     }
