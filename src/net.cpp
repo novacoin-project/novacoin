@@ -17,7 +17,6 @@
 #endif
 
 using namespace std;
-using namespace boost;
 
 static const int MAX_OUTBOUND_CONNECTIONS = 16;
 
@@ -58,7 +57,7 @@ static CNode* pnodeSync = NULL;
 CAddress addrSeenByPeer(CService("0.0.0.0", nPortZero), nLocalServices);
 uint64_t nLocalHostNonce = 0;
 boost::array<int, THREAD_MAX> vnThreadsRunning;
-static std::vector<SOCKET> vhListenSocket;
+static vector<SOCKET> vhListenSocket;
 CAddrMan addrman;
 
 vector<CNode*> vNodes;
@@ -74,7 +73,7 @@ CCriticalSection cs_vOneShots;
 set<CNetAddr> setservAddNodeAddresses;
 CCriticalSection cs_setservAddNodeAddresses;
 
-vector<std::string> vAddedNodes;
+vector<string> vAddedNodes;
 CCriticalSection cs_vAddedNodes;
 
 static CSemaphore *semOutbound = NULL;
@@ -347,7 +346,7 @@ extern int GetExternalIPbySTUN(uint64_t rnd, struct sockaddr_in *mapped, const c
 bool GetMyExternalIP(CNetAddr& ipRet)
 {
     struct sockaddr_in mapped;
-    auto rnd = std::numeric_limits<uint64_t>::max();
+    auto rnd = numeric_limits<uint64_t>::max();
     const char *srv;
     int rc = GetExternalIPbySTUN(rnd, &mapped, &srv);
     if(rc >= 0) {
@@ -397,7 +396,7 @@ CNode* FindNode(const CNetAddr& ip)
     return NULL;
 }
 
-CNode* FindNode(std::string addrName)
+CNode* FindNode(string addrName)
 {
     LOCK(cs_vNodes);
     for(CNode* pnode :  vNodes)
@@ -531,14 +530,14 @@ void CNode::PushVersion()
     RAND_bytes((unsigned char*)&nLocalHostNonce, sizeof(nLocalHostNonce));
     printf("send version message: version %d, blocks=%d, us=%s, them=%s, peer=%s\n", PROTOCOL_VERSION, nBestHeight, addrMe.ToString().c_str(), addrYou.ToString().c_str(), addr.ToString().c_str());
     PushMessage("version", PROTOCOL_VERSION, nLocalServices, nTime, addrYou, addrMe,
-                nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight);
+                nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, vector<string>()), nBestHeight);
 }
 
 
 
 
 
-std::map<CNetAddr, int64_t> CNode::setBanned;
+map<CNetAddr, int64_t> CNode::setBanned;
 CCriticalSection CNode::cs_setBanned;
 
 void CNode::ClearBanned()
@@ -627,7 +626,7 @@ void ThreadSocketHandler(void* parg)
         ThreadSocketHandler2(parg);
         vnThreadsRunning[THREAD_SOCKETHANDLER]--;
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         vnThreadsRunning[THREAD_SOCKETHANDLER]--;
         PrintException(&e, "ThreadSocketHandler()");
     } catch (...) {
@@ -980,7 +979,7 @@ void ThreadDNSAddressSeed(void* parg)
         ThreadDNSAddressSeed2(parg);
         vnThreadsRunning[THREAD_DNSSEED]--;
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         vnThreadsRunning[THREAD_DNSSEED]--;
         PrintException(&e, "ThreadDNSAddressSeed()");
     } catch (...) {
@@ -1068,7 +1067,7 @@ void ThreadDumpAddress(void* parg)
     {
         ThreadDumpAddress2(parg);
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         PrintException(&e, "ThreadDumpAddress()");
     }
     printf("ThreadDumpAddress exited\n");
@@ -1085,7 +1084,7 @@ void ThreadOpenConnections(void* parg)
         ThreadOpenConnections2(parg);
         vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
         PrintException(&e, "ThreadOpenConnections()");
     } catch (...) {
@@ -1160,7 +1159,7 @@ void ThreadOpenConnections2(void* parg)
         // Add seed nodes if IRC isn't working
         if (!IsLimited(NET_IPV4) && addrman.size()==0 && (GetTime() - nStart > 60) && !fTestNet)
         {
-            std::vector<uint32_t> vnSeed =
+            vector<uint32_t> vnSeed =
             {
                 0x1c542868, 0x3859dd6f, 0x203c2e68, 0xf145a6bc, 0x638a545f, 0x325da346, 0x385da346, 0xfb2b8d5f,
                 0x52568c5f, 0xa979e65b, 0x8de6485d, 0x9f79e65b, 0x048a861f, 0x3388b55f, 0x6ff0b45e, 0x17e81f5f,
@@ -1189,7 +1188,7 @@ void ThreadOpenConnections2(void* parg)
                 0xbe5ef3bc, 0x4689344d, 0xb223895e, 0xfcebeaad, 0xb7c0e92e, 0x993c1760, 0xe1e171b0, 0xb857e75b,
                 0xbf10002e, 0xb55b2cb2, 0xa90e2cb2, 0x13d6f15e, 0xf8be9225, 0x14ddf15e, 0x06e90305, 0x82472cb2,
             };
-            std::vector<CAddress> vAdd;
+            vector<CAddress> vAdd;
             for (unsigned int i = 0; i < vnSeed.size(); i++)
             {
                 // It'll only connect to one or two seed nodes because once it connects,
@@ -1208,7 +1207,7 @@ void ThreadOpenConnections2(void* parg)
         // Add Tor nodes if we have connection with onion router
         if (mapArgs.count("-tor"))
         {
-            const std::vector<std::string> vstrTorSeed =
+            const vector<string> vstrTorSeed =
             {
                 "seedp4knqnoei57u.onion",
                 "seedr3hhlepyi7fd.onion",
@@ -1224,7 +1223,7 @@ void ThreadOpenConnections2(void* parg)
                 "eqon4usunavt76m7.onion",
                 "seedd3aldwpslzl3.onion"
             };
-            std::vector<CAddress> vAdd;
+            vector<CAddress> vAdd;
             for (unsigned int i = 0; i < vstrTorSeed.size(); i++)
             {
                 CAddress addr(CService(vstrTorSeed[i], GetDefaultPort()));
@@ -1303,7 +1302,7 @@ void ThreadOpenAddedConnections(void* parg)
         ThreadOpenAddedConnections2(parg);
         vnThreadsRunning[THREAD_ADDEDCONNECTIONS]--;
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         vnThreadsRunning[THREAD_ADDEDCONNECTIONS]--;
         PrintException(&e, "ThreadOpenAddedConnections()");
     } catch (...) {
@@ -1480,7 +1479,7 @@ void ThreadMessageHandler(void* parg)
         ThreadMessageHandler2(parg);
         vnThreadsRunning[THREAD_MESSAGEHANDLER]--;
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         vnThreadsRunning[THREAD_MESSAGEHANDLER]--;
         PrintException(&e, "ThreadMessageHandler()");
     } catch (...) {
@@ -1874,8 +1873,8 @@ void RelayTransaction(const CTransaction& tx, const uint256& hash, const CDataSt
         }
 
         // Save original serialized message so newer versions are preserved
-        mapRelay.insert(std::make_pair(inv, ss));
-        vRelayExpiration.push_back(std::make_pair(GetTime() + 15 * 60, inv));
+        mapRelay.insert({inv, ss});
+        vRelayExpiration.push_back({GetTime() + 15 * 60, inv});
     }
 
     RelayInventory(inv);
