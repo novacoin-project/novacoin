@@ -969,17 +969,6 @@ void ThreadSocketHandler2(void* parg)
     }
 }
 
-// DNS seeds
-// Each pair gives a source name and a seed name.
-// The first name is used as information source for addrman.
-// The second name should resolve to a list of seed addresses.
-static const char *strDNSSeed[][2] = {
-    {"novacoin.karelia.pro", "dnsseed.novacoin.karelia.pro"},
-    {"novacoin.ru", "dnsseed.novacoin.ru"},
-    {"novacoin.ru", "testseed.novacoin.ru"},
-    {"novaco.in", "dnsseed.novaco.in"},
-};
-
 void ThreadDNSAddressSeed(void* parg)
 {
     // Make this thread recognisable as the DNS seeding thread
@@ -1008,15 +997,25 @@ void ThreadDNSAddressSeed2(void* parg)
 
     if (!fTestNet)
     {
+        // DNS seeds
+        // Each pair gives a source name and a seed name.
+        // The first name is used as information source for addrman.
+        // The second name should resolve to a list of seed addresses.
+        static const vector<pair <string, string> > vstrDNSSeed = {
+            { "novacoin.karelia.pro", "dnsseed.novacoin.karelia.pro" },
+            { "novacoin.ru", "dnsseed.novacoin.ru" },
+            { "novacoin.ru", "testseed.novacoin.ru" },
+            { "novaco.in", "dnsseed.novaco.in" },
+        };
         printf("Loading addresses from DNS seeds (could take a while)\n");
 
-        for (unsigned int seed_idx = 0; seed_idx < ARRAYLEN(strDNSSeed); seed_idx++) {
+        for (unsigned int seed_idx = 0; seed_idx < vstrDNSSeed.size(); seed_idx++) {
             if (HaveNameProxy()) {
-                AddOneShot(strDNSSeed[seed_idx][1]);
+                AddOneShot(vstrDNSSeed[seed_idx].second);
             } else {
                 vector<CNetAddr> vaddr;
                 vector<CAddress> vAdd;
-                if (LookupHost(strDNSSeed[seed_idx][1], vaddr))
+                if (LookupHost(vstrDNSSeed[seed_idx].second, vaddr))
                 {
                     for(CNetAddr& ip :  vaddr)
                     {
@@ -1026,24 +1025,13 @@ void ThreadDNSAddressSeed2(void* parg)
                         found++;
                     }
                 }
-                addrman.Add(vAdd, CNetAddr(strDNSSeed[seed_idx][0], true));
+                addrman.Add(vAdd, CNetAddr(vstrDNSSeed[seed_idx].first, true));
             }
         }
     }
 
     printf("%d addresses found from DNS seeds\n", found);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 uint32_t pnSeed[] =
 {
