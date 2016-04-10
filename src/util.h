@@ -198,8 +198,7 @@ void ParseString(const std::string& str, char c, std::vector<std::string>& v);
 std::string FormatMoney(int64_t n, bool fPlus=false);
 bool ParseMoney(const std::string& str, int64_t& nRet);
 bool ParseMoney(const char* pszIn, int64_t& nRet);
-std::vector<unsigned char> ParseHex(const char* psz);
-std::vector<unsigned char> ParseHex(const std::string& str);
+std::vector<uint8_t> ParseHex(const std::string& str);
 bool IsHex(const std::string& str);
 std::vector<unsigned char> DecodeBase64(const char* p, bool* pfInvalid = NULL);
 std::string DecodeBase64(const std::string& str);
@@ -245,10 +244,6 @@ std::string FormatFullVersion();
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments);
 void AddTimeData(const CNetAddr& ip, int64_t nTime);
 void runCommand(std::string strCommand);
-
-
-
-
 
 
 

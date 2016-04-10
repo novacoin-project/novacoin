@@ -437,27 +437,28 @@ bool ParseMoney(const char* pszIn, int64_t& nRet)
     return true;
 }
 
-
-static const signed char phexdigit[256] =
-{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  0,1,2,3,4,5,6,7,8,9,-1,-1,-1,-1,-1,-1,
-  -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, };
-
 bool IsHex(const string& str)
 {
+    static const signed char phexdigit[256] =
+    {
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+         0,  1,  2,  3,  4,  5,  6, 7, 8, 9,-1,-1,-1,-1,-1,-1,
+        -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1, -1, -1, -1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+    };
+
     for(unsigned char c :  str)
     {
         if (phexdigit[c] < 0)
@@ -466,30 +467,19 @@ bool IsHex(const string& str)
     return (str.size() > 0) && (str.size()%2 == 0);
 }
 
-vector<unsigned char> ParseHex(const char* psz)
+vector<uint8_t> ParseHex(const string& str)
 {
-    // convert hex dump to vector
-    vector<unsigned char> vch;
-    for ( ; ; )
+    auto nLen = str.length();
+    vector<uint8_t> vchOut;
+    for(size_t nPos = 0; nPos < nLen; nPos += 2)
     {
-        while (isspace(*psz))
-            psz++;
-        signed char c = phexdigit[(unsigned char)*psz++];
-        if (c == (signed char)-1)
-            break;
-        unsigned char n = (c << 4);
-        c = phexdigit[(unsigned char)*psz++];
-        if (c == (signed char)-1)
-            break;
-        n |= c;
-        vch.push_back(n);
+        istringstream strm(str.substr(nPos, 2));
+        uint8_t x;
+        strm >> hex >> x;
+        vchOut.push_back(x);
     }
-    return vch;
-}
 
-vector<unsigned char> ParseHex(const string& str)
-{
-    return ParseHex(str.c_str());
+    return vchOut;
 }
 
 static void InterpretNegativeSetting(string name, map<string, string>& mapSettingsRet)
