@@ -122,7 +122,7 @@ bool static LookupIntern(const char *pszName, std::vector<CNetAddr>& vIP, unsign
     return (vIP.size() > 0);
 }
 
-bool LookupHost(const string strName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup)
+bool LookupHost(const string& strName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup)
 {
     std::string strHost(strName);
     if (strHost.empty())
