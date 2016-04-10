@@ -41,7 +41,7 @@
     struct stun_addr {
         unsigned char unused;
         unsigned char family;
-        unsigned short port;
+        uint16_t port;
         unsigned int addr;
     } __attribute__((packed));
 #else
@@ -69,7 +69,7 @@
     struct stun_addr {
         unsigned char unused;
         unsigned char family;
-        unsigned short port;
+        uint16_t port;
         unsigned int addr;
     };
 #pragma pack(pop)

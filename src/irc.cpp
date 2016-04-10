@@ -20,7 +20,7 @@ void ThreadIRCSeed2(void* parg);
 struct ircaddr
 {
     struct in_addr ip;
-    unsigned short port;
+    uint16_t port;
 };
 #pragma pack(pop)
 

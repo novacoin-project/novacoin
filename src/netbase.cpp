@@ -122,6 +122,19 @@ bool static LookupIntern(const char *pszName, std::vector<CNetAddr>& vIP, unsign
     return (vIP.size() > 0);
 }
 
+bool LookupHost(const string strName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup)
+{
+    std::string strHost(strName);
+    if (strHost.empty())
+        return false;
+    if ((strHost.compare(0,1, "[") == 0) && (strHost.compare(strHost.length()-1,1, "]") == 0))
+    {
+        strHost = strHost.substr(1, strHost.size() - 2);
+    }
+
+    return LookupIntern(strHost.c_str(), vIP, nMaxSolutions, fAllowLookup);
+}
+
 bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup)
 {
     std::string strHost(pszName);
@@ -612,7 +625,7 @@ CNetAddr::CNetAddr(const std::string &strIp, bool fAllowLookup)
 {
     Init();
     std::vector<CNetAddr> vIP;
-    if (LookupHost(strIp.c_str(), vIP, 1, fAllowLookup))
+    if (LookupHost(strIp, vIP, 1, fAllowLookup))
         *this = vIP[0];
 }
 
@@ -1084,7 +1097,7 @@ CService::CService(const std::string &strIpPort, uint16_t portDefault, bool fAll
         *this = ip;
 }
 
-unsigned short CService::GetPort() const
+uint16_t CService::GetPort() const
 {
     return port;
 }
@@ -1164,7 +1177,7 @@ std::string CService::ToString() const
     return ToStringIPPort();
 }
 
-void CService::SetPort(unsigned short portIn)
+void CService::SetPort(uint16_t portIn)
 {
     port = portIn;
 }

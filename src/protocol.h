@@ -18,9 +18,9 @@
 #include "uint256.h"
 
 extern bool fTestNet;
-inline unsigned short GetDefaultPort()
+inline uint16_t GetDefaultPort()
 {
-    return static_cast<unsigned short>(fTestNet ? 17777 : 7777);
+    return static_cast<uint16_t>(fTestNet ? 17777 : 7777);
 }
 
 extern uint8_t pchMessageStart[4];
