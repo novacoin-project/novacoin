@@ -1301,11 +1301,11 @@ static int64_t nNodesOffset = INT64_MAX;
 int64_t GetTimeOffset()
 {
     // If NTP and system clock are in agreement within 40 minutes, then use NTP.
-    if (abs64(nNtpOffset) < 40 * 60)
+    if (abs(nNtpOffset) < 40 * 60)
         return nNtpOffset;
 
     // If not, then choose between median peer time and system clock.
-    if (abs64(nNodesOffset) < 70 * 60)
+    if (abs(nNodesOffset) < 70 * 60)
         return nNodesOffset;
 
     return 0;
@@ -1335,10 +1335,10 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
     printf("Added time data, samples %d, offset %+" PRId64 " (%+" PRId64 " minutes)\n", vTimeOffsets.size(), nOffsetSample, nOffsetSample/60);
     if (vTimeOffsets.size() >= 5 && vTimeOffsets.size() % 2 == 1)
     {
-        int64_t nMedian = vTimeOffsets.median();
-        vector<int64_t> vSorted = vTimeOffsets.sorted();
+        auto nMedian = vTimeOffsets.median();
+        auto vSorted = vTimeOffsets.sorted();
         // Only let other nodes change our time by so much
-        if (abs64(nMedian) < 70 * 60)
+        if (abs(nMedian) < 70 * 60)
         {
             nNodesOffset = nMedian;
         }
@@ -1352,8 +1352,8 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
                 bool fMatch = false;
 
                 // If nobody has a time different than ours but within 5 minutes of ours, give a warning
-                for(int64_t nOffset :  vSorted)
-                    if (nOffset != 0 && abs64(nOffset) < 5 * 60)
+                for(auto nOffset :  vSorted)
+                    if (nOffset != 0 && abs(nOffset) < 5 * 60)
                         fMatch = true;
 
                 if (!fMatch)

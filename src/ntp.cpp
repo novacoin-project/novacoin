@@ -470,7 +470,7 @@ void ThreadNtpSamples(void* parg) {
             // Trying to get new offset sample from trusted NTP server.
             int64_t nClockOffset = NtpGetTime(strTrustedUpstream) - GetTime();
 
-            if (abs64(nClockOffset) < nMaxOffset) {
+            if (abs(nClockOffset) < nMaxOffset) {
                 // Everything seems right, remember new trusted offset.
                 printf("ThreadNtpSamples: new offset sample from %s, offset=%" PRId64 ".\n", strTrustedUpstream.c_str(), nClockOffset);
                 nNtpOffset = nClockOffset;
@@ -495,7 +495,7 @@ void ThreadNtpSamples(void* parg) {
                 CNetAddr ip;
                 int64_t nClockOffset = NtpGetTime(ip) - GetTime();
 
-                if (abs64(nClockOffset) < nMaxOffset) { // Skip the deliberately wrong timestamps
+                if (abs(nClockOffset) < nMaxOffset) { // Skip the deliberately wrong timestamps
                     printf("ThreadNtpSamples: new offset sample from %s, offset=%" PRId64 ".\n", ip.ToString().c_str(), nClockOffset);
                     vTimeOffsets.input(nClockOffset);
                 }
@@ -514,7 +514,7 @@ void ThreadNtpSamples(void* parg) {
             }
         }
 
-        if (GetNodesOffset() == INT_MAX && abs64(nNtpOffset) > 40 * 60)
+        if (GetNodesOffset() == INT_MAX && abs(nNtpOffset) > 40 * 60)
         {
             // If there is not enough node offsets data and NTP time offset is greater than 40 minutes then give a warning.
             std::string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
