@@ -1097,7 +1097,7 @@ CService::CService(const std::string &strIpPort, uint16_t portDefault, bool fAll
         *this = ip;
 }
 
-unsigned short CService::GetPort() const
+uint16_t CService::GetPort() const
 {
     return port;
 }
@@ -1177,7 +1177,7 @@ std::string CService::ToString() const
     return ToStringIPPort();
 }
 
-void CService::SetPort(unsigned short portIn)
+void CService::SetPort(uint16_t portIn)
 {
     port = portIn;
 }
