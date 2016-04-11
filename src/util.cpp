@@ -7,26 +7,16 @@
 #include "sync.h"
 #include "version.h"
 #include "ui_interface.h"
+
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
-
-// Work around clang compilation problem in Boost 1.46:
-// /usr/include/boost/program_options/detail/config_file.hpp:163:17: error: call to function 'to_internal' that is neither visible in the template definition nor found by argument-dependent lookup
-// See also: http://stackoverflow.com/questions/10020179/compilation-fail-in-boost-librairies-program-options
-//           http://clang.debian.net/status.php?version=3.0&key=CANNOT_FIND_FUNCTION
-namespace boost {
-    namespace program_options {
-        string to_internal(const string&);
-    }
-}
-
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread.hpp>
+
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 
@@ -46,13 +36,12 @@ namespace boost {
 #include <io.h> /* for _commit */
 #include "shlobj.h"
 #elif defined(__linux__)
-# include <sys/prctl.h>
+#include <sys/prctl.h>
 #endif
 
 #if !defined(WIN32) && !defined(ANDROID)
 #include <execinfo.h>
 #endif
-
 
 using namespace std;
 namespace bt = boost::posix_time;
