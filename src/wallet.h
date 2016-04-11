@@ -361,7 +361,7 @@ static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
         nOrderPos = -1; // TODO: calculate elsewhere
         return;
     }
-    nOrderPos = atoi64(mapValue["n"].c_str());
+    nOrderPos = strtoll(mapValue["n"]);
 }
 
 
@@ -513,7 +513,7 @@ public:
 
             ReadOrderPos(pthis->nOrderPos, pthis->mapValue);
 
-            pthis->nTimeSmart = mapValue.count("timesmart") ? (unsigned int)atoi64(pthis->mapValue["timesmart"]) : 0;
+            pthis->nTimeSmart = mapValue.count("timesmart") ? (unsigned int)strtoll(pthis->mapValue["timesmart"]) : 0;
         }
 
         pthis->mapValue.erase("fromaccount");
