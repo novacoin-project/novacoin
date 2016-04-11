@@ -136,41 +136,6 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     return true;
 }
 
-void CDBEnv::MakeMock()
-{
-    if (fDbEnvInit)
-        throw runtime_error("CDBEnv::MakeMock(): already initialized");
-
-    if (fShutdown)
-        throw runtime_error("CDBEnv::MakeMock(): during shutdown");
-
-    printf("CDBEnv::MakeMock()\n");
-
-    dbenv.set_cachesize(1, 0, 1);
-    dbenv.set_lg_bsize(10485760*4);
-    dbenv.set_lg_max(10485760);
-    dbenv.set_lk_max_locks(10000);
-    dbenv.set_lk_max_objects(10000);
-    dbenv.set_flags(DB_AUTO_COMMIT, 1);
-#ifdef DB_LOG_IN_MEMORY
-    dbenv.log_set_config(DB_LOG_IN_MEMORY, fUseMemoryLog ? 1 : 0);
-#endif
-    int ret = dbenv.open(NULL,
-                     DB_CREATE     |
-                     DB_INIT_LOCK  |
-                     DB_INIT_LOG   |
-                     DB_INIT_MPOOL |
-                     DB_INIT_TXN   |
-                     DB_THREAD     |
-                     DB_PRIVATE,
-                     S_IRUSR | S_IWUSR);
-    if (ret > 0)
-        throw runtime_error(strprintf("CDBEnv::MakeMock(): error %d opening database environment", ret));
-
-    fDbEnvInit = true;
-    fMockDb = true;
-}
-
 CDBEnv::VerifyResult CDBEnv::Verify(std::string strFile, bool (*recoverFunc)(CDBEnv& dbenv, std::string strFile))
 {
     LOCK(cs_db);
@@ -268,17 +233,8 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
         {
             pdb = new Db(&bitdb.dbenv, 0);
 
-            bool fMockDb = bitdb.IsMock();
-            if (fMockDb)
-            {
-                DbMpoolFile*mpf = pdb->get_mpf();
-                ret = mpf->set_flags(DB_MPOOL_NOFILE, 1);
-                if (ret != 0)
-                    throw runtime_error(strprintf("CDB() : failed to configure for no temp file backing for database %s", pszFile));
-            }
-
             ret = pdb->open(NULL,      // Txn pointer
-                            fMockDb ? NULL : pszFile,   // Filename
+                            pszFile,   // Filename
                             "main",    // Logical db name
                             DB_BTREE,  // Database type
                             nFlags,    // Flags

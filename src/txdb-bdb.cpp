@@ -20,13 +20,6 @@
 using namespace std;
 using namespace boost;
 
-void MakeMockTXDB() {
-    // In practice this won't do anything because the test framework always initializes
-    // an in-memory BDB via bitdb.MakeMock() first, as we use BDB for addresses and wallets.
-    if (!bitdb.IsMock())
-        bitdb.MakeMock();
-}
-
 //
 // CTxDB
 //
