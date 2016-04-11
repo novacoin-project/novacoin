@@ -51,6 +51,8 @@
 #include "ministun.h"
 #include "netbase.h"
 
+using namespace std;
+
 extern int GetRandInt(int nMax);
 extern uint64_t GetRand(uint64_t nMax);
 
@@ -339,14 +341,14 @@ static int stun_send(int s, struct sockaddr_in *dst, struct stun_header *resp)
 }
 
 /* helper function to generate a random request id */
-static uint64_t randfiller = GetRand(std::numeric_limits<uint64_t>::max());
+static uint64_t randfiller = GetRand(numeric_limits<uint64_t>::max());
 static void stun_req_id(struct stun_header *req)
 {
     const uint64_t *S_block = (const uint64_t *)StunSrvList;
-    req->id.id[0] = GetRandInt(std::numeric_limits<int32_t>::max());
-    req->id.id[1] = GetRandInt(std::numeric_limits<int32_t>::max());
-    req->id.id[2] = GetRandInt(std::numeric_limits<int32_t>::max());
-    req->id.id[3] = GetRandInt(std::numeric_limits<int32_t>::max());
+    req->id.id[0] = GetRandInt(numeric_limits<int32_t>::max());
+    req->id.id[1] = GetRandInt(numeric_limits<int32_t>::max());
+    req->id.id[2] = GetRandInt(numeric_limits<int32_t>::max());
+    req->id.id[3] = GetRandInt(numeric_limits<int32_t>::max());
 
     req->id.id[0] |= 0x55555555;
     req->id.id[1] &= 0x55555555;
@@ -375,10 +377,9 @@ typedef int (stun_cb_f)(struct stun_attr *attr, void *arg);
 static int stun_handle_packet(int s, struct sockaddr_in *src,
                               unsigned char *data, size_t len, stun_cb_f *stun_cb, void *arg)
 {
-    struct stun_header *hdr = (struct stun_header *)data;
+    auto hdr = (struct stun_header *)data;
     struct stun_attr *attr;
     int ret = len;
-    unsigned int x;
 
     /* On entry, 'len' is the length of the udp payload. After the
    * initial checks it becomes the size of unprocessed options,
@@ -389,7 +390,7 @@ static int stun_handle_packet(int s, struct sockaddr_in *src,
 
     len -= sizeof(struct stun_header);
     data += sizeof(struct stun_header);
-    x = ntohs(hdr->msglen); /* len as advertised in the message */
+    uint32_t x = ntohs(hdr->msglen); /* len as advertised in the message */
     if(x < len)
         len = x;
 
@@ -438,8 +439,8 @@ static int stun_handle_packet(int s, struct sockaddr_in *src,
  */
 static int stun_get_mapped(struct stun_attr *attr, void *arg)
 {
-    struct stun_addr *addr = (struct stun_addr *)(attr + 1);
-    struct sockaddr_in *sa = (struct sockaddr_in *)arg;
+    auto addr = (struct stun_addr *)(attr + 1);
+    auto sa = (struct sockaddr_in *)arg;
 
     if (ntohs(attr->attr) != STUN_MAPPED_ADDRESS || ntohs(attr->len) != 8)
         return 1; /* not us. */
@@ -537,14 +538,11 @@ int GetExternalIPbySTUN(uint64_t rnd, struct sockaddr_in *mapped, const char **s
         step = rnd % StunSrvListQty;
     } while(step == 0);
 
-    uint16_t attempt;
-    for(attempt = 1; attempt < StunSrvListQty * 2; attempt++) {
+    for(uint16_t attempt = 1; attempt < StunSrvListQty * 2; attempt++) {
         pos = (pos + step) % StunSrvListQty;
         int rc = StunRequest(*srv = StunSrvList[pos].name, StunSrvList[pos].port, mapped);
         if(rc >= 0)
             return attempt;
-        // fprintf(stderr, "Lookup: %s:%u\t%s\t%d\n", StunSrvList[pos].name,
-        // StunSrvList[pos].port, inet_ntoa(mapped->sin_addr), rc);
     }
     return -1;
 }

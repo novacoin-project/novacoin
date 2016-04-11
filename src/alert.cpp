@@ -15,10 +15,10 @@ using namespace std;
 map<uint256, CAlert> mapAlerts;
 CCriticalSection cs_mapAlerts;
 
-static const char* pszMainKey = "043fa441fd4203d03f5df2b75ea14e36f20d39f43e7a61aa7552ab9bcd7ecb0e77a3be4585b13fcdaa22ef6e51f1ff6f2929bec2494385b086fb86610e33193195";
+static const string strMainKey = "043fa441fd4203d03f5df2b75ea14e36f20d39f43e7a61aa7552ab9bcd7ecb0e77a3be4585b13fcdaa22ef6e51f1ff6f2929bec2494385b086fb86610e33193195";
 
 // TestNet alerts pubKey
-static const char* pszTestKey = "0471dc165db490094d35cde15b1f5d755fa6ad6f2b5ed0f340e3f17f57389c3c2af113a8cbcc885bde73305a553b5640c83021128008ddf882e856336269080496";
+static const string strTestKey = "0471dc165db490094d35cde15b1f5d755fa6ad6f2b5ed0f340e3f17f57389c3c2af113a8cbcc885bde73305a553b5640c83021128008ddf882e856336269080496";
 
 // TestNet alerts private key
 // "308201130201010420b665cff1884e53da26376fd1b433812c9a5a8a4d5221533b15b9629789bb7e42a081a53081a2020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101a1440342000471dc165db490094d35cde15b1f5d755fa6ad6f2b5ed0f340e3f17f57389c3c2af113a8cbcc885bde73305a553b5640c83021128008ddf882e856336269080496"
@@ -41,13 +41,13 @@ void CUnsignedAlert::SetNull()
     strReserved.clear();
 }
 
-std::string CUnsignedAlert::ToString() const
+string CUnsignedAlert::ToString() const
 {
-    std::string strSetCancel;
+    string strSetCancel;
     for(int32_t n :  setCancel)
         strSetCancel += strprintf("%" PRId32 " ", n);
-    std::string strSetSubVer;
-    for(std::string str :  setSubVer)
+    string strSetSubVer;
+    for(string str :  setSubVer)
         strSetSubVer += "\"" + str + "\" ";
     return strprintf(
         "CAlert(\n"
@@ -107,7 +107,7 @@ bool CAlert::Cancels(const CAlert& alert) const
     return (alert.nID <= nCancel || setCancel.count(alert.nID));
 }
 
-bool CAlert::AppliesTo(int nVersion, std::string strSubVerIn) const
+bool CAlert::AppliesTo(int nVersion, string strSubVerIn) const
 {
     // TODO: rework for client-version-embedded-in-strSubVer ?
     return (IsInEffect() &&
@@ -117,7 +117,7 @@ bool CAlert::AppliesTo(int nVersion, std::string strSubVerIn) const
 
 bool CAlert::AppliesToMe() const
 {
-    return AppliesTo(PROTOCOL_VERSION, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<std::string>()));
+    return AppliesTo(PROTOCOL_VERSION, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, vector<string>()));
 }
 
 bool CAlert::RelayTo(CNode* pnode) const
@@ -144,7 +144,7 @@ bool CAlert::RelayTo(CNode* pnode) const
 bool CAlert::CheckSignature() const
 {
     CPubKey key;
-    key.Set(ParseHex(fTestNet ? pszTestKey : pszMainKey));
+    key.Set(ParseHex(fTestNet ? strTestKey : strMainKey));
     if (!key.Verify(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
         return error("CAlert::CheckSignature() : verify signature failed");
 
@@ -180,7 +180,7 @@ bool CAlert::ProcessAlert()
     // alerts or it will be ignored (so an attacker can't
     // send an "everything is OK, don't panic" version that
     // cannot be overridden):
-    int maxInt = std::numeric_limits<int>::max();
+    int maxInt = numeric_limits<int>::max();
     if (nID == maxInt)
     {
         if (!(
@@ -200,7 +200,7 @@ bool CAlert::ProcessAlert()
         // Cancel previous alerts
         for (auto mi = mapAlerts.begin(); mi != mapAlerts.end();)
         {
-            const CAlert& alert = (*mi).second;
+            const auto& alert = (*mi).second;
             if (Cancels(alert))
             {
                 printf("cancelling alert %" PRId32 "\n", alert.nID);
@@ -220,7 +220,7 @@ bool CAlert::ProcessAlert()
         // Check if this alert has been cancelled
         for(auto& item : mapAlerts)
         {
-            const CAlert& alert = item.second;
+            const auto& alert = item.second;
             if (alert.Cancels(*this))
             {
                 printf("alert already cancelled by %" PRId32 "\n", alert.nID);

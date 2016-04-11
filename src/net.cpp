@@ -351,7 +351,9 @@ bool GetMyExternalIP(CNetAddr& ipRet)
     int rc = GetExternalIPbySTUN(rnd, &mapped, &srv);
     if(rc >= 0) {
         ipRet = CNetAddr(mapped.sin_addr);
-        printf("GetExternalIPbySTUN(%" PRIu64 ") returned %s in attempt %d; Server=%s\n", rnd, ipRet.ToStringIP().c_str(), rc, srv);
+        if (fDebugNet) {
+            printf("GetExternalIPbySTUN(%" PRIu64 ") returned %s in attempt %d; Server=%s\n", rnd, ipRet.ToStringIP().c_str(), rc, srv);
+        }
         return true;
     }
     return false;
@@ -369,10 +371,6 @@ void ThreadGetMyExternalIP(void* parg)
         AddLocal(addrLocalHost, LOCAL_HTTP);
     }
 }
-
-
-
-
 
 void AddressCurrentlyConnected(const CService& addr)
 {
