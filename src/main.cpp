@@ -2976,7 +2976,7 @@ bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
                         };
                         if (nBlockLength > 0)
                         {
-                            if (nBlockLength > distance(it, pchData.end()))
+                            if (nBlockLength > (uint32_t)distance(it, pchData.end()))
                             {
                                 SeekToNext();
                                 break; // We've reached the end of buffer
