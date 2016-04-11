@@ -109,7 +109,7 @@ enum txnouttype
 const char* GetTxnOutputType(txnouttype t);
 
 // Script opcodes
-enum opcodetype
+enum opcodetype : uint8_t
 {
     // push value
     OP_0 = 0x00,
@@ -356,9 +356,7 @@ public:
 
     CScript& operator<<(opcodetype opcode)
     {
-        if (opcode < 0 || opcode > 0xff)
-            throw std::runtime_error("CScript::operator<<() : invalid opcode");
-        insert(end(), (uint8_t)opcode);
+        insert(end(), opcode);
         return *this;
     }
 
@@ -607,7 +605,7 @@ public:
                 str += "[error]";
                 return str;
             }
-            if (0 <= opcode && opcode <= OP_PUSHDATA4)
+            if (opcode <= OP_PUSHDATA4)
                 str += fShort? ValueString(vch).substr(0, 10) : ValueString(vch);
             else
                 str += GetOpName(opcode);
