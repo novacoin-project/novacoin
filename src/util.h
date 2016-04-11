@@ -259,22 +259,14 @@ inline std::string itostr(int n)
     return strprintf("%d", n);
 }
 
-inline int64_t atoi64(const char* psz)
+inline int64_t strtoll(const char* psz)
 {
-#ifdef _MSC_VER
-    return _atoi64(psz);
-#else
     return strtoll(psz, NULL, 10);
-#endif
 }
 
-inline int64_t atoi64(const std::string& str)
+inline int64_t strtoll(const std::string& str)
 {
-#ifdef _MSC_VER
-    return _atoi64(str.c_str());
-#else
     return strtoll(str.c_str(), NULL, 10);
-#endif
 }
 
 inline int32_t strtol(const char* psz)

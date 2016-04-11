@@ -419,7 +419,7 @@ bool ParseMoney(const char* pszIn, int64_t& nRet)
         return false;
     if (nUnits < 0 || nUnits > COIN)
         return false;
-    int64_t nWhole = atoi64(strWhole);
+    int64_t nWhole = strtoll(strWhole);
     int64_t nValue = nWhole*COIN + nUnits;
 
     nRet = nValue;
@@ -547,7 +547,7 @@ string GetArg(const string& strArg, const string& strDefault)
 int64_t GetArg(const string& strArg, int64_t nDefault)
 {
     if (mapArgs.count(strArg))
-        return atoi64(mapArgs[strArg]);
+        return strtoll(mapArgs[strArg]);
     return nDefault;
 }
 
