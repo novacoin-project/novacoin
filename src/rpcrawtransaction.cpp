@@ -525,12 +525,12 @@ Value signrawtransaction(const Array& params, bool fHelp)
     {
         static map<string, int> mapSigHashValues =
         {
-            {"ALL", int(SIGHASH_ALL)},
-            {"ALL|ANYONECANPAY", int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)},
-            {"NONE", int(SIGHASH_NONE)},
-            {"NONE|ANYONECANPAY", int(SIGHASH_NONE|SIGHASH_ANYONECANPAY)},
-            {"SINGLE", int(SIGHASH_SINGLE)},
-            {"SINGLE|ANYONECANPAY", int(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY)}
+            {"ALL", SIGHASH_ALL},
+            {"ALL|ANYONECANPAY", SIGHASH_ALL|SIGHASH_ANYONECANPAY},
+            {"NONE", SIGHASH_NONE},
+            {"NONE|ANYONECANPAY", SIGHASH_NONE|SIGHASH_ANYONECANPAY},
+            {"SINGLE", SIGHASH_SINGLE},
+            {"SINGLE|ANYONECANPAY", SIGHASH_SINGLE|SIGHASH_ANYONECANPAY}
         };
         auto strHashType = params[3].get_str();
         if (mapSigHashValues.count(strHashType))
