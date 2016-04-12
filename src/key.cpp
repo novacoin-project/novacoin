@@ -20,7 +20,7 @@ int EC_KEY_regenerate_key(EC_KEY *eckey, BIGNUM *priv_key)
 
     if (!eckey) return 0;
 
-    const EC_GROUP *group = EC_KEY_get0_group(eckey);
+    auto group = EC_KEY_get0_group(eckey);
 
     if ((ctx = BN_CTX_new()) == NULL)
         goto err;
@@ -72,7 +72,7 @@ int ECDSA_SIG_recover_key_GFp(EC_KEY *eckey, ECDSA_SIG *ecsig, const unsigned ch
     int n = 0;
     int i = recid / 2;
 
-    const EC_GROUP *group = EC_KEY_get0_group(eckey);
+    auto group = EC_KEY_get0_group(eckey);
     if ((ctx = BN_CTX_new()) == NULL) { ret = -1; goto err; }
     BN_CTX_start(ctx);
     order = BN_CTX_get(ctx);
@@ -236,8 +236,8 @@ bool CPubKey::ReserealizeSignature(std::vector<unsigned char>& vchSig)
     if (vchSig.empty())
         return false;
 
-    unsigned char *pos = &vchSig[0];
-    ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&pos, vchSig.size());
+    auto pos = &vchSig[0];
+    auto sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&pos, vchSig.size());
     if (sig == NULL)
         return false;
 
@@ -267,7 +267,7 @@ void CKey::MakeNewKey(bool fCompressed)
 
 bool CKey::SetPrivKey(const CPrivKey& vchPrivKey)
 {
-    const unsigned char* pbegin = &vchPrivKey[0];
+    auto pbegin = &vchPrivKey[0];
     if (d2i_ECPrivateKey(&pkey, &pbegin, vchPrivKey.size()))
     {
         // In testing, d2i_ECPrivateKey can return true
@@ -297,7 +297,7 @@ bool CKey::SetSecret(const CSecret& vchSecret, bool fCompressed)
 
     if (vchSecret.size() != 32)
         throw key_error("CKey::SetSecret() : secret must be 32 bytes");
-    BIGNUM *bn = BN_bin2bn(&vchSecret[0],32,BN_new());
+    auto bn = BN_bin2bn(&vchSecret[0],32,BN_new());
     if (bn == NULL)
         throw key_error("CKey::SetSecret() : BN_bin2bn failed");
     if (!EC_KEY_regenerate_key(pkey,bn))
@@ -315,7 +315,7 @@ CSecret CKey::GetSecret(bool &fCompressed) const
 {
     CSecret vchRet;
     vchRet.resize(32);
-    const BIGNUM *bn = EC_KEY_get0_private_key(pkey);
+    auto bn = EC_KEY_get0_private_key(pkey);
     int nBytes = BN_num_bytes(bn);
     if (bn == NULL)
         throw key_error("CKey::GetSecret() : EC_KEY_get0_private_key failed");
@@ -328,7 +328,7 @@ CSecret CKey::GetSecret(bool &fCompressed) const
 
 bool CKey::WritePEM(BIO *streamObj, const SecureString &strPassKey) const // dumppem 4KJLA99FyqMMhjjDe7KnRXK4sjtv9cCtNS /tmp/test.pem 123
 {
-    EVP_PKEY *evpKey = EVP_PKEY_new();
+    auto evpKey = EVP_PKEY_new();
     if (!EVP_PKEY_assign_EC_KEY(evpKey, pkey))
         return error("CKey::WritePEM() : Error initializing EVP_PKEY instance.");
     if(!PEM_write_bio_PKCS8PrivateKey(streamObj, evpKey, EVP_aes_256_cbc(), (char *)&strPassKey[0], strPassKey.size(), NULL, NULL))
@@ -349,7 +349,7 @@ CPrivKey CKey::GetPrivKey() const
     if (!nSize)
         throw key_error("CKey::GetPrivKey() : i2d_ECPrivateKey failed");
     CPrivKey vchPrivKey(nSize, 0);
-    unsigned char* pbegin = &vchPrivKey[0];
+    auto pbegin = &vchPrivKey[0];
     if (i2d_ECPrivateKey(pkey, &pbegin) != nSize)
         throw key_error("CKey::GetPrivKey() : i2d_ECPrivateKey returned unexpected size");
     return vchPrivKey;
@@ -370,10 +370,10 @@ CPubKey CKey::GetPubKey() const
 bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
 {
     vchSig.clear();
-    ECDSA_SIG *sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
+    auto sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
     if (sig==NULL)
         return false;
-    const EC_GROUP *group = EC_KEY_get0_group(pkey);
+    auto group = EC_KEY_get0_group(pkey);
     CBigNum order, halforder;
     EC_GROUP_get_order(group, &order, NULL);
     BN_rshift1(&halforder, &order);
@@ -381,14 +381,14 @@ bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
     if (BN_cmp(sig->s, &halforder) > 0) {
         BN_sub(sig->s, &order, sig->s);
     }
-    unsigned int nSize = ECDSA_size(pkey);
+    size_t nSize = ECDSA_size(pkey);
     vchSig.resize(nSize); // Make sure it is big enough
-    unsigned char *pos = &vchSig[0];
+    auto pos = &vchSig[0];
     nSize = i2d_ECDSA_SIG(sig, &pos);
     ECDSA_SIG_free(sig);
     vchSig.resize(nSize); // Shrink to fit actual size
     // Testing our new signature
-    if (ECDSA_verify(0, (unsigned char*)&hash, sizeof(hash), &vchSig[0], vchSig.size(), pkey) != 1) {
+    if (ECDSA_verify(0, hash.begin(), hash.size(), &vchSig[0], vchSig.size(), pkey) != 1) {
         vchSig.clear();
         return false;
     }
@@ -402,10 +402,10 @@ bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
 bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
 {
     bool fOk = false;
-    ECDSA_SIG *sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
+    auto sig = ECDSA_do_sign(hash.begin(), hash.size(), pkey);
     if (sig==NULL)
         return false;
-    const EC_GROUP *group = EC_KEY_get0_group(pkey);
+    auto group = EC_KEY_get0_group(pkey);
     CBigNum order, halforder;
     EC_GROUP_get_order(group, &order, NULL);
     BN_rshift1(&halforder, &order);
@@ -426,7 +426,7 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
             CKey keyRec;
             keyRec.fSet = true;
             keyRec.SetCompressedPubKey(fCompressedPubKey);
-            if (ECDSA_SIG_recover_key_GFp(keyRec.pkey, sig, (unsigned char*)&hash, sizeof(hash), i, 1) == 1)
+            if (ECDSA_SIG_recover_key_GFp(keyRec.pkey, sig, hash.begin(), hash.size(), i, 1) == 1)
                 if (keyRec.GetPubKey() == this->GetPubKey())
                 {
                     nRecId = i;
@@ -460,11 +460,11 @@ bool CPubKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>
     int nV = vchSig[0];
     if (nV<27 || nV>=35)
         return false;
-    ECDSA_SIG *sig = ECDSA_SIG_new();
+    bool fSuccessful = false;
+    auto sig = ECDSA_SIG_new();
+    auto pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
     BN_bin2bn(&vchSig[1],32,sig->r);
     BN_bin2bn(&vchSig[33],32,sig->s);
-    bool fSuccessful = false;
-    EC_KEY* pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
     if (nV >= 31)
     {
         nV -= 4;
@@ -472,13 +472,13 @@ bool CPubKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>
     }
     do
     {
-        if (ECDSA_SIG_recover_key_GFp(pkey, sig, (unsigned char*)&hash, sizeof(hash), nV - 27, 0) != 1)
+        if (ECDSA_SIG_recover_key_GFp(pkey, sig, hash.begin(), hash.size(), nV - 27, 0) != 1)
             break;
         int nSize = i2o_ECPublicKey(pkey, NULL);
         if (!nSize)
             break;
         std::vector<unsigned char> vchPubKey(nSize, 0);
-        unsigned char* pbegin = &vchPubKey[0];
+        auto pbegin = &vchPubKey[0];
         if (i2o_ECPublicKey(pkey, &pbegin) != nSize)
             break;
         Set(vchPubKey.begin(), vchPubKey.end());
@@ -497,8 +497,8 @@ bool CPubKey::Verify(const uint256 &hash, const std::vector<unsigned char>& vchS
     if (vchSig.empty() || !IsValid())
         return false;
 
-    EC_KEY *pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
-    ECDSA_SIG *norm_sig = ECDSA_SIG_new();
+    auto pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
+    auto norm_sig = ECDSA_SIG_new();
 
     assert(norm_sig);
     assert(pkey);
@@ -508,8 +508,8 @@ bool CPubKey::Verify(const uint256 &hash, const std::vector<unsigned char>& vchS
     {
         int derlen;
         uint8_t *norm_der = NULL;
-        const uint8_t* pbegin = &vbytes[0];
-        const uint8_t* sigptr = &vchSig[0];
+        auto pbegin = &vbytes[0];
+        auto sigptr = &vchSig[0];
 
         // Trying to parse public key
         if (!o2i_ECPublicKey(&pkey, &pbegin, size()))
