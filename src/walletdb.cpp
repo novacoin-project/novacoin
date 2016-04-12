@@ -12,16 +12,8 @@
 
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/variant/get.hpp>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
-using namespace boost;
-
 
 static uint64_t nAccountingEntryNumber = 0;
 extern bool fWalletUnlockMintOnly;
@@ -57,7 +49,7 @@ bool CWalletDB::WriteAccount(const string& strAccount, const CAccount& account)
 
 bool CWalletDB::WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry)
 {
-    return Write(std::make_tuple(string("acentry"), acentry.strAccount, nAccEntryNum), acentry);
+    return Write(make_tuple(string("acentry"), acentry.strAccount, nAccEntryNum), acentry);
 }
 
 bool CWalletDB::WriteAccountingEntry(const CAccountingEntry& acentry)
@@ -90,7 +82,7 @@ void CWalletDB::ListAccountCreditDebit(const string& strAccount, list<CAccountin
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << std::make_tuple(string("acentry"), (fAllAccounts? string("") : strAccount), uint64_t(0));
+            ssKey << make_tuple(string("acentry"), (fAllAccounts? string("") : strAccount), uint64_t(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -758,20 +750,20 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
                 bitdb.mapFileUseCount.erase(wallet.strWalletFile);
 
                 // Copy wallet.dat
-                filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
-                filesystem::path pathDest(strDest);
-                if (filesystem::is_directory(pathDest))
+                boost::filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
+                boost::filesystem::path pathDest(strDest);
+                if (boost::filesystem::is_directory(pathDest))
                     pathDest /= wallet.strWalletFile;
 
                 try {
 #if BOOST_VERSION >= 104000
-                    filesystem::copy_file(pathSrc, pathDest, filesystem::copy_option::overwrite_if_exists);
+                    boost::filesystem::copy_file(pathSrc, pathDest, boost::filesystem::copy_option::overwrite_if_exists);
 #else
-                    filesystem::copy_file(pathSrc, pathDest);
+                    boost::filesystem::copy_file(pathSrc, pathDest);
 #endif
                     printf("copied wallet.dat to %s\n", pathDest.string().c_str());
                     return true;
-                } catch(const filesystem::filesystem_error &e) {
+                } catch(const boost::filesystem::filesystem_error &e) {
                     printf("error copying wallet.dat to %s - %s\n", pathDest.string().c_str(), e.what());
                     return false;
                 }
@@ -876,19 +868,19 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
 
    // read through input file checking and importing keys into wallet.
    while (file.good()) {
-       std::string line;
-       std::getline(file, line);
+       string line;
+       getline(file, line);
        if (line.empty() || line[0] == '#')
            continue; // Skip comments and empty lines
 
-       std::vector<std::string> vstr;
+       vector<string> vstr;
        istringstream iss(line);
        copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(vstr));
        if (vstr.size() < 2)
            continue;
 
        int64_t nTime = DecodeDumpTime(vstr[1]);
-       std::string strLabel;
+       string strLabel;
        bool fLabel = true;
        for (unsigned int nStr = 2; nStr < vstr.size(); nStr++) {
            if (vstr[nStr].compare(0,1, "#") == 0)
@@ -950,7 +942,7 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
        if (fLabel)
            pwallet->SetAddressBookName(addr, strLabel);
 
-       nTimeBegin = std::min(nTimeBegin, nTime);
+       nTimeBegin = min(nTimeBegin, nTime);
    }
    file.close();
 
@@ -970,7 +962,7 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
 //
 // Try to (very carefully!) recover wallet.dat if there is a problem.
 //
-bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys)
+bool CWalletDB::Recover(CDBEnv& dbenv, string filename, bool fOnlyKeys)
 {
     // Recovery procedure:
     // move wallet.dat to wallet.timestamp.bak
@@ -980,7 +972,7 @@ bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys)
     // Set -rescan so any missing transactions will be
     // found.
     int64_t now = GetTime();
-    std::string newFilename = strprintf("wallet.%" PRId64 ".bak", now);
+    string newFilename = strprintf("wallet.%" PRId64 ".bak", now);
 
     int result = dbenv.dbenv.dbrename(NULL, filename.c_str(), NULL,
                                       newFilename.c_str(), DB_AUTO_COMMIT);
@@ -992,7 +984,7 @@ bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys)
         return false;
     }
 
-    std::vector<CDBEnv::KeyValPair> salvagedData;
+    vector<CDBEnv::KeyValPair> salvagedData;
     bool allOK = dbenv.Salvage(newFilename, true, salvagedData);
     if (salvagedData.empty())
     {
@@ -1048,7 +1040,7 @@ bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys)
     return fSuccess;
 }
 
-bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename)
+bool CWalletDB::Recover(CDBEnv& dbenv, string filename)
 {
     return CWalletDB::Recover(dbenv, filename, false);
 }
