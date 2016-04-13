@@ -23,7 +23,7 @@ inline uint16_t GetDefaultPort()
     return static_cast<uint16_t>(fTestNet ? 17777 : 7777);
 }
 
-extern uint8_t pchMessageStart[4];
+extern vector<uint8_t> vchMessageStart;
 
 /** Message header.
  * (4) message start.
@@ -42,7 +42,7 @@ class CMessageHeader
 
         IMPLEMENT_SERIALIZE
             (
-             READWRITE(FLATDATA(pchMessageStart));
+             READWRITE(REF(CFlatData((unsigned char*)&(vchMessageStart.front()), (unsigned char*)&(vchMessageStart.front()) + vchMessageStart.size())));
              READWRITE(FLATDATA(pchCommand));
              READWRITE(nMessageSize);
              READWRITE(nChecksum);
@@ -51,7 +51,7 @@ class CMessageHeader
     // TODO: make private (improves encapsulation)
     public:
         enum {
-            MESSAGE_START_SIZE=sizeof(::pchMessageStart),
+            MESSAGE_START_SIZE=4,
             COMMAND_SIZE=12,
             MESSAGE_SIZE_SIZE=sizeof(int),
             CHECKSUM_SIZE=sizeof(int),
@@ -59,7 +59,7 @@ class CMessageHeader
             MESSAGE_SIZE_OFFSET=MESSAGE_START_SIZE+COMMAND_SIZE,
             CHECKSUM_OFFSET=MESSAGE_SIZE_OFFSET+MESSAGE_SIZE_SIZE
         };
-        char pchMessageStart[MESSAGE_START_SIZE];
+        vector<uint8_t> vchMessageStart;
         char pchCommand[COMMAND_SIZE];
         unsigned int nMessageSize;
         unsigned int nChecksum;

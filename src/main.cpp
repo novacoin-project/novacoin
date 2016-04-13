@@ -2745,6 +2745,7 @@ bool LoadBlockIndex(bool fAllowNew)
         pchMessageStart[1] = 0xf2;
         pchMessageStart[2] = 0xc0;
         pchMessageStart[3] = 0xef;
+        vchMessageStart = { 0xcd, 0xf2, 0xc0, 0xef };
 
         bnProofOfWorkLimit = bnProofOfWorkLimitTestNet; // 16 bits PoW target limit for testnet
         nStakeMinAge = 2 * nOneHour; // test net min age is 2 hours
@@ -3135,6 +3136,7 @@ bool static AlreadyHave(CTxDB& txdb, const CInv& inv)
 // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
 // a large 4-byte int at any alignment.
 uint8_t pchMessageStart[4] = { 0xe4, 0xe8, 0xe9, 0xe5 };
+vector<uint8_t> vchMessageStart = { 0xe4, 0xe8, 0xe9, 0xe5 };
 
 bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 {
