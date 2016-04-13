@@ -545,13 +545,13 @@ bool CAddrDB::Read(CAddrMan& addr)
     if (hashIn != hashTmp)
         return error("CAddrman::Read() : checksum mismatch; data corrupted");
 
-    unsigned char pchMsgTmp[4];
+    vector<uint8_t> vchMsgTmp (4,'\0');
     try {
         // de-serialize file header (pchMessageStart magic number) and
-        ssPeers >> FLATDATA(pchMsgTmp);
+        ssPeers >> REF(CFlatData((unsigned char*)&(vchMsgTmp.front()), (unsigned char*)&(vchMsgTmp.front()) + vchMsgTmp.size()));
 
         // verify the network matches ours
-        if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
+        if (!equal(vchMsgTmp.begin(), vchMsgTmp.end(), begin(pchMessageStart)))
             return error("CAddrman::Read() : invalid network magic number");
 
         // de-serialize address data into one CAddrMan object
