@@ -85,7 +85,7 @@ extern const string strMessageMagic;
 extern int64_t nTimeBestReceived;
 extern CCriticalSection cs_setpwalletRegistered;
 extern set<CWallet*> setpwalletRegistered;
-extern uint8_t pchMessageStart[4];
+extern uint32_t nNetworkID;
 extern map<uint256, CBlock*> mapOrphanBlocks;
 
 // Settings
@@ -1068,7 +1068,7 @@ public:
 
         // Write index header
         unsigned int nSize = fileout.GetSerializeSize(*this);
-        fileout << FLATDATA(pchMessageStart) << nSize;
+        fileout << nNetworkID << nSize;
 
         // Write block
         long fileOutPos = ftell(fileout);

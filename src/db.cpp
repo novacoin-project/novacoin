@@ -486,7 +486,7 @@ bool CAddrDB::Write(const CAddrMan& addr)
 
     // serialize addresses, checksum data up to that point, then append csum
     CDataStream ssPeers(SER_DISK, CLIENT_VERSION);
-    ssPeers << FLATDATA(pchMessageStart);
+    ssPeers << nNetworkID;
     ssPeers << addr;
     uint256 hash = Hash(ssPeers.begin(), ssPeers.end());
     ssPeers << hash;
@@ -549,15 +549,13 @@ bool CAddrDB::Read(CAddrMan& addr)
     if (hashIn != hashTmp)
         return error("CAddrman::Read() : checksum mismatch; data corrupted");
 
-    unsigned char pchMsgTmp[4];
+    uint32_t nMsgNetID;
     try {
         // de-serialize file header (pchMessageStart magic number) and
-        ssPeers >> FLATDATA(pchMsgTmp);
-
+        ssPeers >> nMsgNetID;
         // verify the network matches ours
-        if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
+        if (nMsgNetID != nNetworkID)
             return error("CAddrman::Read() : invalid network magic number");
-
         // de-serialize address data into one CAddrMan object
         ssPeers >> addr;
     }

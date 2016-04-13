@@ -2741,10 +2741,7 @@ bool LoadBlockIndex(bool fAllowNew)
 {
     if (fTestNet)
     {
-        pchMessageStart[0] = 0xcd;
-        pchMessageStart[1] = 0xf2;
-        pchMessageStart[2] = 0xc0;
-        pchMessageStart[3] = 0xef;
+        nNetworkID = 0xefc0f2cd;
 
         bnProofOfWorkLimit = bnProofOfWorkLimitTestNet; // 16 bits PoW target limit for testnet
         nStakeMinAge = 2 * nOneHour; // test net min age is 2 hours
@@ -2970,7 +2967,7 @@ bool LoadExternalBlockFile(FILE* fileIn, CClientUIInterface& uiInterface)
                         auto nBlockLength = *reinterpret_cast<const uint32_t*>(&(*(it+4)));
                         auto SeekToNext = [&pchData, &it, &nPos, &nBlockLength]() {
                             auto previt = it;
-                            it = search(it+8, pchData.end(), BEGIN(pchMessageStart), END(pchMessageStart));
+                            it = search(it+8, pchData.end(), BEGIN(nNetworkID), END(nNetworkID));
                             if (it != pchData.end())
                                 nPos += (it - previt);
                         };
@@ -3127,14 +3124,6 @@ bool static AlreadyHave(CTxDB& txdb, const CInv& inv)
     // Don't know what it is, just say we already got one
     return true;
 }
-
-
-
-
-// The message start string is designed to be unlikely to occur in normal data.
-// The characters are rarely used upper ASCII, not valid as UTF-8, and produce
-// a large 4-byte int at any alignment.
-uint8_t pchMessageStart[4] = { 0xe4, 0xe8, 0xe9, 0xe5 };
 
 bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 {
@@ -3824,7 +3813,7 @@ bool ProcessMessages(CNode* pfrom)
             break;
 
         // Scan for message start
-        CDataStream::iterator pstart = search(vRecv.begin(), vRecv.end(), BEGIN(pchMessageStart), END(pchMessageStart));
+        CDataStream::iterator pstart = search(vRecv.begin(), vRecv.end(), BEGIN(nNetworkID), END(nNetworkID));
         int nHeaderSize = vRecv.GetSerializeSize(CMessageHeader());
         if (vRecv.end() - pstart < nHeaderSize)
         {
