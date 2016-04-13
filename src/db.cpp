@@ -10,19 +10,15 @@
 #include "ui_interface.h"
 
 #include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 
 #ifndef WIN32
 #include "sys/stat.h"
 #endif
 
 using namespace std;
-using namespace boost;
 
-
-unsigned int nWalletDBUpdated;
+uint32_t nWalletDBUpdated;
 extern bool fUseMemoryLog;
-
 
 //
 // CDB
@@ -64,14 +60,14 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
         return false;
 
     pathEnv = pathEnv_;
-    filesystem::path pathDataDir = pathEnv;
+    boost::filesystem::path pathDataDir = pathEnv;
     strPath = pathDataDir.string();
-    filesystem::path pathLogDir = pathDataDir / "database";
-    filesystem::create_directory(pathLogDir);
-    filesystem::path pathErrorFile = pathDataDir / "db.log";
+    boost::filesystem::path pathLogDir = pathDataDir / "database";
+    boost::filesystem::create_directory(pathLogDir);
+    boost::filesystem::path pathErrorFile = pathDataDir / "db.log";
     printf("dbenv.open LogDir=%s ErrorFile=%s\n", pathLogDir.string().c_str(), pathErrorFile.string().c_str());
 
-    unsigned int nEnvFlags = 0;
+    uint32_t nEnvFlags = 0;
     if (GetBoolArg("-privdb", true))
         nEnvFlags |= DB_PRIVATE;
 
@@ -114,7 +110,7 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     if (!dbenv.get_lk_max_locks(&nMaxLocks))
     {
         int nBlocks, nDeepReorg;
-        std::string strMessage;
+        string strMessage;
 
         nBlocks = nMaxLocks / 48768;
         nDeepReorg = (nBlocks - 1) / 2;
@@ -136,7 +132,7 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     return true;
 }
 
-CDBEnv::VerifyResult CDBEnv::Verify(std::string strFile, bool (*recoverFunc)(CDBEnv& dbenv, std::string strFile))
+CDBEnv::VerifyResult CDBEnv::Verify(string strFile, bool (*recoverFunc)(CDBEnv& dbenv, string strFile))
 {
     LOCK(cs_db);
     assert(mapFileUseCount.count(strFile) == 0);
@@ -153,8 +149,8 @@ CDBEnv::VerifyResult CDBEnv::Verify(std::string strFile, bool (*recoverFunc)(CDB
     return (fRecovered ? RECOVER_OK : RECOVER_FAIL);
 }
 
-bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
-                     std::vector<CDBEnv::KeyValPair >& vResult)
+bool CDBEnv::Salvage(string strFile, bool fAggressive,
+                     vector<CDBEnv::KeyValPair >& vResult)
 {
     LOCK(cs_db);
     assert(mapFileUseCount.count(strFile) == 0);
@@ -184,7 +180,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
     while (!strDump.eof() && strLine != "HEADER=END")
         getline(strDump, strLine); // Skip past header
 
-    std::string keyHex, valueHex;
+    string keyHex, valueHex;
     while (!strDump.eof() && keyHex != "DATA=END")
     {
         getline(strDump, keyHex);
@@ -199,7 +195,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
 }
 
 
-void CDBEnv::CheckpointLSN(std::string strFile)
+void CDBEnv::CheckpointLSN(string strFile)
 {
     dbenv.txn_checkpoint(0, 0, 0);
     if (fMockDb)
@@ -217,7 +213,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
 
     fReadOnly = (!strchr(pszMode, '+') && !strchr(pszMode, 'w'));
     bool fCreate = strchr(pszMode, 'c') != NULL;
-    unsigned int nFlags = DB_THREAD;
+    uint32_t nFlags = DB_THREAD;
     if (fCreate)
         nFlags |= DB_CREATE;
 
@@ -262,7 +258,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
     }
 }
 
-static bool IsChainFile(std::string strFile)
+static bool IsChainFile(string strFile)
 {
     if (strFile == "blkindex.dat")
         return true;
@@ -280,7 +276,7 @@ void CDB::Close()
     pdb = NULL;
 
     // Flush database activity from memory pool to disk log
-    unsigned int nMinutes = 0;
+    uint32_t nMinutes = 0;
     if (fReadOnly)
         nMinutes = 1;
     if (IsChainFile(strFile))
@@ -374,7 +370,7 @@ bool CDB::Rewrite(const string& strFile, const char* pszSkip)
                             if (pszSkip != NULL)
                             {
                                 size_t pszSkipLen = strlen(pszSkip);
-                                if (strncmp(&ssKey[0], pszSkip, std::min(ssKey.size(), pszSkipLen)) == 0)
+                                if (strncmp(&ssKey[0], pszSkip, min(ssKey.size(), pszSkipLen)) == 0)
                                     continue;
                             }
 
@@ -482,11 +478,11 @@ bool CAddrDB::Write(const CAddrMan& addr)
     // Generate random temporary filename
     unsigned short randv = 0;
     RAND_bytes((unsigned char *)&randv, sizeof(randv));
-    std::string tmpfn = strprintf("peers.dat.%04x", randv);
+    string tmpfn = strprintf("peers.dat.%04x", randv);
 
     // serialize addresses, checksum data up to that point, then append csum
     CDataStream ssPeers(SER_DISK, CLIENT_VERSION);
-    ssPeers << FLATDATA(pchMessageStart);
+    ssPeers << REF(CFlatData((unsigned char*)&(vchMessageStart.front()), (unsigned char*)&(vchMessageStart.front()) + vchMessageStart.size()));
     ssPeers << addr;
     uint256 hash = Hash(ssPeers.begin(), ssPeers.end());
     ssPeers << hash;
@@ -502,7 +498,7 @@ bool CAddrDB::Write(const CAddrMan& addr)
     try {
         fileout << ssPeers;
     }
-    catch (const std::exception&) {
+    catch (const exception&) {
         return error("CAddrman::Write() : I/O error");
     }
     FileCommit(fileout);
@@ -537,7 +533,7 @@ bool CAddrDB::Read(CAddrMan& addr)
         filein.read((char *)&vchData[0], dataSize);
         filein >> hashIn;
     }
-    catch (const std::exception&) {
+    catch (const exception&) {
         return error("CAddrman::Read() 2 : I/O error or stream data corrupted");
     }
     filein.fclose();
@@ -549,19 +545,19 @@ bool CAddrDB::Read(CAddrMan& addr)
     if (hashIn != hashTmp)
         return error("CAddrman::Read() : checksum mismatch; data corrupted");
 
-    unsigned char pchMsgTmp[4];
+    vector<uint8_t> vchMsgTmp (4,'\0');
     try {
         // de-serialize file header (pchMessageStart magic number) and
-        ssPeers >> FLATDATA(pchMsgTmp);
+        ssPeers >> REF(CFlatData((unsigned char*)&(vchMsgTmp.front()), (unsigned char*)&(vchMsgTmp.front()) + vchMsgTmp.size()));
 
         // verify the network matches ours
-        if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
+        if (!equal(vchMsgTmp.begin(), vchMsgTmp.end(), vchMessageStart.begin()))
             return error("CAddrman::Read() : invalid network magic number");
 
         // de-serialize address data into one CAddrMan object
         ssPeers >> addr;
     }
-    catch (const std::exception&) {
+    catch (const exception&) {
         return error("CAddrman::Read() : I/O error or stream data corrupted");
     }
 

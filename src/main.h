@@ -86,6 +86,7 @@ extern int64_t nTimeBestReceived;
 extern CCriticalSection cs_setpwalletRegistered;
 extern set<CWallet*> setpwalletRegistered;
 extern uint8_t pchMessageStart[4];
+extern vector<uint8_t> vchMessageStart;
 extern map<uint256, CBlock*> mapOrphanBlocks;
 
 // Settings
@@ -1068,7 +1069,7 @@ public:
 
         // Write index header
         unsigned int nSize = fileout.GetSerializeSize(*this);
-        fileout << FLATDATA(pchMessageStart) << nSize;
+        fileout << REF(CFlatData((unsigned char*)&(vchMessageStart.front()), (unsigned char*)&(vchMessageStart.front()) + vchMessageStart.size())) << nSize;
 
         // Write block
         long fileOutPos = ftell(fileout);
