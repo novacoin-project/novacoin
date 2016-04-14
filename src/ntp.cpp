@@ -438,7 +438,7 @@ int64_t NtpGetTime(const std::string &strHostName)
 std::string strTrustedUpstream = "localhost";
 
 // Current offset
-int64_t nNtpOffset = INT64_MAX;
+int64_t nNtpOffset = numeric_limits<int64_t>::max();
 
 int64_t GetNtpOffset() {
     return nNtpOffset;
@@ -477,7 +477,7 @@ void ThreadNtpSamples(void* parg) {
             }
             else {
                 // Something went wrong, disable trusted offset sampling.
-                nNtpOffset = INT64_MAX;
+                nNtpOffset = numeric_limits<int64_t>::max();
                 strTrustedUpstream = "localhost";
 
                 int nSleepMinutes = 1 + GetRandInt(9); // Sleep for 1-10 minutes.
@@ -506,7 +506,7 @@ void ThreadNtpSamples(void* parg) {
             }
             else {
                 // Not enough offsets yet, try to collect additional samples later.
-                nNtpOffset = INT64_MAX;
+                nNtpOffset = numeric_limits<int64_t>::max();
                 int nSleepMinutes = 1 + GetRandInt(4); // Sleep for 1-5 minutes.
                 for (int i = 0; i < nSleepMinutes * 60 && !fShutdown; i++) 
                     Sleep(1000);
@@ -514,7 +514,7 @@ void ThreadNtpSamples(void* parg) {
             }
         }
 
-        if (GetNodesOffset() == INT_MAX && abs(nNtpOffset) > 40 * 60)
+        if (GetNodesOffset() == numeric_limits<int64_t>::max() && abs(nNtpOffset) > 40 * 60)
         {
             // If there is not enough node offsets data and NTP time offset is greater than 40 minutes then give a warning.
             std::string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");

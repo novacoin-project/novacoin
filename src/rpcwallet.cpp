@@ -88,8 +88,8 @@ Value getinfo(const Array& params, bool fHelp)
     auto nNtpOffset = GetNtpOffset(),
             nP2POffset = GetNodesOffset();
 
-    timestamping.push_back(Pair("ntpoffset", nNtpOffset != INT64_MAX ? nNtpOffset : Value::null));
-    timestamping.push_back(Pair("p2poffset", nP2POffset != INT64_MAX ? nP2POffset : Value::null));
+    timestamping.push_back(Pair("ntpoffset", nNtpOffset != numeric_limits<int64_t>::max() ? nNtpOffset : Value::null));
+    timestamping.push_back(Pair("p2poffset", nP2POffset != numeric_limits<int64_t>::max() ? nP2POffset : Value::null));
 
     obj.push_back(Pair("timestamping", timestamping));
 

@@ -1280,7 +1280,7 @@ int64_t GetTime()
 extern int64_t nNtpOffset;
 
 // Median of time samples given by other nodes.
-static int64_t nNodesOffset = INT64_MAX;
+static int64_t nNodesOffset = numeric_limits<int64_t>::max();
 
 // Select time offset:
 int64_t GetTimeOffset()
@@ -1329,7 +1329,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
         }
         else
         {
-            nNodesOffset = INT64_MAX;
+            nNodesOffset = numeric_limits<int64_t>::max();
 
             static bool fDone;
             if (!fDone)
@@ -1356,7 +1356,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
                 printf("%+" PRId64 "  ", n);
             printf("|  ");
         }
-        if (nNodesOffset != INT64_MAX)
+        if (nNodesOffset != numeric_limits<int64_t>::max())
             printf("nNodesOffset = %+" PRId64 "  (%+" PRId64 " minutes)\n", nNodesOffset, nNodesOffset/60);
     }
 }
