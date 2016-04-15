@@ -495,13 +495,11 @@ static int StunRequest2(int sock, struct sockaddr_in *server, struct sockaddr_in
     return stun_handle_packet(sock, &src, reply_buf, res, stun_get_mapped, mapped);
 } // StunRequest2
 
-/*---------------------------------------------------------------------*/
 static int StunRequest(const char *host, uint16_t port, struct sockaddr_in *mapped) {
     struct hostent *hostinfo = gethostbyname(host);
-    if(hostinfo == NULL)
+    if (hostinfo == NULL)
         return -1;
 
-    SOCKET sock = INVALID_SOCKET;
     struct sockaddr_in server, client;
     memset(&server, 0, sizeof(server));
     memset(&client, 0, sizeof(client));
@@ -510,25 +508,23 @@ static int StunRequest(const char *host, uint16_t port, struct sockaddr_in *mapp
     server.sin_addr = *(struct in_addr*) hostinfo->h_addr;
     server.sin_port = htons(port);
 
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if(sock == INVALID_SOCKET)
+    SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock == INVALID_SOCKET)
         return -2;
 
     client.sin_addr.s_addr = htonl(INADDR_ANY);
 
     int rc = -3;
-    if(bind(sock, (struct sockaddr*)&client, sizeof(client)) >= 0)
+    if (::bind(sock, (struct sockaddr*)&client, sizeof(client)) != INVALID_SOCKET)
         rc = StunRequest2(sock, &server, mapped);
     CloseSocket(sock);
     return rc;
 } // StunRequest
 
-/*---------------------------------------------------------------------*/
 // Input: two random values (pos, step) for generate uniuqe way over server
 // list
 // Output: populate struct struct mapped
 // Retval:
-
 int GetExternalIPbySTUN(uint64_t rnd, struct sockaddr_in *mapped, const char **srv) {
     randfiller    = rnd;
     uint16_t pos  = rnd;
