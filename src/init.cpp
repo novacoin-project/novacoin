@@ -342,16 +342,15 @@ bool DropBlockIndex()
         }
         return true;
     }
-    catch(std::exception &e)
+    catch(const std::exception&)
     {
         // TODO: report error here
         return false;
     }
 }
 
-/** Initialize bitcoin.
- *  @pre Parameters should be parsed and config file should be read.
- */
+// Initialize bitcoin.
+//  @pre Parameters should be parsed and config file should be read.
 bool AppInit2()
 {
     // ********************************************************* Step 1: setup
