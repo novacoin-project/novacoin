@@ -346,7 +346,7 @@ extern int GetExternalIPbySTUN(uint64_t rnd, struct sockaddr_in *mapped, const c
 bool GetMyExternalIP(CNetAddr& ipRet)
 {
     struct sockaddr_in mapped;
-    auto rnd = numeric_limits<uint64_t>::max();
+    auto rnd = GetRand(numeric_limits<uint64_t>::max());
     const char *srv;
     int rc = GetExternalIPbySTUN(rnd, &mapped, &srv);
     if(rc >= 0) {

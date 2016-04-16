@@ -53,8 +53,8 @@
 
 using namespace std;
 
-extern int GetRandInt(int nMax);
 extern uint64_t GetRand(uint64_t nMax);
+extern void FillRand(uint8_t *buffer, size_t nCount);
 
 /*---------------------------------------------------------------------*/
 
@@ -344,11 +344,8 @@ static int stun_send(int s, struct sockaddr_in *dst, struct stun_header *resp)
 static uint64_t randfiller = GetRand(numeric_limits<uint64_t>::max());
 static void stun_req_id(struct stun_header *req)
 {
-    const uint64_t *S_block = (const uint64_t *)StunSrvList;
-    req->id.id[0] = GetRandInt(numeric_limits<int32_t>::max());
-    req->id.id[1] = GetRandInt(numeric_limits<int32_t>::max());
-    req->id.id[2] = GetRandInt(numeric_limits<int32_t>::max());
-    req->id.id[3] = GetRandInt(numeric_limits<int32_t>::max());
+    auto S_block = (const uint64_t *)StunSrvList;
+    FillRand((uint8_t*)&req->id.id[0], sizeof(req->id.id));
 
     req->id.id[0] |= 0x55555555;
     req->id.id[1] &= 0x55555555;
