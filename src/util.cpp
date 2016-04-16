@@ -185,8 +185,13 @@ int GetRandInt(int nMax)
 uint256 GetRandHash()
 {
     uint256 hash;
-    RAND_bytes((unsigned char*)&hash, sizeof(hash));
+    RAND_bytes((uint8_t*)&hash, sizeof(hash));
     return hash;
+}
+
+void FillRand(uint8_t *buffer, size_t nCount)
+{
+    RAND_bytes(buffer, nCount);
 }
 
 static FILE* fileout = NULL;

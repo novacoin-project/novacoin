@@ -233,6 +233,7 @@ void ShrinkDebugFile();
 int GetRandInt(int nMax);
 uint64_t GetRand(uint64_t nMax);
 uint256 GetRandHash();
+void FillRand(uint8_t *buffer, size_t nCount);
 int64_t GetTime();
 int64_t GetTimeMillis();
 int64_t GetTimeMicros();
