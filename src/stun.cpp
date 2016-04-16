@@ -515,7 +515,7 @@ static int StunRequest(const char *host, uint16_t port, struct sockaddr_in *mapp
     client.sin_addr.s_addr = htonl(INADDR_ANY);
 
     int rc = -3;
-    if (::bind(sock, (struct sockaddr*)&client, sizeof(client)) != INVALID_SOCKET)
+    if (::bind(sock, (struct sockaddr*)&client, sizeof(client)) != SOCKET_ERROR)
         rc = StunRequest2(sock, &server, mapped);
     CloseSocket(sock);
     return rc;
