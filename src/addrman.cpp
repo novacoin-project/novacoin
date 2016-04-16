@@ -456,66 +456,6 @@ CAddress CAddrMan::Select_(int nUnkBias)
     }
 }
 
-#ifdef DEBUG_ADDRMAN
-int CAddrMan::Check_()
-{
-    std::set<int> setTried;
-    std::map<int, int> mapNew;
-
-    if (vRandom.size() != nTried + nNew) return -7;
-
-    for (auto it = mapInfo.begin(); it != mapInfo.end(); it++)
-    {
-        int n = (*it).first;
-        CAddrInfo &info = (*it).second;
-        if (info.fInTried)
-        {
-
-            if (!info.nLastSuccess) return -1;
-            if (info.nRefCount) return -2;
-            setTried.insert(n);
-        } else {
-            if (info.nRefCount < 0 || info.nRefCount > ADDRMAN_NEW_BUCKETS_PER_ADDRESS) return -3;
-            if (!info.nRefCount) return -4;
-            mapNew[n] = info.nRefCount;
-        }
-        if (mapAddr[info] != n) return -5;
-        if (info.nRandomPos<0 || info.nRandomPos>=vRandom.size() || vRandom[info.nRandomPos] != n) return -14;
-        if (info.nLastTry < 0) return -6;
-        if (info.nLastSuccess < 0) return -8;
-    }
-
-    if (setTried.size() != nTried) return -9;
-    if (mapNew.size() != nNew) return -10;
-
-    for (int n=0; n<vvTried.size(); n++)
-    {
-        std::vector<int> &vTried = vvTried[n];
-        for (auto it = vTried.begin(); it != vTried.end(); it++)
-        {
-            if (!setTried.count(*it)) return -11;
-            setTried.erase(*it);
-        }
-    }
-
-    for (int n=0; n<vvNew.size(); n++)
-    {
-        std::set<int> &vNew = vvNew[n];
-        for (auto it = vNew.begin(); it != vNew.end(); it++)
-        {
-            if (!mapNew.count(*it)) return -12;
-            if (--mapNew[*it] == 0)
-                mapNew.erase(*it);
-        }
-    }
-
-    if (setTried.size()) return -13;
-    if (mapNew.size()) return -15;
-
-    return 0;
-}
-#endif
-
 void CAddrMan::GetAddr_(std::vector<CAddress> &vAddr)
 {
     size_t nNodes = ADDRMAN_GETADDR_MAX_PCT*vRandom.size()/100;
@@ -578,26 +518,12 @@ int CAddrMan::size()
     return (int) vRandom.size();
 }
 
-void CAddrMan::Check()
-{
-#ifdef DEBUG_ADDRMAN
-    {
-        LOCK(cs);
-        int err;
-        if ((err=Check_()))
-            printf("ADDRMAN CONSISTENCY CHECK FAILED!!! err=%i\n", err);
-    }
-#endif
-}
-
 bool CAddrMan::Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty)
 {
     bool fRet = false;
     {
         LOCK(cs);
-        Check();
         fRet |= Add_(addr, source, nTimePenalty);
-        Check();
     }
     if (fRet)
         printf("Added %s from %s: %i tried, %i new\n", addr.ToStringIPPort().c_str(), source.ToString().c_str(), nTried, nNew);
@@ -609,10 +535,8 @@ bool CAddrMan::Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, i
     int nAdd = 0;
     {
         LOCK(cs);
-        Check();
         for (auto it = vAddr.begin(); it != vAddr.end(); it++)
             nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
-        Check();
     }
     if (nAdd)
         printf("Added %i addresses from %s: %i tried, %i new\n", nAdd, source.ToString().c_str(), nTried, nNew);
@@ -623,9 +547,7 @@ void CAddrMan::Good(const CService &addr, int64_t nTime)
 {
     {
         LOCK(cs);
-        Check();
         Good_(addr, nTime);
-        Check();
     }
 }
 
@@ -633,9 +555,7 @@ void CAddrMan::Attempt(const CService &addr, int64_t nTime)
 {
     {
         LOCK(cs);
-        Check();
         Attempt_(addr, nTime);
-        Check();
     }
 }
 
@@ -644,34 +564,28 @@ CAddress CAddrMan::Select(int nUnkBias)
     CAddress addrRet;
     {
         LOCK(cs);
-        Check();
         addrRet = Select_(nUnkBias);
-        Check();
     }
     return addrRet;
 }
 
 std::vector<CAddress> CAddrMan::GetAddr()
 {
-    Check();
     std::vector<CAddress> vAddr;
     {
         LOCK(cs);
         GetAddr_(vAddr);
     }
-    Check();
     return vAddr;
 }
 
 std::vector<CAddrInfo> CAddrMan::GetOnlineAddr()
 {
-    Check();
     std::vector<CAddrInfo> vAddr;
     {
         LOCK(cs);
         GetOnlineAddr_(vAddr);
     }
-    Check();
     return vAddr;
 }
 
@@ -679,8 +593,6 @@ void CAddrMan::Connected(const CService &addr, int64_t nTime)
 {
     {
         LOCK(cs);
-        Check();
         Connected_(addr, nTime);
-        Check();
     }
 }
