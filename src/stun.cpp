@@ -464,11 +464,6 @@ static int StunRequest2(int sock, struct sockaddr_in *server, struct sockaddr_in
     unsigned char reply_buf[1024];
     fd_set rfds;
     struct timeval to = { STUN_TIMEOUT, 0 };
-#ifdef WIN32
-    int srclen;
-#else
-    socklen_t srclen;
-#endif
 
     int res = stun_send(sock, server, req);
     if(res < 0)
@@ -479,10 +474,10 @@ static int StunRequest2(int sock, struct sockaddr_in *server, struct sockaddr_in
     if (res <= 0)  /* timeout or error */
         return -11;
     struct sockaddr_in src = {};
-    srclen = sizeof(src);
-    /* XXX pass -1 in the size, because stun_handle_packet might
-   * write past the end of the buffer.
-   */
+    socklen_t srclen = sizeof(src);
+
+    // XXX pass -1 in the size, because stun_handle_packet might
+    // write past the end of the buffer.
     res = recvfrom(sock, (char *)reply_buf, sizeof(reply_buf) - 1,
                    0, (struct sockaddr *)&src, &srclen);
     if (res <= 0)
