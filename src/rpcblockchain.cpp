@@ -394,13 +394,13 @@ Value getcheckpoint(const Array& params, bool fHelp)
     }
 
     // Check that the block satisfies synchronized checkpoint
-    if (CheckpointsMode == Checkpoints::STRICT)
+    if (CheckpointsMode == Checkpoints::CP_STRICT)
         result.push_back(Pair("policy", "strict"));
 
-    if (CheckpointsMode == Checkpoints::ADVISORY)
+    if (CheckpointsMode == Checkpoints::CP_ADVISORY)
         result.push_back(Pair("policy", "advisory"));
 
-    if (CheckpointsMode == Checkpoints::PERMISSIVE)
+    if (CheckpointsMode == Checkpoints::CP_PERMISSIVE)
         result.push_back(Pair("policy", "permissive"));
 
     if (mapArgs.count("-checkpointkey"))
