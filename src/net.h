@@ -8,7 +8,6 @@
 #include <limits>
 #include <deque>
 #ifndef Q_MOC_RUN
-#include <boost/array.hpp>
 #endif
 #include <openssl/rand.h>
 
@@ -129,7 +128,7 @@ extern bool fDiscover;
 extern uint64_t nLocalServices;
 extern uint64_t nLocalHostNonce;
 extern CAddress addrSeenByPeer;
-extern boost::array<int, THREAD_MAX> vnThreadsRunning;
+extern array<int, THREAD_MAX> vnThreadsRunning;
 extern CAddrMan addrman;
 
 extern vector<CNode*> vNodes;

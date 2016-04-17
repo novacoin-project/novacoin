@@ -56,7 +56,7 @@ static CNode* pnodeLocalHost = NULL;
 static CNode* pnodeSync = NULL;
 CAddress addrSeenByPeer(CService("0.0.0.0", nPortZero), nLocalServices);
 uint64_t nLocalHostNonce = 0;
-boost::array<int, THREAD_MAX> vnThreadsRunning;
+array<int, THREAD_MAX> vnThreadsRunning;
 static vector<SOCKET> vhListenSocket;
 CAddrMan addrman;
 
@@ -345,7 +345,7 @@ extern int GetExternalIPbySTUN(uint64_t rnd, struct sockaddr_in *mapped, const c
 // We now get our external IP from the IRC server first and only use this as a backup
 bool GetMyExternalIP(CNetAddr& ipRet)
 {
-    struct sockaddr_in mapped;
+    struct sockaddr_in mapped = {};
     auto rnd = GetRand(numeric_limits<uint64_t>::max());
     const char *srv;
     int rc = GetExternalIPbySTUN(rnd, &mapped, &srv);
