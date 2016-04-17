@@ -412,19 +412,19 @@ bool AppInit2()
     // Ping and address broadcast intervals
     nPingInterval = max<int64_t>(10 * 60, GetArg("-keepalive", 30 * 60));
 
-    CheckpointsMode = Checkpoints::STRICT;
+    CheckpointsMode = Checkpoints::CP_STRICT;
     auto strCpMode = GetArg("-cppolicy", "strict");
 
     if(strCpMode == "strict") {
-        CheckpointsMode = Checkpoints::STRICT;
+        CheckpointsMode = Checkpoints::CP_STRICT;
     }
 
     if(strCpMode == "advisory") {
-        CheckpointsMode = Checkpoints::ADVISORY;
+        CheckpointsMode = Checkpoints::CP_ADVISORY;
     }
 
     if(strCpMode == "permissive") {
-        CheckpointsMode = Checkpoints::PERMISSIVE;
+        CheckpointsMode = Checkpoints::CP_PERMISSIVE;
     }
 
     fTestNet = GetBoolArg("-testnet");
