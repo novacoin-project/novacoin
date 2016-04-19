@@ -1,19 +1,9 @@
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#endif
 #ifndef WIN32
 #include <unistd.h>
 #endif
 
 #include "netbase.h"
 #include "net.h"
-//#include "util.h"
 #include "ui_interface.h"
 
 extern int GetRandInt(int nMax);
