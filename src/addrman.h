@@ -9,14 +9,12 @@
 #include "util.h"
 #include "sync.h"
 
-
 #include <map>
 #include <vector>
 
 #include <openssl/rand.h>
 
-
-/** Extended statistics about a CAddress */
+// Extended statistics about a CAddress
 class CAddrInfo : public CAddress
 {
 private:
@@ -53,25 +51,10 @@ public:
         READWRITE(nAttempts);
     )
 
-    void Init()
-    {
-        nLastSuccess = 0;
-        nLastTry = 0;
-        nAttempts = 0;
-        nRefCount = 0;
-        fInTried = false;
-        nRandomPos = -1;
-    }
+    void Init();
 
-    CAddrInfo(const CAddress &addrIn, const CNetAddr &addrSource) : CAddress(addrIn), source(addrSource)
-    {
-        Init();
-    }
-
-    CAddrInfo() : CAddress(), source()
-    {
-        Init();
-    }
+    CAddrInfo(const CAddress &addrIn, const CNetAddr &addrSource);
+    CAddrInfo();
 
     // Calculate in which "tried" bucket this entry belongs
     int GetTriedBucket(const std::vector<unsigned char> &nKey) const;
@@ -80,10 +63,7 @@ public:
     int GetNewBucket(const std::vector<unsigned char> &nKey, const CNetAddr& src) const;
 
     // Calculate in which "new" bucket this entry belongs, using its default source
-    int GetNewBucket(const std::vector<unsigned char> &nKey) const
-    {
-        return GetNewBucket(nKey, source);
-    }
+    int GetNewBucket(const std::vector<unsigned char> &nKey) const;
 
     // Determine whether the statistics about this entry are bad enough so that it can just be deleted
     bool IsTerrible(int64_t nNow = GetAdjustedTime()) const;
@@ -161,7 +141,7 @@ public:
 // the maximum number of nodes to return in a getaddr call
 #define ADDRMAN_GETADDR_MAX 2500
 
-/** Stochastical (IP) address manager */
+// Stochastical (IP) address manager
 class CAddrMan
 {
 private:
@@ -419,138 +399,37 @@ public:
                 }
             )
 
-
-    CAddrMan() : vRandom(0), vvTried(ADDRMAN_TRIED_BUCKET_COUNT, std::vector<int>(0)), vvNew(ADDRMAN_NEW_BUCKET_COUNT, std::set<int>())
-    {
-         nKey.resize(32);
-         RAND_bytes(&nKey[0], 32);
-
-         nIdCount = 0;
-         nTried = 0;
-         nNew = 0;
-    }
+    CAddrMan();
 
     // Return the number of (unique) addresses in all tables.
-    int size()
-    {
-        return (int) vRandom.size();
-    }
+    int size();
 
     // Consistency check
-    void Check()
-    {
-#ifdef DEBUG_ADDRMAN
-        {
-            LOCK(cs);
-            int err;
-            if ((err=Check_()))
-                printf("ADDRMAN CONSISTENCY CHECK FAILED!!! err=%i\n", err);
-        }
-#endif
-    }
+    void Check();
 
     // Add a single address.
-    bool Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0)
-    {
-        bool fRet = false;
-        {
-            LOCK(cs);
-            Check();
-            fRet |= Add_(addr, source, nTimePenalty);
-            Check();
-        }
-        if (fRet)
-            printf("Added %s from %s: %i tried, %i new\n", addr.ToStringIPPort().c_str(), source.ToString().c_str(), nTried, nNew);
-        return fRet;
-    }
+    bool Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0);
 
     // Add multiple addresses.
-    bool Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, int64_t nTimePenalty = 0)
-    {
-        int nAdd = 0;
-        {
-            LOCK(cs);
-            Check();
-            for (auto it = vAddr.begin(); it != vAddr.end(); it++)
-                nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
-            Check();
-        }
-        if (nAdd)
-            printf("Added %i addresses from %s: %i tried, %i new\n", nAdd, source.ToString().c_str(), nTried, nNew);
-        return nAdd > 0;
-    }
+    bool Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, int64_t nTimePenalty = 0);
 
     // Mark an entry as accessible.
-    void Good(const CService &addr, int64_t nTime = GetAdjustedTime())
-    {
-        {
-            LOCK(cs);
-            Check();
-            Good_(addr, nTime);
-            Check();
-        }
-    }
+    void Good(const CService &addr, int64_t nTime = GetAdjustedTime());
 
     // Mark an entry as connection attempted to.
-    void Attempt(const CService &addr, int64_t nTime = GetAdjustedTime())
-    {
-        {
-            LOCK(cs);
-            Check();
-            Attempt_(addr, nTime);
-            Check();
-        }
-    }
+    void Attempt(const CService &addr, int64_t nTime = GetAdjustedTime());
 
     // Choose an address to connect to.
     // nUnkBias determines how much "new" entries are favored over "tried" ones (0-100).
-    CAddress Select(int nUnkBias = 50)
-    {
-        CAddress addrRet;
-        {
-            LOCK(cs);
-            Check();
-            addrRet = Select_(nUnkBias);
-            Check();
-        }
-        return addrRet;
-    }
+    CAddress Select(int nUnkBias = 50);
 
     // Return a bunch of addresses, selected at random.
-    std::vector<CAddress> GetAddr()
-    {
-        Check();
-        std::vector<CAddress> vAddr;
-        {
-            LOCK(cs);
-            GetAddr_(vAddr);
-        }
-        Check();
-        return vAddr;
-    }
+    std::vector<CAddress> GetAddr();
 
-    std::vector<CAddrInfo> GetOnlineAddr()
-    {
-        Check();
-        std::vector<CAddrInfo> vAddr;
-        {
-            LOCK(cs);
-            GetOnlineAddr_(vAddr);
-        }
-        Check();
-        return vAddr;
-    }
+    std::vector<CAddrInfo> GetOnlineAddr();
 
     // Mark an entry as currently-connected-to.
-    void Connected(const CService &addr, int64_t nTime = GetAdjustedTime())
-    {
-        {
-            LOCK(cs);
-            Check();
-            Connected_(addr, nTime);
-            Check();
-        }
-    }
+    void Connected(const CService &addr, int64_t nTime = GetAdjustedTime());
 };
 
 #endif
