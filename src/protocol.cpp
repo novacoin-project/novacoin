@@ -7,10 +7,6 @@
 #include "util.h"
 #include "netbase.h"
 
-#ifndef WIN32
-# include <arpa/inet.h>
-#endif
-
 // Network ID, previously known as pchMessageStart
 uint32_t nNetworkID = 0xe5e9e8e4;
 

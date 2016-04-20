@@ -11,10 +11,6 @@
 #endif
 #include <openssl/rand.h>
 
-#ifndef WIN32
-#include <arpa/inet.h>
-#endif
-
 #include "mruset.h"
 #include "netbase.h"
 #include "addrman.h"
