@@ -36,7 +36,7 @@ struct CLockLocation
 
     std::string ToString() const
     {
-        return mutexName+"  "+sourceFile+":"+itostr(sourceLine);
+        return mutexName+"  "+sourceFile+":"+std::to_string(sourceLine);
     }
 
 private:

@@ -34,14 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#endif
 #ifndef WIN32
 #include <unistd.h>
 #endif
