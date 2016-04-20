@@ -388,10 +388,61 @@ namespace Checkpoints
     }
 }
 
+void CUnsignedSyncCheckpoint::SetNull()
+{
+    nVersion = 1;
+    hashCheckpoint = 0;
+}
+
+std::string CUnsignedSyncCheckpoint::ToString() const
+{
+    return strprintf(
+        "CSyncCheckpoint(\n"
+        "    nVersion       = %" PRId32 "\n"
+        "    hashCheckpoint = %s\n"
+        ")\n",
+        nVersion,
+        hashCheckpoint.ToString().c_str());
+}
+
 // ppcoin: sync-checkpoint master key
 const string CSyncCheckpoint::strMasterPubKey = "04a51b735f816de4ec3f891d5b38bbc91e1f7245c7c08d17990760b86b4d8fc3910a850ffecf73bfa8886f01739a0c4c4322201282d07b6e48ce931cc92af94850";
 
 string CSyncCheckpoint::strMasterPrivKey = "";
+
+CSyncCheckpoint::CSyncCheckpoint()
+{
+    SetNull();
+}
+
+void CSyncCheckpoint::SetNull()
+{
+    CUnsignedSyncCheckpoint::SetNull();
+    vchMsg.clear();
+    vchSig.clear();
+}
+
+bool CSyncCheckpoint::IsNull() const
+{
+    return (hashCheckpoint == 0);
+}
+
+uint256 CSyncCheckpoint::GetHash() const
+{
+    return SerializeHash(*this);
+}
+
+bool CSyncCheckpoint::RelayTo(CNode* pnode) const
+{
+    // returns true if wasn't already sent
+    if (pnode->hashCheckpointKnown != hashCheckpoint)
+    {
+        pnode->hashCheckpointKnown = hashCheckpoint;
+        pnode->PushMessage("checkpoint", *this);
+        return true;
+    }
+    return false;
+}
 
 // ppcoin: verify signature of sync-checkpoint message
 bool CSyncCheckpoint::CheckSignature()
