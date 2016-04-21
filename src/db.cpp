@@ -316,6 +316,105 @@ bool CDBEnv::RemoveDb(const string& strFile)
     return (rc == 0);
 }
 
+DbTxn *CDBEnv::TxnBegin(int flags)
+{
+    DbTxn* ptxn = NULL;
+    int ret = dbenv.txn_begin(NULL, &ptxn, flags);
+    if (!ptxn || ret != 0)
+        return NULL;
+    return ptxn;
+}
+
+Dbc* CDB::GetCursor()
+{
+    if (!pdb)
+        return NULL;
+    Dbc* pcursor = NULL;
+    int ret = pdb->cursor(NULL, &pcursor, 0);
+    if (ret != 0)
+        return NULL;
+    return pcursor;
+}
+
+int CDB::ReadAtCursor(Dbc* pcursor, CDataStream& ssKey, CDataStream& ssValue, unsigned int fFlags)
+{
+    // Read at cursor
+    Dbt datKey;
+    if (fFlags == DB_SET || fFlags == DB_SET_RANGE || fFlags == DB_GET_BOTH || fFlags == DB_GET_BOTH_RANGE)
+    {
+        datKey.set_data(&ssKey[0]);
+        datKey.set_size((uint32_t)ssKey.size());
+    }
+    Dbt datValue;
+    if (fFlags == DB_GET_BOTH || fFlags == DB_GET_BOTH_RANGE)
+    {
+        datValue.set_data(&ssValue[0]);
+        datValue.set_size((uint32_t)ssValue.size());
+    }
+    datKey.set_flags(DB_DBT_MALLOC);
+    datValue.set_flags(DB_DBT_MALLOC);
+    int ret = pcursor->get(&datKey, &datValue, fFlags);
+    if (ret != 0)
+        return ret;
+    else if (datKey.get_data() == NULL || datValue.get_data() == NULL)
+        return 99999;
+
+    // Convert to streams
+    ssKey.SetType(SER_DISK);
+    ssKey.clear();
+    ssKey.write((char*)datKey.get_data(), datKey.get_size());
+    ssValue.SetType(SER_DISK);
+    ssValue.clear();
+    ssValue.write((char*)datValue.get_data(), datValue.get_size());
+
+    // Clear and free memory
+    memset(datKey.get_data(), 0, datKey.get_size());
+    memset(datValue.get_data(), 0, datValue.get_size());
+    free(datKey.get_data());
+    free(datValue.get_data());
+    return 0;
+}
+
+bool CDB::TxnBegin()
+{
+    if (!pdb || activeTxn)
+        return false;
+    DbTxn* ptxn = bitdb.TxnBegin();
+    if (!ptxn)
+        return false;
+    activeTxn = ptxn;
+    return true;
+}
+
+bool CDB::TxnCommit()
+{
+    if (!pdb || !activeTxn)
+        return false;
+    int ret = activeTxn->commit(0);
+    activeTxn = NULL;
+    return (ret == 0);
+}
+
+bool CDB::TxnAbort()
+{
+    if (!pdb || !activeTxn)
+        return false;
+    int ret = activeTxn->abort();
+    activeTxn = NULL;
+    return (ret == 0);
+}
+
+bool CDB::ReadVersion(int& nVersion)
+{
+    nVersion = 0;
+    return Read(std::string("version"), nVersion);
+}
+
+bool CDB::WriteVersion(int nVersion)
+{
+    return Write(std::string("version"), nVersion);
+}
+
 bool CDB::Rewrite(const string& strFile, const char* pszSkip)
 {
     while (!fShutdown)

@@ -77,22 +77,8 @@ public:
         READWRITE(hashCheckpoint);
     )
 
-    void SetNull()
-    {
-        nVersion = 1;
-        hashCheckpoint = 0;
-    }
-
-    std::string ToString() const
-    {
-        return strprintf(
-                "CSyncCheckpoint(\n"
-                "    nVersion       = %" PRId32 "\n"
-                "    hashCheckpoint = %s\n"
-                ")\n",
-            nVersion,
-            hashCheckpoint.ToString().c_str());
-    }
+    void SetNull();
+    std::string ToString() const;
 };
 
 class CSyncCheckpoint : public CUnsignedSyncCheckpoint
@@ -104,10 +90,7 @@ public:
     std::vector<unsigned char> vchMsg;
     std::vector<unsigned char> vchSig;
 
-    CSyncCheckpoint()
-    {
-        SetNull();
-    }
+    CSyncCheckpoint();
 
     IMPLEMENT_SERIALIZE
     (
@@ -115,35 +98,10 @@ public:
         READWRITE(vchSig);
     )
 
-    void SetNull()
-    {
-        CUnsignedSyncCheckpoint::SetNull();
-        vchMsg.clear();
-        vchSig.clear();
-    }
-
-    bool IsNull() const
-    {
-        return (hashCheckpoint == 0);
-    }
-
-    uint256 GetHash() const
-    {
-        return SerializeHash(*this);
-    }
-
-    bool RelayTo(CNode* pnode) const
-    {
-        // returns true if wasn't already sent
-        if (pnode->hashCheckpointKnown != hashCheckpoint)
-        {
-            pnode->hashCheckpointKnown = hashCheckpoint;
-            pnode->PushMessage("checkpoint", *this);
-            return true;
-        }
-        return false;
-    }
-
+    void SetNull();
+    bool IsNull() const;
+    uint256 GetHash() const;
+    bool RelayTo(CNode* pnode) const;
     bool CheckSignature();
     bool ProcessSyncCheckpoint(CNode* pfrom);
 };
