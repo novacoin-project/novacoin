@@ -12,10 +12,6 @@
 #include "miner.h"
 #include "ntp.h"
 
-#ifdef WIN32
-#include <string.h>
-#endif
-
 using namespace std;
 
 static const int MAX_OUTBOUND_CONNECTIONS = 16;
