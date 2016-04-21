@@ -476,6 +476,194 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest, int64_t nTimeout)
     }
 }
 
+CNode::CNode(SOCKET hSocketIn, CAddress addrIn, string addrNameIn, bool fInboundIn) : vSend(SER_NETWORK, MIN_PROTO_VERSION), vRecv(SER_NETWORK, MIN_PROTO_VERSION)
+{
+    nServices = 0;
+    hSocket = hSocketIn;
+    nLastSend = 0;
+    nLastRecv = 0;
+    nSendBytes = 0;
+    nRecvBytes = 0;
+    nLastSendEmpty = GetTime();
+    nTimeConnected = GetTime();
+    nHeaderStart = -1;
+    nMessageStart = numeric_limits<uint32_t>::max();
+    addr = addrIn;
+    addrName = addrNameIn.empty() ? addr.ToStringIPPort() : addrNameIn;
+    nVersion = 0;
+    strSubVer.clear();
+    fOneShot = false;
+    fClient = false; // set by version message
+    fInbound = fInboundIn;
+    fNetworkNode = false;
+    fSuccessfullyConnected = false;
+    fDisconnect = false;
+    nRefCount = 0;
+    nReleaseTime = 0;
+    hashContinue = 0;
+    pindexLastGetBlocksBegin = 0;
+    hashLastGetBlocksEnd = 0;
+    nStartingHeight = -1;
+    nNextLocalAddrSend = 0;
+    nNextAddrSend = 0;
+    nNextInvSend = 0;
+    fStartSync = false;
+    fGetAddr = false;
+    nMisbehavior = 0;
+    hashCheckpointKnown = 0;
+    setInventoryKnown.max_size((size_t)SendBufferSize() / 1000);
+
+    // Be shy and don't send version until we hear
+    if (hSocket != INVALID_SOCKET && !fInbound)
+        PushVersion();
+}
+
+CNode::~CNode()
+{
+    if (hSocket != INVALID_SOCKET)
+    {
+        CloseSocket(hSocket);
+    }
+}
+
+int CNode::GetRefCount()
+{
+    return max(nRefCount, 0) + (GetTime() < nReleaseTime ? 1 : 0);
+}
+
+CNode* CNode::AddRef(int64_t nTimeout)
+{
+    if (nTimeout != 0)
+        nReleaseTime = max(nReleaseTime, GetTime() + nTimeout);
+    else
+        nRefCount++;
+    return this;
+}
+
+void CNode::Release()
+{
+    nRefCount--;
+}
+
+void CNode::AddAddressKnown(const CAddress& addr)
+{
+    setAddrKnown.insert(addr);
+}
+
+void CNode::PushAddress(const CAddress& addr)
+{
+    // Known checking here is only to save space from duplicates.
+    // SendMessages will filter it again for knowns that were added
+    // after addresses were pushed.
+    if (addr.IsValid() && !setAddrKnown.count(addr))
+        vAddrToSend.push_back(addr);
+}
+
+void CNode::AddInventoryKnown(const CInv& inv)
+{
+    {
+        LOCK(cs_inventory);
+        setInventoryKnown.insert(inv);
+    }
+}
+
+void CNode::PushInventory(const CInv& inv)
+{
+    {
+        LOCK(cs_inventory);
+        if (!setInventoryKnown.count(inv))
+            vInventoryToSend.push_back(inv);
+    }
+}
+
+void CNode::AskFor(const CInv& inv)
+{
+    // We're using mapAskFor as a priority queue,
+    // the key is the earliest time the request can be sent
+    int64_t& nRequestTime = mapAlreadyAskedFor[inv];
+    if (fDebugNet)
+        printf("askfor %s   %" PRId64 " (%s)\n", inv.ToString().c_str(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000).c_str());
+
+    // Make sure not to reuse time indexes to keep things in the same order
+    int64_t nNow = (GetTime() - 1) * 1000000;
+    static int64_t nLastTime;
+    ++nLastTime;
+    nNow = max(nNow, nLastTime);
+    nLastTime = nNow;
+
+    // Each retry is 2 minutes after the last
+    nRequestTime = max(nRequestTime + 2 * 60 * 1000000, nNow);
+    mapAskFor.insert({ nRequestTime, inv });
+}
+
+void CNode::BeginMessage(const char* pszCommand)
+{
+    ENTER_CRITICAL_SECTION(cs_vSend);
+    if (nHeaderStart != -1)
+        AbortMessage();
+    nHeaderStart = (int32_t)vSend.size();
+    vSend << CMessageHeader(pszCommand, 0);
+    nMessageStart = (uint32_t)vSend.size();
+    if (fDebug)
+        printf("sending: %s ", pszCommand);
+}
+
+void CNode::AbortMessage()
+{
+    if (nHeaderStart < 0)
+        return;
+    vSend.resize(nHeaderStart);
+    nHeaderStart = -1;
+    nMessageStart = numeric_limits<uint32_t>::max();
+    LEAVE_CRITICAL_SECTION(cs_vSend);
+
+    if (fDebug)
+        printf("(aborted)\n");
+}
+
+void CNode::EndMessage()
+{
+    if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0)
+    {
+        printf("dropmessages DROPPING SEND MESSAGE\n");
+        AbortMessage();
+        return;
+    }
+
+    if (nHeaderStart < 0)
+        return;
+
+    // Set the size
+    uint32_t nSize = (uint32_t) vSend.size() - nMessageStart;
+    memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::MESSAGE_SIZE_OFFSET, &nSize, sizeof(nSize));
+
+    // Set the checksum
+    auto hash = Hash(vSend.begin() + nMessageStart, vSend.end());
+    uint32_t nChecksum = 0;
+    memcpy(&nChecksum, &hash, sizeof(nChecksum));
+    assert(nMessageStart - nHeaderStart >= CMessageHeader::CHECKSUM_OFFSET + sizeof(nChecksum));
+    memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::CHECKSUM_OFFSET, &nChecksum, sizeof(nChecksum));
+
+    if (fDebug) {
+        printf("(%d bytes)\n", nSize);
+    }
+
+    nHeaderStart = -1;
+    nMessageStart = numeric_limits<uint32_t>::max();
+    LEAVE_CRITICAL_SECTION(cs_vSend);
+}
+
+void CNode::EndMessageAbortIfEmpty()
+{
+    if (nHeaderStart < 0)
+        return;
+    int nSize = (int) vSend.size() - nMessageStart;
+    if (nSize > 0)
+        EndMessage();
+    else
+        AbortMessage();
+}
+
 void CNode::CloseSocketDisconnect()
 {
     fDisconnect = true;
@@ -1849,6 +2037,16 @@ public:
     }
 }
 instance_of_cnetcleanup;
+
+inline void RelayInventory(const CInv& inv)
+{
+    // Put on lists to offer to the other nodes
+    {
+        LOCK(cs_vNodes);
+        for(CNode* pnode :  vNodes)
+            pnode->PushInventory(inv);
+    }
+}
 
 void RelayTransaction(const CTransaction& tx, const uint256& hash)
 {
