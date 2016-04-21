@@ -19,8 +19,31 @@ static uint64_t nAccountingEntryNumber = 0;
 extern bool fWalletUnlockMintOnly;
 
 //
+//CKeyMetadata
+//
+
+CKeyMetadata::CKeyMetadata()
+{
+    SetNull();
+}
+
+CKeyMetadata::CKeyMetadata(int64_t nCreateTime_)
+{
+    nVersion = CKeyMetadata::CURRENT_VERSION;
+    nCreateTime = nCreateTime_;
+}
+
+void CKeyMetadata::SetNull()
+{
+    nVersion = CKeyMetadata::CURRENT_VERSION;
+    nCreateTime = 0;
+}
+
+//
 // CWalletDB
 //
+
+CWalletDB::CWalletDB(string strFilename, const char* pszMode) : CDB(strFilename.c_str(), pszMode) {}
 
 bool CWalletDB::WriteName(const string& strAddress, const string& strName)
 {
@@ -34,6 +57,159 @@ bool CWalletDB::EraseName(const string& strAddress)
     // receiving addresses must always have an address book entry if they're not change return.
     nWalletDBUpdated++;
     return Erase(make_pair(string("name"), strAddress));
+}
+
+bool CWalletDB::WriteTx(uint256 hash, const CWalletTx& wtx)
+{
+    nWalletDBUpdated++;
+    return Write(make_pair(string("tx"), hash), wtx);
+}
+
+bool CWalletDB::EraseTx(uint256 hash)
+{
+    nWalletDBUpdated++;
+    return Erase(make_pair(string("tx"), hash));
+}
+
+bool CWalletDB::WriteKey(const CPubKey& key, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta)
+{
+    nWalletDBUpdated++;
+    if(!Write(make_pair(string("keymeta"), key), keyMeta))
+        return false;
+
+    if(!Write(make_pair(string("key"), key), vchPrivKey, false))
+        return false;
+
+    return true;
+}
+
+bool CWalletDB::WriteMalleableKey(const CMalleableKeyView& keyView, const CSecret& vchSecretH, const CKeyMetadata &keyMeta)
+{
+    nWalletDBUpdated++;
+    if(!Write(make_pair(string("malmeta"), keyView.ToString()), keyMeta))
+        return false;
+
+    if(!Write(make_pair(string("malpair"), keyView.ToString()), vchSecretH, false))
+        return false;
+
+    return true;
+}
+
+bool CWalletDB::WriteCryptedMalleableKey(const CMalleableKeyView& keyView, const vector<unsigned char>& vchCryptedSecretH, const CKeyMetadata &keyMeta)
+{
+    nWalletDBUpdated++;
+    if(!Write(make_pair(string("malmeta"), keyView.ToString()), keyMeta))
+        return false;
+
+    if(!Write(make_pair(string("malcpair"), keyView.ToString()), vchCryptedSecretH, false))
+        return false;
+
+    Erase(make_pair(string("malpair"), keyView.ToString()));
+
+    return true;
+}
+
+bool CWalletDB::WriteCryptedKey(const CPubKey& key, const vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta)
+{
+    nWalletDBUpdated++;
+    bool fEraseUnencryptedKey = true;
+
+    if(!Write(make_pair(string("keymeta"), key), keyMeta))
+        return false;
+
+    if (!Write(make_pair(string("ckey"), key), vchCryptedSecret, false))
+        return false;
+    if (fEraseUnencryptedKey)
+    {
+        Erase(make_pair(string("key"), key));
+        Erase(make_pair(string("wkey"), key));
+    }
+    return true;
+}
+
+bool CWalletDB::WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey)
+{
+    nWalletDBUpdated++;
+    return Write(make_pair(string("mkey"), nID), kMasterKey, true);
+}
+
+bool CWalletDB::EraseMasterKey(unsigned int nID)
+{
+    nWalletDBUpdated++;
+    return Erase(make_pair(string("mkey"), nID));
+}
+
+bool CWalletDB::EraseCryptedKey(const CPubKey& key)
+{
+    return Erase(make_pair(string("ckey"), key));
+}
+
+bool CWalletDB::EraseCryptedMalleableKey(const CMalleableKeyView& keyView)
+{
+    return Erase(make_pair(string("malcpair"), keyView.ToString()));
+}
+
+bool CWalletDB::WriteCScript(const uint160& hash, const CScript& redeemScript)
+{
+    nWalletDBUpdated++;
+    return Write(make_pair(string("cscript"), hash), redeemScript, false);
+}
+
+bool CWalletDB::WriteWatchOnly(const CScript &dest)
+{
+    nWalletDBUpdated++;
+    return Write(make_pair(string("watchs"), dest), '1');
+}
+
+bool CWalletDB::EraseWatchOnly(const CScript &dest)
+{
+    nWalletDBUpdated++;
+    return Erase(make_pair(string("watchs"), dest));
+}
+
+bool CWalletDB::WriteBestBlock(const CBlockLocator& locator)
+{
+    nWalletDBUpdated++;
+    return Write(string("bestblock"), locator);
+}
+
+bool CWalletDB::ReadBestBlock(CBlockLocator& locator)
+{
+    return Read(string("bestblock"), locator);
+}
+
+bool CWalletDB::WriteOrderPosNext(int64_t nOrderPosNext)
+{
+    nWalletDBUpdated++;
+    return Write(string("orderposnext"), nOrderPosNext);
+}
+
+bool CWalletDB::WriteDefaultKey(const CPubKey& key)
+{
+    nWalletDBUpdated++;
+    return Write(string("defaultkey"), key);
+}
+
+bool CWalletDB::ReadPool(int64_t nPool, CKeyPool& keypool)
+{
+    return Read(make_pair(string("pool"), nPool), keypool);
+}
+
+bool CWalletDB::WritePool(int64_t nPool, const CKeyPool& keypool)
+{
+    nWalletDBUpdated++;
+    return Write(make_pair(string("pool"), nPool), keypool);
+}
+
+bool CWalletDB::ErasePool(int64_t nPool)
+{
+    nWalletDBUpdated++;
+    return Erase(make_pair(string("pool"), nPool));
+}
+
+bool CWalletDB::WriteMinVersion(int nVersion)
+{
+    return Write(string("minversion"), nVersion);
 }
 
 bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
