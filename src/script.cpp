@@ -2042,6 +2042,235 @@ CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction& txTo,
     return CombineSignatures(scriptPubKey, txTo, nIn, txType, vSolutions, stack1, stack2);
 }
 
+//
+//CScript
+//
+
+CScript& CScript::push_int64(int64_t n)
+{
+    if (n == -1 || (n >= 1 && n <= 16))
+    {
+        push_back((uint8_t)n + (OP_1 - 1));
+    }
+    else
+    {
+        CBigNum bn(n);
+        *this << bn.getvch();
+    }
+    return *this;
+}
+
+CScript& CScript::push_uint64(uint64_t n)
+{
+    if (n >= 1 && n <= 16)
+    {
+        push_back((uint8_t)n + (OP_1 - 1));
+    }
+    else
+    {
+        CBigNum bn(n);
+        *this << bn.getvch();
+    }
+    return *this;
+}
+
+CScript& CScript::operator+=(const CScript& b)
+{
+    insert(end(), b.begin(), b.end());
+    return *this;
+}
+
+CScript& CScript::operator<<(opcodetype opcode)
+{
+    insert(end(), opcode);
+    return *this;
+}
+
+CScript& CScript::operator<<(const uint160& b)
+{
+    insert(end(), sizeof(b));
+    insert(end(), (uint8_t*)&b, (uint8_t*)&b + sizeof(b));
+    return *this;
+}
+
+CScript& CScript::operator<<(const uint256& b)
+{
+    insert(end(), sizeof(b));
+    insert(end(), (uint8_t*)&b, (uint8_t*)&b + sizeof(b));
+    return *this;
+}
+
+CScript& CScript::operator<<(const CPubKey& key)
+{
+    std::vector<uint8_t> vchKey(key.begin(), key.end());
+    return (*this) << vchKey;
+}
+
+CScript& CScript::operator<<(const CBigNum& b)
+{
+    *this << b.getvch();
+    return *this;
+}
+
+CScript& CScript::operator<<(const std::vector<uint8_t>& b)
+{
+    if (b.size() < OP_PUSHDATA1)
+    {
+        insert(end(), (uint8_t)b.size());
+    }
+    else if (b.size() <= 0xff)
+    {
+        insert(end(), OP_PUSHDATA1);
+        insert(end(), (uint8_t)b.size());
+    }
+    else if (b.size() <= 0xffff)
+    {
+        insert(end(), OP_PUSHDATA2);
+        uint16_t nSize = (uint16_t) b.size();
+        insert(end(), (uint8_t*)&nSize, (uint8_t*)&nSize + sizeof(nSize));
+    }
+    else
+    {
+        insert(end(), OP_PUSHDATA4);
+        uint32_t nSize = (uint32_t) b.size();
+        insert(end(), (uint8_t*)&nSize, (uint8_t*)&nSize + sizeof(nSize));
+    }
+    insert(end(), b.begin(), b.end());
+    return *this;
+}
+
+CScript& CScript::operator<<(const CScript& b)
+{
+    // I'm not sure if this should push the script or concatenate scripts.
+    // If there's ever a use for pushing a script onto a script, delete this member fn
+    assert(!"Warning: Pushing a CScript onto a CScript with << is probably not intended, use + to concatenate!");
+    return *this;
+}
+
+bool CScript::GetOp(iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>& vchRet)
+{
+     // Wrapper so it can be called with either iterator or const_iterator
+     const_iterator pc2 = pc;
+     bool fRet = GetOp2(pc2, opcodeRet, &vchRet);
+     pc = begin() + (pc2 - begin());
+     return fRet;
+}
+
+bool CScript::GetOp(iterator& pc, opcodetype& opcodeRet)
+{
+     const_iterator pc2 = pc;
+     bool fRet = GetOp2(pc2, opcodeRet, NULL);
+     pc = begin() + (pc2 - begin());
+     return fRet;
+}
+
+bool CScript::GetOp(const_iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>& vchRet) const
+{
+    return GetOp2(pc, opcodeRet, &vchRet);
+}
+
+bool CScript::GetOp(const_iterator& pc, opcodetype& opcodeRet) const
+{
+    return GetOp2(pc, opcodeRet, NULL);
+}
+
+bool CScript::GetOp2(const_iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>* pvchRet) const
+{
+    opcodeRet = OP_INVALIDOPCODE;
+    if (pvchRet)
+        pvchRet->clear();
+    if (pc >= end())
+        return false;
+
+    // Read instruction
+    if (end() - pc < 1)
+        return false;
+    uint32_t opcode = *pc++;
+
+    // Immediate operand
+    if (opcode <= OP_PUSHDATA4)
+    {
+        uint32_t nSize = OP_0;
+        if (opcode < OP_PUSHDATA1)
+        {
+            nSize = opcode;
+        }
+        else if (opcode == OP_PUSHDATA1)
+        {
+            if (end() - pc < 1)
+                return false;
+            nSize = *pc++;
+        }
+        else if (opcode == OP_PUSHDATA2)
+        {
+            if (end() - pc < 2)
+                return false;
+            memcpy(&nSize, &pc[0], 2);
+            pc += 2;
+        }
+        else if (opcode == OP_PUSHDATA4)
+        {
+            if (end() - pc < 4)
+                return false;
+            memcpy(&nSize, &pc[0], 4);
+            pc += 4;
+        }
+        if (end() - pc < 0 || (uint32_t)(end() - pc) < nSize)
+            return false;
+        if (pvchRet)
+            pvchRet->assign(pc, pc + nSize);
+        pc += nSize;
+    }
+
+    opcodeRet = (opcodetype)opcode;
+    return true;
+}
+
+int CScript::DecodeOP_N(opcodetype opcode)
+{
+    if (opcode == OP_0)
+        return 0;
+    assert(opcode >= OP_1 && opcode <= OP_16);
+    return (opcode - (OP_1 - 1));
+}
+
+opcodetype CScript::EncodeOP_N(int n)
+{
+    assert(n >= 0 && n <= 16);
+    if (n == 0)
+        return OP_0;
+    return (opcodetype)(OP_1+n-1);
+}
+
+int CScript::FindAndDelete(const CScript& b)
+{
+    int nFound = 0;
+    if (b.empty())
+        return nFound;
+    iterator pc = begin();
+    opcodetype opcode;
+    do
+    {
+        while (end() - pc >= (long)b.size() && memcmp(&pc[0], &b[0], b.size()) == 0)
+        {
+            erase(pc, pc + b.size());
+            ++nFound;
+        }
+    }
+    while (GetOp(pc, opcode));
+    return nFound;
+}
+
+int CScript::Find(opcodetype op) const
+{
+    int nFound = 0;
+    opcodetype opcode;
+    for (const_iterator pc = begin(); pc != end() && GetOp(pc, opcode);)
+        if (opcode == op)
+            ++nFound;
+    return nFound;
+}
+
 unsigned int CScript::GetSigOpCount(bool fAccurate) const
 {
     uint32_t n = 0;
@@ -2097,6 +2326,25 @@ bool CScript::IsPayToScriptHash() const
             this->at(0) == OP_HASH160 &&
             this->at(1) == 0x14 &&
             this->at(22) == OP_EQUAL);
+}
+
+bool CScript::IsPushOnly(const_iterator pc) const
+{
+    while (pc < end())
+    {
+        opcodetype opcode;
+        if (!GetOp(pc, opcode))
+            return false;
+        if (opcode > OP_16)
+            return false;
+    }
+    return true;
+}
+
+// Called by CTransaction::IsStandard and P2SH VerifyScript (which makes it consensus-critical).
+bool CScript::IsPushOnly() const
+{
+    return this->IsPushOnly(begin());
 }
 
 bool CScript::HasCanonicalPushes() const
@@ -2183,4 +2431,42 @@ void CScript::SetMultisig(int nRequired, const std::vector<CPubKey>& keys)
     for(const auto& key :  keys)
         *this << key;
     *this << EncodeOP_N((int)(keys.size())) << OP_CHECKMULTISIG;
+}
+
+void CScript::PrintHex() const
+{
+    printf("CScript(%s)\n", HexStr(begin(), end(), true).c_str());
+}
+
+std::string CScript::ToString(bool fShort) const
+{
+    std::string str;
+    opcodetype opcode;
+    std::vector<uint8_t> vch;
+    const_iterator pc = begin();
+    while (pc < end())
+    {
+        if (!str.empty())
+            str += " ";
+        if (!GetOp(pc, opcode, vch))
+        {
+            str += "[error]";
+            return str;
+        }
+        if (opcode <= OP_PUSHDATA4)
+            str += fShort? ValueString(vch).substr(0, 10) : ValueString(vch);
+        else
+            str += GetOpName(opcode);
+    }
+    return str;
+}
+
+void CScript::print() const
+{
+    printf("%s\n", ToString().c_str());
+}
+
+CScriptID CScript::GetID() const
+{
+    return CScriptID(Hash160(*this));
 }
