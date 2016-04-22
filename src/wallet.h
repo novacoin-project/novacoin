@@ -110,32 +110,9 @@ public:
     MasterKeyMap mapMasterKeys;
     unsigned int nMasterKeyMaxID;
 
-    CWallet()
-    {
-        SetNull();
-    }
-    CWallet(std::string strWalletFileIn)
-    {
-        SetNull();
-
-        strWalletFile = strWalletFileIn;
-        fFileBacked = true;
-    }
-    void SetNull()
-    {
-        nWalletVersion = FEATURE_BASE;
-        nWalletMaxVersion = FEATURE_BASE;
-        fFileBacked = false;
-        nMasterKeyMaxID = 0;
-        pwalletdbEncryption = NULL;
-        pwalletdbDecryption = NULL;
-        nNextResend = 0;
-        nLastResend = 0;
-        nOrderPosNext = 0;
-        nKernelsTried = 0;
-        nCoinDaysTried = 0;
-        nTimeFirstKey = 0;
-    }
+    CWallet();
+    CWallet(std::string strWalletFileIn);
+    void SetNull();
 
     std::map<uint256, CWalletTx> mapWallet;
     std::vector<uint256> vMintingWalletUpdated;
@@ -413,58 +390,11 @@ public:
     mutable int64_t nAvailableWatchCreditCached;
     mutable int64_t nChangeCached;
 
-    CWalletTx()
-    {
-        Init(NULL);
-    }
-
-    CWalletTx(const CWallet* pwalletIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
-
-    void Init(const CWallet* pwalletIn)
-    {
-        pwallet = pwalletIn;
-        vtxPrev.clear();
-        mapValue.clear();
-        vOrderForm.clear();
-        fTimeReceivedIsTxTime = false;
-        nTimeReceived = 0;
-        nTimeSmart = 0;
-        fFromMe = false;
-        strFromAccount.clear();
-        vfSpent.clear();
-        fDebitCached = false;
-        fWatchDebitCached = false;
-        fCreditCached = false;
-        fWatchCreditCached = false;
-        fAvailableCreditCached = false;
-        fAvailableWatchCreditCached = false;
-        fImmatureCreditCached = false;
-        fImmatureWatchCreditCached = false;
-        fChangeCached = false;
-        nDebitCached = 0;
-        nWatchDebitCached = 0;
-        nCreditCached = 0;
-        nWatchCreditCached = 0;
-        nAvailableCreditCached = 0;
-        nAvailableWatchCreditCached = 0;
-        nImmatureCreditCached = 0;
-        nImmatureWatchCreditCached = 0;
-        nChangeCached = 0;
-        nOrderPos = -1;
-    }
+    CWalletTx();
+    CWalletTx(const CWallet* pwalletIn);
+    CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn);
+    CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn);
+    void Init(const CWallet* pwalletIn);
 
     IMPLEMENT_SERIALIZE
     (

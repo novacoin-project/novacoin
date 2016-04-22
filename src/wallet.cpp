@@ -24,6 +24,35 @@ extern int64_t nReserveBalance;
 // mapWallet
 //
 
+CWallet::CWallet()
+{
+    SetNull();
+}
+
+CWallet::CWallet(std::string strWalletFileIn)
+{
+    SetNull();
+
+    strWalletFile = strWalletFileIn;
+    fFileBacked = true;
+}
+
+void CWallet::SetNull()
+{
+    nWalletVersion = FEATURE_BASE;
+    nWalletMaxVersion = FEATURE_BASE;
+    fFileBacked = false;
+    nMasterKeyMaxID = 0;
+    pwalletdbEncryption = NULL;
+    pwalletdbDecryption = NULL;
+    nNextResend = 0;
+    nLastResend = 0;
+    nOrderPosNext = 0;
+    nKernelsTried = 0;
+    nCoinDaysTried = 0;
+    nTimeFirstKey = 0;
+}
+
 struct CompareValueOnly
 {
     bool operator()(const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t1,
@@ -808,6 +837,59 @@ isminetype CWallet::IsMine(const CTxIn &txin) const
         }
     }
     return MINE_NO;
+}
+
+CWalletTx::CWalletTx()
+{
+    Init(NULL);
+}
+
+CWalletTx::CWalletTx(const CWallet* pwalletIn)
+{
+    Init(pwalletIn);
+}
+
+CWalletTx::CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn) : CMerkleTx(txIn)
+{
+    Init(pwalletIn);
+}
+
+CWalletTx::CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn) : CMerkleTx(txIn)
+{
+    Init(pwalletIn);
+}
+
+void CWalletTx::Init(const CWallet* pwalletIn)
+{
+    pwallet = pwalletIn;
+    vtxPrev.clear();
+    mapValue.clear();
+    vOrderForm.clear();
+    fTimeReceivedIsTxTime = false;
+    nTimeReceived = 0;
+    nTimeSmart = 0;
+    fFromMe = false;
+    strFromAccount.clear();
+    vfSpent.clear();
+    fDebitCached = false;
+    fWatchDebitCached = false;
+    fCreditCached = false;
+    fWatchCreditCached = false;
+    fAvailableCreditCached = false;
+    fAvailableWatchCreditCached = false;
+    fImmatureCreditCached = false;
+    fImmatureWatchCreditCached = false;
+    fChangeCached = false;
+    nDebitCached = 0;
+    nWatchDebitCached = 0;
+    nCreditCached = 0;
+    nWatchCreditCached = 0;
+    nAvailableCreditCached = 0;
+    nAvailableWatchCreditCached = 0;
+    nImmatureCreditCached = 0;
+    nImmatureWatchCreditCached = 0;
+    nChangeCached = 0;
+    nOrderPos = -1;
 }
 
 // marks certain txout's as spent
