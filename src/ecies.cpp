@@ -9,13 +9,15 @@
  */
 
 #include "ies.h"
-#include <iostream>
+#include <new>
 #include <vector>
 
 #define SET_ERROR(string) \
     sprintf(error, "%s %s:%d", (string), __FILE__, __LINE__)
 #define SET_OSSL_ERROR(string) \
     sprintf(error, "%s {error = %s} %s:%d", (string), ERR_error_string(ERR_get_error(), NULL), __FILE__, __LINE__)
+
+const size_t nEnvKeyLen = 16 + 20; // EVP_CIPHER_key_length(EVP_aes_128_cbc()) + EVP_MD_size(EVP_ripemd160())
 
 /* Copyright (c) 1998-2011 The OpenSSL Project. All rights reserved.
  * Taken from openssl/crypto/ecdh/ech_kdf.c in github:openssl/openssl
@@ -76,11 +78,6 @@ int ECDH_KDF_X9_62(unsigned char *out, size_t outlen,
     return rv;
 }
 
-static size_t envelope_key_len(const ies_ctx_t *ctx)
-{
-    return EVP_CIPHER_key_length(ctx->cipher) + EVP_MD_size(ctx->md);
-}
-
 static EC_KEY * ecies_key_create(const EC_KEY *user, char *error) {
 
     const EC_GROUP *group;
@@ -115,7 +112,6 @@ static EC_KEY * ecies_key_create(const EC_KEY *user, char *error) {
 static unsigned char *prepare_envelope_key(const ies_ctx_t *ctx, cryptogram_t *cryptogram, char *error)
 {
 
-    const size_t key_buf_len = envelope_key_len(ctx);
     const size_t ecdh_key_len = (EC_GROUP_get_degree(EC_KEY_get0_group(ctx->user_key)) + 7) / 8;
     unsigned char *envelope_key = NULL, *ktmp = NULL;
     EC_KEY *ephemeral = NULL;
@@ -124,7 +120,7 @@ static unsigned char *prepare_envelope_key(const ies_ctx_t *ctx, cryptogram_t *c
     /* High-level ECDH via EVP does not allow use of arbitrary KDF function.
      * We should use low-level API for KDF2
      * c.f. openssl/crypto/ec/ec_pmeth.c */
-    if ((envelope_key = (unsigned char *) OPENSSL_malloc(key_buf_len)) == NULL) {
+    if ((envelope_key = (unsigned char *) OPENSSL_malloc(nEnvKeyLen)) == NULL) {
         SET_ERROR("Failed to allocate memory for envelope_key");
         goto err;
     }
@@ -148,7 +144,7 @@ static unsigned char *prepare_envelope_key(const ies_ctx_t *ctx, cryptogram_t *c
     }
 
     /* equals to ISO 18033-2 KDF2 */
-    if (!ECDH_KDF_X9_62(envelope_key, key_buf_len, ktmp, ecdh_key_len, 0, 0, ctx->kdf_md)) {
+    if (!ECDH_KDF_X9_62(envelope_key, nEnvKeyLen, ktmp, ecdh_key_len, 0, 0, ctx->kdf_md)) {
         SET_OSSL_ERROR("Failed to stretch with KDF2");
         goto err;
     }
@@ -180,7 +176,7 @@ static unsigned char *prepare_envelope_key(const ies_ctx_t *ctx, cryptogram_t *c
     if (ephemeral)
         EC_KEY_free(ephemeral);
     if (envelope_key) {
-        OPENSSL_cleanse(envelope_key, key_buf_len);
+        OPENSSL_cleanse(envelope_key, nEnvKeyLen);
         OPENSSL_free(envelope_key);
     }
     if (ktmp) {
@@ -307,7 +303,7 @@ cryptogram_t * ecies_encrypt(const ies_ctx_t *ctx, const unsigned char *data, si
         goto err;
     }
 
-    OPENSSL_cleanse(envelope_key, envelope_key_len(ctx));
+    OPENSSL_cleanse(envelope_key, nEnvKeyLen);
     OPENSSL_free(envelope_key);
 
     return cryptogram;
@@ -316,7 +312,7 @@ cryptogram_t * ecies_encrypt(const ies_ctx_t *ctx, const unsigned char *data, si
     if (cryptogram)
         cryptogram_free(cryptogram);
     if (envelope_key) {
-        OPENSSL_cleanse(envelope_key, envelope_key_len(ctx));
+        OPENSSL_cleanse(envelope_key, nEnvKeyLen);
         OPENSSL_free(envelope_key);
     }
     return NULL;
@@ -378,12 +374,11 @@ static EC_KEY *ecies_key_create_public_octets(EC_KEY *user, unsigned char *octet
 unsigned char *restore_envelope_key(const ies_ctx_t *ctx, const cryptogram_t *cryptogram, char *error)
 {
 
-    const size_t key_buf_len = envelope_key_len(ctx);
     const size_t ecdh_key_len = (EC_GROUP_get_degree(EC_KEY_get0_group(ctx->user_key)) + 7) / 8;
     EC_KEY *ephemeral = NULL, *user_copy = NULL;
     unsigned char *envelope_key = NULL, *ktmp = NULL;
 
-    if ((envelope_key = (unsigned char *) OPENSSL_malloc(key_buf_len)) == NULL) {
+    if ((envelope_key = (unsigned char *) OPENSSL_malloc(nEnvKeyLen)) == NULL) {
         SET_ERROR("Failed to allocate memory for envelope_key");
         goto err;
     }
@@ -417,7 +412,7 @@ unsigned char *restore_envelope_key(const ies_ctx_t *ctx, const cryptogram_t *cr
     }
 
     /* equals to ISO 18033-2 KDF2 */
-    if (!ECDH_KDF_X9_62(envelope_key, key_buf_len, ktmp, ecdh_key_len, 0, 0, ctx->kdf_md)) {
+    if (!ECDH_KDF_X9_62(envelope_key, nEnvKeyLen, ktmp, ecdh_key_len, 0, 0, ctx->kdf_md)) {
         SET_OSSL_ERROR("Failed to stretch with KDF2");
         goto err;
     }
@@ -435,7 +430,7 @@ unsigned char *restore_envelope_key(const ies_ctx_t *ctx, const cryptogram_t *cr
     if (user_copy)
         EC_KEY_free(user_copy);
     if (envelope_key) {
-        OPENSSL_cleanse(envelope_key, key_buf_len);
+        OPENSSL_cleanse(envelope_key, nEnvKeyLen);
         OPENSSL_free(envelope_key);
     }
     if (ktmp) {
@@ -548,7 +543,7 @@ unsigned char * ecies_decrypt(const ies_ctx_t *ctx, const cryptogram_t *cryptogr
     }
 
   err:
-    OPENSSL_cleanse(envelope_key, envelope_key_len(ctx));
+    OPENSSL_cleanse(envelope_key, nEnvKeyLen);
     OPENSSL_free(envelope_key);
 
     return output;
