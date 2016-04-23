@@ -365,7 +365,9 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/cryptogram.cpp \
     src/uint256.cpp \
     src/ecies.cpp \
-    src/ipcollector.cpp
+    src/ipcollector.cpp \
+    src/serialize.cpp
+
 
 RESOURCES += \
     src/qt/bitcoin.qrc
