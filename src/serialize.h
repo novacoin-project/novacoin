@@ -164,17 +164,20 @@ template<typename Stream> inline void Unserialize(Stream& s, bool& a, int, int=0
 
 //
 // Compact size
-//  size <  253        -- 1 byte
-//  size <= USHRT_MAX  -- 3 bytes  (253 + 2 bytes)
-//  size <= UINT_MAX   -- 5 bytes  (254 + 4 bytes)
-//  size >  UINT_MAX   -- 9 bytes  (255 + 8 bytes)
+//  size <  253          -- 1 byte
+//  size <= UINT16_MAX   -- 3 bytes  (253 + 2 bytes)
+//  size <= UINT32_MAX   -- 5 bytes  (254 + 4 bytes)
+//  size >  UINT32_MAX   -- 9 bytes  (255 + 8 bytes)
 //
-inline unsigned int GetSizeOfCompactSize(uint64_t nSize)
+inline uint32_t GetSizeOfCompactSize(uint64_t nSize)
 {
-    if (nSize < 253)             return sizeof(unsigned char);
-    else if (nSize <= std::numeric_limits<unsigned short>::max()) return sizeof(unsigned char) + sizeof(unsigned short);
-    else if (nSize <= std::numeric_limits<unsigned int>::max())  return sizeof(unsigned char) + sizeof(unsigned int);
-    else                         return sizeof(unsigned char) + sizeof(uint64_t);
+    if (nSize < 0xfd)
+        return 1;
+    if (nSize <= std::numeric_limits<uint16_t>::max())
+        return 3;
+    if (nSize <= std::numeric_limits<uint32_t>::max())
+        return 5;
+    return 9;
 }
 
 template<typename Stream>

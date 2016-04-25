@@ -4,29 +4,29 @@
 template<typename Stream>
 void WriteCompactSize(Stream& os, uint64_t nSize)
 {
-    if (nSize < 253)
+    if (nSize < 0xfd)
     {
-        unsigned char chSize = (unsigned char)nSize;
+        auto chSize = (uint8_t)nSize;
         WRITEDATA(os, chSize);
     }
-    else if (nSize <= std::numeric_limits<unsigned short>::max())
+    else if (nSize <= std::numeric_limits<uint16_t>::max())
     {
-        unsigned char chSize = 253;
-        unsigned short xSize = (unsigned short)nSize;
+        uint8_t chSize = 0xfd;
+        auto xSize = (uint16_t)nSize;
         WRITEDATA(os, chSize);
         WRITEDATA(os, xSize);
     }
-    else if (nSize <= std::numeric_limits<unsigned int>::max())
+    else if (nSize <= std::numeric_limits<uint32_t>::max())
     {
-        unsigned char chSize = 254;
-        unsigned int xSize = (unsigned int)nSize;
+        uint8_t chSize = 0xfe;
+        auto xSize = (uint32_t)nSize;
         WRITEDATA(os, chSize);
         WRITEDATA(os, xSize);
     }
     else
     {
-        unsigned char chSize = 255;
-        uint64_t xSize = nSize;
+        uint8_t chSize = 0xff;
+        auto xSize = nSize;
         WRITEDATA(os, chSize);
         WRITEDATA(os, xSize);
     }
@@ -37,22 +37,22 @@ void WriteCompactSize(Stream& os, uint64_t nSize)
 template<typename Stream>
 uint64_t ReadCompactSize(Stream& is)
 {
-    unsigned char chSize;
+    uint8_t chSize;
     READDATA(is, chSize);
     uint64_t nSizeRet = 0;
-    if (chSize < 253)
+    if (chSize < 0xfd)
     {
         nSizeRet = chSize;
     }
-    else if (chSize == 253)
+    else if (chSize == 0xfd)
     {
-        unsigned short xSize;
+        uint16_t xSize;
         READDATA(is, xSize);
         nSizeRet = xSize;
     }
-    else if (chSize == 254)
+    else if (chSize == 0xfe)
     {
-        unsigned int xSize;
+        uint32_t xSize;
         READDATA(is, xSize);
         nSizeRet = xSize;
     }
@@ -91,9 +91,9 @@ void CBufferedFile::setstate(short bits, const char *psz)
 
 bool CBufferedFile::Fill()
 {
-    unsigned int pos = (unsigned int)(nSrcPos % vchBuf.size());
-    unsigned int readNow = (unsigned int)(vchBuf.size() - pos);
-    unsigned int nAvail = (unsigned int)(vchBuf.size() - (nSrcPos - nReadPos) - nRewind);
+    auto pos = (uint32_t)(nSrcPos % vchBuf.size());
+    auto readNow = (uint32_t)(vchBuf.size() - pos);
+    auto nAvail = (uint32_t)(vchBuf.size() - (nSrcPos - nReadPos) - nRewind);
     if (nAvail < readNow)
         readNow = nAvail;
     if (readNow == 0)
@@ -131,8 +131,8 @@ CBufferedFile& CBufferedFile::read(char *pch, size_t nSize)
     while (nSize > 0) {
         if (nReadPos == nSrcPos)
             Fill();
-        unsigned int pos = (unsigned int)(nReadPos % vchBuf.size());
-        size_t nNow = nSize;
+        auto pos = (uint32_t)(nReadPos % vchBuf.size());
+        auto nNow = nSize;
         if (nNow + pos > vchBuf.size())
             nNow = vchBuf.size() - pos;
         if (nNow + nReadPos > nSrcPos)
