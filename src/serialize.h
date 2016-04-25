@@ -1177,9 +1177,9 @@ public:
     }
 };
 
-/** Wrapper around a FILE* that implements a ring buffer to
- *  deserialize from. It guarantees the ability to rewind
- *  a given number of bytes. */
+// Wrapper around a FILE* that implements a ring buffer to
+// deserialize from. It guarantees the ability to rewind
+// a given number of bytes.
 class CBufferedFile
 {
 private:
@@ -1194,113 +1194,29 @@ private:
     short exceptmask;
 
 protected:
-    void setstate(short bits, const char *psz) {
-        state |= bits;
-        if (state & exceptmask)
-            throw std::ios_base::failure(psz);
-    }
-
+    void setstate(short bits, const char *psz);
     // read data from the source to fill the buffer
-    bool Fill() {
-        unsigned int pos = (unsigned int)(nSrcPos % vchBuf.size());
-        unsigned int readNow = (unsigned int)(vchBuf.size() - pos);
-        unsigned int nAvail = (unsigned int)(vchBuf.size() - (nSrcPos - nReadPos) - nRewind);
-        if (nAvail < readNow)
-            readNow = nAvail;
-        if (readNow == 0)
-            return false;
-        size_t read = fread((void*)&vchBuf[pos], 1, readNow, src);
-        if (read == 0) {
-            setstate(std::ios_base::failbit, feof(src) ? "CBufferedFile::Fill : end of file" : "CBufferedFile::Fill : fread failed");
-            return false;
-        } else {
-            nSrcPos += read;
-            return true;
-        }
-    }
+    bool Fill();
 
 public:
     int nType;
     int nVersion;
 
-    CBufferedFile(FILE *fileIn, uint64_t nBufSize, uint64_t nRewindIn, int nTypeIn, int nVersionIn) :
-        src(fileIn), nSrcPos(0), nReadPos(0), nReadLimit(std::numeric_limits<uint64_t>::max()), nRewind(nRewindIn), vchBuf(nBufSize, 0),
-        state(0), exceptmask(std::ios_base::badbit | std::ios_base::failbit), nType(nTypeIn), nVersion(nVersionIn) {
-    }
-
+    CBufferedFile(FILE *fileIn, uint64_t nBufSize, uint64_t nRewindIn, int nTypeIn, int nVersionIn);
     // check whether no error occurred
-    bool good() const {
-        return state == 0;
-    }
-
+    bool good() const;
     // check whether we're at the end of the source file
-    bool eof() const {
-        return nReadPos == nSrcPos && feof(src);
-    }
-
+    bool eof() const;
     // read a number of bytes
-    CBufferedFile& read(char *pch, size_t nSize) {
-        if (nSize + nReadPos > nReadLimit)
-            throw std::ios_base::failure("Read attempted past buffer limit");
-        if (nSize + nRewind > vchBuf.size())
-            throw std::ios_base::failure("Read larger than buffer size");
-        while (nSize > 0) {
-            if (nReadPos == nSrcPos)
-                Fill();
-            unsigned int pos = (unsigned int)(nReadPos % vchBuf.size());
-            size_t nNow = nSize;
-            if (nNow + pos > vchBuf.size())
-                nNow = vchBuf.size() - pos;
-            if (nNow + nReadPos > nSrcPos)
-                nNow = (size_t)(nSrcPos - nReadPos);
-            memcpy(pch, &vchBuf[pos], nNow);
-            nReadPos += nNow;
-            pch += nNow;
-            nSize -= nNow;
-        }
-        return (*this);
-    }
-
+    CBufferedFile& read(char *pch, size_t nSize);
     // return the current reading position
-    uint64_t GetPos() {
-        return nReadPos;
-    }
-
+    uint64_t GetPos();
     // rewind to a given reading position
-    bool SetPos(uint64_t nPos) {
-        nReadPos = nPos;
-        if (nReadPos + nRewind < nSrcPos) {
-            nReadPos = nSrcPos - nRewind;
-            return false;
-        } else if (nReadPos > nSrcPos) {
-            nReadPos = nSrcPos;
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    bool Seek(uint64_t nPos) {
-        long nLongPos = (long)nPos;
-        if (nPos != (uint64_t)nLongPos)
-            return false;
-        if (fseek(src, nLongPos, SEEK_SET))
-            return false;
-        nLongPos = ftell(src);
-        nSrcPos = nLongPos;
-        nReadPos = nLongPos;
-        state = 0;
-        return true;
-    }
-
+    bool SetPos(uint64_t nPos);
+    bool Seek(uint64_t nPos);
     // prevent reading beyond a certain position
     // no argument removes the limit
-    bool SetLimit(uint64_t nPos = std::numeric_limits<uint64_t>::max()) {
-        if (nPos < nReadPos)
-            return false;
-        nReadLimit = nPos;
-        return true;
-    }
+    bool SetLimit(uint64_t nPos = std::numeric_limits<uint64_t>::max());
 
     template<typename T>
     CBufferedFile& operator>>(T& obj) {
@@ -1310,15 +1226,7 @@ public:
     }
 
     // search for a given byte in the stream, and remain positioned on it
-    void FindByte(char ch) {
-        for ( ; ; ) {
-            if (nReadPos == nSrcPos)
-                Fill();
-            if (vchBuf[nReadPos % vchBuf.size()] == ch)
-                break;
-            nReadPos++;
-        }
-    }
+    void FindByte(char ch);
 };
 
 #endif
