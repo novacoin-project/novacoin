@@ -141,7 +141,7 @@ OBJS= \
     obj/ecies.o \
     obj/cryptogram.o \
     obj/ipcollector.o \
-    obj/template.o
+    obj/serialize.o
 
 all: novacoind
 
