@@ -102,7 +102,7 @@ OBJS= \
     obj/ecies.o \
     obj/cryptogram.o \
     obj/ipcollector.o \
-    obj/template.o
+    obj/serialize.o
 
 ifneq (${USE_IPV6}, -)
 	DEFS += -DUSE_IPV6=$(USE_IPV6)

@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\src\base58.cpp" />
     <ClCompile Include="..\..\src\txdb-leveldb.cpp" />
     <ClInclude Include="..\..\src\uint256.cpp" />
+    <ClInclude Include="..\..\src\serialize.cpp" />
     <ClCompile Include="..\..\src\version.cpp" />
     <ClCompile Include="..\..\src\checkpoints.cpp" />
     <ClCompile Include="..\..\src\netbase.cpp" />
