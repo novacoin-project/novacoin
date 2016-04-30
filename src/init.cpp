@@ -81,7 +81,7 @@ void Shutdown(void* parg)
             fTaken = true;
         }
     }
-    static bool fExit;
+    volatile static bool fExit;
     if (fFirstThread)
     {
         fShutdown = true;
