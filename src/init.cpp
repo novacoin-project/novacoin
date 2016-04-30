@@ -708,7 +708,6 @@ bool AppInit2()
     bool fBound = false;
     if (!fNoListen)
     {
-        std::string strError;
         if (mapArgs.count("-bind")) {
             for(std::string strBind :  mapMultiArgs["-bind"]) {
                 CService addrBind;
