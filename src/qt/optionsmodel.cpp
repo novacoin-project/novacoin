@@ -227,7 +227,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             proxy.first = CService("127.0.0.1", nSocksDefault);
             GetProxy(NET_IPV4, proxy);
 
-            proxy.first.SetPort(value.toInt());
+            proxy.first.SetupPort(value.toInt());
             settings.setValue("addrProxy", proxy.first.ToStringIPPort().c_str());
             successful = ApplyProxySettings();
         }
@@ -263,7 +263,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             proxy.first = CService("127.0.0.1", nSocksDefault);
             GetProxy(NET_TOR, proxy);
 
-            proxy.first.SetPort((uint16_t)value.toUInt());
+            proxy.first.SetupPort((uint16_t)value.toUInt());
             settings.setValue("addrTor", proxy.first.ToStringIPPort().c_str());
             successful = ApplyTorSettings();
         }

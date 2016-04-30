@@ -1177,7 +1177,7 @@ std::string CService::ToString() const
     return ToStringIPPort();
 }
 
-void CService::SetPort(uint16_t portIn)
+void CService::SetupPort(uint16_t portIn)
 {
     port = portIn;
 }
