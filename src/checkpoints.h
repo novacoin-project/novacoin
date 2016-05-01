@@ -55,11 +55,11 @@ namespace Checkpoints
     bool AcceptPendingSyncCheckpoint();
     uint256 AutoSelectSyncCheckpoint();
     bool CheckSync(const uint256& hashBlock, const CBlockIndex* pindexPrev);
-    bool WantedByPendingSyncCheckpoint(uint256 hashBlock);
+    bool WantedByPendingSyncCheckpoint(const uint256 &hashBlock);
     bool ResetSyncCheckpoint();
     void AskForPendingSyncCheckpoint(CNode* pfrom);
-    bool SetCheckpointPrivKey(std::string strPrivKey);
-    bool SendSyncCheckpoint(uint256 hashCheckpoint);
+    bool SetCheckpointPrivKey(const std::string &strPrivKey);
+    bool SendSyncCheckpoint(const uint256 &hashCheckpoint);
     bool IsMatureSyncCheckpoint();
 }
 
