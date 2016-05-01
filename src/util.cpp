@@ -185,7 +185,7 @@ int GetRandInt(int nMax)
 uint256 GetRandHash()
 {
     uint256 hash;
-    RAND_bytes((uint8_t*)&hash, sizeof(hash));
+    RAND_bytes(hash.begin(), hash.size());
     return hash;
 }
 

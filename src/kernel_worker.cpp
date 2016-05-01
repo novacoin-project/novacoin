@@ -41,13 +41,13 @@ void KernelWorker::Do_generic()
         // Complete first hashing iteration
         uint256 hash1;
         SHA256_Update(&ctx, (unsigned char*)&nTimeTx, 4);
-        SHA256_Final((unsigned char*)&hash1, &ctx);
+        SHA256_Final(hash1.begin(), &ctx);
 
         // Restore context
         ctx = workerCtx;
 
         // Finally, calculate kernel hash
-        SHA256((unsigned char*)&hash1, sizeof(hashProofOfStake), (unsigned char*)&hashProofOfStake);
+        SHA256(hash1.begin(), sizeof(hashProofOfStake), (unsigned char*)&hashProofOfStake);
 
         // Skip if hash doesn't satisfy the maximum target
         if (hashProofOfStake[7] > nMaxTarget32)
@@ -95,14 +95,14 @@ bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTx
         // Complete first hashing iteration
         uint256 hash1;
         SHA256_Update(&ctx, (unsigned char*)&nTimeTx, 4);
-        SHA256_Final((unsigned char*)&hash1, &ctx);
+        SHA256_Final(hash1.begin(), &ctx);
 
         // Restore context
         ctx = workerCtx;
 
         // Finally, calculate kernel hash
         uint256 hashProofOfStake;
-        SHA256((unsigned char*)&hash1, sizeof(hashProofOfStake), (unsigned char*)&hashProofOfStake);
+        SHA256(hash1.begin(), hashProofOfStake.size(), hashProofOfStake.begin());
 
         // Skip if hash doesn't satisfy the maximum target
         if (hashProofOfStake > nMaxTarget)

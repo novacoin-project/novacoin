@@ -370,7 +370,7 @@ CPubKey CKey::GetPubKey() const
 bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
 {
     vchSig.clear();
-    auto sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
+    auto sig = ECDSA_do_sign(hash.begin(), hash.size(), pkey);
     if (sig==NULL)
         return false;
     auto group = EC_KEY_get0_group(pkey);
