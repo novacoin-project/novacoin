@@ -49,11 +49,6 @@ static const int64_t CENT = 10000;
 #define UBEGIN(a)           ((unsigned char*)&(a))
 #define UEND(a)             ((unsigned char*)&((&(a))[1]))
 
-#define UVOIDBEGIN(a)        ((void*)&(a))
-#define CVOIDBEGIN(a)        ((const void*)&(a))
-#define UINTBEGIN(a)        ((uint32_t*)&(a))
-#define CUINTBEGIN(a)        ((const uint32_t*)&(a))
-
 #ifndef THROW_WITH_STACKTRACE
 #define THROW_WITH_STACKTRACE(exception)  \
 {                                         \
