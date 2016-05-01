@@ -200,9 +200,9 @@ public:
     }
 
     bool Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const;
-    bool VerifyCompact(uint256 hash, const std::vector<unsigned char>& vchSig);
+    bool VerifyCompact(const uint256 &hash, const std::vector<unsigned char>& vchSig);
 
-    bool SetCompactSignature(uint256 hash, const std::vector<unsigned char>& vchSig);
+    bool SetCompactSignature(const uint256 &hash, const std::vector<unsigned char>& vchSig);
 
     // Reserialize to DER
     static bool ReserealizeSignature(std::vector<unsigned char>& vchSig);
@@ -255,7 +255,7 @@ public:
     // The format is one header byte, followed by two times 32 bytes for the serialized r and s values.
     // The header byte: 0x1B = first key with even y, 0x1C = first key with odd y,
     //                  0x1D = second key with even y, 0x1E = second key with odd y
-    bool SignCompact(uint256 hash, std::vector<unsigned char>& vchSig);
+    bool SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig);
 
     bool IsValid();
 

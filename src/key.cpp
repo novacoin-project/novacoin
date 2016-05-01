@@ -399,7 +399,7 @@ bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
 // The format is one header byte, followed by two times 32 bytes for the serialized r and s values.
 // The header byte: 0x1B = first key with even y, 0x1C = first key with odd y,
 //                  0x1D = second key with even y, 0x1E = second key with odd y
-bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
+bool CKey::SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig)
 {
     bool fOk = false;
     auto sig = ECDSA_do_sign(hash.begin(), hash.size(), pkey);
@@ -453,7 +453,7 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
 // This is only slightly more CPU intensive than just verifying it.
 // If this function succeeds, the recovered public key is guaranteed to be valid
 // (the signature is a valid signature of the given data for that key)
-bool CPubKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>& vchSig)
+bool CPubKey::SetCompactSignature(const uint256 &hash, const std::vector<unsigned char>& vchSig)
 {
     if (vchSig.size() != 65)
         return false;
@@ -531,7 +531,7 @@ bool CPubKey::Verify(const uint256 &hash, const std::vector<unsigned char>& vchS
     return ret;
 }
 
-bool CPubKey::VerifyCompact(uint256 hash, const std::vector<unsigned char>& vchSig)
+bool CPubKey::VerifyCompact(const uint256 &hash, const std::vector<unsigned char>& vchSig)
 {
     CPubKey key;
     if (!key.SetCompactSignature(hash, vchSig))
