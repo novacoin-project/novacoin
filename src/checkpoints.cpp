@@ -113,7 +113,7 @@ namespace Checkpoints
     }
 
     // ppcoin: only descendant of current sync-checkpoint is allowed
-    bool ValidateSyncCheckpoint(uint256 hashCheckpoint)
+    bool ValidateSyncCheckpoint(const uint256 &hashCheckpoint)
     {
         if (!mapBlockIndex.count(hashSyncCheckpoint))
             return error("ValidateSyncCheckpoint: block index missing for current sync-checkpoint %s", hashSyncCheckpoint.ToString().c_str());
@@ -259,7 +259,7 @@ namespace Checkpoints
         return true;
     }
 
-    bool WantedByPendingSyncCheckpoint(uint256 hashBlock)
+    bool WantedByPendingSyncCheckpoint(const uint256 &hashBlock)
     {
         LOCK(cs_hashSyncCheckpoint);
         if (hashPendingCheckpoint == 0)
@@ -325,7 +325,7 @@ namespace Checkpoints
             pfrom->AskFor(CInv(MSG_BLOCK, hashPendingCheckpoint));
     }
 
-    bool SetCheckpointPrivKey(string strPrivKey)
+    bool SetCheckpointPrivKey(const string &strPrivKey)
     {
         // Test signing a sync-checkpoint with genesis block
         CSyncCheckpoint checkpoint;
@@ -345,7 +345,7 @@ namespace Checkpoints
         return true;
     }
 
-    bool SendSyncCheckpoint(uint256 hashCheckpoint)
+    bool SendSyncCheckpoint(const uint256 &hashCheckpoint)
     {
         CSyncCheckpoint checkpoint;
         checkpoint.hashCheckpoint = hashCheckpoint;
