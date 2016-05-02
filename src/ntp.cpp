@@ -280,7 +280,7 @@ bool InitWithHost(const std::string &strHostName, SOCKET &sockfd, socklen_t &ser
         return false;
     }
 
-    struct sockaddr_in servaddr;
+    struct sockaddr_in servaddr = {};
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(123);
 
