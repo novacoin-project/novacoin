@@ -205,7 +205,7 @@ void CDBEnv::CheckpointLSN(string strFile)
 
 
 CDB::CDB(const char *pszFile, const char* pszMode) :
-    pdb(NULL), activeTxn(NULL)
+    pdb(NULL), activeTxn(NULL), fReadOnly(true)
 {
     int ret;
     if (pszFile == NULL)
