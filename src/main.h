@@ -732,10 +732,10 @@ class CScriptCheck
 {
 private:
     CScript scriptPubKey;
-    const CTransaction *ptxTo;
-    unsigned int nIn;
-    unsigned int nFlags;
-    int nHashType;
+    const CTransaction *ptxTo = nullptr;
+    unsigned int nIn = 0;
+    unsigned int nFlags = 0;
+    int nHashType = 0;
 
 public:
     CScriptCheck() {}
