@@ -146,29 +146,73 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
         if (!SetCrypted())
             return false;
 
-        CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
-        for (; mi != mapCryptedKeys.end(); ++mi)
+        bool keyPass = false;
+        bool keyFail = false;
+
+        // Check regular key pairs
         {
-            const auto &vchPubKey = (*mi).second.first;
-            const auto &vchCryptedSecret = (*mi).second.second;
-            CSecret vchSecret;
-            if(!DecryptSecret(vMasterKeyIn, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
-                return false;
-            if (vchSecret.size() != 32)
-                return false;
-            CKey key;
-            key.SetSecret(vchSecret);
-            key.SetCompressedPubKey(vchPubKey.IsCompressed());
-            if (key.GetPubKey() == vchPubKey)
-                break;
-            return false;
+            auto mi = mapCryptedKeys.begin();
+            for (; mi != mapCryptedKeys.end(); ++mi)
+            {
+                const auto &vchPubKey = (*mi).second.first;
+                const auto &vchCryptedSecret = (*mi).second.second;
+                CSecret vchSecret;
+                if (!DecryptSecret(vMasterKeyIn, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
+                {
+                    keyFail = true;
+                    break;
+                }
+                if (vchSecret.size() != 32)
+                {
+                    keyFail = true;
+                    break;
+                }
+                keyPass = true;
+                if (fDecryptionThoroughlyChecked)
+                    break;
+            }
         }
 
+        // Check malleable key pairs
+        {
+            if (keyPass && !keyFail)
+            {
+                auto mi = mapCryptedMalleableKeys.begin();
+                for(; mi != mapCryptedMalleableKeys.end(); ++mi)
+                {
+                    const auto &H = mi->first.GetMalleablePubKey().GetH();
+                    CSecret vchSecretH;
+                    if (!DecryptSecret(vMasterKeyIn, mi->second, H.GetHash(), vchSecretH))
+                    {
+                        keyFail = true;
+                        break;
+                    }
+                    if (vchSecretH.size() != 32)
+                    {
+                        keyFail = true;
+                        break;
+                    }
+                    keyPass = true;
+                    if (fDecryptionThoroughlyChecked)
+                        break;
+                }
+            }
+        }
+
+        if (keyPass && keyFail)
+        {
+            printf("The wallet is probably corrupted: Some keys decrypt but not all.\n");
+            assert(false);
+        }
+        if (keyFail || !keyPass)
+            return false;
         vMasterKey = vMasterKeyIn;
+        fDecryptionThoroughlyChecked = true;
     }
     NotifyStatusChanged(this);
     return true;
 }
+
 
 bool CCryptoKeyStore::AddKey(const CKey& key)
 {
