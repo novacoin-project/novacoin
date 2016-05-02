@@ -118,10 +118,13 @@ class CInv
         const char* GetCommand() const;
         std::string ToString() const;
 
+        int GetType() const { return type; }
+        uint256 GetHash() const { return hash; }
+
     // TODO: make private (improves encapsulation)
-    public:
-        int type;
-        uint256 hash;
+    private:
+        int type = 0;
+        uint256 hash = 0;
 };
 
 #endif // __INCLUDED_PROTOCOL_H__
