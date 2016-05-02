@@ -8,7 +8,7 @@
 
 using namespace std;
 
-KernelWorker::KernelWorker(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, uint32_t nIntervalBegin, uint32_t nIntervalEnd) 
+KernelWorker::KernelWorker(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, uint32_t nIntervalBegin, uint32_t nIntervalEnd)
         : kernel(kernel), nBits(nBits), nInputTxTime(nInputTxTime), bnValueIn(nValueIn), nIntervalBegin(nIntervalBegin), nIntervalEnd(nIntervalEnd)
     {
         solutions = vector<pair<uint256,uint32_t> >();
@@ -73,7 +73,7 @@ vector<pair<uint256,uint32_t> >& KernelWorker::GetSolutions()
 
 // Scan given kernel for solutions
 
-bool ScanKernelBackward(unsigned char *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, pair<uint256, uint32_t> &solution)
+bool ScanKernelBackward(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, pair<uint256, uint32_t> &solution)
 {
     uint256 nTargetPerCoinDay;
     nTargetPerCoinDay.SetCompact(nBits);
