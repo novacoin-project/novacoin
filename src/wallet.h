@@ -592,29 +592,16 @@ public:
 class CAccountingEntry
 {
 public:
-    std::string strAccount;
-    int64_t nCreditDebit;
-    int64_t nTime;
-    std::string strOtherAccount;
-    std::string strComment;
+    std::string strAccount = "";
+    int64_t nCreditDebit = 0;
+    int64_t nTime = 0;
+    std::string strOtherAccount = "";
+    std::string strComment = "";
     mapValue_t mapValue;
-    int64_t nOrderPos;  // position in ordered transaction list
-    uint64_t nEntryNo;
+    int64_t nOrderPos = -1;  // position in ordered transaction list
+    uint64_t nEntryNo = 0;
 
-    CAccountingEntry()
-    {
-        SetNull();
-    }
-
-    void SetNull()
-    {
-        nCreditDebit = 0;
-        nTime = 0;
-        strAccount.clear();
-        strOtherAccount.clear();
-        strComment.clear();
-        nOrderPos = -1;
-    }
+    CAccountingEntry() { }
 
     IMPLEMENT_SERIALIZE
     (
