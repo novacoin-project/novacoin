@@ -224,7 +224,6 @@ static int store_cipher_body(
     if (EVP_EncryptFinal_ex(&cipher, body, &out_len) != 1) {
         SET_OSSL_ERROR("Error while finalizing the data using the symmetric cipher");
         EVP_CIPHER_CTX_cleanup(&cipher);
-        cryptogram_free(cryptogram);
         return 0;
     }
 
