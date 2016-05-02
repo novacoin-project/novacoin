@@ -400,7 +400,7 @@ private:
     CPubKey vchPubKeyH;
 
 public:
-    CMalleableKeyView() { };
+    CMalleableKeyView() { }
     CMalleableKeyView(const CMalleableKey &b);
     CMalleableKeyView(const std::string &strMalleableKey);
 

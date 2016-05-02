@@ -708,7 +708,9 @@ void CMalleablePubKey::GetVariant(CPubKey &R, CPubKey &vchPubKeyVariant)
     bnHash.setuint160(Hash160(vchLr));
 
     CPoint pointH;
-    pointH.setPubKey(pubKeyH);
+    if (!pointH.setPubKey(pubKeyH)) {
+        throw key_error("CMalleablePubKey::GetVariant() : Unable to decode H value");
+    }
 
     CPoint P;
     // Calculate P = Hash(L*r)*G + H
@@ -719,7 +721,9 @@ void CMalleablePubKey::GetVariant(CPubKey &R, CPubKey &vchPubKeyVariant)
     }
 
     std::vector<unsigned char> vchResult;
-    P.getBytes(vchResult);
+    if (!P.getBytes(vchResult)) {
+        throw key_error("CMalleablePubKey::GetVariant() : Unable to convert P value");
+    }
 
     vchPubKeyVariant = CPubKey(vchResult);
 }
