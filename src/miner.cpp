@@ -159,8 +159,11 @@ CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txCoinStake)
     // 1-satoshi-fee transactions. It should be set above the real
     // cost to you of processing a transaction.
     auto nMinTxFee = MIN_TX_FEE;
-    if (mapArgs.count("-mintxfee"))
-        ParseMoney(mapArgs["-mintxfee"], nMinTxFee);
+    if (mapArgs.count("-mintxfee")) {
+        bool fResult = ParseMoney(mapArgs["-mintxfee"], nMinTxFee);
+        if (!fResult) // Parse error
+            nMinTxFee = MIN_TX_FEE;
+    }
 
     auto pindexPrev = pindexBest;
 
