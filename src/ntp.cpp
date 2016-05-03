@@ -32,11 +32,11 @@ extern int GetRandInt(int nMax);
 
 typedef struct {
   union {
-    uint32_t Xl_ui;
+    uint32_t Xl_ui=0;
     int32_t Xl_i;
   } Ul_i;
   union {
-    uint32_t Xl_uf;
+    uint32_t Xl_uf=0;
     int32_t Xl_f;
   } Ul_f;
 } l_fp;
@@ -54,13 +54,13 @@ inline void ntohl_fp(l_fp *n, l_fp *h) {
 }
 
 struct pkt {
-  uint8_t  li_vn_mode;     /* leap indicator, version and mode */
-  uint8_t  stratum;        /* peer stratum */
-  uint8_t  ppoll;          /* peer poll interval */
-  int8_t  precision;      /* peer clock precision */
-  uint32_t    rootdelay;      /* distance to primary clock */
-  uint32_t    rootdispersion; /* clock dispersion */
-  uint32_t refid;          /* reference clock ID */
+  uint8_t  li_vn_mode=227;     /* leap indicator, version and mode */
+  uint8_t  stratum=0;        /* peer stratum */
+  uint8_t  ppoll=4;          /* peer poll interval */
+  int8_t  precision=0;      /* peer clock precision */
+  uint32_t    rootdelay=0;      /* distance to primary clock */
+  uint32_t    rootdispersion=0; /* clock dispersion */
+  uint32_t refid=0;          /* reference clock ID */
   l_fp    ref;        /* time peer clock was last updated */
   l_fp    org;            /* originate time stamp */
   l_fp    rec;            /* receive time stamp */
@@ -342,22 +342,6 @@ int64_t DoReq(SOCKET sockfd, socklen_t servlen, struct sockaddr cliaddr) {
     struct pkt *prt  = new pkt;
     time_t seconds_transmit;
     int len = 48;
-
-    msg->li_vn_mode=227;
-    msg->stratum=0;
-    msg->ppoll=4;
-    msg->precision=0;
-    msg->rootdelay=0;
-    msg->rootdispersion=0;
-
-    msg->ref.Ul_i.Xl_i=0;
-    msg->ref.Ul_f.Xl_f=0;
-    msg->org.Ul_i.Xl_i=0;
-    msg->org.Ul_f.Xl_f=0;
-    msg->rec.Ul_i.Xl_i=0;
-    msg->rec.Ul_f.Xl_f=0;
-    msg->xmt.Ul_i.Xl_i=0;
-    msg->xmt.Ul_f.Xl_f=0;
 
     int retcode = sendto(sockfd, (char *) msg, len, 0, &cliaddr, servlen);
     if (retcode < 0) {
