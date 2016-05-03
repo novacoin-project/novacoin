@@ -66,8 +66,8 @@ struct pkt {
   l_fp    rec;            /* receive time stamp */
   l_fp    xmt;            /* transmit time stamp */
 
-  uint32_t exten[1];       /* misused */
-  uint8_t  mac[5 * sizeof(uint32_t)]; /* mac */
+  uint32_t exten[1] = {0};       /* misused */
+  uint8_t  mac[5 * sizeof(uint32_t)] = {0}; /* mac */
 };
 
 const int nServersCount = 162;
