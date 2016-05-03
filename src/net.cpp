@@ -1767,11 +1767,19 @@ bool BindListenPort(const CService &addrBind, string& strError)
 #ifndef WIN32
 #ifdef SO_NOSIGPIPE
     // Different way of disabling SIGPIPE on BSD
-    setsockopt(hListenSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&nOne, sizeof(int));
+    if (setsockopt(hListenSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&nOne, sizeof(int)) == SOCKET_ERROR)
+    {
+        printf("WARNING: setsockopt failed\n");
+        //TODO: work around problem - may be add CloseSocket and return false?
+    }
 #endif
     // Allow binding if the port is still in TIME_WAIT state after
     // the program was closed and restarted. Not an issue on windows!
-    setsockopt(hListenSocket, SOL_SOCKET, SO_REUSEADDR, (void*)&nOne, sizeof(int));
+    if (setsockopt(hListenSocket, SOL_SOCKET, SO_REUSEADDR, (void*)&nOne, sizeof(int)) == SOCKET_ERROR)
+    {
+        printf("WARNING: setsockopt failed\n");
+        //TODO: work around problem - may be add CloseSocket and return false?
+    }
 #endif
 
 #ifdef WIN32
@@ -1783,6 +1791,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     {
         strError = strprintf("Error: Couldn't set properties on socket for incoming connections (error %d)", WSAGetLastError());
         printf("%s\n", strError.c_str());
+        CloseSocket(hSocket);
         return false;
     }
 
@@ -1792,14 +1801,26 @@ bool BindListenPort(const CService &addrBind, string& strError)
     if (addrBind.IsIPv6()) {
 #ifdef IPV6_V6ONLY
 #ifdef WIN32
-        setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&nOne, sizeof(int));
+    if (setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&nOne, sizeof(int)) == SOCKET_ERROR)
+    {
+        printf("WARNING: setsockopt failed\n");
+        //TODO: work around problem - may be add CloseSocket and return false?
+    }
 #else
-        setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&nOne, sizeof(int));
+    if (setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&nOne, sizeof(int)) == SOCKET_ERROR)
+    {
+        printf("WARNING: setsockopt failed\n");
+        //TODO: work around problem - may be add CloseSocket and return false?
+    }
 #endif
 #endif
 #ifdef WIN32
-        int nProtLevel = PROTECTION_LEVEL_UNRESTRICTED;
-        setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, (const char*)&nProtLevel, sizeof(int));
+    int nProtLevel = PROTECTION_LEVEL_UNRESTRICTED;
+    if (setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, (const char*)&nProtLevel, sizeof(int)) == SOCKET_ERROR)
+    {
+        printf("WARNING: setsockopt failed\n");
+        //TODO: work around problem - may be add CloseSocket and return false?
+    }
 #endif
     }
 #endif
