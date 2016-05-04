@@ -79,6 +79,80 @@ template uint64_t ReadCompactSize<CAutoFile>(CAutoFile&);
 template uint64_t ReadCompactSize<CDataStream>(CDataStream&);
 
 //
+//CDataStream
+//
+
+
+bool CDataStream::Rewind(size_type n)
+{
+    // Rewind by n characters if the buffer hasn't been compacted yet
+    if (n > nReadPos)
+        return false;
+    nReadPos -= (unsigned int)n;
+    return true;
+}
+
+void CDataStream::setstate(short bits, const char* psz)
+{
+    state |= bits;
+    if (state & exceptmask)
+        throw std::ios_base::failure(psz);
+}
+
+CDataStream& CDataStream::read(char* pch, int nSize)
+{
+    // Read from the beginning of the buffer
+    assert(nSize >= 0);
+    unsigned int nReadPosNext = nReadPos + nSize;
+    if (nReadPosNext >= vch.size())
+    {
+        if (nReadPosNext > vch.size())
+        {
+            setstate(std::ios::failbit, "CDataStream::read() : end of data");
+            memset(pch, 0, nSize);
+            nSize = (int)(vch.size() - nReadPos);
+        }
+        memcpy(pch, &vch[nReadPos], nSize);
+        nReadPos = 0;
+        vch.clear();
+        return (*this);
+    }
+    memcpy(pch, &vch[nReadPos], nSize);
+    nReadPos = nReadPosNext;
+    return (*this);
+}
+
+CDataStream& CDataStream::ignore(int nSize)
+{
+    // Ignore from the beginning of the buffer
+    assert(nSize >= 0);
+    unsigned int nReadPosNext = nReadPos + nSize;
+    if (nReadPosNext >= vch.size())
+    {
+        if (nReadPosNext > vch.size())
+            setstate(std::ios::failbit, "CDataStream::ignore() : end of data");
+        nReadPos = 0;
+        vch.clear();
+        return (*this);
+    }
+    nReadPos = nReadPosNext;
+    return (*this);
+}
+
+CDataStream& CDataStream::write(const char* pch, int nSize)
+{
+    // Write to the end of the buffer
+    assert(nSize >= 0);
+    vch.insert(vch.end(), pch, pch + nSize);
+    return (*this);
+}
+
+void CDataStream::GetAndClear(CSerializeData &data) {
+    vch.swap(data);
+    CSerializeData().swap(vch);
+}
+
+//
 //CAutoFile
 //
 

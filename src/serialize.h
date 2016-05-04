@@ -929,26 +929,12 @@ public:
         nReadPos = 0;
     }
 
-    bool Rewind(size_type n)
-    {
-        // Rewind by n characters if the buffer hasn't been compacted yet
-        if (n > nReadPos)
-            return false;
-        nReadPos -= (unsigned int)n;
-        return true;
-    }
-
+    bool Rewind(size_type n);
 
     //
     // Stream subset
     //
-    void setstate(short bits, const char* psz)
-    {
-        state |= bits;
-        if (state & exceptmask)
-            throw std::ios_base::failure(psz);
-    }
-
+    void setstate(short bits, const char* psz);
     bool eof() const             { return size() == 0; }
     bool fail() const            { return (state & (std::ios::badbit | std::ios::failbit)) != 0; }
     bool good() const            { return !eof() && (state == 0); }
@@ -965,53 +951,9 @@ public:
     void ReadVersion()           { *this >> nVersion; }
     void WriteVersion()          { *this << nVersion; }
 
-    CDataStream& read(char* pch, int nSize)
-    {
-        // Read from the beginning of the buffer
-        assert(nSize >= 0);
-        unsigned int nReadPosNext = nReadPos + nSize;
-        if (nReadPosNext >= vch.size())
-        {
-            if (nReadPosNext > vch.size())
-            {
-                setstate(std::ios::failbit, "CDataStream::read() : end of data");
-                memset(pch, 0, nSize);
-                nSize = (int)(vch.size() - nReadPos);
-            }
-            memcpy(pch, &vch[nReadPos], nSize);
-            nReadPos = 0;
-            vch.clear();
-            return (*this);
-        }
-        memcpy(pch, &vch[nReadPos], nSize);
-        nReadPos = nReadPosNext;
-        return (*this);
-    }
-
-    CDataStream& ignore(int nSize)
-    {
-        // Ignore from the beginning of the buffer
-        assert(nSize >= 0);
-        unsigned int nReadPosNext = nReadPos + nSize;
-        if (nReadPosNext >= vch.size())
-        {
-            if (nReadPosNext > vch.size())
-                setstate(std::ios::failbit, "CDataStream::ignore() : end of data");
-            nReadPos = 0;
-            vch.clear();
-            return (*this);
-        }
-        nReadPos = nReadPosNext;
-        return (*this);
-    }
-
-    CDataStream& write(const char* pch, int nSize)
-    {
-        // Write to the end of the buffer
-        assert(nSize >= 0);
-        vch.insert(vch.end(), pch, pch + nSize);
-        return (*this);
-    }
+    CDataStream& read(char* pch, int nSize);
+    CDataStream& ignore(int nSize);
+    CDataStream& write(const char* pch, int nSize);
 
     template<typename Stream>
     void Serialize(Stream& s, int nType, int nVersion) const
@@ -1044,10 +986,7 @@ public:
         return (*this);
     }
 
-    void GetAndClear(CSerializeData &data) {
-        vch.swap(data);
-        CSerializeData().swap(vch);
-    }
+    void GetAndClear(CSerializeData &data);
 };
 
 
