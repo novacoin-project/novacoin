@@ -1246,8 +1246,9 @@ void ShrinkDebugFile()
         // Restart the file with some of the end
         try {
             vector<char>* vBuf = new vector <char>(200000, 0);
-            fseek(file, -((long)(vBuf->size())), SEEK_END);
-            size_t nBytes = fread(&vBuf->operator[](0), 1, vBuf->size(), file);
+            size_t nBytes = 1; //write one byte if fseek failed
+            if (fseek(file, -((long)(vBuf->size())), SEEK_END) == 0)
+                nBytes = fread(&vBuf->operator[](0), 1, vBuf->size(), file);
             fclose(file);
             file = fopen(pathLog.string().c_str(), "w");
             if (file)
