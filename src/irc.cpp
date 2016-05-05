@@ -274,8 +274,10 @@ void ThreadIRCSeed2(void* parg)
             {
                 printf("IRC name already in use\n");
                 nNameRetry++;
-                Wait(10);
-                continue;
+                if (Wait(10))
+                    continue;
+                else
+                    return;
             }
             nErrorWait = nErrorWait * 11 / 10;
             if (Wait(nErrorWait += 60))
