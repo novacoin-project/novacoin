@@ -523,7 +523,7 @@ unsigned char * ecies_decrypt(const ies_ctx_t *ctx, const cryptogram_t *cryptogr
 {
     unsigned char *envelope_key = NULL, *output = NULL;
 
-    if (!ctx || !cryptogram || !length || !error) {
+    if (!ctx || !cryptogram || !length) {
         SET_ERROR("Invalid argument");
         goto err;
     }
