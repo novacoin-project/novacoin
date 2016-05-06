@@ -845,7 +845,7 @@ bool AppInit2()
         for (auto mi = mapBlockIndex.begin(); mi != mapBlockIndex.end(); ++mi)
         {
             auto hash = (*mi).first;
-            if (strncmp(hash.ToString().c_str(), strMatch.c_str(), strMatch.size()) == 0)
+            if (strMatch.compare(hash.ToString()) == 0)
             {
                 auto pindex = (*mi).second;
                 CBlock block;
