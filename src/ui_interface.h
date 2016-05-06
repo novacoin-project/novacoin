@@ -105,8 +105,14 @@ extern CClientUIInterface uiInterface;
  */
 inline std::string _(const char* psz)
 {
-    boost::optional<std::string> rv = uiInterface.Translate(psz);
-    return rv ? (*rv) : psz;
+    try {
+        boost::optional<std::string> rv = uiInterface.Translate(psz);
+        return rv ? (*rv) : psz;
+    }
+    catch (const boost::bad_function_call& e) {
+        printf("Warning: %s in %s:%d\n", e.what(), __FILE__, __LINE__);
+        return psz;
+    }
 }
 
 #endif
