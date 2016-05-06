@@ -584,7 +584,6 @@ bool AppInit2()
         printf("Startup time: %s\n", DateTimeStrFormat("%x %H:%M:%S", GetTime()).c_str());
     printf("Default data directory %s\n", GetDefaultDataDir().string().c_str());
     printf("Used data directory %s\n", strDataDir.c_str());
-    std::ostringstream strErrors;
 
     if (fDaemon)
         fprintf(stdout, "NovaCoin server starting\n");
@@ -594,8 +593,6 @@ bool AppInit2()
         for (int i=0; i<nScriptCheckThreads-1; i++)
             NewThread(ThreadScriptCheck, NULL);
     }
-
-    int64_t nStart;
 
     // ********************************************************* Step 5: verify database integrity
 
@@ -794,6 +791,7 @@ bool AppInit2()
 
     printf("Loading block index...\n");
     bool fLoaded = false;
+    int64_t nStart;
     while (!fLoaded) {
         std::string strLoadError;
         uiInterface.InitMessage(_("Loading block index..."));
@@ -879,6 +877,7 @@ bool AppInit2()
     uiInterface.InitMessage(_("Loading wallet..."));
     printf("Loading wallet...\n");
     nStart = GetTimeMillis();
+    std::ostringstream strErrors;
     bool fFirstRun = true;
     pwalletMain = new CWallet(strWalletFileName);
     DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
