@@ -466,7 +466,7 @@ void MultisigDialog::on_signTransactionButton_clicked()
 
     // Sign what we can
     bool fComplete = true;
-    for(unsigned int i = 0; i < mergedTx.vin.size(); i++)
+    for(uint32_t i = 0; i < mergedTx.vin.size(); i++)
     {
         CTxIn& txin = mergedTx.vin[i];
         if(mapPrevOut.count(txin.prevout) == 0)

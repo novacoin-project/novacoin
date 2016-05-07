@@ -542,7 +542,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
     bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
 
     // Sign what we can:
-    for (unsigned int i = 0; i < mergedTx.vin.size(); i++)
+    for (uint32_t i = 0; i < mergedTx.vin.size(); i++)
     {
         auto& txin = mergedTx.vin[i];
         if (mapPrevOut.count(txin.prevout) == 0)

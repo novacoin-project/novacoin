@@ -2322,7 +2322,7 @@ bool CWallet::MergeCoins(const int64_t& nAmount, const int64_t& nMinValue, const
         if (wtxNew.vout[0].nValue <= 0)
             return false;
 
-        for (unsigned int i = 0; i < wtxNew.vin.size(); i++) {
+        for (uint32_t i = 0; i < wtxNew.vin.size(); i++) {
             const CWalletTx *txin = vwtxPrev[i];
 
             // Sign all scripts again
@@ -2507,7 +2507,7 @@ bool CWallet::CreateCoinStake(uint256 &hashTx, uint32_t nOut, uint32_t nGenerati
         }
 
         // Limit size
-        unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
+        auto nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
         if (nBytes >= MAX_BLOCK_SIZE_GEN/5)
             return error("CreateCoinStake : exceeded coinstake size limit\n");
 

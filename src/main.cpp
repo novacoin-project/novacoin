@@ -359,7 +359,7 @@ bool CTransaction::AreInputsStandard(const MapPrevTx& mapInputs) const
     if (IsCoinBase())
         return true; // Coinbases don't use vin normally
 
-    for (unsigned int i = 0; i < vin.size(); i++)
+    for (uint32_t i = 0; i < vin.size(); i++)
     {
         const CTxOut& prev = GetOutputFor(vin[i], mapInputs);
 

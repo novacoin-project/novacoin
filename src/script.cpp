@@ -412,7 +412,7 @@ bool CheckSequence(const int64_t& nSequence, const CTransaction &txTo, unsigned 
     return true;
 }
 
-bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType)
+bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, const CTransaction& txTo, uint32_t nIn, unsigned int flags, int nHashType)
 {
     CAutoBN_CTX pctx;
     auto pc = script.begin();
@@ -1831,8 +1831,7 @@ bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, vecto
     return true;
 }
 
-bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const CTransaction& txTo, unsigned int nIn,
-                  unsigned int flags, int nHashType)
+bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const CTransaction& txTo, uint32_t nIn, unsigned int flags, int nHashType)
 {
     vector<vector<unsigned char> > stack, stackCopy;
     if (!EvalScript(stack, scriptSig, txTo, nIn, flags, nHashType))
@@ -1872,7 +1871,7 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const C
     return true;
 }
 
-bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CTransaction& txTo, unsigned int nIn, int nHashType)
+bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CTransaction& txTo, uint32_t nIn, int nHashType)
 {
     assert(nIn < txTo.vin.size());
     auto& txin = txTo.vin[nIn];
@@ -1906,7 +1905,7 @@ bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CTransa
     return VerifyScript(txin.scriptSig, fromPubKey, txTo, nIn, STRICT_FLAGS, 0);
 }
 
-bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CTransaction& txTo, unsigned int nIn, int nHashType)
+bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CTransaction& txTo, uint32_t nIn, int nHashType)
 {
     assert(nIn < txTo.vin.size());
     auto& txin = txTo.vin[nIn];
@@ -2027,7 +2026,7 @@ static CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction
     return CScript();
 }
 
-CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction& txTo, unsigned int nIn,
+CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction& txTo, uint32_t nIn,
                           const CScript& scriptSig1, const CScript& scriptSig2)
 {
     txnouttype txType;
