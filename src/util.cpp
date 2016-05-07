@@ -8,6 +8,8 @@
 #include "version.h"
 #include "ui_interface.h"
 
+#include <random>
+
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
 #include <boost/program_options/detail/config_file.hpp>
@@ -1119,20 +1121,19 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
     return path;
 }
 
-string randomStrGen(int length) {
-    static string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+string randomStrGen(size_t length) {
+    std::mt19937 mtrand;
+    mtrand.seed(static_cast<unsigned int>(time(NULL)));
+    static const string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     string result;
     result.resize(length);
-    for (int32_t i = 0; i < length; i++)
-        result[i] = charset[rand() % charset.length()];
-
+    for (size_t i = 0; i < length; ++i)
+        result[i] = charset[mtrand() % charset.length()];
     return result;
 }
 
 void createConf()
 {
-    srand(static_cast<unsigned int>(time(NULL)));
-
     ofstream pConf;
 #if BOOST_FILESYSTEM_VERSION >= 3
     pConf.open(GetConfigFile().generic_string().c_str());
