@@ -53,6 +53,7 @@ static const int64_t MIN_TXOUT_AMOUNT = CENT/100;
 
 
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
+inline bool MoneyRange(CBigNum nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 // Maximum number of script-checking threads allowed
@@ -581,14 +582,14 @@ public:
      */
     int64_t GetValueOut() const
     {
-        int64_t nValueOut = 0;
-        for(const CTxOut& txout :  vout)
+        CBigNum nValueOut = 0;
+        for(const auto& txout :  vout)
         {
             nValueOut += txout.nValue;
             if (!MoneyRange(txout.nValue) || !MoneyRange(nValueOut))
                 throw runtime_error("CTransaction::GetValueOut() : value out of range");
         }
-        return nValueOut;
+        return nValueOut.getint64();
     }
 
     /** Amount of bitcoins coming in to this transaction

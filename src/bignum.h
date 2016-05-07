@@ -191,6 +191,11 @@ public:
         BN_mpi2bn(pch, (int)(p - pch), this);
     }
 
+    int64_t getint64()
+    {
+        return (int64_t) getuint64();
+    }
+
     uint64_t getuint64()
     {
         size_t nSize = BN_bn2mpi(this, NULL);

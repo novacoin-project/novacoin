@@ -1032,38 +1032,41 @@ bool CWallet::IsFromMe(const CTransaction& tx) const
 
 int64_t CWallet::GetDebit(const CTransaction& tx, const isminefilter& filter) const
 {
-    int64_t nDebit = 0;
+    CBigNum nDebit = 0;
     for(const CTxIn& txin :  tx.vin)
     {
-        nDebit += GetDebit(txin, filter);
-        if (!MoneyRange(nDebit))
+        auto nValue = GetDebit(txin, filter);
+        nDebit += nValue;
+        if (!MoneyRange(nValue) || !MoneyRange(nDebit))
             throw runtime_error("CWallet::GetDebit() : value out of range");
     }
-    return nDebit;
+    return nDebit.getint64();
 }
 
 int64_t CWallet::GetCredit(const CTransaction& tx, const isminefilter& filter) const
 {
-    int64_t nCredit = 0;
+    CBigNum nCredit = 0;
     for(const CTxOut& txout :  tx.vout)
     {
-        nCredit += GetCredit(txout, filter);
-        if (!MoneyRange(nCredit))
+        auto nValue = GetCredit(txout, filter);
+        nCredit += nValue;
+        if (!MoneyRange(nValue) || !MoneyRange(nCredit))
             throw runtime_error("CWallet::GetCredit() : value out of range");
     }
-    return nCredit;
+    return nCredit.getint64();
 }
 
 int64_t CWallet::GetChange(const CTransaction& tx) const
 {
-    int64_t nChange = 0;
+    CBigNum nChange = 0;
     for(const CTxOut& txout :  tx.vout)
     {
-        nChange += GetChange(txout);
-        if (!MoneyRange(nChange))
+        int64_t nValue = GetChange(txout);
+        nChange += nValue;
+        if (!MoneyRange(nValue) || !MoneyRange(nChange))
             throw runtime_error("CWallet::GetChange() : value out of range");
     }
-    return nChange;
+    return nChange.getint64();
 }
 
 int64_t CWalletTx::GetTxTime() const
@@ -1254,22 +1257,23 @@ int64_t CWalletTx::GetAvailableCredit(bool fUseCache) const
             return nAvailableCreditCached;
     }
 
-    int64_t nCredit = 0;
-    for (unsigned int i = 0; i < vout.size(); i++)
+    CBigNum nCredit = 0;
+    for (uint32_t i = 0; i < vout.size(); i++)
     {
         if (!IsSpent(i))
         {
             const CTxOut &txout = vout[i];
-            nCredit += pwallet->GetCredit(txout, MINE_SPENDABLE);
-            if (!MoneyRange(nCredit))
+            int64_t nValue = pwallet->GetCredit(txout, MINE_SPENDABLE);
+            nCredit += nValue;
+            if (!MoneyRange(nValue) || !MoneyRange(nCredit))
                 throw runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
         }
     }
 
-    nAvailableCreditCached = nCredit;
+    nAvailableCreditCached = nCredit.getint64();
     fAvailableCreditCached = true;
 
-    return nCredit;
+    return nCredit.getint64();
 }
 
 int64_t CWalletTx::GetAvailableWatchCredit(bool fUseCache) const
@@ -1283,22 +1287,23 @@ int64_t CWalletTx::GetAvailableWatchCredit(bool fUseCache) const
             return nAvailableWatchCreditCached;
     }
 
-    int64_t nCredit = 0;
+    CBigNum nCredit = 0;
     for (unsigned int i = 0; i < vout.size(); i++)
     {
         if (!IsSpent(i))
         {
             const CTxOut &txout = vout[i];
-            nCredit += pwallet->GetCredit(txout, MINE_WATCH_ONLY);
-            if (!MoneyRange(nCredit))
+            int64_t nValue = pwallet->GetCredit(txout, MINE_WATCH_ONLY);
+            nCredit += nValue;
+            if (!MoneyRange(nValue) || !MoneyRange(nCredit))
                 throw runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
         }
     }
 
-    nAvailableWatchCreditCached = nCredit;
+    nAvailableWatchCreditCached = nCredit.getint64();
     fAvailableWatchCreditCached = true;
 
-    return nCredit;
+    return nCredit.getint64();
 }
 
 int64_t CWalletTx::GetChange() const

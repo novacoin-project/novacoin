@@ -492,10 +492,10 @@ bool CTransaction::CheckTransaction() const
         return DoS(100, error("CTransaction::CheckTransaction() : size limits failed"));
 
     // Check for negative or overflow output values
-    int64_t nValueOut = 0;
-    for (unsigned int i = 0; i < vout.size(); i++)
+    CBigNum nValueOut = 0;
+    for (uint32_t i = 0; i < vout.size(); i++)
     {
-        const CTxOut& txout = vout[i];
+        const auto& txout = vout[i];
         if (txout.IsEmpty() && !IsCoinBase() && !IsCoinStake())
             return DoS(100, error("CTransaction::CheckTransaction() : txout empty for user transaction"));
         if (!MoneyRange(txout.nValue))
@@ -1371,12 +1371,15 @@ int64_t CTransaction::GetValueIn(const MapPrevTx& inputs) const
     if (IsCoinBase())
         return 0;
 
-    int64_t nResult = 0;
-    for (unsigned int i = 0; i < vin.size(); i++)
+    CBigNum nResult = 0;
+    for (uint32_t i = 0; i < vin.size(); i++)
     {
-        nResult += GetOutputFor(vin[i], inputs).nValue;
+        const auto& txOut = GetOutputFor(vin[i], inputs);
+        nResult += txOut.nValue;
+        if (!MoneyRange(txOut.nValue) || !MoneyRange(nResult))
+            throw runtime_error("CTransaction::GetValueIn() : value out of range");
     }
-    return nResult;
+    return nResult.getint64();
 
 }
 
@@ -1418,32 +1421,34 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
     if (!IsCoinBase())
     {
         int64_t nValueIn = 0;
-        int64_t nFees = 0;
-        for (unsigned int i = 0; i < vin.size(); i++)
         {
-            auto prevout = vin[i].prevout;
-            assert(inputs.count(prevout.hash) > 0);
-            CTxIndex& txindex = inputs[prevout.hash].first;
-            CTransaction& txPrev = inputs[prevout.hash].second;
+            CBigNum bnValueIn = 0;
+            for (uint32_t i = 0; i < vin.size(); i++)
+            {
+                auto prevout = vin[i].prevout;
+                assert(inputs.count(prevout.hash) > 0);
+                CTxIndex& txindex = inputs[prevout.hash].first;
+                CTransaction& txPrev = inputs[prevout.hash].second;
 
-            if (prevout.n >= txPrev.vout.size() || prevout.n >= txindex.vSpent.size())
-                return DoS(100, error("ConnectInputs() : %s prevout.n out of range %d %" PRIszu " %" PRIszu " prev tx %s\n%s", GetHash().ToString().substr(0,10).c_str(), prevout.n, txPrev.vout.size(), txindex.vSpent.size(), prevout.hash.ToString().substr(0,10).c_str(), txPrev.ToString().c_str()));
+                if (prevout.n >= txPrev.vout.size() || prevout.n >= txindex.vSpent.size())
+                    return DoS(100, error("ConnectInputs() : %s prevout.n out of range %d %" PRIszu " %" PRIszu " prev tx %s\n%s", GetHash().ToString().substr(0,10).c_str(), prevout.n, txPrev.vout.size(), txindex.vSpent.size(), prevout.hash.ToString().substr(0,10).c_str(), txPrev.ToString().c_str()));
 
-            // If prev is coinbase or coinstake, check that it's matured
-            if (txPrev.IsCoinBase() || txPrev.IsCoinStake())
-                for (const CBlockIndex* pindex = pindexBlock; pindex && pindexBlock->nHeight - pindex->nHeight < nCoinbaseMaturity; pindex = pindex->pprev)
-                    if (pindex->nBlockPos == txindex.pos.nBlockPos && pindex->nFile == txindex.pos.nFile)
-                        return error("ConnectInputs() : tried to spend %s at depth %d", txPrev.IsCoinBase() ? "coinbase" : "coinstake", pindexBlock->nHeight - pindex->nHeight);
+                // If prev is coinbase or coinstake, check that it's matured
+                if (txPrev.IsCoinBase() || txPrev.IsCoinStake())
+                    for (const CBlockIndex* pindex = pindexBlock; pindex && pindexBlock->nHeight - pindex->nHeight < nCoinbaseMaturity; pindex = pindex->pprev)
+                        if (pindex->nBlockPos == txindex.pos.nBlockPos && pindex->nFile == txindex.pos.nFile)
+                            return error("ConnectInputs() : tried to spend %s at depth %d", txPrev.IsCoinBase() ? "coinbase" : "coinstake", pindexBlock->nHeight - pindex->nHeight);
 
-            // ppcoin: check transaction timestamp
-            if (txPrev.nTime > nTime)
-                return DoS(100, error("ConnectInputs() : transaction timestamp earlier than input transaction"));
+                // ppcoin: check transaction timestamp
+                if (txPrev.nTime > nTime)
+                    return DoS(100, error("ConnectInputs() : transaction timestamp earlier than input transaction"));
 
-            // Check for negative or overflow input values
-            nValueIn += txPrev.vout[prevout.n].nValue;
-            if (!MoneyRange(txPrev.vout[prevout.n].nValue) || !MoneyRange(nValueIn))
-                return DoS(100, error("ConnectInputs() : txin values out of range"));
-
+                // Check for negative or overflow input values
+                bnValueIn += txPrev.vout[prevout.n].nValue;
+                if (!MoneyRange(txPrev.vout[prevout.n].nValue) || !MoneyRange(bnValueIn))
+                    return DoS(100, error("ConnectInputs() : txin values out of range"));
+            }
+            nValueIn = bnValueIn.getint64();
         }
 
         if (pvChecks)
@@ -1525,11 +1530,7 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
 
             // Tally transaction fees
             auto nTxFee = nValueIn - GetValueOut();
-            if (nTxFee < 0)
-                return DoS(100, error("ConnectInputs() : %s nTxFee < 0", GetHash().ToString().substr(0,10).c_str()));
-
-            nFees += nTxFee;
-            if (!MoneyRange(nFees))
+            if (!MoneyRange(nTxFee))
                 return DoS(100, error("ConnectInputs() : nFees out of range"));
         }
     }
@@ -1546,8 +1547,8 @@ bool CTransaction::ClientConnectInputs()
     // Take over previous transactions' spent pointers
     {
         LOCK(mempool.cs);
-        int64_t nValueIn = 0;
-        for (unsigned int i = 0; i < vin.size(); i++)
+        CBigNum bnValueIn = 0;
+        for (uint32_t i = 0; i < vin.size(); i++)
         {
             // Get prev tx from single transactions in memory
             auto prevout = vin[i].prevout;
@@ -1572,12 +1573,12 @@ bool CTransaction::ClientConnectInputs()
             // // Flag outpoints as used
             // txPrev.vout[prevout.n].posNext = posThisTx;
 
-            nValueIn += txPrev.vout[prevout.n].nValue;
+            bnValueIn += txPrev.vout[prevout.n].nValue;
 
-            if (!MoneyRange(txPrev.vout[prevout.n].nValue) || !MoneyRange(nValueIn))
+            if (!MoneyRange(txPrev.vout[prevout.n].nValue) || !MoneyRange(bnValueIn))
                 return error("ClientConnectInputs() : txin values out of range");
         }
-        if (GetValueOut() > nValueIn)
+        if (GetValueOut() > bnValueIn.getint64())
             return false;
     }
 
