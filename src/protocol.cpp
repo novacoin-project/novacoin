@@ -7,30 +7,30 @@
 #include "util.h"
 #include "netbase.h"
 
+using namespace std;
+
 // Network ID, previously known as pchMessageStart
 uint32_t nNetworkID = 0xe5e9e8e4;
 
-static const std::vector<const char*> vpszTypeName = { "ERROR", "tx", "block" };
+static const vector<const char*> vpszTypeName = { "ERROR", "tx", "block" };
 
-CMessageHeader::CMessageHeader() : nMessageSize(std::numeric_limits<uint32_t>::max()), nChecksum(0)
+CMessageHeader::CMessageHeader() : nNetworkID(::nNetworkID), nMessageSize(numeric_limits<uint32_t>::max()), nChecksum(0)
 {
-    nNetworkID = ::nNetworkID;
-    memset(pchCommand, 0, sizeof(pchCommand));
+    fill(begin(pchCommand), end(pchCommand), '\0');
     pchCommand[1] = 1;
 }
 
-CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn) : nMessageSize(nMessageSizeIn), nChecksum(0)
+CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn) : nNetworkID(::nNetworkID), nMessageSize(nMessageSizeIn), nChecksum(0)
 {
-    nNetworkID = ::nNetworkID;
     strncpy(pchCommand, pszCommand, COMMAND_SIZE);
 }
 
-std::string CMessageHeader::GetCommand() const
+string CMessageHeader::GetCommand() const
 {
     if (pchCommand[COMMAND_SIZE-1] == 0)
-        return std::string(pchCommand, pchCommand + strlen(pchCommand));
+        return string(pchCommand, pchCommand + strlen(pchCommand));
     else
-        return std::string(pchCommand, pchCommand + COMMAND_SIZE);
+        return string(pchCommand, pchCommand + COMMAND_SIZE);
 }
 
 bool CMessageHeader::IsValid() const
@@ -67,7 +67,7 @@ CAddress::CAddress() : CService(), nServices(NODE_NETWORK), nTime(100000000), nL
 CAddress::CAddress(CService ipIn, uint64_t nServicesIn) : CService(ipIn), nServices(nServicesIn), nTime(100000000), nLastTry(0) { }
 CInv::CInv() { }
 CInv::CInv(int typeIn, const uint256& hashIn) : type(typeIn), hash(hashIn) { }
-CInv::CInv(const std::string& strType, const uint256& hashIn) : hash(hashIn)
+CInv::CInv(const string& strType, const uint256& hashIn) : hash(hashIn)
 {
     unsigned int i;
     for (i = 1; i < vpszTypeName.size(); ++i)
@@ -78,7 +78,7 @@ CInv::CInv(const std::string& strType, const uint256& hashIn) : hash(hashIn)
         }
     }
     if (i == vpszTypeName.size())
-        throw std::out_of_range(strprintf("CInv::CInv(string, uint256) : unknown type '%s'", strType.c_str()));
+        throw out_of_range(strprintf("CInv::CInv(string, uint256) : unknown type '%s'", strType.c_str()));
 }
 
 bool operator<(const CInv& a, const CInv& b)
@@ -94,11 +94,11 @@ bool CInv::IsKnownType() const
 const char* CInv::GetCommand() const
 {
     if (!IsKnownType())
-        throw std::out_of_range(strprintf("CInv::GetCommand() : type=%d unknown type", type));
+        throw out_of_range(strprintf("CInv::GetCommand() : type=%d unknown type", type));
     return vpszTypeName[type];
 }
 
-std::string CInv::ToString() const
+string CInv::ToString() const
 {
     return strprintf("%s %s", GetCommand(), hash.ToString().substr(0,20).c_str());
 }
