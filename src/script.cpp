@@ -75,13 +75,19 @@ void MakeSameSize(valtype& vch1, valtype& vch2)
 }
 
 
-
 //
 // Script is a stack machine (like Forth) that evaluates a predicate
 // returning a bool indicating valid or not.  There are no loops.
 //
 #define stacktop(i)  (stack.at(stack.size()+(i)))
+
+//static inline valtype stacktop(vector<valtype>& st, int nDepth)
+//{
+//    return st.at(st.size()+nDepth);
+//}
+
 #define altstacktop(i)  (altstack.at(altstack.size()+(i)))
+
 static inline void popstack(vector<valtype>& stack)
 {
     if (stack.empty())
@@ -704,8 +710,8 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // (x1 x2 x3 x4 -- x3 x4 x1 x2)
                     if (stack.size() < 4)
                         return false;
-                    swap(stacktop(-4), stacktop(-2));
-                    swap(stacktop(-3), stacktop(-1));
+                    swap(*(stack.end()-4),*(stack.end()-2));
+                    swap(*(stack.end()-3),*(stack.end()-1));
                 }
                 break;
 
@@ -773,7 +779,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
                     if (stack.size() < 2)
                         return false;
-                    int n = CastToBigNum(stacktop(-1)).getint32();
+                    int n = CastToBigNum(stack.back()).getint32();
                     popstack(stack);
                     if (n < 0 || n >= (int)stack.size())
                         return false;
@@ -791,8 +797,8 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     //  x2 x3 x1  after second swap
                     if (stack.size() < 3)
                         return false;
-                    swap(stacktop(-3), stacktop(-2));
-                    swap(stacktop(-2), stacktop(-1));
+                    swap(*(stack.end()-3), *(stack.end()-2));
+                    swap(*(stack.end()-2), *(stack.end()-1));
                 }
                 break;
 
@@ -801,7 +807,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // (x1 x2 -- x2 x1)
                     if (stack.size() < 2)
                         return false;
-                    swap(stacktop(-2), stacktop(-1));
+                    swap(*(stack.end()-2),*(stack.end()-1));
                 }
                 break;
 
@@ -821,7 +827,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, co
                     // (in -- in size)
                     if (stack.size() < 1)
                         return false;
-                    CBigNum bn((uint16_t) stacktop(-1).size());
+                    CBigNum bn((uint16_t) (stack.back()).size());
                     stack.push_back(bn.getvch());
                 }
                 break;
