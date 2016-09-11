@@ -259,7 +259,7 @@ const char* GetOpName(opcodetype opcode);
 inline std::string ValueString(const std::vector<unsigned char>& vch)
 {
     if (vch.size() <= 4)
-        return strprintf("%d", CBigNum(vch).getint32());
+        return std::to_string(CBigNum(vch).getint32());
     else
         return HexStr(vch);
 }

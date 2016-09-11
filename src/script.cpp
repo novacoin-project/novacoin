@@ -1234,13 +1234,13 @@ class CSignatureCache
 {
 private:
      // sigdata_type is (signature hash, signature, public key):
-    typedef tuple<uint256, std::vector<unsigned char>, CPubKey > sigdata_type;
+    typedef tuple<uint256, vector<unsigned char>, CPubKey > sigdata_type;
     set< sigdata_type> setValid;
     boost::shared_mutex cs_sigcache;
 
 public:
     bool
-    Get(const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubKey)
+    Get(const uint256 &hash, const vector<unsigned char>& vchSig, const CPubKey& pubKey)
     {
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
 
@@ -1251,25 +1251,25 @@ public:
         return false;
     }
 
-    void Set(const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubKey)
+    void Set(const uint256 &hash, const vector<unsigned char>& vchSig, const CPubKey& pubKey)
     {
         // DoS prevention: limit cache size to less than 10MB
         // (~200 bytes per cache entry times 50,000 entries)
         // Since there are a maximum of 20,000 signature operations per block
         // 50,000 is a reasonable default.
-        int64_t nMaxCacheSize = GetArg("-maxsigcachesize", 50000);
+        size_t nMaxCacheSize = GetArgUInt("-maxsigcachesize", 50000u);
         if (nMaxCacheSize <= 0) return;
 
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
 
-        while (static_cast<int64_t>(setValid.size()) > nMaxCacheSize)
+        while (setValid.size() > nMaxCacheSize)
         {
             // Evict a random entry. Random because that helps
             // foil would-be DoS attackers who might try to pre-generate
             // and re-use a set of valid signatures just-slightly-greater
             // than our cache size.
             auto randomHash = GetRandHash();
-            std::vector<unsigned char> unused;
+            vector<unsigned char> unused;
             auto it = setValid.lower_bound(sigdata_type(randomHash, unused, unused));
             if (it == setValid.end())
                 it = setValid.begin();
@@ -1562,7 +1562,7 @@ bool Solver(const CKeyStore& keystore, const CScript& scriptPubKey, const uint25
     return false;
 }
 
-int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char> >& vSolutions)
+int ScriptSigArgsExpected(txnouttype t, const vector<vector<unsigned char> >& vSolutions)
 {
     switch (t)
     {
@@ -1767,14 +1767,14 @@ class CAffectedKeysVisitor : public boost::static_visitor<void> {
 private:
     const CKeyStore &keystore;
     CAffectedKeysVisitor& operator=(CAffectedKeysVisitor const&);
-    std::vector<CKeyID> &vKeys;
+    vector<CKeyID> &vKeys;
 
 public:
-    CAffectedKeysVisitor(const CKeyStore &keystoreIn, std::vector<CKeyID> &vKeysIn) : keystore(keystoreIn), vKeys(vKeysIn) {}
+    CAffectedKeysVisitor(const CKeyStore &keystoreIn, vector<CKeyID> &vKeysIn) : keystore(keystoreIn), vKeys(vKeysIn) {}
 
     void Process(const CScript &script) {
         txnouttype type;
-        std::vector<CTxDestination> vDest;
+        vector<CTxDestination> vDest;
         int nRequired;
         if (ExtractDestinations(script, type, vDest, nRequired)) {
             for(const CTxDestination &dest :  vDest)
@@ -1797,7 +1797,7 @@ public:
 };
 
 
-void ExtractAffectedKeys(const CKeyStore &keystore, const CScript& scriptPubKey, std::vector<CKeyID> &vKeys) {
+void ExtractAffectedKeys(const CKeyStore &keystore, const CScript& scriptPubKey, vector<CKeyID> &vKeys) {
     CAffectedKeysVisitor(keystore, vKeys).Process(scriptPubKey);
 }
 
@@ -2107,7 +2107,7 @@ CScript& CScript::operator<<(const uint256& b)
 
 CScript& CScript::operator<<(const CPubKey& key)
 {
-    std::vector<uint8_t> vchKey(key.begin(), key.end());
+    vector<uint8_t> vchKey(key.begin(), key.end());
     return (*this) << vchKey;
 }
 
@@ -2117,7 +2117,7 @@ CScript& CScript::operator<<(const CBigNum& b)
     return *this;
 }
 
-CScript& CScript::operator<<(const std::vector<uint8_t>& b)
+CScript& CScript::operator<<(const vector<uint8_t>& b)
 {
     if (b.size() < OP_PUSHDATA1)
     {
@@ -2152,7 +2152,7 @@ CScript& CScript::operator<<(const CScript& b)
     return *this;
 }
 
-bool CScript::GetOp(iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>& vchRet)
+bool CScript::GetOp(iterator& pc, opcodetype& opcodeRet, vector<uint8_t>& vchRet)
 {
      // Wrapper so it can be called with either iterator or const_iterator
      const_iterator pc2 = pc;
@@ -2169,7 +2169,7 @@ bool CScript::GetOp(iterator& pc, opcodetype& opcodeRet)
      return fRet;
 }
 
-bool CScript::GetOp(const_iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>& vchRet) const
+bool CScript::GetOp(const_iterator& pc, opcodetype& opcodeRet, vector<uint8_t>& vchRet) const
 {
     return GetOp2(pc, opcodeRet, &vchRet);
 }
@@ -2179,7 +2179,7 @@ bool CScript::GetOp(const_iterator& pc, opcodetype& opcodeRet) const
     return GetOp2(pc, opcodeRet, NULL);
 }
 
-bool CScript::GetOp2(const_iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>* pvchRet) const
+bool CScript::GetOp2(const_iterator& pc, opcodetype& opcodeRet, vector<uint8_t>* pvchRet) const
 {
     opcodeRet = OP_INVALIDOPCODE;
     if (pvchRet)
@@ -2366,7 +2366,7 @@ bool CScript::HasCanonicalPushes() const
     while (pc < end())
     {
         opcodetype opcode;
-        std::vector<unsigned char> data;
+        vector<unsigned char> data;
         if (!GetOp(pc, opcode, data))
             return false;
         if (opcode > OP_16)
@@ -2436,7 +2436,7 @@ void CScript::SetAddress(const CBitcoinAddress& dest)
     }
 }
 
-void CScript::SetMultisig(int nRequired, const std::vector<CPubKey>& keys)
+void CScript::SetMultisig(int nRequired, const vector<CPubKey>& keys)
 {
     this->clear();
 
@@ -2451,11 +2451,11 @@ void CScript::PrintHex() const
     printf("CScript(%s)\n", HexStr(begin(), end(), true).c_str());
 }
 
-std::string CScript::ToString(bool fShort) const
+string CScript::ToString(bool fShort) const
 {
-    std::string str;
+    string str;
     opcodetype opcode;
-    std::vector<uint8_t> vch;
+    vector<uint8_t> vch;
     const_iterator pc = begin();
     while (pc < end())
     {
