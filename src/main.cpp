@@ -1405,7 +1405,7 @@ bool CScriptCheck::operator()() const {
     return true;
 }
 
-bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType)
+bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, uint32_t nIn, unsigned int flags, int nHashType)
 {
     return CScriptCheck(txFrom, txTo, nIn, flags, nHashType)();
 }

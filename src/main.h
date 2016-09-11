@@ -139,7 +139,7 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
 void ResendWalletTransactions(bool fForceResend=false);
 
-bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType);
+bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, uint32_t nIn, unsigned int flags, int nHashType);
 
 
 
@@ -210,7 +210,7 @@ public:
     uint32_t n;
 
     CInPoint() { SetNull(); }
-    CInPoint(CTransaction* ptxIn, unsigned int nIn) { ptx = ptxIn; n = nIn; }
+    CInPoint(CTransaction* ptxIn, uint32_t nIn) { ptx = ptxIn; n = nIn; }
     void SetNull() { ptx = NULL; n = numeric_limits<uint32_t>::max(); }
     bool IsNull() const { return (ptx == NULL && n == numeric_limits<uint32_t>::max()); }
 };
@@ -225,7 +225,7 @@ public:
     uint32_t n;
 
     COutPoint() { SetNull(); }
-    COutPoint(uint256 hashIn, unsigned int nIn) { hash = hashIn; n = nIn; }
+    COutPoint(uint256 hashIn, uint32_t nIn) { hash = hashIn; n = nIn; }
     IMPLEMENT_SERIALIZE( READWRITE(FLATDATA(*this)); )
     void SetNull() { hash = 0; n = numeric_limits<uint32_t>::max(); }
     bool IsNull() const { return (hash == 0 && n == numeric_limits<uint32_t>::max()); }
@@ -734,13 +734,13 @@ class CScriptCheck
 private:
     CScript scriptPubKey;
     const CTransaction *ptxTo = nullptr;
-    unsigned int nIn = 0;
+    uint32_t nIn = 0;
     unsigned int nFlags = 0;
     int nHashType = 0;
 
 public:
     CScriptCheck() {}
-    CScriptCheck(const CTransaction& txFromIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, int nHashTypeIn) :
+    CScriptCheck(const CTransaction& txFromIn, const CTransaction& txToIn, uint32_t nInIn, unsigned int nFlagsIn, int nHashTypeIn) :
         scriptPubKey(txFromIn.vout[txToIn.vin[nInIn].prevout.n].scriptPubKey),
         ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), nHashType(nHashTypeIn) { }
 

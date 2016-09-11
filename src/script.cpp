@@ -13,7 +13,7 @@
 
 using namespace std;
 
-bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubKey, const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, int flags);
+bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubKey, const CScript &scriptCode, const CTransaction& txTo, uint32_t nIn, int nHashType, int flags);
 
 static const valtype vchFalse(0);
 static const valtype vchZero(0);
@@ -341,7 +341,7 @@ bool IsCanonicalSignature(const valtype &vchSig, unsigned int flags) {
     return IsDERSignature(vchSig, true, (flags & SCRIPT_VERIFY_LOW_S) != 0);
 }
 
-bool CheckLockTime(const int64_t& nLockTime, const CTransaction &txTo, unsigned int nIn)
+bool CheckLockTime(const int64_t& nLockTime, const CTransaction &txTo, uint32_t nIn)
 {
     // There are two kinds of nLockTime: lock-by-blockheight
     // and lock-by-blocktime, distinguished by whether
@@ -377,7 +377,7 @@ bool CheckLockTime(const int64_t& nLockTime, const CTransaction &txTo, unsigned 
     return true;
 }
 
-bool CheckSequence(const int64_t& nSequence, const CTransaction &txTo, unsigned int nIn)
+bool CheckSequence(const int64_t& nSequence, const CTransaction &txTo, uint32_t nIn)
 {
     // Relative lock times are supported by comparing the passed
     // in operand to the sequence number of the input.
@@ -1282,7 +1282,7 @@ public:
 };
 
 bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubKey, const CScript &scriptCode,
-              const CTransaction& txTo, unsigned int nIn, int nHashType, int flags)
+              const CTransaction& txTo, uint32_t nIn, int nHashType, int flags)
 {
     static CSignatureCache signatureCache;
 
@@ -1930,7 +1930,7 @@ static CScript PushAll(const vector<valtype>& values)
     return result;
 }
 
-static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& txTo, unsigned int nIn,
+static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& txTo, uint32_t nIn,
                                const vector<valtype>& vSolutions,
                                vector<valtype>& sigs1, vector<valtype>& sigs2)
 {
@@ -1986,7 +1986,7 @@ static CScript CombineMultisig(const CScript& scriptPubKey, const CTransaction& 
     return result;
 }
 
-static CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction& txTo, unsigned int nIn,
+static CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction& txTo, uint32_t nIn,
                                  const txnouttype txType, const vector<valtype>& vSolutions,
                                  vector<valtype>& sigs1, vector<valtype>& sigs2)
 {
