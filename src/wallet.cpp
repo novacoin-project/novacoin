@@ -2167,7 +2167,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64_t> >& vecSend, 
                     wtxNew.vin.push_back(CTxIn(coin.first->GetHash(),coin.second));
 
                 // Sign
-                int nIn = 0;
+                uint32_t nIn = 0;
                 for(const auto& coin : setCoins)
                     if (!SignSignature(*this, *coin.first, wtxNew, nIn++))
                         return false;
@@ -2504,7 +2504,7 @@ bool CWallet::CreateCoinStake(uint256 &hashTx, uint32_t nOut, uint32_t nGenerati
         }
 
         // Sign
-        int nIn = 0;
+        uint32_t nIn = 0;
         for(const CWalletTx* pcoin :  vwtxPrev)
         {
             if (!SignSignature(*this, *pcoin, txNew, nIn++))
