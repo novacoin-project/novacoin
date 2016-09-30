@@ -75,11 +75,13 @@ vector<pair<uint256,uint32_t> >& KernelWorker::GetSolutions()
 
 bool ScanKernelBackward(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, pair<uint256, uint32_t> &solution)
 {
-    uint256 nTargetPerCoinDay;
-    nTargetPerCoinDay.SetCompact(nBits);
+    CBigNum bnTargetPerCoinDay;
+    bnTargetPerCoinDay.SetCompact(nBits);
+
+    CBigNum bnValueIn(nValueIn);
 
     // Get maximum possible target to filter out the majority of obviously insufficient hashes
-    auto nMaxTarget = nTargetPerCoinDay * (uint64_t)nValueIn * (uint64_t)nStakeMaxAge / (uint64_t)COIN / (uint64_t)nOneDay;
+    auto nMaxTarget = (bnTargetPerCoinDay * bnValueIn * nStakeMaxAge / COIN / nOneDay).getuint256();
 
     SHA256_CTX ctx, workerCtx;
     // Init new sha256 context and update it
@@ -108,10 +110,10 @@ bool ScanKernelBackward(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, 
         if (hashProofOfStake > nMaxTarget)
             continue;
 
-        auto nCoinDayWeight = uint256(nValueIn) * (uint64_t)GetWeight((int64_t)nInputTxTime, (int64_t)nTimeTx) / (uint64_t)COIN / (uint64_t)nOneDay; // TODO: Stop using signed types for value, time, weight and so on, because all these casts are really stupid.
-        auto nTargetProofOfStake = nCoinDayWeight * nTargetPerCoinDay;
+        auto bnCoinDayWeight = bnValueIn * GetWeight((int64_t)nInputTxTime, (int64_t)nTimeTx) / COIN / nOneDay;
+        auto bnTargetProofOfStake = bnCoinDayWeight * bnTargetPerCoinDay;
 
-        if (nTargetProofOfStake >= hashProofOfStake)
+        if (bnTargetProofOfStake >= CBigNum(hashProofOfStake))
         {
             solution = { hashProofOfStake, nTimeTx };
             return true;
