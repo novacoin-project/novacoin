@@ -2970,29 +2970,38 @@ set< set<CBitcoinAddress> > CWallet::GetAddressGroupings()
     {
         CWalletTx *pcoin = &walletEntry.second;
 
-        if (pcoin->vin.size() > 0 && IsMine(pcoin->vin[0]))
+        if (pcoin->vin.size() > 0)
         {
+            bool any_mine = false;
             // group all input addresses with each other
             for(CTxIn txin :  pcoin->vin)
             {
                 CBitcoinAddress address;
+                if(!IsMine(txin)) // If this input isn't mine, ignore it
+                    continue;
                 if(!ExtractAddress(*this, mapWallet[txin.prevout.hash].vout[txin.prevout.n].scriptPubKey, address))
                     continue;
                 grouping.insert(address);
+                any_mine = true;
             }
 
             // group change with input addresses
+            if (any_mine)
+            {
             for(CTxOut txout :  pcoin->vout)
                 if (IsChange(txout))
                 {
-                    auto tx = mapWallet[pcoin->vin[0].prevout.hash];
                     CBitcoinAddress txoutAddr;
                     if(!ExtractAddress(*this, txout.scriptPubKey, txoutAddr))
                         continue;
                     grouping.insert(txoutAddr);
                 }
-            groupings.insert(grouping);
-            grouping.clear();
+            }
+            if (!grouping.empty())
+            {
+                groupings.insert(grouping);
+                grouping.clear();
+            }
         }
 
         // group lone addrs by themselves
