@@ -11,7 +11,6 @@
 #include <random>
 
 #include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/case_conv.hpp> // for to_lower()
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
@@ -514,7 +513,7 @@ void ParseParameters(int argc, const char* const argv[])
             str = str.substr(0, is_index);
         }
 #ifdef WIN32
-        boost::to_lower(str);
+        transform(str.begin(), str.end(), str.begin(), ::tolower);
         if (str.compare(0,1, "/") == 0)
             str = "-" + str.substr(1);
 #endif
