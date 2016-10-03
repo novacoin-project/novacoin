@@ -27,6 +27,8 @@
  * online backup system.
  */
 
+#include <cstring>
+
 #include "scrypt.h"
 
 #ifdef _MSC_VER
