@@ -16,7 +16,6 @@
 #include "addrman.h"
 #include "hash.h"
 
-using namespace std;
 
 class CRequestTracker;
 class CNode;
@@ -30,8 +29,8 @@ const uint16_t nPortZero = 0;
 inline uint64_t ReceiveBufferSize() { return 1000*GetArg("-maxreceivebuffer", 5*1000); }
 inline uint64_t SendBufferSize() { return 1000*GetArg("-maxsendbuffer", 1*1000); }
 
-void AddOneShot(string strDest);
-bool RecvLine(SOCKET hSocket, string& strLine);
+void AddOneShot(std::string strDest);
+bool RecvLine(SOCKET hSocket, std::string& strLine);
 bool GetMyExternalIP(CNetAddr& ipRet);
 void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);
@@ -39,7 +38,7 @@ CNode* FindNode(const CService& ip);
 CNode* ConnectNode(CAddress addrConnect, const char *strDest = NULL, int64_t nTimeout=0);
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
 uint16_t GetListenPort();
-bool BindListenPort(const CService &bindAddr, string& strError=REF(string()));
+bool BindListenPort(const CService &bindAddr, std::string& strError=REF(std::string()));
 void StartNode(void* parg);
 bool StopNode();
 
@@ -123,17 +122,17 @@ extern bool fDiscover;
 extern uint64_t nLocalServices;
 extern uint64_t nLocalHostNonce;
 extern CAddress addrSeenByPeer;
-extern array<int, THREAD_MAX> vnThreadsRunning;
+extern std::array<int, THREAD_MAX> vnThreadsRunning;
 extern CAddrMan addrman;
 
-extern vector<CNode*> vNodes;
+extern std::vector<CNode*> vNodes;
 extern CCriticalSection cs_vNodes;
-extern vector<string> vAddedNodes;
+extern std::vector<std::string> vAddedNodes;
 extern CCriticalSection cs_vAddedNodes;
-extern map<CInv, CDataStream> mapRelay;
-extern deque<pair<int64_t, CInv> > vRelayExpiration;
+extern std::map<CInv, CDataStream> mapRelay;
+extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
 extern CCriticalSection cs_mapRelay;
-extern map<CInv, int64_t> mapAlreadyAskedFor;
+extern std::map<CInv, int64_t> mapAlreadyAskedFor;
 
 
 class CNodeStats
@@ -143,9 +142,9 @@ public:
     int64_t nLastSend;
     int64_t nLastRecv;
     int64_t nTimeConnected;
-    string addrName;
+    std::string addrName;
     int32_t nVersion;
-    string strSubVer;
+    std::string strSubVer;
     bool fInbound;
     int64_t nReleaseTime;
     int32_t nStartingHeight;
@@ -176,10 +175,10 @@ public:
     int32_t nHeaderStart;
     uint32_t nMessageStart;
     CAddress addr;
-    string addrName;
+    std::string addrName;
     CService addrLocal;
     int32_t nVersion;
-    string strSubVer;
+    std::string strSubVer;
     bool fOneShot;
     bool fClient;
     bool fInbound;
@@ -192,13 +191,13 @@ protected:
 
     // Denial-of-service detection/prevention
     // Key is IP address, value is banned-until-time
-    static map<CNetAddr, int64_t> setBanned;
+    static std::map<CNetAddr, int64_t> setBanned;
     static CCriticalSection cs_setBanned;
     int nMisbehavior;
 
 public:
     int64_t nReleaseTime;
-    map<uint256, CRequestTracker> mapRequests;
+    std::map<uint256, CRequestTracker> mapRequests;
     CCriticalSection cs_mapRequests;
     uint256 hashContinue;
     CBlockIndex* pindexLastGetBlocksBegin;
@@ -207,10 +206,10 @@ public:
     bool fStartSync;
 
     // flood relay
-    vector<CAddress> vAddrToSend;
-    set<CAddress> setAddrKnown;
+    std::vector<CAddress> vAddrToSend;
+    std::set<CAddress> setAddrKnown;
     bool fGetAddr;
-    set<uint256> setKnown;
+    std::set<uint256> setKnown;
     uint256 hashCheckpointKnown; // ppcoin: known sent sync-checkpoint
     int64_t nNextAddrSend;
     int64_t nNextLocalAddrSend;
@@ -218,11 +217,11 @@ public:
 
     // inventory based relay
     mruset<CInv> setInventoryKnown;
-    vector<CInv> vInventoryToSend;
+    std::vector<CInv> vInventoryToSend;
     CCriticalSection cs_inventory;
-    multimap<int64_t, CInv> mapAskFor;
+    std::multimap<int64_t, CInv> mapAskFor;
 
-    CNode(SOCKET hSocketIn, CAddress addrIn, string addrNameIn = "", bool fInboundIn=false);
+    CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn = "", bool fInboundIn=false);
     ~CNode();
 
 private:

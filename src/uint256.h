@@ -11,8 +11,6 @@
 #include <iomanip>
 #include <sstream>
 
-using namespace std;
-
 
 /** Base class without constructors for uint256 and uint160.
  * This makes the compiler let u use it in a union.
@@ -510,7 +508,7 @@ public:
         virtual const char* what() const throw () { return what_.c_str(); }
         virtual ~uint256_error() throw () {}
 private:
-        std::string what_; 
+        std::string what_;
 };
 
 /** 256-bit unsigned integer */

@@ -6,6 +6,8 @@
 #include "net.h"
 #include "ui_interface.h"
 
+using namespace std;
+
 extern int GetRandInt(int nMax);
 
 /*
@@ -72,7 +74,7 @@ struct pkt {
 
 const int nServersCount = 162;
 
-std::string NtpServers[162] = {
+string NtpServers[162] = {
     // Microsoft
     "time.windows.com",
 
@@ -270,11 +272,11 @@ std::string NtpServers[162] = {
     // ... To be continued
 };
 
-bool InitWithHost(const std::string &strHostName, SOCKET &sockfd, socklen_t &servlen, struct sockaddr *pcliaddr) {
+bool InitWithHost(const string &strHostName, SOCKET &sockfd, socklen_t &servlen, struct sockaddr *pcliaddr) {
   
     sockfd = INVALID_SOCKET;
 
-    std::vector<CNetAddr> vIP;
+    vector<CNetAddr> vIP;
     bool fRet = LookupHost(strHostName, vIP, 10, true);
     if (!fRet) {
         return false;
@@ -390,7 +392,7 @@ int64_t NtpGetTime(CNetAddr& ip) {
     return nTime;
 }
 
-int64_t NtpGetTime(const std::string &strHostName)
+int64_t NtpGetTime(const string &strHostName)
 {
     struct sockaddr cliaddr;
 
@@ -409,7 +411,7 @@ int64_t NtpGetTime(const std::string &strHostName)
 
 // NTP server, which we unconditionally trust. This may be your own installation of ntpd somewhere, for example. 
 // "localhost" means "trust no one"
-std::string strTrustedUpstream = "localhost";
+string strTrustedUpstream = "localhost";
 
 // Current offset
 int64_t nNtpOffset = numeric_limits<int64_t>::max();
@@ -423,7 +425,7 @@ void ThreadNtpSamples(void* parg) {
 
     printf("Trying to find NTP server at localhost...\n");
 
-    std::string strLocalHost = "127.0.0.1";
+    string strLocalHost = "127.0.0.1";
     if (NtpGetTime(strLocalHost) == GetTime()) {
         printf("There is NTP server active at localhost,  we don't need NTP thread.\n");
 
@@ -491,10 +493,10 @@ void ThreadNtpSamples(void* parg) {
         if (GetNodesOffset() == numeric_limits<int64_t>::max() && abs(nNtpOffset) > 40 * 60)
         {
             // If there is not enough node offsets data and NTP time offset is greater than 40 minutes then give a warning.
-            std::string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
+            string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
             strMiscWarning = strMessage;
             printf("*** %s\n", strMessage.c_str());
-            uiInterface.ThreadSafeMessageBox(strMessage+" ", std::string("NovaCoin"), CClientUIInterface::OK | CClientUIInterface::ICON_EXCLAMATION);
+            uiInterface.ThreadSafeMessageBox(strMessage+" ", string("NovaCoin"), CClientUIInterface::OK | CClientUIInterface::ICON_EXCLAMATION);
         }
 
         printf("nNtpOffset = %+" PRId64 "  (%+" PRId64 " minutes)\n", nNtpOffset, nNtpOffset/60);

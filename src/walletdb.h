@@ -8,7 +8,6 @@
 #include "db.h"
 #include "keystore.h"
 
-using namespace std;
 
 class CKeyPool;
 class CAccount;
@@ -49,19 +48,19 @@ public:
 class CWalletDB : public CDB
 {
 public:
-    CWalletDB(string strFilename, const char* pszMode="r+");
+    CWalletDB(std::string strFilename, const char* pszMode="r+");
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);
 public:
-    bool WriteName(const string& strAddress, const string& strName);
-    bool EraseName(const string& strAddress);
+    bool WriteName(const std::string& strAddress, const std::string& strName);
+    bool EraseName(const std::string& strAddress);
     bool WriteTx(uint256 hash, const CWalletTx& wtx);
     bool EraseTx(uint256 hash);
     bool WriteKey(const CPubKey& key, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta);
     bool WriteMalleableKey(const CMalleableKeyView& keyView, const CSecret& vchSecretH, const CKeyMetadata &keyMeta);
-    bool WriteCryptedMalleableKey(const CMalleableKeyView& keyView, const vector<unsigned char>& vchCryptedSecretH, const CKeyMetadata &keyMeta);
-    bool WriteCryptedKey(const CPubKey& key, const vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta);
+    bool WriteCryptedMalleableKey(const CMalleableKeyView& keyView, const std::vector<unsigned char>& vchCryptedSecretH, const CKeyMetadata &keyMeta);
+    bool WriteCryptedKey(const CPubKey& key, const std::vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta);
     bool WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey);
     bool EraseMasterKey(unsigned int nID);
     bool EraseCryptedKey(const CPubKey& key);
@@ -77,22 +76,22 @@ public:
     bool WritePool(int64_t nPool, const CKeyPool& keypool);
     bool ErasePool(int64_t nPool);
     bool WriteMinVersion(int nVersion);
-    bool ReadAccount(const string& strAccount, CAccount& account);
-    bool WriteAccount(const string& strAccount, const CAccount& account);
+    bool ReadAccount(const std::string& strAccount, CAccount& account);
+    bool WriteAccount(const std::string& strAccount, const CAccount& account);
 private:
     bool WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry);
 public:
     bool WriteAccountingEntry(const CAccountingEntry& acentry);
-    int64_t GetAccountCreditDebit(const string& strAccount);
-    void ListAccountCreditDebit(const string& strAccount, list<CAccountingEntry>& acentries);
+    int64_t GetAccountCreditDebit(const std::string& strAccount);
+    void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
     DBErrors ReorderTransactions(CWallet*);
     DBErrors LoadWallet(CWallet* pwallet);
-    DBErrors FindWalletTx(CWallet* pwallet, vector<uint256>& vTxHash);
+    DBErrors FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash);
     DBErrors ZapWalletTx(CWallet* pwallet);
 
-    static bool Recover(CDBEnv& dbenv, string filename, bool fOnlyKeys);
-    static bool Recover(CDBEnv& dbenv, string filename);
+    static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
+    static bool Recover(CDBEnv& dbenv, std::string filename);
 };
 
 #endif // BITCOIN_WALLETDB_H
