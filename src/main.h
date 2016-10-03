@@ -727,34 +727,6 @@ protected:
     const CTxOut& GetOutputFor(const CTxIn& input, const MapPrevTx& inputs) const;
 };
 
-/** Closure representing one script verification
- *  Note that this stores references to the spending transaction */
-class CScriptCheck
-{
-private:
-    CScript scriptPubKey;
-    const CTransaction *ptxTo = nullptr;
-    uint32_t nIn = 0;
-    unsigned int nFlags = 0;
-    int nHashType = 0;
-
-public:
-    CScriptCheck() {}
-    CScriptCheck(const CTransaction& txFromIn, const CTransaction& txToIn, uint32_t nInIn, unsigned int nFlagsIn, int nHashTypeIn) :
-        scriptPubKey(txFromIn.vout[txToIn.vin[nInIn].prevout.n].scriptPubKey),
-        ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), nHashType(nHashTypeIn) { }
-
-    bool operator()() const;
-
-    void swap(CScriptCheck &check) {
-        scriptPubKey.swap(check.scriptPubKey);
-        std::swap(ptxTo, check.ptxTo);
-        std::swap(nIn, check.nIn);
-        std::swap(nFlags, check.nFlags);
-        std::swap(nHashType, check.nHashType);
-    }
-};
-
 
 
 
