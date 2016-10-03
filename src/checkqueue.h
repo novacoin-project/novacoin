@@ -7,37 +7,34 @@
 
 #include <algorithm>
 #include <vector>
-
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 extern bool fShutdown;
 
 template<typename T> class CCheckQueueControl;
 
-/** Queue for verifications that have to be performed.
-  * The verifications are represented by a type T, which must provide an
-  * operator(), returning a bool.
-  *
-  * One thread (the master) is assumed to push batches of verifications
-  * onto the queue, where they are processed by N-1 worker threads. When
-  * the master is done adding work, it temporarily joins the worker pool
-  * as an N'th worker, until all jobs are done.
-  */
+// Queue for verifications that have to be performed.
+// The verifications are represented by a type T, which must provide an
+// operator(), returning a bool.
+//
+// One thread (the master) is assumed to push batches of verifications
+// onto the queue, where they are processed by N-1 worker threads. When
+// the master is done adding work, it temporarily joins the worker pool
+// as an N'th worker, until all jobs are done.
+//
 template<typename T> class CCheckQueue {
 private:
     // Mutex to protect the inner state
-    boost::mutex mutex;
+    std::mutex mutex;
 
     // Worker threads block on this when out of work
-    boost::condition_variable condWorker;
+    std::condition_variable condWorker;
 
     // Master thread blocks on this when out of work
-    boost::condition_variable condMaster;
+    std::condition_variable condMaster;
 
     // Quit method blocks on this until all workers are gone
-    boost::condition_variable condQuit;
+    std::condition_variable condQuit;
 
     // The queue of elements to be processed.
     // As the order of booleans doesn't matter, it is used as a LIFO (stack)
@@ -65,14 +62,14 @@ private:
 
     // Internal function that does bulk of the verification work.
     bool Loop(bool fMaster = false) {
-        boost::condition_variable &cond = fMaster ? condMaster : condWorker;
+        std::condition_variable &cond = fMaster ? condMaster : condWorker;
         std::vector<T> vChecks;
         vChecks.reserve(nBatchSize);
         unsigned int nNow = 0;
         bool fOk = true;
         do {
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                std::unique_lock<std::mutex> lock(mutex);
                 // first do the clean-up of the previous loop run (allowing us to do it in the same critsect)
                 if (nNow) {
                     fAllOk &= fOk;
@@ -143,7 +140,7 @@ public:
 
     // Add a batch of checks to the queue
     void Add(std::vector<T> &vChecks) {
-        boost::unique_lock<boost::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
         for(T &check :  vChecks) {
             queue.push_back(T());
             check.swap(queue.back());
@@ -157,7 +154,7 @@ public:
 
     // Shut the queue down
     void Quit() {
-        boost::unique_lock<boost::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
         fQuit = true;
         // No need to wake the master, as he will quit automatically when all jobs are
         // done.
@@ -173,14 +170,14 @@ public:
 
     bool IsIdle()
     {
-        boost::unique_lock<boost::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
         return (nTotal == nIdle && nTodo == 0 && fAllOk == true);
     }
 };
 
-/** RAII-style controller object for a CCheckQueue that guarantees the passed
- *  queue is finished before continuing.
- */
+// RAII-style controller object for a CCheckQueue that guarantees the passed
+// queue is finished before continuing.
+//
 template<typename T> class CCheckQueueControl {
 private:
     CCheckQueue<T> *pqueue;
@@ -189,14 +186,14 @@ private:
 public:
     CCheckQueueControl(CCheckQueue<T> *pqueueIn) : pqueue(pqueueIn), fDone(false) {
         // passed queue is supposed to be unused, or NULL
-        if (pqueue != NULL) {
+        if (pqueue != nullptr) {
             bool isIdle = pqueue->IsIdle();
             assert(isIdle);
         }
     }
 
     bool Wait() {
-        if (pqueue == NULL)
+        if (pqueue == nullptr)
             return true;
         bool fRet = pqueue->Wait();
         fDone = true;
@@ -204,7 +201,7 @@ public:
     }
 
     void Add(std::vector<T> &vChecks) {
-        if (pqueue != NULL)
+        if (pqueue != nullptr)
             pqueue->Add(vChecks);
     }
 
