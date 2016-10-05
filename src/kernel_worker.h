@@ -3,7 +3,6 @@
 
 #include <vector>
 
-using namespace std;
 
 class KernelWorker
 {
@@ -12,14 +11,14 @@ public:
     { }
     KernelWorker(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, uint32_t nIntervalBegin, uint32_t nIntervalEnd);
     void Do();
-    vector<pair<uint256,uint32_t> >& GetSolutions();
+    std::vector<std::pair<uint256,uint32_t> >& GetSolutions();
 
 private:
     // One way hashing.
     void Do_generic();
 
     // Kernel solutions.
-    vector<pair<uint256,uint32_t> > solutions;
+    std::vector<std::pair<uint256,uint32_t> > solutions;
 
     // Kernel metadata.
     uint8_t *kernel = nullptr;
@@ -33,6 +32,6 @@ private:
 };
 
 // Scan given kernel for solutions
-bool ScanKernelBackward(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, pair<uint32_t, uint32_t> &SearchInterval, pair<uint256, uint32_t> &solution);
+bool ScanKernelBackward(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, std::pair<uint32_t, uint32_t> &SearchInterval, std::pair<uint256, uint32_t> &solution);
 
 #endif // NOVACOIN_KERNELWORKER_H

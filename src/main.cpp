@@ -253,6 +253,78 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 // CTransaction and CTxIndex
 //
 
+bool CTransaction::IsFinal(int nBlockHeight, int64_t nBlockTime) const
+{
+    // Time based nLockTime implemented in 0.1.6
+    if (nLockTime == 0)
+        return true;
+    if (nBlockHeight == 0)
+        nBlockHeight = nBestHeight;
+    if (nBlockTime == 0)
+        nBlockTime = GetAdjustedTime();
+    if ((int64_t)nLockTime < ((int64_t)nLockTime < LOCKTIME_THRESHOLD ? (int64_t)nBlockHeight : nBlockTime))
+        return true;
+    for(const CTxIn& txin : vin)
+        if (!txin.IsFinal())
+            return false;
+    return true;
+}
+
+bool CTransaction::IsNewerThan(const CTransaction& old) const
+{
+    if (vin.size() != old.vin.size())
+        return false;
+    for (unsigned int i = 0; i < vin.size(); i++)
+        if (vin[i].prevout != old.vin[i].prevout)
+            return false;
+    bool fNewer = false;
+    unsigned int nLowest = numeric_limits<unsigned int>::max();
+    for (unsigned int i = 0; i < vin.size(); i++)
+    {
+        if (vin[i].nSequence != old.vin[i].nSequence)
+        {
+            if (vin[i].nSequence <= nLowest)
+            {
+                fNewer = false;
+                nLowest = vin[i].nSequence;
+            }
+            if (old.vin[i].nSequence < nLowest)
+            {
+                fNewer = true;
+                nLowest = old.vin[i].nSequence;
+            }
+        }
+    }
+    return fNewer;
+}
+
+bool CTransaction::ReadFromDisk(CDiskTxPos pos, FILE** pfileRet)
+{
+    auto filein = CAutoFile(OpenBlockFile(pos.nFile, 0, pfileRet ? "rb+" : "rb"), SER_DISK, CLIENT_VERSION);
+    if (!filein)
+        return error("CTransaction::ReadFromDisk() : OpenBlockFile failed");
+
+    // Read transaction
+    if (fseek(filein, pos.nTxPos, SEEK_SET) != 0)
+        return error("CTransaction::ReadFromDisk() : fseek failed");
+
+    try {
+        filein >> *this;
+    }
+    catch (const std::exception&) {
+        return error("%s() : deserialize or I/O error", BOOST_CURRENT_FUNCTION);
+    }
+
+    // Return file pointer
+    if (pfileRet)
+    {
+        if (fseek(filein, pos.nTxPos, SEEK_SET) != 0)
+            return error("CTransaction::ReadFromDisk() : second fseek failed");
+        *pfileRet = filein.release();
+    }
+    return true;
+}
+
 bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet)
 {
     SetNull();
@@ -408,8 +480,7 @@ bool CTransaction::AreInputsStandard(const MapPrevTx& mapInputs) const
     return true;
 }
 
-unsigned int
-CTransaction::GetLegacySigOpCount() const
+unsigned int CTransaction::GetLegacySigOpCount() const
 {
     unsigned int nSigOps = 0;
     if (!IsCoinBase())
@@ -585,6 +656,30 @@ int64_t CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree, enum G
     return nMinFee;
 }
 
+string CTransaction::ToStringShort() const
+{
+    string str;
+    str += strprintf("%s %s", GetHash().ToString().c_str(), IsCoinBase()? "base" : (IsCoinStake()? "stake" : "user"));
+    return str;
+}
+
+string CTransaction::ToString() const
+{
+    string str;
+    str += IsCoinBase()? "Coinbase" : (IsCoinStake()? "Coinstake" : "CTransaction");
+    str += strprintf("(hash=%s, nTime=%d, ver=%d, vin.size=%" PRIszu ", vout.size=%" PRIszu ", nLockTime=%d)\n",
+        GetHash().ToString().substr(0,10).c_str(),
+        nTime,
+        nVersion,
+        vin.size(),
+        vout.size(),
+        nLockTime);
+    for (unsigned int i = 0; i < vin.size(); i++)
+        str += "    " + vin[i].ToString() + "\n";
+    for (unsigned int i = 0; i < vout.size(); i++)
+        str += "    " + vout[i].ToString() + "\n";
+    return str;
+}
 
 bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
                         bool* pfMissingInputs)
@@ -770,6 +865,20 @@ void CTxMemPool::queryHashes(std::vector<uint256>& vtxid)
 }
 
 
+string CTxIn::ToString() const
+{
+    string str;
+    str += "CTxIn(";
+    str += CTxIn::prevout.ToString();
+    if (CTxIn::prevout.IsNull())
+        str += strprintf(", coinbase %s", HexStr(CTxIn::scriptSig).c_str());
+    else
+        str += strprintf(", scriptSig=%s", CTxIn::scriptSig.ToString().substr(0,24).c_str());
+    if (CTxIn::nSequence != numeric_limits<unsigned int>::max())
+        str += strprintf(", nSequence=%" PRIu32, CTxIn::nSequence);
+    str += ")";
+    return str;
+}
 
 
 int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet) const
@@ -1251,21 +1360,32 @@ void static InvalidChainFound(CBlockIndex* pindexNew)
       DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 }
 
-
 void CBlock::UpdateTime(const CBlockIndex* pindexPrev)
 {
     nTime = max(GetBlockTime(), GetAdjustedTime());
 }
 
+unsigned int CBlock::GetStakeEntropyBit(unsigned int nHeight) const
+{
+    // Protocol switch to support p2pool at novacoin block #9689
+    if (nHeight >= 9689 || fTestNet)
+    {
+        // Take last bit of block hash as entropy bit
+        auto nEntropyBit = (GetHash().Get32()) & (uint32_t)1;
+        if (fDebug && GetBoolArg("-printstakemodifier"))
+            printf("GetStakeEntropyBit: nTime=%" PRIu32 " hashBlock=%s nEntropyBit=%" PRIu32 "\n", nTime, GetHash().ToString().c_str(), nEntropyBit);
+        return nEntropyBit;
+    }
 
+    // Before novacoin block #9689 - get from pregenerated table
+    int nBitNum = nHeight & 0xFF;
+    int nItemNum = nHeight / 0xFF;
 
-
-
-
-
-
-
-
+    auto nEntropyBit = ((entropyStore[nItemNum] & (uint256(1) << nBitNum)) >> nBitNum).Get32();
+    if (fDebug && GetBoolArg("-printstakemodifier"))
+        printf("GetStakeEntropyBit: from pregenerated table, nHeight=%" PRIu32 " nEntropyBit=%" PRIu32 "\n", nHeight, nEntropyBit);
+    return nEntropyBit;
+}
 
 bool CTransaction::DisconnectInputs(CTxDB& txdb)
 {
@@ -1389,6 +1509,18 @@ const CTxOut& CTransaction::GetOutputFor(const CTxIn& input, const MapPrevTx& in
         throw std::runtime_error("CTransaction::GetOutputFor() : prevout.n out of range");
 
     return txPrev.vout[input.prevout.n];
+}
+
+int64_t CTransaction::GetValueOut() const
+{
+    CBigNum nValueOut = 0;
+    for(const auto& txout :  vout)
+    {
+        nValueOut += txout.nValue;
+        if (!MoneyRange(txout.nValue) || !MoneyRange(nValueOut))
+            throw runtime_error("CTransaction::GetValueOut() : value out of range");
+    }
+    return nValueOut.getint64();
 }
 
 int64_t CTransaction::GetValueIn(const MapPrevTx& inputs) const
@@ -1610,8 +1742,136 @@ bool CTransaction::ClientConnectInputs()
     return true;
 }
 
+int64_t CBlock::GetMaxTransactionTime() const
+{
+    int64_t maxTransactionTime = 0;
+    for(const auto& tx : vtx)
+        maxTransactionTime = max(maxTransactionTime, (int64_t)tx.nTime);
+    return maxTransactionTime;
+}
 
+uint256 CBlock::BuildMerkleTree() const
+{
+    vMerkleTree.clear();
+    for(const auto& tx :  vtx)
+        vMerkleTree.push_back(tx.GetHash());
+    int j = 0;
+    for (int nSize = (int)vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
+    {
+        for (int i = 0; i < nSize; i += 2)
+        {
+            int i2 = min(i+1, nSize-1);
+            vMerkleTree.push_back(Hash(vMerkleTree[j+i].begin(),  vMerkleTree[j+i].end(),
+                                       vMerkleTree[j+i2].begin(), vMerkleTree[j+i2].end()));
+        }
+        j += nSize;
+    }
+    return (vMerkleTree.empty() ? 0 : vMerkleTree.back());
+}
 
+vector<uint256> CBlock::GetMerkleBranch(int nIndex) const
+{
+    if (vMerkleTree.empty())
+        BuildMerkleTree();
+    vector<uint256> vMerkleBranch;
+    int j = 0;
+    for (int nSize = (int)vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
+    {
+        int i = min(nIndex^1, nSize-1);
+        vMerkleBranch.push_back(vMerkleTree[j+i]);
+        nIndex >>= 1;
+        j += nSize;
+    }
+    return vMerkleBranch;
+}
+
+uint256 CBlock::CheckMerkleBranch(uint256 hash, const vector<uint256>& vMerkleBranch, int nIndex)
+{
+    if (nIndex == -1)
+        return 0;
+    for(const uint256& otherside :  vMerkleBranch)
+    {
+        if (nIndex & 1)
+            hash = Hash(otherside.begin(), otherside.end(), hash.begin(), hash.end());
+        else
+            hash = Hash(hash.begin(), hash.end(), otherside.begin(), otherside.end());
+        nIndex >>= 1;
+    }
+    return hash;
+}
+
+bool CBlock::WriteToDisk(unsigned int& nFileRet, unsigned int& nBlockPosRet)
+{
+    // Open history file to append
+    auto fileout = CAutoFile(AppendBlockFile(nFileRet), SER_DISK, CLIENT_VERSION);
+    if (!fileout)
+        return error("CBlock::WriteToDisk() : AppendBlockFile failed");
+
+    // Write index header
+    unsigned int nSize = fileout.GetSerializeSize(*this);
+    fileout << nNetworkID << nSize;
+
+    // Write block
+    long fileOutPos = ftell(fileout);
+    if (fileOutPos < 0)
+        return error("CBlock::WriteToDisk() : ftell failed");
+    nBlockPosRet = fileOutPos;
+    fileout << *this;
+
+    // Flush stdio buffers and commit to disk before returning
+    fflush(fileout);
+    if (!IsInitialBlockDownload() || (nBestHeight+1) % 500 == 0)
+        FileCommit(fileout);
+
+    return true;
+}
+
+bool CBlock::ReadFromDisk(unsigned int nFile, unsigned int nBlockPos, bool fReadTransactions)
+{
+    SetNull();
+
+    // Open history file to read
+    auto filein = CAutoFile(OpenBlockFile(nFile, nBlockPos, "rb"), SER_DISK, CLIENT_VERSION);
+    if (!filein)
+        return error("CBlock::ReadFromDisk() : OpenBlockFile failed");
+    if (!fReadTransactions)
+        filein.nType |= SER_BLOCKHEADERONLY;
+
+    // Read block
+    try {
+        filein >> *this;
+    }
+    catch (const std::exception&) {
+        return error("%s() : deserialize or I/O error", BOOST_CURRENT_FUNCTION);
+    }
+
+    // Check the header
+    if (fReadTransactions && IsProofOfWork() && !CheckProofOfWork(GetHash(), nBits))
+        return error("CBlock::ReadFromDisk() : errors in block header");
+
+    return true;
+}
+
+void CBlock::print() const
+{
+    printf("CBlock(hash=%s, ver=%" PRId32 ", hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%" PRIu32 ", nBits=%08x, nNonce=%" PRIu32 ", vtx=%" PRIszu ", vchBlockSig=%s)\n",
+        GetHash().ToString().c_str(),
+        nVersion,
+        hashPrevBlock.ToString().c_str(),
+        hashMerkleRoot.ToString().c_str(),
+        nTime, nBits, nNonce,
+        vtx.size(),
+        HexStr(vchBlockSig.begin(), vchBlockSig.end()).c_str());
+    for (unsigned int i = 0; i < vtx.size(); i++)
+    {
+        printf("  ");
+        vtx[i].print();
+    }
+    printf("  vMerkleTree: ");
+    for (unsigned int i = 0; i < vMerkleTree.size(); i++)
+        printf("%s ", vMerkleTree[i].ToString().substr(0,10).c_str());
+    printf("\n");
+}
 
 bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
 {
@@ -2461,6 +2721,45 @@ uint256 CBlockIndex::GetBlockTrust() const
     }
 }
 
+CBlock CBlockIndex::GetBlockHeader() const
+{
+    CBlock block;
+    block.nVersion       = nVersion;
+    if (pprev)
+        block.hashPrevBlock = pprev->GetBlockHash();
+    block.hashMerkleRoot = hashMerkleRoot;
+    block.nTime          = nTime;
+    block.nBits          = nBits;
+    block.nNonce         = nNonce;
+    return block;
+}
+
+enum { nMedianTimeSpan=11 };
+
+int64_t CBlockIndex::GetMedianTimePast() const
+{
+    int64_t pmedian[nMedianTimeSpan];
+    int64_t* pbegin = &pmedian[nMedianTimeSpan];
+    int64_t* pend = &pmedian[nMedianTimeSpan];
+    const CBlockIndex* pindex = this;
+    for (int i = 0; i < nMedianTimeSpan && pindex; i++, pindex = pindex->pprev)
+        *(--pbegin) = pindex->GetBlockTime();
+    sort(pbegin, pend);
+    return pbegin[(pend - pbegin)/2];
+}
+
+int64_t CBlockIndex::GetMedianTime() const
+{
+    const CBlockIndex* pindex = this;
+    for (int i = 0; i < nMedianTimeSpan/2; i++)
+    {
+        if (!pindex->pnext)
+            return GetBlockTime();
+        pindex = pindex->pnext;
+    }
+    return pindex->GetMedianTimePast();
+}
+
 bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
 {
     unsigned int nFound = 0;
@@ -2471,6 +2770,34 @@ bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, uns
         pstart = pstart->pprev;
     }
     return (nFound >= nRequired);
+}
+
+bool CBlockIndex::SetStakeEntropyBit(unsigned int nEntropyBit)
+{
+    if (nEntropyBit > 1)
+        return false;
+    nFlags |= (nEntropyBit? BLOCK_STAKE_ENTROPY : 0);
+    return true;
+}
+
+void CBlockIndex::SetStakeModifier(uint64_t nModifier, bool fGeneratedStakeModifier)
+{
+    nStakeModifier = nModifier;
+    if (fGeneratedStakeModifier)
+        nFlags |= BLOCK_STAKE_MODIFIER;
+}
+
+string CBlockIndex::ToString() const
+{
+    return strprintf("CBlockIndex(nprev=%p, pnext=%p, nFile=%u, nBlockPos=%-6d nHeight=%d, nMint=%s, nMoneySupply=%s, nFlags=(%s)(%d)(%s), nStakeModifier=%016" PRIx64 ", nStakeModifierChecksum=%08x, hashProofOfStake=%s, prevoutStake=(%s), nStakeTime=%d merkle=%s, hashBlock=%s)",
+        (const void*)pprev, (const void*)pnext, nFile, nBlockPos, nHeight,
+        FormatMoney(nMint).c_str(), FormatMoney(nMoneySupply).c_str(),
+        GeneratedStakeModifier() ? "MOD" : "-", GetStakeEntropyBit(), IsProofOfStake()? "PoS" : "PoW",
+        nStakeModifier, nStakeModifierChecksum,
+        hashProofOfStake.ToString().c_str(),
+        prevoutStake.ToString().c_str(), nStakeTime,
+        hashMerkleRoot.ToString().c_str(),
+        GetBlockHash().ToString().c_str());
 }
 
 bool static ReserealizeBlockSignature(CBlock* pblock)
@@ -2647,6 +2974,122 @@ bool CBlock::CheckBlockSignature() const
     }
 
     return false;
+}
+
+
+
+//
+// CDiskBlockIndex
+//
+
+uint256 CDiskBlockIndex::GetBlockHash() const
+{
+    if (fUseFastIndex && blockHash != 0)
+        return blockHash;
+
+    CBlock block;
+    block.nVersion        = nVersion;
+    block.hashPrevBlock   = hashPrev;
+    block.hashMerkleRoot  = hashMerkleRoot;
+    block.nTime           = nTime;
+    block.nBits           = nBits;
+    block.nNonce          = nNonce;
+
+    const_cast<CDiskBlockIndex*>(this)->blockHash = block.GetHash();
+
+    return blockHash;
+}
+
+string CDiskBlockIndex::ToString() const
+{
+    string str = "CDiskBlockIndex(";
+    str += CBlockIndex::ToString();
+    str += strprintf("\n                hashBlock=%s, hashPrev=%s, hashNext=%s)",
+        GetBlockHash().ToString().c_str(),
+        hashPrev.ToString().c_str(),
+        hashNext.ToString().c_str());
+    return str;
+}
+
+//
+//CBlockLocator
+//
+
+void CBlockLocator::Set(const CBlockIndex* pindex)
+{
+    vHave.clear();
+    int nStep = 1;
+    while (pindex)
+    {
+        vHave.push_back(pindex->GetBlockHash());
+        // Exponentially larger steps back
+        for (int i = 0; pindex && i < nStep; i++)
+            pindex = pindex->pprev;
+        if (vHave.size() > 10)
+            nStep *= 2;
+    }
+    vHave.push_back((!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet));
+}
+
+int CBlockLocator::GetDistanceBack()
+{
+    // Retrace how far back it was in the sender's branch
+    int nDistance = 0;
+    int nStep = 1;
+    for(const auto& hash :  vHave)
+    {
+        auto mi = mapBlockIndex.find(hash);
+        if (mi != mapBlockIndex.end())
+        {
+            auto pindex = (*mi).second;
+            if (pindex->IsInMainChain())
+                return nDistance;
+        }
+        nDistance += nStep;
+        if (nDistance > 10)
+            nStep *= 2;
+    }
+    return nDistance;
+}
+
+CBlockIndex* CBlockLocator::GetBlockIndex()
+{
+    // Find the first block the caller has in the main chain
+    for(const auto& hash : vHave)
+    {
+        auto mi = mapBlockIndex.find(hash);
+        if (mi != mapBlockIndex.end())
+        {
+            auto pindex = (*mi).second;
+            if (pindex->IsInMainChain())
+                return pindex;
+        }
+    }
+    return pindexGenesisBlock;
+}
+
+uint256 CBlockLocator::GetBlockHash()
+{
+    // Find the first block the caller has in the main chain
+    for(const uint256& hash :  vHave)
+    {
+        auto mi = mapBlockIndex.find(hash);
+        if (mi != mapBlockIndex.end())
+        {
+            auto pindex = (*mi).second;
+            if (pindex->IsInMainChain())
+                return hash;
+        }
+    }
+    return (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet);
+}
+
+int CBlockLocator::GetHeight()
+{
+    CBlockIndex* pindex = GetBlockIndex();
+    if (!pindex)
+        return 0;
+    return pindex->nHeight;
 }
 
 bool CheckDiskSpace(uint64_t nAdditionalBytes)

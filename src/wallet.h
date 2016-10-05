@@ -31,7 +31,7 @@ class CCoinControl;
 // Set of selected transactions
 typedef std::set<std::pair<const CWalletTx*,unsigned int> > CoinsSet;
 
-/** (client) version numbers for particular wallet features */
+// (client) version numbers for particular wallet features
 enum WalletFeature
 {
     FEATURE_BASE = 10500, // the earliest version new wallets supports (only useful for getinfo's clientversion output)
@@ -42,23 +42,15 @@ enum WalletFeature
     FEATURE_LATEST = 60017
 };
 
-/** A key pool entry */
+// A key pool entry
 class CKeyPool
 {
 public:
     int64_t nTime;
     CPubKey vchPubKey;
 
-    CKeyPool()
-    {
-        nTime = GetTime();
-    }
-
-    CKeyPool(const CPubKey& vchPubKeyIn)
-    {
-        nTime = GetTime();
-        vchPubKey = vchPubKeyIn;
-    }
+    CKeyPool() : nTime(GetTime()) {}
+    CKeyPool(const CPubKey& vchPubKeyIn) : nTime(GetTime()), vchPubKey(vchPubKeyIn) {}
 
     IMPLEMENT_SERIALIZE
     (
@@ -69,9 +61,9 @@ public:
     )
 };
 
-/** A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
- * and provides the ability to create new transactions.
- */
+// A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
+// and provides the ability to create new transactions.
+//
 class CWallet : public CCryptoKeyStore
 {
 private:
@@ -153,7 +145,7 @@ public:
     bool LoadKey(const CMalleableKeyView &keyView, const CSecret &vchSecretH) { return CCryptoKeyStore::AddMalleableKey(keyView, vchSecretH); }
     bool LoadCryptedKey(const CMalleableKeyView &keyView, const std::vector<unsigned char> &vchCryptedSecretH) { return CCryptoKeyStore::AddCryptedMalleableKey(keyView, vchCryptedSecretH); }
 
-    bool LoadMinVersion(int nVersion) { nWalletVersion = nVersion; nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion); return true; }
+    bool LoadMinVersion(int nVersion);
 
     // Adds an encrypted key to the store, and saves it to disk.
     bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
@@ -257,16 +249,7 @@ public:
     bool DelAddressBookName(const CBitcoinAddress& address);
     void UpdatedTransaction(const uint256 &hashTx);
     void PrintWallet(const CBlock& block);
-
-    void Inventory(const uint256 &hash)
-    {
-        {
-            LOCK(cs_wallet);
-            auto mi = mapRequestCount.find(hash);
-            if (mi != mapRequestCount.end())
-                (*mi).second++;
-        }
-    }
+    void Inventory(const uint256 &hash);
 
     unsigned int GetKeyPoolSize()
     {
@@ -310,11 +293,7 @@ protected:
     int64_t nIndex;
     CPubKey vchPubKey;
 public:
-    CReserveKey(CWallet* pwalletIn)
-    {
-        nIndex = -1;
-        pwallet = pwalletIn;
-    }
+    CReserveKey(CWallet* pwalletIn) : pwallet(pwalletIn), nIndex(-1) {}
 
     ~CReserveKey()
     {
@@ -330,7 +309,6 @@ public:
 
 typedef std::map<std::string, std::string> mapValue_t;
 
-
 static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
 {
     if (!mapValue.count("n"))
@@ -341,7 +319,6 @@ static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
     nOrderPos = strtoll(mapValue["n"]);
 }
 
-
 static void WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
 {
     if (nOrderPos == -1)
@@ -350,9 +327,9 @@ static void WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
 }
 
 
-/** A transaction with a bunch of additional info that only the owner cares about.
- * It includes any unrecorded transactions needed to link it back to the block chain.
- */
+// A transaction with a bunch of additional info that only the owner cares about.
+// It includes any unrecorded transactions needed to link it back to the block chain.
+//
 class CWalletTx : public CMerkleTx
 {
 private:
@@ -511,10 +488,8 @@ public:
     int nDepth;
     bool fSpendable;
 
-    COutput(const CWalletTx *txIn, int iIn, int nDepthIn, bool fSpendableIn)
-    {
-        tx = txIn; i = iIn; nDepth = nDepthIn; fSpendable = fSpendableIn;
-    }
+    COutput(const CWalletTx *txIn, int iIn, int nDepthIn, bool fSpendableIn) :
+            tx(txIn), i(iIn), nDepth(nDepthIn), fSpendable(fSpendableIn) {}
 
     std::string ToString() const
     {
@@ -525,7 +500,7 @@ public:
 
 
 
-/** Private key that includes an expiration date in case it never gets used. */
+// Private key that includes an expiration date in case it never gets used.
 class CWalletKey
 {
 public:
@@ -536,11 +511,7 @@ public:
     //// todo: add something to note what created it (user, getnewaddress, change)
     ////   maybe should have a map<string, string> property map
 
-    CWalletKey(int64_t nExpires=0)
-    {
-        nTimeCreated = (nExpires ? GetTime() : 0);
-        nTimeExpires = nExpires;
-    }
+    CWalletKey(int64_t nExpires=0) : nTimeCreated(nExpires ? GetTime() : 0), nTimeExpires(nExpires) {}
 
     IMPLEMENT_SERIALIZE
     (
@@ -552,8 +523,6 @@ public:
         READWRITE(strComment);
     )
 };
-
-
 
 
 

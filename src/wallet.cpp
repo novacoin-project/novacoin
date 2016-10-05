@@ -205,6 +205,13 @@ bool CWallet::LoadKeyMetadata(const CMalleableKeyView &keyView, const CKeyMetada
     return true;
 }
 
+bool CWallet::LoadMinVersion(int nVersion)
+{
+    nWalletVersion = nVersion;
+    nWalletMaxVersion = max(nWalletMaxVersion, nVersion);
+    return true;
+}
+
 bool CWallet::AddCScript(const CScript& redeemScript)
 {
     if (!CCryptoKeyStore::AddCScript(redeemScript))
@@ -838,6 +845,7 @@ isminetype CWallet::IsMine(const CTxIn &txin) const
     }
     return MINE_NO;
 }
+
 
 CWalletTx::CWalletTx()
 {
@@ -2721,6 +2729,16 @@ void CWallet::PrintWallet(const CBlock& block)
         }
     }
     printf("\n");
+}
+
+void CWallet::Inventory(const uint256 &hash)
+{
+    {
+        LOCK(cs_wallet);
+        auto mi = mapRequestCount.find(hash);
+        if (mi != mapRequestCount.end())
+            (*mi).second++;
+    }
 }
 
 bool CWallet::GetTransaction(const uint256 &hashTx, CWalletTx& wtx)
