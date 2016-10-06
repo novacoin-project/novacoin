@@ -6,6 +6,8 @@
 #include "kernel.h"
 #include "kernel_worker.h"
 
+#include <openssl/sha.h>
+
 using namespace std;
 
 KernelWorker::KernelWorker(uint8_t *kernel, uint32_t nBits, uint32_t nInputTxTime, int64_t nValueIn, uint32_t nIntervalBegin, uint32_t nIntervalEnd)

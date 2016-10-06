@@ -12,6 +12,8 @@
 
 using namespace std;
 
+extern unsigned int nStakeMinAge;
+
 namespace Checkpoints
 {
     typedef map<int, pair<uint256, unsigned int> > MapCheckpoints;

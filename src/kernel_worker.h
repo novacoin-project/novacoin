@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "bignum.h"
+
 
 class KernelWorker
 {
