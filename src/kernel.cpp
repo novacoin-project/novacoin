@@ -9,10 +9,12 @@
 #include "kernel_worker.h"
 #include "txdb.h"
 
-extern uint32_t nStakeMaxAge;
 extern uint32_t nStakeTargetSpacing;
 
 using namespace std;
+
+uint32_t nStakeMinAge = 30 * nOneDay; // 30 days as zero time weight
+uint32_t nStakeMaxAge = 90 * nOneDay; // 90 days as full weight
 
 // Protocol switch time for fixed kernel modifier interval
 uint32_t nModifierSwitchTime  = 1413763200;    // Mon, 20 Oct 2014 00:00:00 GMT

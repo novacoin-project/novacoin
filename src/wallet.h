@@ -19,7 +19,6 @@
 #include "walletdb.h"
 #include "base58.h"
 
-extern unsigned int nStakeMaxAge;
 extern bool fWalletUnlockMintOnly;
 extern bool fConfChange;
 class CAccountingEntry;
