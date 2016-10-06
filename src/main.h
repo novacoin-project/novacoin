@@ -23,14 +23,15 @@
 class CWallet;
 class CBlock;
 class CBlockIndex;
-class CKeyItem;
-class CReserveKey;
 class COutPoint;
 
 class CAddress;
 class CInv;
-class CRequestTracker;
 class CNode;
+
+class CTxDB;
+class CTxIndex;
+class CScriptCheck;
 
 //
 // Global state
@@ -96,11 +97,6 @@ extern const uint256 entropyStore[38];
 
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64_t nMinDiskSpace = 52428800;
-
-class CReserveKey;
-class CTxDB;
-class CTxIndex;
-class CScriptCheck;
 
 void RegisterWallet(CWallet* pwalletIn);
 void UnregisterWallet(CWallet* pwalletIn);
