@@ -3,6 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <regex>
+
 #include "txdb.h"
 #include "wallet.h"
 #include "walletdb.h"
@@ -11,7 +13,6 @@
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
-#include <boost/algorithm/string/replace.hpp>
 #include <openssl/bio.h>
 
 #include "main.h"
@@ -784,11 +785,9 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
         // notify an external script when a wallet transaction comes in or is updated
         auto strCmd = GetArg("-walletnotify", "");
 
-        if ( !strCmd.empty())
-        {
-            boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
-            boost::thread t(runCommand, strCmd); // thread runs free
-        }
+        if (!strCmd.empty())
+            // thread runs free
+            boost::thread t(runCommand, regex_replace(strCmd, static_cast<regex>("%s"), wtxIn.GetHash().GetHex()));
 
     }
     return true;
