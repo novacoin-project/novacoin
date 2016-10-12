@@ -11,7 +11,6 @@
 #include "kernel.h"
 #include "bitcoinrpc.h"
 
-#include <boost/format.hpp>
 
 using namespace json_spirit;
 using namespace std;
@@ -138,7 +137,7 @@ Value scaninput(const Array& params, bool fHelp)
                 if (nOut < 0 || nOut > (int)tx.vout.size() - 1)
                 {
                     stringstream strErrorMsg;
-                    strErrorMsg << boost::format("Invalid parameter, input number %d is out of range") % nOut;
+                    strErrorMsg << "Invalid parameter, input number " << to_string(nOut) << " is out of range";
                     throw JSONRPCError(RPC_INVALID_PARAMETER, strErrorMsg.str());
                 }
 
@@ -151,7 +150,7 @@ Value scaninput(const Array& params, bool fHelp)
             if (nOut < 0 || nOut > (int)tx.vout.size() - 1)
             {
                 stringstream strErrorMsg;
-                strErrorMsg << boost::format("Invalid parameter, input number %d is out of range") % nOut;
+                strErrorMsg << "Invalid parameter, input number " << to_string(nOut) << " is out of range";
                 throw JSONRPCError(RPC_INVALID_PARAMETER, strErrorMsg.str());
             }
 
