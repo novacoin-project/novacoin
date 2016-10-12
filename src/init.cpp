@@ -11,7 +11,6 @@
 #include "ipcollector.h"
 #include "ui_interface.h"
 #include "checkpoints.h"
-#include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -269,7 +268,7 @@ std::string HelpMessage()
 #endif
 
         "  -paytxfee=<amt>        " + _("Fee per KB to add to transactions you send") + "\n" +
-        "  -mininput=<amt>        " + str(boost::format(_("When creating transactions, ignore inputs with value less than this (default: %s)")) % FormatMoney(MIN_TXOUT_AMOUNT)) + "\n" +
+        "  -mininput=<amt>        " + ((string)("When creating transactions, ignore inputs with value less than this (default: ") + FormatMoney(MIN_TXOUT_AMOUNT) + ")") + "\n" +
 #ifdef QT_GUI
         "  -server                " + _("Accept command line and JSON-RPC commands") + "\n" +
 #endif
