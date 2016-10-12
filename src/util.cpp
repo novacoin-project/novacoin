@@ -10,7 +10,6 @@
 
 #include <random>
 
-#include <boost/algorithm/string/join.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
@@ -1387,7 +1386,16 @@ string FormatSubVersion(const string& name, int nClientVersion, const vector<str
     ss << "/";
     ss << name << ":" << FormatVersion(nClientVersion);
     if (!comments.empty())
-        ss << "(" << boost::algorithm::join(comments, "; ") << ")";
+    {
+        ss << "(";
+        for (const auto& st : comments)
+        {
+            ss << st;
+            if (st == comments.back()) break;
+            ss << "; ";
+        }
+        ss << ")";
+    }
     ss << "/";
     return ss.str();
 }
