@@ -2600,22 +2600,22 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
 {
     // Check amount
     if (nValue <= 0)
-        return _("Invalid amount");
+        return "Invalid amount";
     if (nValue + nTransactionFee > GetBalance())
-        return _("Insufficient funds");
+        return "Insufficient funds";
 
     CReserveKey reservekey(this);
     int64_t nFeeRequired;
 
     if (IsLocked())
     {
-        string strError = _("Error: Wallet locked, unable to create transaction  ");
+        string strError("Error: Wallet locked, unable to create transaction  ");
         printf("SendMoney() : %s", strError.c_str());
         return strError;
     }
     if (fWalletUnlockMintOnly)
     {
-        string strError = _("Error: Wallet unlocked for block minting only, unable to create transaction.");
+        string strError("Error: Wallet unlocked for block minting only, unable to create transaction.");
         printf("SendMoney() : %s", strError.c_str());
         return strError;
     }
@@ -2634,7 +2634,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
         return "ABORTED";
 
     if (!CommitTransaction(wtxNew, reservekey))
-        return _("Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
+        return "Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.";
 
     return "";
 }

@@ -493,7 +493,7 @@ void ThreadNtpSamples(void* parg) {
         if (GetNodesOffset() == numeric_limits<int64_t>::max() && abs(nNtpOffset) > 40 * 60)
         {
             // If there is not enough node offsets data and NTP time offset is greater than 40 minutes then give a warning.
-            string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
+            string strMessage("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
             strMiscWarning = strMessage;
             printf("*** %s\n", strMessage.c_str());
             uiInterface.ThreadSafeMessageBox(strMessage+" ", string("NovaCoin"), CClientUIInterface::OK | CClientUIInterface::ICON_EXCLAMATION);
