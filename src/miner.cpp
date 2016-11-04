@@ -717,7 +717,7 @@ void ThreadStakeMiner(void* parg)
                 // Create new coinstake transaction
                 if (!pwallet->CreateCoinStake(LuckyInput.first, LuckyInput.second, solution.second, nBits, txCoinStake, key))
                 {
-                    string strMessage = _("Warning: Unable to create coinstake transaction, see debug.log for the details. Mining thread has been stopped.");
+                    string strMessage("Warning: Unable to create coinstake transaction, see debug.log for the details. Mining thread has been stopped.");
                     strMiscWarning = strMessage;
                     printf("*** %s\n", strMessage.c_str());
 
@@ -728,7 +728,7 @@ void ThreadStakeMiner(void* parg)
                 auto pblock = CreateNewBlock(pwallet, &txCoinStake);
                 if (!pblock)
                 {
-                    string strMessage = _("Warning: Unable to allocate memory for the new block object. Mining thread has been stopped.");
+                    string strMessage("Warning: Unable to allocate memory for the new block object. Mining thread has been stopped.");
                     strMiscWarning = strMessage;
                     printf("*** %s\n", strMessage.c_str());
 
@@ -741,7 +741,7 @@ void ThreadStakeMiner(void* parg)
                 // ... and sign it
                 if (!key.Sign(pblock->GetHash(), pblock->vchBlockSig))
                 {
-                    string strMessage = _("Warning: Proof-of-Stake miner is unable to sign the block (locked wallet?). Mining thread has been stopped.");
+                    string strMessage("Warning: Proof-of-Stake miner is unable to sign the block (locked wallet?). Mining thread has been stopped.");
                     strMiscWarning = strMessage;
                     printf("*** %s\n", strMessage.c_str());
 

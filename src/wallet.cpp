@@ -3,6 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <regex>
+
 #include "txdb.h"
 #include "wallet.h"
 #include "walletdb.h"
@@ -11,7 +13,6 @@
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
-#include <boost/algorithm/string/replace.hpp>
 #include <openssl/bio.h>
 
 #include "main.h"
@@ -784,11 +785,9 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
         // notify an external script when a wallet transaction comes in or is updated
         auto strCmd = GetArg("-walletnotify", "");
 
-        if ( !strCmd.empty())
-        {
-            boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
-            boost::thread t(runCommand, strCmd); // thread runs free
-        }
+        if (!strCmd.empty())
+            // thread runs free
+            boost::thread t(runCommand, regex_replace(strCmd, static_cast<regex>("%s"), wtxIn.GetHash().GetHex()));
 
     }
     return true;
@@ -2601,22 +2600,22 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
 {
     // Check amount
     if (nValue <= 0)
-        return _("Invalid amount");
+        return "Invalid amount";
     if (nValue + nTransactionFee > GetBalance())
-        return _("Insufficient funds");
+        return "Insufficient funds";
 
     CReserveKey reservekey(this);
     int64_t nFeeRequired;
 
     if (IsLocked())
     {
-        string strError = _("Error: Wallet locked, unable to create transaction  ");
+        string strError("Error: Wallet locked, unable to create transaction  ");
         printf("SendMoney() : %s", strError.c_str());
         return strError;
     }
     if (fWalletUnlockMintOnly)
     {
-        string strError = _("Error: Wallet unlocked for block minting only, unable to create transaction.");
+        string strError("Error: Wallet unlocked for block minting only, unable to create transaction.");
         printf("SendMoney() : %s", strError.c_str());
         return strError;
     }
@@ -2635,7 +2634,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
         return "ABORTED";
 
     if (!CommitTransaction(wtxNew, reservekey))
-        return _("Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
+        return "Error: The transaction was rejected.  This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.";
 
     return "";
 }

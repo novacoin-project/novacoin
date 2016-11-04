@@ -10,7 +10,6 @@
 
 #include <random>
 
-#include <boost/algorithm/string/join.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
@@ -366,13 +365,14 @@ void ParseString(const string& str, char c, vector<string>& v)
 
 string FormatMoney(int64_t n, bool fPlus)
 {
-    // Note: not using straight sprintf here because we do NOT want
-    // localized number formatting.
-    int64_t n_abs = (n > 0 ? n : -n);
-    int64_t quotient = n_abs/COIN;
-    int64_t remainder = n_abs%COIN;
-    string str = strprintf("%" PRId64 ".%06" PRId64, quotient, remainder);
+    ostringstream ss;
 
+    if (n < 0)
+        ss << '-';
+    else if (fPlus && n > 0)
+        ss << '+';
+    ss << abs(n/COIN) << '.' << setfill('0') << setw(6) << abs(n%COIN);
+    string str = ss.str();
     // Right-trim excess zeros before the decimal point:
     size_t nTrim = 0;
     for (size_t i = str.size()-1; (str[i] == '0' && isdigit(str[i-2])); --i)
@@ -380,10 +380,6 @@ string FormatMoney(int64_t n, bool fPlus)
     if (nTrim)
         str.erase(str.size()-nTrim, nTrim);
 
-    if (n < 0)
-        str.insert(0u, 1, '-');
-    else if (fPlus && n > 0)
-        str.insert(0u, 1, '+');
     return str;
 }
 
@@ -1350,7 +1346,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
                 if (!fMatch)
                 {
                     fDone = true;
-                    string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
+                    string strMessage("Warning: Please check that your computer's date and time are correct! If your clock is wrong NovaCoin will not work properly.");
                     strMiscWarning = strMessage;
                     printf("*** %s\n", strMessage.c_str());
                     uiInterface.ThreadSafeMessageBox(strMessage+" ", string("NovaCoin"), CClientUIInterface::OK | CClientUIInterface::ICON_EXCLAMATION);
@@ -1387,7 +1383,16 @@ string FormatSubVersion(const string& name, int nClientVersion, const vector<str
     ss << "/";
     ss << name << ":" << FormatVersion(nClientVersion);
     if (!comments.empty())
-        ss << "(" << boost::algorithm::join(comments, "; ") << ")";
+    {
+        ss << "(";
+        for (const auto& st : comments)
+        {
+            ss << st;
+            if (st == comments.back()) break;
+            ss << "; ";
+        }
+        ss << ")";
+    }
     ss << "/";
     return ss.str();
 }
