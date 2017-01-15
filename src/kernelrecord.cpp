@@ -1,4 +1,5 @@
 #include "kernelrecord.h"
+#include "kernel.h"
 
 #include "wallet.h"
 #include "base58.h"
