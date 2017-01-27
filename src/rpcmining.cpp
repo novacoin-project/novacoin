@@ -29,7 +29,7 @@ Value getsubsidy(const Array& params, bool fHelp)
 
     if (params.size() != 0)
     {
-        CBigNum bnTarget(uint256(params[0].get_str()));
+        uint256 bnTarget(params[0].get_str());
         nBits = bnTarget.GetCompact();
     }
     else
@@ -104,7 +104,7 @@ Value scaninput(const Array& params, bool fHelp)
         if (dDiff <= 0)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, diff must be greater than zero");
 
-        CBigNum bnTarget(nPoWBase);
+        uint256 bnTarget(nPoWBase);
         bnTarget *= 1000;
         bnTarget /= (int) (dDiff * 1000);
         nBits = bnTarget.GetCompact();
