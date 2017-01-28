@@ -102,7 +102,7 @@ bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 
     {
         LOCK(cs_KeyStore);
-        mapScripts[redeemScript.GetID()] = redeemScript;
+        mapScripts[CScriptID(redeemScript)] = redeemScript;
     }
     return true;
 }

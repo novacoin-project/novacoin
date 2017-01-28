@@ -2478,8 +2478,3 @@ void CScript::print() const
 {
     printf("%s\n", ToString().c_str());
 }
-
-CScriptID CScript::GetID() const
-{
-    return CScriptID(Hash160(*this));
-}

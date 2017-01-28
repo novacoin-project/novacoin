@@ -889,7 +889,7 @@ Value addmultisigaddress(const Array& params, bool fHelp)
         strprintf("redeemScript exceeds size limit: %" PRIszu " > %d", inner.size(), MAX_SCRIPT_ELEMENT_SIZE));
 
     pwalletMain->AddCScript(inner);
-    CBitcoinAddress address(inner.GetID());
+    CBitcoinAddress address{ CScriptID(inner) }; // "most vexing parse"
 
     pwalletMain->SetAddressBookName(address, strAccount);
     return address.ToString();
@@ -913,7 +913,7 @@ Value addredeemscript(const Array& params, bool fHelp)
     auto innerData = ParseHexV(params[0], "redeemScript");
     CScript inner(innerData.begin(), innerData.end());
     pwalletMain->AddCScript(inner);
-    CBitcoinAddress address(inner.GetID());
+    CBitcoinAddress address{ CScriptID(inner) }; // "most vexing parse"
 
     pwalletMain->SetAddressBookName(address, strAccount);
     return address.ToString();

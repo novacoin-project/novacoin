@@ -165,6 +165,10 @@ const unsigned char vchMaxModHalfOrder[32] = {
 
 const unsigned char *vchZero = NULL;
 
+CScriptID::CScriptID(const CScript& in) : uint160(Hash160(in.begin(), in.end()))
+{
+}
+
 void CKey::SetCompressedPubKey(bool fCompressed)
 {
     EC_KEY_set_conv_form(pkey, fCompressed ? POINT_CONVERSION_COMPRESSED : POINT_CONVERSION_UNCOMPRESSED);
