@@ -1710,7 +1710,11 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
 
     if (whichType == TX_PUBKEY)
     {
-        addressRet = CPubKey(vSolutions[0]).GetID();
+        CPubKey pubKey(vSolutions[0]);
+        if (!pubKey.IsValid())
+            return false;
+
+        addressRet = pubKey.GetID();
         return true;
     }
     else if (whichType == TX_PUBKEYHASH)
@@ -1819,9 +1823,16 @@ bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, vecto
         nRequiredRet = vSolutions.front()[0];
         for (unsigned int i = 1; i < vSolutions.size()-1; i++)
         {
-            CTxDestination address = CPubKey(vSolutions[i]).GetID();
+            CPubKey pubKey(vSolutions[i]);
+            if (!pubKey.IsValid())
+                continue;
+
+            CTxDestination address = pubKey.GetID();
             addressRet.push_back(address);
         }
+
+        if (addressRet.empty())
+            return false;
     }
     else
     {
@@ -2477,9 +2488,4 @@ string CScript::ToString(bool fShort) const
 void CScript::print() const
 {
     printf("%s\n", ToString().c_str());
-}
-
-CScriptID CScript::GetID() const
-{
-    return CScriptID(Hash160(*this));
 }

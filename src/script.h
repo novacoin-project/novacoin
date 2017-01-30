@@ -375,7 +375,6 @@ public:
     void PrintHex() const;
     std::string ToString(bool fShort=false) const;
     void print() const;
-    CScriptID GetID() const;
 };
 
 bool IsCanonicalPubKey(const std::vector<unsigned char> &vchPubKey, unsigned int flags);

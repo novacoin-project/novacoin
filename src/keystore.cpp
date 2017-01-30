@@ -18,6 +18,15 @@ bool CKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const
     return true;
 }
 
+bool CKeyStore::GetSecret(const CKeyID &address, CSecret& vchSecret, bool &fCompressed) const
+{
+    CKey key;
+    if (!GetKey(address, key))
+        return false;
+    vchSecret = key.GetSecret(fCompressed);
+    return true;
+}
+
 bool CBasicKeyStore::AddKey(const CKey& key)
 {
     bool fCompressed = false;
@@ -38,6 +47,54 @@ bool CBasicKeyStore::AddMalleableKey(const CMalleableKeyView& keyView, const CSe
     return true;
 }
 
+bool CBasicKeyStore::GetMalleableKey(const CMalleableKeyView &keyView, CMalleableKey &mKey) const
+{
+    {
+        LOCK(cs_KeyStore);
+        MalleableKeyMap::const_iterator mi = mapMalleableKeys.find(keyView);
+        if (mi != mapMalleableKeys.end())
+        {
+            mKey = mi->first.GetMalleableKey(mi->second);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CBasicKeyStore::HaveKey(const CKeyID &address) const
+{
+    bool result;
+    {
+        LOCK(cs_KeyStore);
+        result = (mapKeys.count(address) > 0);
+    }
+    return result;
+}
+
+void CBasicKeyStore::GetKeys(std::set<CKeyID> &setAddress) const
+{
+    setAddress.clear();
+    {
+        LOCK(cs_KeyStore);
+        KeyMap::const_iterator mi;
+        for (mi = mapKeys.begin(); mi != mapKeys.end(); ++mi) setAddress.insert((*mi).first);
+    }
+}
+
+bool CBasicKeyStore::GetKey(const CKeyID &address, CKey &keyOut) const
+{
+    {
+        LOCK(cs_KeyStore);
+        KeyMap::const_iterator mi = mapKeys.find(address);
+        if (mi != mapKeys.end())
+        {
+            keyOut.SetSecret((*mi).second.first, (*mi).second.second);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 {
     if (redeemScript.size() > MAX_SCRIPT_ELEMENT_SIZE)
@@ -45,7 +102,7 @@ bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 
     {
         LOCK(cs_KeyStore);
-        mapScripts[redeemScript.GetID()] = redeemScript;
+        mapScripts[CScriptID(redeemScript)] = redeemScript;
     }
     return true;
 }
@@ -111,6 +168,77 @@ bool CBasicKeyStore::HaveWatchOnly() const
     return (!setWatchOnly.empty());
 }
 
+bool CBasicKeyStore::CheckOwnership(const CPubKey &pubKeyVariant, const CPubKey &R) const
+{
+    {
+        LOCK(cs_KeyStore);
+        for (MalleableKeyMap::const_iterator mi = mapMalleableKeys.begin(); mi != mapMalleableKeys.end(); mi++)
+        {
+            if (mi->first.CheckKeyVariant(R, pubKeyVariant))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool CBasicKeyStore::CheckOwnership(const CPubKey &pubKeyVariant, const CPubKey &R, CMalleableKeyView &view) const
+{
+    {
+        LOCK(cs_KeyStore);
+        for (MalleableKeyMap::const_iterator mi = mapMalleableKeys.begin(); mi != mapMalleableKeys.end(); mi++)
+        {
+            if (mi->first.CheckKeyVariant(R, pubKeyVariant))
+            {
+                view = mi->first;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CBasicKeyStore::CreatePrivKey(const CPubKey &pubKeyVariant, const CPubKey &R, CKey &privKey) const
+{
+    {
+        LOCK(cs_KeyStore);
+        for (MalleableKeyMap::const_iterator mi = mapMalleableKeys.begin(); mi != mapMalleableKeys.end(); mi++)
+        {
+            if (mi->first.CheckKeyVariant(R, pubKeyVariant))
+            {
+                CMalleableKey mKey = mi->first.GetMalleableKey(mi->second);
+                return mKey.CheckKeyVariant(R, pubKeyVariant, privKey);
+            }
+        }
+    }
+    return false;
+}
+
+void CBasicKeyStore::ListMalleableViews(std::list<CMalleableKeyView> &malleableViewList) const
+{
+    malleableViewList.clear();
+    {
+        LOCK(cs_KeyStore);
+        for (MalleableKeyMap::const_iterator mi = mapMalleableKeys.begin(); mi != mapMalleableKeys.end(); mi++)
+            malleableViewList.push_back(CMalleableKeyView(mi->first));
+    }
+}
+
+bool CBasicKeyStore::GetMalleableView(const CMalleablePubKey &mpk, CMalleableKeyView &view)
+{
+    const CKeyID &mpkID = mpk.GetID();
+    {
+        LOCK(cs_KeyStore);
+        for (MalleableKeyMap::const_iterator mi = mapMalleableKeys.begin(); mi != mapMalleableKeys.end(); mi++)
+            if (mi->first.GetID() == mpkID)
+            {
+                view = CMalleableKeyView(mi->first);
+                return true;
+            }
+    }
+    return false;
+}
+
+
 bool CCryptoKeyStore::SetCrypted()
 {
     {
@@ -122,6 +250,27 @@ bool CCryptoKeyStore::SetCrypted()
         fUseCrypto = true;
     }
     return true;
+}
+
+CCryptoKeyStore::CCryptoKeyStore() : fUseCrypto(false), fDecryptionThoroughlyChecked(false)
+{
+}
+
+bool CCryptoKeyStore::IsCrypted() const
+{
+    return fUseCrypto;
+}
+
+bool CCryptoKeyStore::IsLocked() const
+{
+    if (!IsCrypted())
+        return false;
+    bool result;
+    {
+        LOCK(cs_KeyStore);
+        result = vMasterKey.empty();
+    }
+    return result;
 }
 
 bool CCryptoKeyStore::Lock()
@@ -266,6 +415,16 @@ bool CCryptoKeyStore::AddMalleableKey(const CMalleableKeyView& keyView, const CS
     return true;
 }
 
+bool CCryptoKeyStore::HaveKey(const CKeyID &address) const
+{
+    {
+        LOCK(cs_KeyStore);
+        if (!IsCrypted())
+            return CBasicKeyStore::HaveKey(address);
+        return mapCryptedKeys.count(address) > 0;
+    }
+}
+
 bool CCryptoKeyStore::AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret)
 {
     {
@@ -381,6 +540,90 @@ bool CCryptoKeyStore::GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) co
             vchPubKeyOut = (*mi).second.first;
             return true;
         }
+    }
+    return false;
+}
+
+void CCryptoKeyStore::GetKeys(std::set<CKeyID> &setAddress) const
+{
+    if (!IsCrypted())
+    {
+        CBasicKeyStore::GetKeys(setAddress);
+        return;
+    }
+    setAddress.clear();
+    CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
+    while (mi != mapCryptedKeys.end())
+    {
+        setAddress.insert((*mi).first);
+        mi++;
+    }
+}
+
+bool CCryptoKeyStore::CheckOwnership(const CPubKey &pubKeyVariant, const CPubKey &R) const
+{
+    {
+        LOCK(cs_KeyStore);
+        if (!IsCrypted())
+            return CBasicKeyStore::CheckOwnership(pubKeyVariant, R);
+        for (CryptedMalleableKeyMap::const_iterator mi = mapCryptedMalleableKeys.begin(); mi != mapCryptedMalleableKeys.end(); mi++)
+        {
+            if (mi->first.CheckKeyVariant(R, pubKeyVariant))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool CCryptoKeyStore::CheckOwnership(const CPubKey &pubKeyVariant, const CPubKey &R, CMalleableKeyView &view) const
+{
+    {
+        LOCK(cs_KeyStore);
+        if (!IsCrypted())
+            return CBasicKeyStore::CheckOwnership(pubKeyVariant, R, view);
+        for (CryptedMalleableKeyMap::const_iterator mi = mapCryptedMalleableKeys.begin(); mi != mapCryptedMalleableKeys.end(); mi++)
+        {
+            if (mi->first.CheckKeyVariant(R, pubKeyVariant))
+            {
+                view = mi->first;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CCryptoKeyStore::CheckOwnership(const CMalleablePubKey &mpk)
+{
+    CMalleableKeyView view;
+    return GetMalleableView(mpk, view);
+}
+
+void CCryptoKeyStore::ListMalleableViews(std::list<CMalleableKeyView> &malleableViewList) const
+{
+    malleableViewList.clear();
+    {
+        LOCK(cs_KeyStore);
+        if (!IsCrypted())
+            return CBasicKeyStore::ListMalleableViews(malleableViewList);
+        for (CryptedMalleableKeyMap::const_iterator mi = mapCryptedMalleableKeys.begin(); mi != mapCryptedMalleableKeys.end(); mi++)
+            malleableViewList.push_back(CMalleableKeyView(mi->first));
+    }
+}
+
+bool CCryptoKeyStore::GetMalleableView(const CMalleablePubKey &mpk, CMalleableKeyView &view)
+{
+    const CKeyID &mpkID = mpk.GetID();
+    {
+        LOCK(cs_KeyStore);
+        if (!IsCrypted())
+            return CBasicKeyStore::GetMalleableView(mpk, view);
+        for (CryptedMalleableKeyMap::const_iterator mi = mapCryptedMalleableKeys.begin(); mi != mapCryptedMalleableKeys.end(); mi++)
+            if (mi->first.GetID() == mpkID)
+            {
+                view = CMalleableKeyView(mi->first);
+                return true;
+            }
     }
     return false;
 }

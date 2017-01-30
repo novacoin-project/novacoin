@@ -29,7 +29,7 @@ Value getsubsidy(const Array& params, bool fHelp)
 
     if (params.size() != 0)
     {
-        CBigNum bnTarget(uint256(params[0].get_str()));
+        uint256 bnTarget(params[0].get_str());
         nBits = bnTarget.GetCompact();
     }
     else
@@ -104,7 +104,7 @@ Value scaninput(const Array& params, bool fHelp)
         if (dDiff <= 0)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, diff must be greater than zero");
 
-        CBigNum bnTarget(nPoWBase);
+        uint256 bnTarget(nPoWBase);
         bnTarget *= 1000;
         bnTarget /= (int) (dDiff * 1000);
         nBits = bnTarget.GetCompact();
@@ -292,13 +292,13 @@ Value getworkex(const Array& params, bool fHelp)
         char phash1[64];
         FormatHashBuffers(pblock, pmidstate, pdata, phash1);
 
-        auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+        auto hashTarget = uint256().SetCompact(pblock->nBits);
 
         auto coinbaseTx = pblock->vtx[0];
         auto merkle = pblock->GetMerkleBranch(0);
 
         Object result;
-        result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
+        result.push_back(Pair("data",     HexStr(begin(pdata), end(pdata))));
         result.push_back(Pair("target",   HexStr(hashTarget.begin(), hashTarget.end())));
 
         CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
@@ -431,12 +431,12 @@ Value getwork(const Array& params, bool fHelp)
         char phash1[64];
         FormatHashBuffers(pblock, pmidstate, pdata, phash1);
 
-        auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+        auto hashTarget = uint256().SetCompact(pblock->nBits);
 
         Object result;
-        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
-        result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
-        result.push_back(Pair("hash1",    HexStr(BEGIN(phash1), END(phash1)))); // deprecated
+        result.push_back(Pair("midstate", HexStr(begin(pmidstate), end(pmidstate)))); // deprecated
+        result.push_back(Pair("data",     HexStr(begin(pdata), end(pdata))));
+        result.push_back(Pair("hash1",    HexStr(begin(phash1), end(phash1)))); // deprecated
         result.push_back(Pair("target",   HexStr(hashTarget.begin(), hashTarget.end())));
         return result;
     }
@@ -595,7 +595,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
     Object aux;
     aux.push_back(Pair("flags", HexStr(COINBASE_FLAGS.begin(), COINBASE_FLAGS.end())));
 
-    auto hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+    auto hashTarget = uint256().SetCompact(pblock->nBits);
 
     static Array aMutable;
     if (aMutable.empty())

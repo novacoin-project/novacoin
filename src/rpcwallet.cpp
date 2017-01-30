@@ -95,7 +95,7 @@ Value getinfo(const Array& params, bool fHelp)
 
     obj.push_back(Pair("moneysupply",   ValueFromAmount(pindexBest->nMoneySupply)));
     obj.push_back(Pair("connections",   (int)vNodes.size()));
-    obj.push_back(Pair("proxy",         (proxy.first.IsValid() ? proxy.first.ToStringIPPort() : string())));
+    obj.push_back(Pair("proxy",         (proxy.IsValid() ? proxy.ToStringIPPort() : string())));
     obj.push_back(Pair("ip",            addrSeenByPeer.ToStringIP()));
 
     diff.push_back(Pair("proof-of-work",  GetDifficulty()));
@@ -889,7 +889,7 @@ Value addmultisigaddress(const Array& params, bool fHelp)
         strprintf("redeemScript exceeds size limit: %" PRIszu " > %d", inner.size(), MAX_SCRIPT_ELEMENT_SIZE));
 
     pwalletMain->AddCScript(inner);
-    CBitcoinAddress address(inner.GetID());
+    CBitcoinAddress address{ CScriptID(inner) }; // "most vexing parse"
 
     pwalletMain->SetAddressBookName(address, strAccount);
     return address.ToString();
@@ -913,7 +913,7 @@ Value addredeemscript(const Array& params, bool fHelp)
     auto innerData = ParseHexV(params[0], "redeemScript");
     CScript inner(innerData.begin(), innerData.end());
     pwalletMain->AddCScript(inner);
-    CBitcoinAddress address(inner.GetID());
+    CBitcoinAddress address{ CScriptID(inner) }; // "most vexing parse"
 
     pwalletMain->SetAddressBookName(address, strAccount);
     return address.ToString();

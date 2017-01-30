@@ -368,7 +368,7 @@ Value decodescript(const Array& params, bool fHelp)
     }
     ScriptPubKeyToJSON(script, r, false);
 
-    r.push_back(Pair("p2sh", CBitcoinAddress(script.GetID()).ToString()));
+    r.push_back(Pair("p2sh", CBitcoinAddress(CScriptID(script)).ToString()));
     return r;
 }
 
@@ -690,7 +690,7 @@ Value createmultisig(const Array& params, bool fHelp)
         throw runtime_error(
             strprintf("redeemScript exceeds size limit: %" PRIszu " > %d", inner.size(), MAX_SCRIPT_ELEMENT_SIZE));
 
-    auto innerID = inner.GetID();
+    auto innerID = CScriptID(inner);
     CBitcoinAddress address(innerID);
 
     Object result;

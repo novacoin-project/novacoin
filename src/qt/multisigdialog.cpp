@@ -190,7 +190,7 @@ void MultisigDialog::on_createAddressButton_clicked()
         QMessageBox::warning(this, tr("Error"), tr("Redeem script exceeds size limit: %1 > %2\nReduce the number of addresses involved in the address creation.").arg(script.size()).arg(MAX_SCRIPT_ELEMENT_SIZE), QMessageBox::Ok);
         return;
     }
-    CScriptID scriptID = script.GetID();
+    CScriptID scriptID(script);
     CBitcoinAddress address(scriptID);
 
     ui->multisigAddress->setText(address.ToString().c_str());
@@ -216,7 +216,7 @@ void MultisigDialog::on_saveRedeemScriptButton_clicked()
     std::string redeemScript = ui->redeemScript->text().toStdString();
     std::vector<unsigned char> scriptData(ParseHex(redeemScript));
     CScript script(scriptData.begin(), scriptData.end());
-    CScriptID scriptID = script.GetID();
+    CScriptID scriptID(script);
 
     LOCK(wallet->cs_wallet);
     if(!wallet->HaveCScript(scriptID))
@@ -238,7 +238,7 @@ void MultisigDialog::on_saveMultisigAddressButton_clicked()
 
     std::vector<unsigned char> scriptData(ParseHex(redeemScript));
     CScript script(scriptData.begin(), scriptData.end());
-    CScriptID scriptID = script.GetID();
+    CScriptID scriptID(script);
 
     LOCK(wallet->cs_wallet);
     if(!wallet->HaveCScript(scriptID))
