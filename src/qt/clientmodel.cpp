@@ -17,8 +17,7 @@ extern double GetDifficulty(const CBlockIndex* blockindex);
 static const int64_t nClientStartupTime = GetTime();
 
 ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
-    QObject(parent), optionsModel(optionsModel),
-    cachedNumBlocks(0), cachedNumBlocksOfPeers(0), pollTimer(0)
+    QObject(parent), optionsModel(optionsModel), cachedNumBlocks(0), pollTimer(0)
 {
     numBlocksAtStartup = -1;
 
@@ -96,14 +95,11 @@ void ClientModel::updateTimer()
     // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
     // Periodically check and update with a timer.
     int newNumBlocks = getNumBlocks();
-    int newNumBlocksOfPeers = getNumBlocksOfPeers();
 
-    if(cachedNumBlocks != newNumBlocks || cachedNumBlocksOfPeers != newNumBlocksOfPeers)
+    if(cachedNumBlocks != newNumBlocks)
     {
         cachedNumBlocks = newNumBlocks;
-        cachedNumBlocksOfPeers = newNumBlocksOfPeers;
-
-        emit numBlocksChanged(newNumBlocks, newNumBlocksOfPeers);
+        emit numBlocksChanged(newNumBlocks);
     }
 
     emit bytesChanged(getTotalBytesRecv(), getTotalBytesSent());
@@ -130,7 +126,7 @@ void ClientModel::updateAlert(const QString &hash, int status)
 
     // Emit a numBlocksChanged when the status message changes,
     // so that the view recomputes and updates the status bar.
-    emit numBlocksChanged(getNumBlocks(), getNumBlocksOfPeers());
+    emit numBlocksChanged(getNumBlocks());
 }
 
 bool ClientModel::isTestNet() const
@@ -141,11 +137,6 @@ bool ClientModel::isTestNet() const
 bool ClientModel::inInitialBlockDownload() const
 {
     return IsInitialBlockDownload();
-}
-
-int ClientModel::getNumBlocksOfPeers() const
-{
-    return GetNumBlocksOfPeers();
 }
 
 QString ClientModel::getStatusBarWarnings() const
