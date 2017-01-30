@@ -478,7 +478,7 @@ bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest
         return ConnectSocket(addr, hSocketRet, nTimeout);
     }
     addr = CService("0.0.0.0:0");
-    if (!HaveNameProxy)
+    if (!HaveNameProxy())
         return false;
     // first connect to name proxy server
     if (!ConnectSocketDirectly(nameProxy, hSocket, nTimeout))

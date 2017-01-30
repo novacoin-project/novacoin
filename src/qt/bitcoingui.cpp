@@ -443,8 +443,8 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
         setNumConnections(clientModel->getNumConnections());
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
 
-        setNumBlocks(clientModel->getNumBlocks(), clientModel->getNumBlocksOfPeers());
-        connect(clientModel, SIGNAL(numBlocksChanged(int,int)), this, SLOT(setNumBlocks(int,int)));
+        setNumBlocks(clientModel->getNumBlocks());
+        connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
 
         QTimer *timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(updateMining()));
@@ -575,7 +575,7 @@ void BitcoinGUI::setNumConnections(int count)
     labelConnectionsIcon->setToolTip(tr("%n active connection(s) to NovaCoin network", "", count));
 }
 
-void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
+void BitcoinGUI::setNumBlocks(int count)
 {
     // don't show / hide progress bar and its label if we have no connection to the network
     if (!clientModel || clientModel->getNumConnections() == 0)
@@ -589,31 +589,11 @@ void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
     QString strStatusBarWarnings = clientModel->getStatusBarWarnings();
     QString tooltip;
 
-    if(count < nTotalBlocks)
-    {
-        int nRemainingBlocks = nTotalBlocks - count;
-        float nPercentageDone = count / (nTotalBlocks * 0.01f);
+    if (strStatusBarWarnings.isEmpty())
+        progressBarLabel->setVisible(false);
 
-        if (strStatusBarWarnings.isEmpty())
-        {
-            progressBarLabel->setText(tr("Synchronizing with network..."));
-            progressBarLabel->setVisible(true);
-            progressBar->setFormat(tr("~%n block(s) remaining", "", nRemainingBlocks));
-            progressBar->setMaximum(nTotalBlocks);
-            progressBar->setValue(count);
-            progressBar->setVisible(true);
-        }
-
-        tooltip = tr("Downloaded %1 of %2 blocks of transaction history (%3% done).").arg(count).arg(nTotalBlocks).arg(nPercentageDone, 0, 'f', 2);
-    }
-    else
-    {
-        if (strStatusBarWarnings.isEmpty())
-            progressBarLabel->setVisible(false);
-
-        progressBar->setVisible(false);
-        tooltip = tr("Downloaded %1 blocks of transaction history.").arg(count);
-    }
+    progressBar->setVisible(false);
+    tooltip = tr("Downloaded %1 blocks of transaction history.").arg(count);
 
     // Override progressBarLabel text and hide progress bar, when we have warnings to display
     if (!strStatusBarWarnings.isEmpty())
@@ -653,7 +633,7 @@ void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
     }
 
     // Set icon state: spinning if catching up, tick otherwise
-    if(secs < 90*60 && count >= nTotalBlocks)
+    if(secs < 90*60)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
@@ -702,7 +682,7 @@ void BitcoinGUI::updateMining()
         return;
     }
 
-    if (clientModel->inInitialBlockDownload() || clientModel->getNumBlocksOfPeers() > clientModel->getNumBlocks())
+    if (clientModel->inInitialBlockDownload())
     {
         labelMiningIcon->setToolTip(tr("Blockchain download is in progress"));
         return;
