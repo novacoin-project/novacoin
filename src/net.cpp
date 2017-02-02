@@ -179,7 +179,7 @@ bool RecvLine(SOCKET hSocket, string& strLine)
             {
                 // socket error
                 int nErr = WSAGetLastError();
-                printf("recv failed: %d\n", nErr);
+                printf("recv failed: %s\n", NetworkErrorString(nErr).c_str());
                 return false;
             }
         }
@@ -445,10 +445,10 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest, int64_t nTimeout)
 #ifdef WIN32
         u_long nOne = 1;
         if (ioctlsocket(hSocket, FIONBIO, &nOne) == SOCKET_ERROR)
-            printf("ConnectSocket() : ioctlsocket non-blocking setting failed, error %d\n", WSAGetLastError());
+            printf("ConnectSocket() : ioctlsocket non-blocking setting failed, error %s\n", NetworkErrorString(WSAGetLastError()).c_str());
 #else
         if (fcntl(hSocket, F_SETFL, O_NONBLOCK) == SOCKET_ERROR)
-            printf("ConnectSocket() : fcntl non-blocking setting failed, error %d\n", errno);
+            printf("ConnectSocket() : fcntl non-blocking setting failed, error %s\n", NetworkErrorString(errno).c_str());
 #endif
 
         // Add node
@@ -939,7 +939,7 @@ void ThreadSocketHandler2(void* parg)
             if (have_fds)
             {
                 int nErr = WSAGetLastError();
-                printf("socket select error %d\n", nErr);
+                printf("socket select error %s\n", NetworkErrorString(nErr).c_str());
                 for (unsigned int i = 0; i <= hSocketMax; i++)
                     FD_SET(i, &fdsetRecv);
             }
@@ -976,7 +976,7 @@ void ThreadSocketHandler2(void* parg)
             {
                 int nErr = WSAGetLastError();
                 if (nErr != WSAEWOULDBLOCK)
-                    printf("socket error accept failed: %d\n", nErr);
+                    printf("socket error accept failed: %s\n", NetworkErrorString(nErr).c_str());
             }
             else if (nInbound >= GetArgInt("-maxconnections", 125) - MAX_OUTBOUND_CONNECTIONS)
             {
@@ -1063,7 +1063,7 @@ void ThreadSocketHandler2(void* parg)
                             if (nErr != WSAEWOULDBLOCK && nErr != WSAEMSGSIZE && nErr != WSAEINTR && nErr != WSAEINPROGRESS)
                             {
                                 if (!pnode->fDisconnect)
-                                    printf("socket recv error %d\n", nErr);
+                                    printf("socket recv error %s\n", NetworkErrorString(nErr).c_str());
                                 pnode->CloseSocketDisconnect();
                             }
                         }
@@ -1098,7 +1098,7 @@ void ThreadSocketHandler2(void* parg)
                             int nErr = WSAGetLastError();
                             if (nErr != WSAEWOULDBLOCK && nErr != WSAEMSGSIZE && nErr != WSAEINTR && nErr != WSAEINPROGRESS)
                             {
-                                printf("socket send error %d\n", nErr);
+                                printf("socket send error %s\n", NetworkErrorString(nErr).c_str());
                                 pnode->CloseSocketDisconnect();
                             }
                         }
@@ -1746,7 +1746,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     SOCKET hListenSocket = socket(((struct sockaddr*)&sockaddr)->sa_family, SOCK_STREAM, IPPROTO_TCP);
     if (hListenSocket == INVALID_SOCKET)
     {
-        strError = strprintf("Error: Couldn't open socket for incoming connections (socket returned error %d)", WSAGetLastError());
+        strError = strprintf("Error: Couldn't open socket for incoming connections (socket returned error %s)", NetworkErrorString(WSAGetLastError()).c_str());
         printf("%s\n", strError.c_str());
         return false;
     }
@@ -1776,7 +1776,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     if (fcntl(hListenSocket, F_SETFL, O_NONBLOCK) == SOCKET_ERROR)
 #endif
     {
-        strError = strprintf("Error: Couldn't set properties on socket for incoming connections (error %d)", WSAGetLastError());
+        strError = strprintf("Error: Couldn't set properties on socket for incoming connections (error %s)", NetworkErrorString(WSAGetLastError()).c_str());
         printf("%s\n", strError.c_str());
         CloseSocket(hListenSocket);
         return false;
@@ -1816,7 +1816,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
         if (nErr == WSAEADDRINUSE)
             strError = strprintf(_("Unable to bind to %s on this computer. NovaCoin is probably already running."), addrBind.ToString().c_str());
         else
-            strError = strprintf(_("Unable to bind to %s on this computer (bind returned error %d, %s)"), addrBind.ToString().c_str(), nErr, strerror(nErr));
+            strError = strprintf(_("Unable to bind to %s on this computer (bind returned error %s)"), addrBind.ToString().c_str(), NetworkErrorString(nErr).c_str());
         printf("%s\n", strError.c_str());
         CloseSocket(hListenSocket);
         return false;
@@ -1826,7 +1826,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     // Listen for incoming connections
     if (listen(hListenSocket, SOMAXCONN) == SOCKET_ERROR)
     {
-        strError = strprintf("Error: Listening for incoming connections failed (listen returned error %d)", WSAGetLastError());
+        strError = strprintf("Error: Listening for incoming connections failed (listen returned error %s)", NetworkErrorString(WSAGetLastError()).c_str());
         printf("%s\n", strError.c_str());
         CloseSocket(hListenSocket);
         return false;
@@ -2016,7 +2016,7 @@ public:
         for(SOCKET hListenSocket :  vhListenSocket)
             if (hListenSocket != INVALID_SOCKET)
                 if (!CloseSocket(hListenSocket))
-                    printf("CloseSocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+                    printf("CloseSocket(hListenSocket) failed with error %s\n", NetworkErrorString(WSAGetLastError()).c_str());
 
         // clean up some globals (to help leak detection)
         for(CNode *pnode :  vNodes)
@@ -2099,6 +2099,7 @@ uint64_t CNode::GetTotalBytesSent()
     LOCK(cs_totalBytesSent);
     return nTotalBytesSent;
 }
+
 int64_t PoissonNextSend(int64_t nNow, int average_interval_seconds) {
     return nNow + (int64_t)(log1p(GetRand(1ULL << 48) * -0.0000000000000035527136788 /* -1/2^48 */) * average_interval_seconds * -1000000.0 + 0.5);
 }

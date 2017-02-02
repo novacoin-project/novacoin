@@ -328,7 +328,7 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
             }
             if (nRet == SOCKET_ERROR)
             {
-                printf("select() for connection failed: %i\n",WSAGetLastError());
+                printf("select() for connection failed: %s\n", NetworkErrorString(WSAGetLastError()).c_str());
                 CloseSocket(hSocket);
                 return false;
             }
@@ -339,13 +339,13 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
             if (getsockopt(hSocket, SOL_SOCKET, SO_ERROR, &nRet, &nRetSize) == SOCKET_ERROR)
 #endif
             {
-                printf("getsockopt() for connection failed: %i\n",WSAGetLastError());
+                printf("getsockopt() for connection failed: %s\n", NetworkErrorString(WSAGetLastError()).c_str());
                 CloseSocket(hSocket);
                 return false;
             }
             if (nRet != 0)
             {
-                printf("connect() failed after select(): %s\n",strerror(nRet));
+                printf("connect() failed after select(): %s\n", NetworkErrorString(nRet).c_str());
                 CloseSocket(hSocket);
                 return false;
             }
@@ -356,7 +356,7 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
         else
 #endif
         {
-            printf("connect() failed: %i\n",WSAGetLastError());
+            printf("connect() failed: %s\n", NetworkErrorString(WSAGetLastError()).c_str());
             CloseSocket(hSocket);
             return false;
         }
@@ -1087,6 +1087,40 @@ void CService::SetupPort(uint16_t portIn)
 {
     port = portIn;
 }
+
+#ifdef WIN32
+std::string NetworkErrorString(int err)
+{
+    char buf[256];
+    buf[0] = 0;
+    if(FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+            NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            buf, sizeof(buf), NULL))
+    {
+        return strprintf("%s (%d)", buf, err);
+    }
+    else
+    {
+        return strprintf("Unknown error (%d)", err);
+    }
+}
+#else
+std::string NetworkErrorString(int err)
+{
+    char buf[256];
+    const char *s = buf;
+    buf[0] = 0;
+    /* Too bad there are two incompatible implementations of the
+     * thread-safe strerror. */
+#ifdef STRERROR_R_CHAR_P /* GNU variant can return a pointer outside the passed buffer */
+    s = strerror_r(err, buf, sizeof(buf));
+#else /* POSIX variant always returns message in buffer */
+    if (strerror_r(err, buf, sizeof(buf)))
+        buf[0] = 0;
+#endif
+    return strprintf("%s (%d)", s, err);
+}
+#endif
 
 bool CloseSocket(SOCKET& hSocket)
 {
