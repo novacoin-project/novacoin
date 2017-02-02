@@ -434,7 +434,6 @@ public:
     }
 
     bool IsFinal(int nBlockHeight=0, int64_t nBlockTime=0) const;
-    bool IsNewerThan(const CTransaction& old) const;
 
     bool IsCoinBase() const
     {

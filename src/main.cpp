@@ -269,34 +269,6 @@ bool CTransaction::IsFinal(int nBlockHeight, int64_t nBlockTime) const
     return true;
 }
 
-bool CTransaction::IsNewerThan(const CTransaction& old) const
-{
-    if (vin.size() != old.vin.size())
-        return false;
-    for (unsigned int i = 0; i < vin.size(); i++)
-        if (vin[i].prevout != old.vin[i].prevout)
-            return false;
-    bool fNewer = false;
-    unsigned int nLowest = numeric_limits<unsigned int>::max();
-    for (unsigned int i = 0; i < vin.size(); i++)
-    {
-        if (vin[i].nSequence != old.vin[i].nSequence)
-        {
-            if (vin[i].nSequence <= nLowest)
-            {
-                fNewer = false;
-                nLowest = vin[i].nSequence;
-            }
-            if (old.vin[i].nSequence < nLowest)
-            {
-                fNewer = true;
-                nLowest = old.vin[i].nSequence;
-            }
-        }
-    }
-    return fNewer;
-}
-
 bool CTransaction::ReadFromDisk(CDiskTxPos pos, FILE** pfileRet)
 {
     auto filein = CAutoFile(OpenBlockFile(pos.nFile, 0, pfileRet ? "rb+" : "rb"), SER_DISK, CLIENT_VERSION);
