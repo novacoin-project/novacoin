@@ -21,7 +21,6 @@ LIBPATHS= \
  -L"$(DEPSDIR)/lib/db48"
 
 USE_LEVELDB:=0
-USE_IPV6:=1
 
 LIBS= -dead_strip
 
@@ -103,10 +102,6 @@ OBJS= \
     obj/cryptogram.o \
     obj/ipcollector.o \
     obj/serialize.o
-
-ifneq (${USE_IPV6}, -)
-	DEFS += -DUSE_IPV6=$(USE_IPV6)
-endif
 
 all: novacoind
 

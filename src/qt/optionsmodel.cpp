@@ -25,10 +25,8 @@ bool static ApplyProxySettings()
 
     if (!IsLimited(NET_IPV4))
         SetProxy(NET_IPV4, addrProxy);
-#ifdef USE_IPV6
-        if (!IsLimited(NET_IPV6))
-            SetProxy(NET_IPV6, addrProxy);
-#endif
+    if (!IsLimited(NET_IPV6))
+        SetProxy(NET_IPV6, addrProxy);
 
     SetNameProxy(addrProxy);
 
