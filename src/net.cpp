@@ -727,7 +727,7 @@ void CNode::ClearBanned()
     setBanned.clear();
 }
 
-bool CNode::IsBanned(CNetAddr ip)
+bool CNode::IsBanned(const CNetAddr& ip)
 {
     bool fResult = false;
     {

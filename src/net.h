@@ -477,7 +477,7 @@ public:
     // between nodes running old code and nodes running
     // new code.
     static void ClearBanned(); // needed for unit testing
-    static bool IsBanned(CNetAddr ip);
+    static bool IsBanned(const CNetAddr& ip);
     bool Misbehaving(int howmuch); // 1 == a little, 100 == a lot
     void copyStats(CNodeStats &stats);
     // Network stats
