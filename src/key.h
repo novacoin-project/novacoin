@@ -201,7 +201,6 @@ public:
     }
 
     bool Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const;
-    bool VerifyCompact(const uint256 &hash, const std::vector<unsigned char>& vchSig);
 
     bool SetCompactSignature(const uint256 &hash, const std::vector<unsigned char>& vchSig);
 

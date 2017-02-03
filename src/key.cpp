@@ -535,14 +535,6 @@ bool CPubKey::Verify(const uint256 &hash, const std::vector<unsigned char>& vchS
     return ret;
 }
 
-bool CPubKey::VerifyCompact(const uint256 &hash, const std::vector<unsigned char>& vchSig)
-{
-    CPubKey key;
-    if (!key.SetCompactSignature(hash, vchSig))
-        return false;
-    return true;
-}
-
 bool CKey::IsValid()
 {
     if (!fSet)
