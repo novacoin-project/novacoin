@@ -948,7 +948,6 @@ public:
     }
 
     int64_t GetMedianTimePast() const;
-    int64_t GetMedianTime() const;
 
     /**
      * Returns true if there are nRequired or more blocks of minVersion or above

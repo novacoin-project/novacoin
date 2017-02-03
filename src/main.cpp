@@ -2717,18 +2717,6 @@ int64_t CBlockIndex::GetMedianTimePast() const
     return pbegin[(pend - pbegin)/2];
 }
 
-int64_t CBlockIndex::GetMedianTime() const
-{
-    const CBlockIndex* pindex = this;
-    for (int i = 0; i < nMedianTimeSpan/2; i++)
-    {
-        if (!pindex->pnext)
-            return GetBlockTime();
-        pindex = pindex->pnext;
-    }
-    return pindex->GetMedianTimePast();
-}
-
 bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
 {
     unsigned int nFound = 0;
