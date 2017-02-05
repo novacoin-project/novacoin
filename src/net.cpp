@@ -980,11 +980,8 @@ void ThreadSocketHandler2(void* parg)
             }
             else if (nInbound >= GetArgInt("-maxconnections", 125) - MAX_OUTBOUND_CONNECTIONS)
             {
-                {
-                    LOCK(cs_setservAddNodeAddresses);
-                    if (!setservAddNodeAddresses.count(addr))
-                        CloseSocket(hSocket);
-                }
+                printf("connection from %s dropped (overall limit)\n", addr.ToString().c_str());
+                CloseSocket(hSocket);
             }
             else if (CNode::IsBanned(addr))
             {
