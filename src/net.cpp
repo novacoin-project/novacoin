@@ -33,19 +33,14 @@ void ThreadDNSAddressSeed2(void* parg);
 #endif
 #endif
 
-struct LocalServiceInfo {
-    int nScore;
-    uint16_t nPort;
-};
-
 //
 // Global state variables
 //
 bool fClient = false;
 bool fDiscover = true;
 uint64_t nLocalServices = (fClient ? 0 : NODE_NETWORK);
-static CCriticalSection cs_mapLocalHost;
-static map<CNetAddr, LocalServiceInfo> mapLocalHost;
+CCriticalSection cs_mapLocalHost;
+map<CNetAddr, LocalServiceInfo> mapLocalHost;
 static bool vfReachable[NET_MAX] = {};
 static bool vfLimited[NET_MAX] = {};
 static CNode* pnodeLocalHost = NULL;

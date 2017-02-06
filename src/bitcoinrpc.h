@@ -162,6 +162,7 @@ extern json_spirit::Value importaddress(const json_spirit::Array& params, bool f
 extern json_spirit::Value removeaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getnettotals(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value ntptime(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getnetworkinfo(const json_spirit::Array& params, bool fHelp);
 
 extern json_spirit::Value sendalert(const json_spirit::Array& params, bool fHelp);
 

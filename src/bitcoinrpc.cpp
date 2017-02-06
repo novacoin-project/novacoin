@@ -236,8 +236,8 @@ Value stop(const Array& params, bool fHelp)
 static const CRPCCommand vRPCCommands[] =
 { //  name                      function                 safemd  unlocked
   //  ------------------------  -----------------------  ------  --------
-    { "help",                       &help,                        true,   true },
-    { "stop",                       &stop,                        true,   true },
+    { "help",                       &help,                        true,   true  },
+    { "stop",                       &stop,                        true,   true  },
     { "getbestblockhash",           &getbestblockhash,            true,   false },
     { "getblockcount",              &getblockcount,               true,   false },
     { "getconnectioncount",         &getconnectioncount,          true,   false },
@@ -249,10 +249,11 @@ static const CRPCCommand vRPCCommands[] =
     { "getinfo",                    &getinfo,                     true,   false },
     { "getsubsidy",                 &getsubsidy,                  true,   false },
     { "getmininginfo",              &getmininginfo,               true,   false },
-    { "scaninput",                  &scaninput,                   true,   true },
+    { "scaninput",                  &scaninput,                   true,   true  },
     { "getnewaddress",              &getnewaddress,               true,   false },
     { "getnettotals",               &getnettotals,                true,   true  },
     { "ntptime",                    &ntptime,                     true,   true  },
+    { "getnetworkinfo",             &getnetworkinfo,              true,   false },
     { "getaccountaddress",          &getaccountaddress,           true,   false },
     { "setaccount",                 &setaccount,                  true,   false },
     { "getaccount",                 &getaccount,                  false,  false },
