@@ -38,6 +38,7 @@ void ThreadDNSAddressSeed2(void* parg);
 //
 bool fClient = false;
 bool fDiscover = true;
+bool fListen = true;
 uint64_t nLocalServices = (fClient ? 0 : NODE_NETWORK);
 CCriticalSection cs_mapLocalHost;
 map<CNetAddr, LocalServiceInfo> mapLocalHost;
@@ -94,7 +95,7 @@ void CNode::PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd)
 // find 'best' local address for a particular peer
 bool GetLocal(CService& addr, const CNetAddr *paddrPeer)
 {
-    if (fNoListen)
+    if (!fListen)
         return false;
 
     int nBestScore = -1;
@@ -227,7 +228,7 @@ bool IsPeerAddrLocalGood(CNode *pnode)
 // pushes our own address to a peer
 void AdvertiseLocal(CNode *pnode)
 {
-    if (!fNoListen && pnode->fSuccessfullyConnected)
+    if (fListen && pnode->fSuccessfullyConnected)
     {
         auto addrLocal = GetLocalAddress(&pnode->addr);
         // If discovery is enabled, sometimes give our peer the address it

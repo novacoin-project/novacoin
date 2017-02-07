@@ -116,7 +116,7 @@ enum threadId
 
 extern bool fClient;
 extern bool fDiscover;
-extern bool fNoListen;
+extern bool fListen;
 
 extern bool fDiscover;
 extern uint64_t nLocalServices;

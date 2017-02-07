@@ -674,19 +674,19 @@ bool AppInit2()
     // see Step 2: parameter interactions for more information about these
     if (!IsLimited(NET_IPV4) || !IsLimited(NET_IPV6))
     {
-        fNoListen = !GetBoolArg("-listen", true);
+        fListen = GetBoolArg("-listen", true);
         fDiscover = GetBoolArg("-discover", true);
         fNameLookup = GetBoolArg("-dns", true);
     } else {
         // Don't listen, discover addresses or search for nodes if IPv4 and IPv6 networking is disabled.
-        fNoListen = true;
+        fListen = false;
         fDiscover = fNameLookup = false;
         SoftSetBoolArg("-irc", false);
         SoftSetBoolArg("-dnsseed", false);
     }
 
     bool fBound = false;
-    if (!fNoListen)
+    if (fListen)
     {
         if (mapArgs.count("-bind")) {
             for(std::string strBind :  mapMultiArgs["-bind"]) {
