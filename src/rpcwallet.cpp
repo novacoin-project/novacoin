@@ -7,6 +7,7 @@
 #include "walletdb.h"
 #include "bitcoinrpc.h"
 #include "init.h"
+#include "timedata.h"
 #include "util.h"
 #include "ntp.h"
 #include "base58.h"

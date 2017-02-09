@@ -270,7 +270,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/multisigdialog.h \
     src/qt/secondauthdialog.h \
     src/ies.h \
-    src/ipcollector.h
+    src/ipcollector.h \
+    src/timedata.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/intro.cpp \
@@ -354,7 +355,8 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/uint256.cpp \
     src/ecies.cpp \
     src/ipcollector.cpp \
-    src/serialize.cpp
+    src/serialize.cpp \
+    src/timedata.cpp
 
 
 RESOURCES += \

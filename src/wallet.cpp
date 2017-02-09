@@ -13,6 +13,8 @@
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
+#include "timedata.h"
+
 #include <openssl/bio.h>
 
 #include "main.h"

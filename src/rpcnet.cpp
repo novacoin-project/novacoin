@@ -9,6 +9,7 @@
 #include "walletdb.h"
 #include "net.h"
 #include "ntp.h"
+#include "timedata.h"
 
 using namespace json_spirit;
 using namespace std;
