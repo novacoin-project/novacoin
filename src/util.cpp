@@ -181,13 +181,6 @@ int GetRandInt(int nMax)
     return static_cast<int>(GetRand(nMax));
 }
 
-uint256 GetRandHash()
-{
-    uint256 hash;
-    RAND_bytes(hash.begin(), hash.size());
-    return hash;
-}
-
 void FillRand(uint8_t *buffer, size_t nCount)
 {
     RAND_bytes(buffer, nCount);

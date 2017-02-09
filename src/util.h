@@ -5,9 +5,6 @@
 #ifndef BITCOIN_UTIL_H
 #define BITCOIN_UTIL_H
 
-
-#include "uint256.h"
-
 #ifndef WIN32
 #include <sys/types.h>
 #include <sys/time.h>
@@ -225,7 +222,6 @@ boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 void ShrinkDebugFile();
 int GetRandInt(int nMax);
 uint64_t GetRand(uint64_t nMax);
-uint256 GetRandHash();
 void FillRand(uint8_t *buffer, size_t nCount);
 int64_t GetTime();
 int64_t GetTimeMillis();
