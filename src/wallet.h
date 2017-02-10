@@ -7,8 +7,7 @@
 
 #include <string>
 #include <vector>
-
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "main.h"
 #include "key.h"
@@ -21,11 +20,15 @@
 
 extern bool fWalletUnlockMintOnly;
 extern bool fConfChange;
+
 class CAccountingEntry;
 class CWalletTx;
 class CReserveKey;
 class COutput;
 class CCoinControl;
+
+//Settings
+extern int64_t nTransactionFee;
 
 // Set of selected transactions
 typedef std::set<std::pair<const CWalletTx*,unsigned int> > CoinsSet;

@@ -20,7 +20,11 @@
 #include "main.h"
 
 using namespace std;
+
+//Settings
+
 extern int64_t nReserveBalance;
+int64_t nTransactionFee = MIN_TX_FEE;
 
 //////////////////////////////////////////////////////////////////////////////
 //
