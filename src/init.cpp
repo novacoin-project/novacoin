@@ -24,7 +24,6 @@
 
 
 using namespace std;
-using namespace boost;
 
 CWallet* pwalletMain;
 CClientUIInterface uiInterface;
@@ -321,21 +320,21 @@ bool DropBlockIndex()
     try
     {
 #ifdef USE_LEVELDB
-        filesystem::path directory = GetDataDir() / "txleveldb";
-        filesystem::remove_all(directory); // remove directory
+        boost::filesystem::path directory = GetDataDir() / "txleveldb";
+        boost::filesystem::remove_all(directory); // remove directory
 #else
-        filesystem::path indexFile = GetDataDir() / "blkindex.dat";
-        filesystem::remove(indexFile); // remove index file
+        boost::filesystem::path indexFile = GetDataDir() / "blkindex.dat";
+        boost::filesystem::remove(indexFile); // remove index file
 #endif
 
         unsigned int nFile = 1;
         for ( ; ; )
         {
-            filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);
+            boost::filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);
             // Break if no such file
-            if( !filesystem::exists( strBlockFile ) )
+            if( !boost::filesystem::exists( strBlockFile ) )
                 break;
-            filesystem::remove(strBlockFile);
+            boost::filesystem::remove(strBlockFile);
             nFile++;
         }
         return true;
@@ -611,7 +610,7 @@ bool AppInit2()
             return false;
     }
 
-    if (filesystem::exists(GetDataDir() / strWalletFileName))
+    if (boost::filesystem::exists(GetDataDir() / strWalletFileName))
     {
         CDBEnv::VerifyResult r = bitdb.Verify(strWalletFileName, CWalletDB::Recover);
         if (r == CDBEnv::RECOVER_OK)
@@ -957,13 +956,13 @@ bool AppInit2()
         StartShutdown();
     }
 
-    filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
-    if (filesystem::exists(pathBootstrap)) {
+    boost::filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
+    if (boost::filesystem::exists(pathBootstrap)) {
         uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
 
         FILE *file = fopen(pathBootstrap.string().c_str(), "rb");
         if (file) {
-            filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
+            boost::filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
             LoadExternalBlockFile(file, uiInterface);
             RenameOver(pathBootstrap, pathBootstrapOld);
         }
