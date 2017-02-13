@@ -2,7 +2,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <openssl/aes.h>
 #include <openssl/evp.h>
 
 #include "crypter.h"
@@ -65,6 +64,8 @@ bool CCrypter::Encrypt(const CKeyingMaterial& vchPlaintext, vector<unsigned char
 {
     if (!fKeySet)
         return false;
+
+    const int AES_BLOCK_SIZE = 16; // taken from <openssl/aes.h>
 
     // max ciphertext len for a n bytes of plaintext is
     // n + AES_BLOCK_SIZE - 1 bytes
