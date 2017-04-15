@@ -331,8 +331,12 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
     }
 
     SOCKET hSocket = socket(((struct sockaddr*)&sockaddr)->sa_family, SOCK_STREAM, IPPROTO_TCP);
-    if (hSocket == INVALID_SOCKET)
+    if (hSocket == INVALID_SOCKET) 
+    {
+        closesocket(hSocket);
         return false;
+    }
+
 #ifdef SO_NOSIGPIPE
     int set = 1;
     setsockopt(hSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&set, sizeof(int));
