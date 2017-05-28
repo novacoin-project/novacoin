@@ -2382,9 +2382,9 @@ bool CBlock::AcceptBlock()
     if (hashBestChain == hash)
     {
         LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-            if (nBestHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
-                pnode->PushInventory(CInv(MSG_BLOCK, hash));
+        for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+            if (nBestHeight > ((*it)->nStartingHeight != -1 ? (*it)->nStartingHeight - 2000 : nBlockEstimate))
+                (*it)->PushInventory(CInv(MSG_BLOCK, hash));
     }
 
     // ppcoin: check pending sync-checkpoint
@@ -3309,15 +3309,15 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                     uint256 hashRand = hashSalt ^ (hashAddr<<32) ^ ((GetTime()+hashAddr)/nOneDay);
                     hashRand = Hash(BEGIN(hashRand), END(hashRand));
                     multimap<uint256, CNode*> mapMix;
-                    BOOST_FOREACH(CNode* pnode, vNodes)
+                    for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
                     {
-                        if (pnode->nVersion < CADDR_TIME_VERSION)
+                        if ((*it)->nVersion < CADDR_TIME_VERSION)
                             continue;
                         unsigned int nPointer;
-                        memcpy(&nPointer, &pnode, sizeof(nPointer));
+                        memcpy(&nPointer, &(*it), sizeof(nPointer));
                         uint256 hashKey = hashRand ^ nPointer;
                         hashKey = Hash(BEGIN(hashKey), END(hashKey));
-                        mapMix.insert(make_pair(hashKey, pnode));
+                        mapMix.insert(make_pair(hashKey, (*it)));
                     }
                     int nRelayNodes = fReachable ? 2 : 1; // limited relaying of addresses outside our network(s)
                     for (multimap<uint256, CNode*>::iterator mi = mapMix.begin(); mi != mapMix.end() && nRelayNodes-- > 0; ++mi)
@@ -3504,8 +3504,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             // Relay
             pfrom->hashCheckpointKnown = checkpoint.hashCheckpoint;
             LOCK(cs_vNodes);
-            BOOST_FOREACH(CNode* pnode, vNodes)
-                checkpoint.RelayTo(pnode);
+            for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+                checkpoint.RelayTo(*it);
         }
     }
 
@@ -3743,8 +3743,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 pfrom->setKnown.insert(alertHash);
                 {
                     LOCK(cs_vNodes);
-                    BOOST_FOREACH(CNode* pnode, vNodes)
-                        alert.RelayTo(pnode);
+                    for (vector<CNode*>::const_iterator it = vNodes.begin(); it != vNodes.end(); ++it)
+                        alert.RelayTo(*it);
                 }
             }
             else {
