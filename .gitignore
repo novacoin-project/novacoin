@@ -1,5 +1,7 @@
 src/*.exe
-src/novacoind
+src/HanCoin
+src/HanCoind
+src/test_HanCoin
 src/build.h
 .*.swp
 *.*~*
@@ -8,11 +10,11 @@ src/build.h
 *.orig
 *.o
 *.patch
-.novacoin
+.HanCoin
 #compilation and Qt preprocessor part
 *.qm
 Makefile
-novacoin-qt
+HanCoin-qt
 #resources cpp
 qrc_*.cpp
 #qt creator
