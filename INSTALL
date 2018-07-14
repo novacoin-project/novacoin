@@ -1,9 +1,9 @@
-Building NovaCoin
+Building HanCoin
 
-See doc/readme-qt.rst for instructions on building NovaCoin Qt,
+See doc/readme-qt.rst for instructions on building HanCoin QT,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of NovaCoin.
+implementation of HanCoin.
 
-See doc/build-*.txt for instructions on building novacoind,
+See doc/build-*.txt for instructions on building HanCoind,
 the intended-for-services, no-graphical-interface, reference
-implementation of NovaCoin.
+implementation of HanCoin.
