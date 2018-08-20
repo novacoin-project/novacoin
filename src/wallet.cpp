@@ -2909,7 +2909,7 @@ set< set<CBitcoinAddress> > CWallet::GetAddressGroupings()
                     CBitcoinAddress txoutAddr;
                     if(!ExtractAddress(*this, txout.scriptPubKey, txoutAddr))
                         continue;
-                        grouping.insert(txoutAddr);
+                    grouping.insert(txoutAddr);
                 }
             }
             if (!grouping.empty())
