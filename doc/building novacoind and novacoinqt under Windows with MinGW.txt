@@ -187,7 +187,7 @@ LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware -static
 USE_LEVELDB:=0 
 на
 USE_LEVELDB:=1
-(выше USE_IPV6:=1)
+
 Так же измените 
 cd leveldb; make; cd ..
 на 
@@ -272,7 +272,7 @@ Qt5 + транзакционный индекс BDB
 
 set PATH=%PATH%;C:\Qt\5.4.0\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_ASM=1" novacoin-qt.pro
+qmake "USE_ASM=1" novacoin-qt.pro
 mingw32-make -f Makefile.Release
 
 
@@ -280,21 +280,21 @@ Qt5 + транзакционный индекс LevelDB
 
 set PATH=%PATH%;C:\Qt\5.4.0\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt.pro
+qmake "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt.pro
 mingw32-make -f Makefile.Release
 
 Qt4 + транзакционный индекс BDB
 
 set PATH=%PATH%;C:\Qt\4.8.6\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_ASM=1" novacoin-qt.pro
+qmake "USE_ASM=1" novacoin-qt.pro
 mingw32-make -f Makefile.Release
 
 Qt4 + транзакционный индекс LevelDB
 
 set PATH=%PATH%;C:\Qt\4.8.6\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt.pro
+qmake "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt.pro
 mingw32-make -f Makefile.Release
 
 
@@ -467,7 +467,7 @@ Qt5 + транзакционный индекс BDB
 
 set PATH=%PATH%;C:\Qt\5.4.0-x64\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_ASM=1" novacoin-qt64.pro
+qmake "USE_ASM=1" novacoin-qt64.pro
 mingw32-make -f Makefile.Release
 
 
@@ -475,21 +475,21 @@ Qt5 + транзакционный индекс LevelDB
 
 set PATH=%PATH%;C:\Qt\5.4.0-x64\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt64.pro
+qmake "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt64.pro
 mingw32-make -f Makefile.Release
 
 Qt4 + транзакционный индекс BDB
 
 set PATH=%PATH%;C:\Qt\4.8.6-x64\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_ASM=1" novacoin-qt64.pro
+qmake "USE_ASM=1" novacoin-qt64.pro
 mingw32-make -f Makefile.Release
 
 Qt4 + транзакционный индекс LevelDB
 
 set PATH=%PATH%;C:\Qt\4.8.6-x64\bin
 cd C:\MyProjects\novacoin-master
-qmake "USE_IPV6=1" "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt64.pro
+qmake "USE_LEVELDB=1" "USE_ASM=1" novacoin-qt64.pro
 mingw32-make -f Makefile.Release
 
 Если всё сделано правильно, то файл novacoin-qt.exe будет находится в папке C:\MyProjects\novacoin-master\release

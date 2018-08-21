@@ -24,7 +24,6 @@
 
 
 using namespace std;
-using namespace boost;
 
 CWallet* pwalletMain;
 CClientUIInterface uiInterface;
@@ -321,21 +320,21 @@ bool DropBlockIndex()
     try
     {
 #ifdef USE_LEVELDB
-        filesystem::path directory = GetDataDir() / "txleveldb";
-        filesystem::remove_all(directory); // remove directory
+        boost::filesystem::path directory = GetDataDir() / "txleveldb";
+        boost::filesystem::remove_all(directory); // remove directory
 #else
-        filesystem::path indexFile = GetDataDir() / "blkindex.dat";
-        filesystem::remove(indexFile); // remove index file
+        boost::filesystem::path indexFile = GetDataDir() / "blkindex.dat";
+        boost::filesystem::remove(indexFile); // remove index file
 #endif
 
         unsigned int nFile = 1;
         for ( ; ; )
         {
-            filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);
+            boost::filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);
             // Break if no such file
-            if( !filesystem::exists( strBlockFile ) )
+            if( !boost::filesystem::exists( strBlockFile ) )
                 break;
-            filesystem::remove(strBlockFile);
+            boost::filesystem::remove(strBlockFile);
             nFile++;
         }
         return true;
@@ -611,7 +610,7 @@ bool AppInit2()
             return false;
     }
 
-    if (filesystem::exists(GetDataDir() / strWalletFileName))
+    if (boost::filesystem::exists(GetDataDir() / strWalletFileName))
     {
         CDBEnv::VerifyResult r = bitdb.Verify(strWalletFileName, CWalletDB::Recover);
         if (r == CDBEnv::RECOVER_OK)
@@ -642,12 +641,6 @@ bool AppInit2()
                 SetLimited(net);
         }
     }
-#if defined(USE_IPV6)
-#if ! USE_IPV6
-    else
-        SetLimited(NET_IPV6);
-#endif
-#endif
 
     CService addrProxy;
     bool fProxy = false;
@@ -658,10 +651,8 @@ bool AppInit2()
 
         if (!IsLimited(NET_IPV4))
             SetProxy(NET_IPV4, addrProxy);
-#ifdef USE_IPV6
             if (!IsLimited(NET_IPV6))
                 SetProxy(NET_IPV6, addrProxy);
-#endif
             SetNameProxy(addrProxy);
         fProxy = true;
     }
@@ -682,19 +673,19 @@ bool AppInit2()
     // see Step 2: parameter interactions for more information about these
     if (!IsLimited(NET_IPV4) || !IsLimited(NET_IPV6))
     {
-        fNoListen = !GetBoolArg("-listen", true);
+        fListen = GetBoolArg("-listen", true);
         fDiscover = GetBoolArg("-discover", true);
         fNameLookup = GetBoolArg("-dns", true);
     } else {
         // Don't listen, discover addresses or search for nodes if IPv4 and IPv6 networking is disabled.
-        fNoListen = true;
+        fListen = false;
         fDiscover = fNameLookup = false;
         SoftSetBoolArg("-irc", false);
         SoftSetBoolArg("-dnsseed", false);
     }
 
     bool fBound = false;
-    if (!fNoListen)
+    if (fListen)
     {
         if (mapArgs.count("-bind")) {
             for(std::string strBind :  mapMultiArgs["-bind"]) {
@@ -706,10 +697,8 @@ bool AppInit2()
         } else {
             struct in_addr inaddr_any;
             inaddr_any.s_addr = INADDR_ANY;
-#ifdef USE_IPV6
             if (!IsLimited(NET_IPV6))
                 fBound |= Bind(CService(in6addr_any, GetListenPort()), false);
-#endif
             if (!IsLimited(NET_IPV4))
                 fBound |= Bind(CService(inaddr_any, GetListenPort()), !fBound);
 
@@ -725,10 +714,8 @@ bool AppInit2()
         struct in_addr inaddr_loopback;
         inaddr_loopback.s_addr = htonl(INADDR_LOOPBACK);
 
-#ifdef USE_IPV6
         if (!BindListenPort(CService(in6addr_loopback, GetListenPort()), strError))
             return InitError(strError);
-#endif
         if (!BindListenPort(CService(inaddr_loopback, GetListenPort()), strError))
             return InitError(strError);
     }
@@ -969,13 +956,13 @@ bool AppInit2()
         StartShutdown();
     }
 
-    filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
-    if (filesystem::exists(pathBootstrap)) {
+    boost::filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
+    if (boost::filesystem::exists(pathBootstrap)) {
         uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
 
         FILE *file = fopen(pathBootstrap.string().c_str(), "rb");
         if (file) {
-            filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
+            boost::filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
             LoadExternalBlockFile(file, uiInterface);
             RenameOver(pathBootstrap, pathBootstrapOld);
         }

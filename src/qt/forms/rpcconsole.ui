@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>740</width>
-    <height>450</height>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,39 +24,16 @@
        <string>&amp;Information</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="15" column="2">
-        <widget class="QLabel" name="labelConfigfile">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
+       <item row="15" column="0">
+        <widget class="QPushButton" name="openDebugLogfileButton">
+         <property name="toolTip">
+          <string>Open the NovaCoin debug log file from the current data directory. This can take a few seconds for large log files.</string>
          </property>
          <property name="text">
-          <string>Configuration file</string>
+          <string>&amp;Open</string>
          </property>
-        </widget>
-       </item>
-       <item row="13" column="2">
-        <widget class="QLabel" name="lastBlockTime">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Current number of blocks</string>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -76,7 +53,7 @@
          </property>
         </widget>
        </item>
-       <item row="17" column="0">
+       <item row="16" column="0">
         <widget class="QLabel" name="labelCLOptions">
          <property name="font">
           <font>
@@ -86,114 +63,6 @@
          </property>
          <property name="text">
           <string>Command-line options</string>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="0">
-        <widget class="QPushButton" name="openDebugLogfileButton">
-         <property name="toolTip">
-          <string>Open the NovaCoin debug log file from the current data directory. This can take a few seconds for large log files.</string>
-         </property>
-         <property name="text">
-          <string>&amp;Open</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="0">
-        <widget class="QLabel" name="labelDebugLogfile">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Debug log file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="18" column="3" rowspan="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>404</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="19" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="18" column="0">
-        <widget class="QPushButton" name="showCLOptionsButton">
-         <property name="toolTip">
-          <string>Show the NovaCoin-Qt help message to get a list with possible NovaCoin command-line options.</string>
-         </property>
-         <property name="text">
-          <string>&amp;Show</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Last block time</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Network</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2">
-        <widget class="QLabel" name="startupTime">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>Startup time</string>
          </property>
         </widget>
        </item>
@@ -250,15 +119,8 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Estimated total blocks</string>
-         </property>
-        </widget>
-       </item>
        <item row="12" column="2">
-        <widget class="QLabel" name="totalBlocks">
+        <widget class="QLabel" name="lastBlockTime">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
          </property>
@@ -270,6 +132,206 @@
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Current number of blocks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="17" column="0">
+        <widget class="QPushButton" name="showCLOptionsButton">
+         <property name="toolTip">
+          <string>Show the NovaCoin-Qt help message to get a list with possible NovaCoin command-line options.</string>
+         </property>
+         <property name="text">
+          <string>&amp;Show</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Last block time</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Network</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QLabel" name="buildDate">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Client version</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Client name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>NovaCoin Core</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="clientName">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="2">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="15" column="2">
+        <widget class="QPushButton" name="openConfigurationfileButton">
+         <property name="toolTip">
+          <string>Open the NovaCoin configuration file from the current data directory.</string>
+         </property>
+         <property name="text">
+          <string>O&amp;pen</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="labelDebugLogfile">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Debug log file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="3" rowspan="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>404</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="2">
+        <widget class="QLabel" name="startupTime">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Startup time</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="2">
+        <widget class="QLabel" name="labelConfigfile">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Configuration file</string>
          </property>
         </widget>
        </item>
@@ -345,91 +407,6 @@
         <widget class="QLabel" name="label_12">
          <property name="text">
           <string>Build date</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2">
-        <widget class="QLabel" name="buildDate">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Client version</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>NovaCoin Core</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="clientName">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Client name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="2">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="16" column="2">
-        <widget class="QPushButton" name="openConfigurationfileButton">
-         <property name="toolTip">
-          <string>Open the NovaCoin configuration file from the current data directory.</string>
-         </property>
-         <property name="text">
-          <string>O&amp;pen</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
          </property>
         </widget>
        </item>

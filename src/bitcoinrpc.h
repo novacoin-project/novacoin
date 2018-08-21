@@ -119,6 +119,11 @@ public:
      * @throws an exception (json_spirit::Value) when an error happens.
      */
     json_spirit::Value execute(const std::string &method, const json_spirit::Array &params) const;
+    /**
+    * Returns a list of registered commands
+    * @returns List of registered commands.
+    */
+    std::vector<std::string> listCommands() const;
 };
 
 extern const CRPCTable tableRPC;
@@ -157,6 +162,7 @@ extern json_spirit::Value importaddress(const json_spirit::Array& params, bool f
 extern json_spirit::Value removeaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getnettotals(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value ntptime(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getnetworkinfo(const json_spirit::Array& params, bool fHelp);
 
 extern json_spirit::Value sendalert(const json_spirit::Array& params, bool fHelp);
 

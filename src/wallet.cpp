@@ -13,12 +13,18 @@
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
+#include "timedata.h"
+
 #include <openssl/bio.h>
 
 #include "main.h"
 
 using namespace std;
+
+//Settings
+
 extern int64_t nReserveBalance;
+int64_t nTransactionFee = MIN_TX_FEE;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -2863,21 +2869,6 @@ void CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool)
         if (fDebug && GetBoolArg("-printkeypool"))
             printf("keypool reserve %" PRId64 "\n", nIndex);
     }
-}
-
-int64_t CWallet::AddReserveKey(const CKeyPool& keypool)
-{
-    {
-        LOCK2(cs_main, cs_wallet);
-        CWalletDB walletdb(strWalletFile);
-
-        int64_t nIndex = 1 + *(--setKeyPool.end());
-        if (!walletdb.WritePool(nIndex, keypool))
-            throw runtime_error("AddReserveKey() : writing added key failed");
-        setKeyPool.insert(nIndex);
-        return nIndex;
-    }
-    return -1;
 }
 
 void CWallet::KeepKey(int64_t nIndex)

@@ -176,7 +176,8 @@ int main(int argc, char *argv[])
     ParseParameters(argc, argv);
 
     // User language is set up: pick a data directory
-    Intro::pickDataDirectory();
+    if (!Intro::pickDataDirectory())
+        return 0;
 
     // Install global event filter that makes sure that long tooltips can be word-wrapped
     app.installEventFilter(new GUIUtil::ToolTipToRichTextFilter(TOOLTIP_WRAP_THRESHOLD, &app));

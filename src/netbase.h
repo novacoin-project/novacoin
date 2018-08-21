@@ -67,10 +67,8 @@ class CNetAddr
         std::vector<unsigned char> GetGroup() const;
         int GetReachabilityFrom(const CNetAddr *paddrPartner = NULL) const;
 
-#ifdef USE_IPV6
         CNetAddr(const struct in6_addr& pipv6Addr);
         bool GetIn6Addr(struct in6_addr* pipv6Addr) const;
-#endif
 
         friend bool operator==(const CNetAddr& a, const CNetAddr& b);
         friend bool operator!=(const CNetAddr& a, const CNetAddr& b);
@@ -110,10 +108,8 @@ class CService : public CNetAddr
         std::string ToStringPort() const;
         std::string ToStringIPPort() const;
 
-#ifdef USE_IPV6
         CService(const struct in6_addr& ipv6Addr, uint16_t port);
         CService(const struct sockaddr_in6& addr);
-#endif
 
         IMPLEMENT_SERIALIZE
             (
@@ -142,6 +138,8 @@ bool Lookup(const char *pszName, std::vector<CService>& vAddr, uint16_t portDefa
 bool LookupNumeric(const char *pszName, CService& addr, uint16_t portDefault = 0);
 bool ConnectSocket(const CService &addr, SOCKET& hSocketRet, int nTimeout = nConnectTimeout);
 bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, uint16_t portDefault = 0, int nTimeout = nConnectTimeout);
+/** Return readable error string for a network error code */
+std::string NetworkErrorString(int err);
 /** Close socket and set hSocket to INVALID_SOCKET */
 bool CloseSocket(SOCKET& hSocket);
 

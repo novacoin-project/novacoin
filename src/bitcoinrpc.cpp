@@ -20,7 +20,6 @@
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
@@ -236,8 +235,8 @@ Value stop(const Array& params, bool fHelp)
 static const CRPCCommand vRPCCommands[] =
 { //  name                      function                 safemd  unlocked
   //  ------------------------  -----------------------  ------  --------
-    { "help",                       &help,                        true,   true },
-    { "stop",                       &stop,                        true,   true },
+    { "help",                       &help,                        true,   true  },
+    { "stop",                       &stop,                        true,   true  },
     { "getbestblockhash",           &getbestblockhash,            true,   false },
     { "getblockcount",              &getblockcount,               true,   false },
     { "getconnectioncount",         &getconnectioncount,          true,   false },
@@ -249,10 +248,11 @@ static const CRPCCommand vRPCCommands[] =
     { "getinfo",                    &getinfo,                     true,   false },
     { "getsubsidy",                 &getsubsidy,                  true,   false },
     { "getmininginfo",              &getmininginfo,               true,   false },
-    { "scaninput",                  &scaninput,                   true,   true },
+    { "scaninput",                  &scaninput,                   true,   true  },
     { "getnewaddress",              &getnewaddress,               true,   false },
     { "getnettotals",               &getnettotals,                true,   true  },
     { "ntptime",                    &ntptime,                     true,   true  },
+    { "getnetworkinfo",             &getnetworkinfo,              true,   false },
     { "getaccountaddress",          &getaccountaddress,           true,   false },
     { "setaccount",                 &setaccount,                  true,   false },
     { "getaccount",                 &getaccount,                  false,  false },
@@ -728,7 +728,7 @@ static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol, SocketA
                 boost::ref(context),
                 fUseSSL,
                 conn,
-                boost::asio::placeholders::error));
+                _1));
 }
 
 /**
@@ -754,6 +754,8 @@ static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol, 
     if (error)
     {
         delete conn;
+        // TODO: Actually handle errors
+        printf("%s: Error: %s\n", __func__, error.message().c_str());
     }
 
     // Restrict callers by IP.  It is important to
@@ -1109,6 +1111,16 @@ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_s
     }
 }
 
+std::vector<std::string> CRPCTable::listCommands() const
+{
+    std::vector<std::string> commandList;
+    typedef std::map<std::string, const CRPCCommand*> commandMap;
+
+    std::transform( mapCommands.begin(), mapCommands.end(),
+                   std::back_inserter(commandList),
+                   boost::bind(&commandMap::value_type::first,_1) );
+    return commandList;
+}
 
 Object CallRPC(const string& strMethod, const Array& params)
 {

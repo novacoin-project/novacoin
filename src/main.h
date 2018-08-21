@@ -87,7 +87,6 @@ extern uint32_t nNetworkID;
 extern std::map<uint256, CBlock*> mapOrphanBlocks;
 
 // Settings
-extern int64_t nTransactionFee;
 extern int64_t nMinimumInputValue;
 extern bool fUseFastIndex;
 extern int nScriptCheckThreads;
@@ -434,7 +433,6 @@ public:
     }
 
     bool IsFinal(int nBlockHeight=0, int64_t nBlockTime=0) const;
-    bool IsNewerThan(const CTransaction& old) const;
 
     bool IsCoinBase() const
     {
@@ -949,7 +947,6 @@ public:
     }
 
     int64_t GetMedianTimePast() const;
-    int64_t GetMedianTime() const;
 
     /**
      * Returns true if there are nRequired or more blocks of minVersion or above

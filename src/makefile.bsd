@@ -3,7 +3,6 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 USE_LEVELDB:=0
-USE_IPV6:=1
 ARCH:=$(uname -m)
 
 # CC:=clang
@@ -36,10 +35,6 @@ LIBS += \
    -l ssl \
    -l crypto \
    -l execinfo
-
-ifneq (${USE_IPV6}, -)
-	DEFS += -DUSE_IPV6=$(USE_IPV6)
-endif
 
 LIBS+= \
  -Wl,-B$(LMODE2) \
@@ -130,6 +125,7 @@ OBJS= \
     obj/rpcrawtransaction.o \
     obj/script.o \
     obj/sync.o \
+    obj/timedata.o \
     obj/util.o \
     obj/wallet.o \
     obj/walletdb.o \

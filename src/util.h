@@ -5,9 +5,6 @@
 #ifndef BITCOIN_UTIL_H
 #define BITCOIN_UTIL_H
 
-
-#include "uint256.h"
-
 #ifndef WIN32
 #include <sys/types.h>
 #include <sys/time.h>
@@ -33,7 +30,7 @@
 #endif
 #include <inttypes.h>
 
-#include "netbase.h" // for AddTimeData
+#include "compat.h"
 
 static const int32_t nOneHour = 60 * 60;
 static const int32_t nOneDay = 24 * 60 * 60;
@@ -151,7 +148,6 @@ extern bool fServer;
 extern bool fCommandLine;
 extern std::string strMiscWarning;
 extern bool fTestNet;
-extern bool fNoListen;
 extern bool fLogTimestamps;
 extern bool fReopenDebugLog;
 
@@ -185,7 +181,6 @@ bool ATTR_WARN_PRINTF(1,2) error(const char *format, ...);
  */
 #define printf OutputDebugStringF
 
-void LogException(std::exception* pex, const char* pszThread);
 void PrintException(std::exception* pex, const char* pszThread);
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
 void ParseString(const std::string& str, char c, std::vector<std::string>& v);
@@ -227,18 +222,13 @@ boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 void ShrinkDebugFile();
 int GetRandInt(int nMax);
 uint64_t GetRand(uint64_t nMax);
-uint256 GetRandHash();
 void FillRand(uint8_t *buffer, size_t nCount);
 int64_t GetTime();
 int64_t GetTimeMillis();
 int64_t GetTimeMicros();
 
-int64_t GetAdjustedTime();
-int64_t GetTimeOffset();
-int64_t GetNodesOffset();
 std::string FormatFullVersion();
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments);
-void AddTimeData(const CNetAddr& ip, int64_t nTime);
 void runCommand(std::string strCommand);
 
 
@@ -465,62 +455,6 @@ bool TimingResistantEqual(const T& a, const T& b)
         accumulator |= a[i] ^ b[i%b.size()];
     return accumulator == 0;
 }
-
-/** Median filter over a stream of values.
- * Returns the median of the last N numbers
- */
-template <typename T> class CMedianFilter
-{
-private:
-    std::vector<T> vValues;
-    std::vector<T> vSorted;
-    unsigned int nSize;
-public:
-    CMedianFilter(unsigned int size, T initial_value):
-        nSize(size)
-    {
-        vValues.reserve(size);
-        vValues.push_back(initial_value);
-        vSorted = vValues;
-    }
-
-    void input(T value)
-    {
-        if(vValues.size() == nSize)
-        {
-            vValues.erase(vValues.begin());
-        }
-        vValues.push_back(value);
-
-        vSorted.resize(vValues.size());
-        std::copy(vValues.begin(), vValues.end(), vSorted.begin());
-        std::sort(vSorted.begin(), vSorted.end());
-    }
-
-    T median() const
-    {
-        size_t size = vSorted.size();
-        assert(size>0);
-        if(size & 1) // Odd number of elements
-        {
-            return vSorted[size/2];
-        }
-        else // Even number of elements
-        {
-            return (vSorted[size/2-1] + vSorted[size/2]) / 2;
-        }
-    }
-
-    int size() const
-    {
-        return static_cast<int>(vValues.size());
-    }
-
-    std::vector<T> sorted () const
-    {
-        return vSorted;
-    }
-};
 
 bool NewThread(void(*pfn)(void*), void* parg);
 

@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <cassert>
-#include  <stdexcept>
+#include <stdexcept>
+
+#include <openssl/rand.h>
 
 #include "uint256.h"
 
@@ -214,4 +216,11 @@ uint256::uint256(const std::vector<unsigned char>& vch)
         memcpy(pn, &vch[0], sizeof(pn));
     else
         *this = 0;
+}
+
+uint256 GetRandHash()
+{
+    uint256 hash;
+    RAND_bytes(hash.begin(), hash.size());
+    return hash;
 }

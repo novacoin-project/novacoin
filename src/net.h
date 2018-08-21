@@ -116,7 +116,7 @@ enum threadId
 
 extern bool fClient;
 extern bool fDiscover;
-extern bool fNoListen;
+extern bool fListen;
 
 extern bool fDiscover;
 extern uint64_t nLocalServices;
@@ -134,6 +134,13 @@ extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
 extern CCriticalSection cs_mapRelay;
 extern std::map<CInv, int64_t> mapAlreadyAskedFor;
 
+struct LocalServiceInfo {
+    int nScore;
+    uint16_t nPort;
+};
+
+extern CCriticalSection cs_mapLocalHost;
+extern std::map<CNetAddr, LocalServiceInfo> mapLocalHost;
 
 class CNodeStats
 {
@@ -477,7 +484,7 @@ public:
     // between nodes running old code and nodes running
     // new code.
     static void ClearBanned(); // needed for unit testing
-    static bool IsBanned(CNetAddr ip);
+    static bool IsBanned(const CNetAddr& ip);
     bool Misbehaving(int howmuch); // 1 == a little, 100 == a lot
     void copyStats(CNodeStats &stats);
     // Network stats

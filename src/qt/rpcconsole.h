@@ -2,6 +2,7 @@
 #define RPCCONSOLE_H
 
 #include <QWidget>
+#include <QCompleter>
 
 namespace Ui {
     class RPCConsole;
@@ -82,6 +83,7 @@ private:
     int historyPtr;
 
     void startExecutor();
+    QCompleter *autoCompleter;
 };
 
 #endif // RPCCONSOLE_H

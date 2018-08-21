@@ -19,8 +19,6 @@
 #include "main.h"
 
 using namespace std;
-using namespace boost;
-
 
 
 CCriticalSection cs_setpwalletRegistered;
@@ -74,7 +72,6 @@ CScript COINBASE_FLAGS;
 const string strMessageMagic = "NovaCoin Signed Message:\n";
 
 // Settings
-int64_t nTransactionFee = MIN_TX_FEE;
 int64_t nMinimumInputValue = MIN_TXOUT_AMOUNT;
 
 // Ping and address broadcast intervals
@@ -267,34 +264,6 @@ bool CTransaction::IsFinal(int nBlockHeight, int64_t nBlockTime) const
         if (!txin.IsFinal())
             return false;
     return true;
-}
-
-bool CTransaction::IsNewerThan(const CTransaction& old) const
-{
-    if (vin.size() != old.vin.size())
-        return false;
-    for (unsigned int i = 0; i < vin.size(); i++)
-        if (vin[i].prevout != old.vin[i].prevout)
-            return false;
-    bool fNewer = false;
-    unsigned int nLowest = numeric_limits<unsigned int>::max();
-    for (unsigned int i = 0; i < vin.size(); i++)
-    {
-        if (vin[i].nSequence != old.vin[i].nSequence)
-        {
-            if (vin[i].nSequence <= nLowest)
-            {
-                fNewer = false;
-                nLowest = vin[i].nSequence;
-            }
-            if (old.vin[i].nSequence < nLowest)
-            {
-                fNewer = true;
-                nLowest = old.vin[i].nSequence;
-            }
-        }
-    }
-    return fNewer;
 }
 
 bool CTransaction::ReadFromDisk(CDiskTxPos pos, FILE** pfileRet)
@@ -2745,18 +2714,6 @@ int64_t CBlockIndex::GetMedianTimePast() const
     return pbegin[(pend - pbegin)/2];
 }
 
-int64_t CBlockIndex::GetMedianTime() const
-{
-    const CBlockIndex* pindex = this;
-    for (int i = 0; i < nMedianTimeSpan/2; i++)
-    {
-        if (!pindex->pnext)
-            return GetBlockTime();
-        pindex = pindex->pnext;
-    }
-    return pindex->GetMedianTimePast();
-}
-
 bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
 {
     unsigned int nFound = 0;
@@ -3091,7 +3048,7 @@ int CBlockLocator::GetHeight()
 
 bool CheckDiskSpace(uint64_t nAdditionalBytes)
 {
-    uint64_t nFreeBytesAvailable = filesystem::space(GetDataDir()).available;
+    uint64_t nFreeBytesAvailable = boost::filesystem::space(GetDataDir()).available;
 
     // Check for nMinDiskSpace bytes (currently 50MB)
     if (nFreeBytesAvailable < nMinDiskSpace + nAdditionalBytes)
@@ -3107,7 +3064,7 @@ bool CheckDiskSpace(uint64_t nAdditionalBytes)
     return true;
 }
 
-static filesystem::path BlockFilePath(unsigned int nFile)
+static boost::filesystem::path BlockFilePath(unsigned int nFile)
 {
     string strBlockFn = strprintf("blk%04u.dat", nFile);
     return GetDataDir() / strBlockFn;
@@ -3644,7 +3601,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         if (!pfrom->fInbound)
         {
             // Advertise our address
-            if (!fNoListen && !IsInitialBlockDownload())
+            if (fListen && !IsInitialBlockDownload())
             {
                 auto addr = GetLocalAddress(&pfrom->addr);
                 if (addr.IsRoutable())

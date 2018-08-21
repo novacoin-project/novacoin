@@ -9,6 +9,7 @@
 #include "walletdb.h"
 #include "net.h"
 #include "ntp.h"
+#include "timedata.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -382,5 +383,51 @@ Value ntptime(const Array& params, bool fHelp)
         else throw runtime_error("Unexpected response");
     }
 
+    return obj;
+}
+
+Value getnetworkinfo(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getnetworkinfo\n"
+            "Returns an object containing various state info regarding P2P networking.\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"version\": xxxxx,           (numeric) the server version\n"
+            "  \"protocolversion\": xxxxx,   (numeric) the protocol version\n"
+            "  \"timeoffset\": xxxxx,        (numeric) the time offset\n"
+            "  \"connections\": xxxxx,       (numeric) the number of connections\n"
+            "  \"proxy\": \"host:port\",     (string, optional) the proxy used by the server\n"
+            "  \"localaddresses\": [,        (array) list of local addresses\n"
+            "    \"address\": \"xxxx\",      (string) network address\n"
+            "    \"port\": xxx,              (numeric) network port\n"
+            "    \"score\": xxx              (numeric) relative score\n"
+            "  ]\n"
+            "}\n"
+        );
+
+    proxyType proxy;
+    GetProxy(NET_IPV4, proxy);
+
+    Object obj;
+    obj.push_back(Pair("version",         CLIENT_VERSION));
+    obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
+    obj.push_back(Pair("timeoffset",      GetTimeOffset()));
+    obj.push_back(Pair("connections",     (int)vNodes.size()));
+    obj.push_back(Pair("proxy",           (proxy.IsValid() ? proxy.ToStringIPPort() : string())));
+    Array localAddresses;
+    {
+        LOCK(cs_mapLocalHost);
+        for(const auto &item : mapLocalHost)
+        {
+            Object rec;
+            rec.push_back(Pair("address", item.first.ToString()));
+            rec.push_back(Pair("port", (int)item.second.nPort));
+            rec.push_back(Pair("score", item.second.nScore));
+            localAddresses.push_back(rec);
+        }
+    }
+    obj.push_back(Pair("localaddresses", localAddresses));
     return obj;
 }
