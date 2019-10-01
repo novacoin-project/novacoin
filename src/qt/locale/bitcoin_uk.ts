@@ -20,12 +20,12 @@
 Copyright © 2011-2012 The PPCoin Developers
 Copyright © 2014 The Peerunity Developers
 Copyright © 2014 The EmerCoin Developers
-Copyright © 2012-2016 The NovaCoin developers</source>
+Copyright © 2012-2019 The NovaCoin developers</source>
         <translation>© 2009-2016 Розробники Bitcoin
 © 2011-2012 Розробники PPCoin
 © 2014 Розробники Peerunity
 © 2014 Розробники EmerCoin
-© 2012-2016 Розробники NovaCoin</translation>
+© 2012-2019 Розробники NovaCoin</translation>
     </message>
     <message>
         <location filename="../forms/aboutdialog.ui" line="114"/>
@@ -4102,12 +4102,12 @@ If the file does not exist, create it with owner-readable-only file permissions.
     <message>
         <location filename="../bitcoinstrings.cpp" line="107"/>
         <source>Importing blockchain data file.</source>
-        <translation>Імпорт з файлу даних ланцюжки блоків.</translation>
+        <translation>Імпорт з файлу даних ланцюжка блоків.</translation>
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="108"/>
         <source>Importing bootstrap blockchain data file.</source>
-        <translation>Початкове завантаження ланцюжки блоків.</translation>
+        <translation>Початкове завантаження ланцюжка блоків.</translation>
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="109"/>

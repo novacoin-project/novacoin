@@ -46,7 +46,6 @@
         <file alias="import">res/icons/import.png</file>
     </qresource>
     <qresource prefix="/images">
-        <file alias="about">res/images/about.png</file>
         <file alias="splash">res/images/splash2.jpg</file>
     </qresource>
     <qresource prefix="/movies">
