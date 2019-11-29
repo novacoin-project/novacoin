@@ -119,11 +119,11 @@ private:
     QMovie *syncIconMovie;
 
     /** Create the main UI actions. */
-    void createActions();
+    void createActions(int nQtStyle);
     /** Create the menu bar and sub-menus. */
     void createMenuBar();
     /** Create the toolbars */
-    void createToolBars();
+    void createToolBars(int nQtStyle);
     /** Create system tray (notification) icon */
     void createTrayIcon();
 

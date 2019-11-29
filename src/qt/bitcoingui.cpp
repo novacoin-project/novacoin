@@ -101,17 +101,74 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     setUnifiedTitleAndToolBarOnMac(true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
+
+    int nQtStyle = GetArg("-qtstyle", 0);
+    if(nQtStyle < 0) nQtStyle = 0;
+
+    if(!nQtStyle) {
+        resize(850, 550);
+        qApp->setStyleSheet("");
+    } else if(nQtStyle == 1) {
+        resize(850, 525);
+#ifndef Q_OS_MAC
+        qApp->setStyleSheet("QToolBar QToolButton { text-align: center; width: 100%; \
+          padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; \
+          margin-top: 2px; } \
+          QToolBar QToolButton:hover { font-weight: bold; } \
+          #toolbar { border: none; height: 100%; min-width: 150px; max-width: 150px; } \
+          QMenuBar { min-height: 20px; }");
+#else
+        qApp->setStyleSheet("QToolBar QToolButton { text-align: center; width: 100%; \
+          padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; \
+          margin-top: 2px; } \
+          QToolBar QToolButton:hover { font-weight: bold; background-color: transparent; } \
+          #toolbar { border: none; height: 100%; min-width: 150px; max-width: 150px; }");
+#endif
+    } else {
+        resize(850, 525);
+#ifndef Q_OS_MAC
+        qApp->setStyleSheet("QToolBar QToolButton { text-align: center; width: 100%; \
+          color: white; background-color: grey; padding-left: 5px; padding-right: 5px; \
+          padding-top: 2px; padding-bottom: 2px; margin-top: 2px; } \
+          QToolBar QToolButton:hover { font-weight: bold; \
+          background-color: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 2, \
+          stop: 0 #808080, stop: 1 #d2d2d2); } \
+          #toolbar { border: none; height: 100%; min-width: 150px; max-width: 150px; \
+          background-color: grey; } \
+          QMenuBar { color: white; background-color: grey; } \
+          QMenuBar::item { color: white; background-color: grey; \
+          padding-top: 6px; padding-bottom: 6px; \
+          padding-left: 10px; padding-right: 10px; } \
+          QMenuBar::item:selected { background-color: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 2, \
+          stop: 0 #808080, stop: 1 #d2d2d2); } \
+          QMenu { border: 1px solid; color: black; background-color: grey; } \
+          QMenu::item { background-color: grey; } \
+          QMenu::item:disabled { color: gray; } \
+          QMenu::item:enabled:selected { color: white; background-color: grey; } \
+          QMenu::separator { height: 4px; }");
+#else
+        qApp->setStyleSheet("QToolBar QToolButton { text-align: center; width: 100%; \
+          color: white; padding-left: 5px; padding-right: 5px; \
+          padding-top: 2px; padding-bottom: 2px; margin-top: 2px; } \
+          QToolBar QToolButton:hover { font-weight: bold; \
+          background-color: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 2, \
+          stop: 0 #808080, stop: 1 #d2d2d2); } \
+          #toolbar { border: none; height: 100%; min-width: 150px; max-width: 150px; \
+          background-color: grey; }");
+#endif
+    }
+
     // Accept D&D of URIs
     setAcceptDrops(true);
 
     // Create actions for the toolbar, menu bar and tray/dock icon
-    createActions();
+    createActions(nQtStyle);
 
     // Create application menu bar
     createMenuBar();
 
     // Create the toolbars
-    createToolBars();
+    createToolBars(nQtStyle);
 
     // Create the tray icon (or setup the dock icon)
     createTrayIcon();
@@ -237,7 +294,7 @@ BitcoinGUI::~BitcoinGUI()
     delete signVerifyMessageDialog;
 }
 
-void BitcoinGUI::createActions()
+void BitcoinGUI::createActions(int nQtStyle)
 {
     QActionGroup *tabGroup = new QActionGroup(this);
 
@@ -407,10 +464,22 @@ void BitcoinGUI::createMenuBar()
     help->addAction(aboutQtAction);
 }
 
-void BitcoinGUI::createToolBars()
+void BitcoinGUI::createToolBars(int nQtStyle)
 {
-    QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    QToolBar *toolbar = addToolBar(tr("Primary tool bar"));
+    toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    toolbar->setMovable(false);
+    toolbar->setIconSize(QSize(32, 32));
+
+    if(!nQtStyle) {
+        toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    } else {
+        toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        toolbar->setObjectName("toolbar");
+        addToolBar(Qt::LeftToolBarArea, toolbar);
+        toolbar->setOrientation(Qt::Vertical);
+    }
+
     toolbar->addAction(overviewAction);
     toolbar->addAction(sendCoinsAction);
     toolbar->addAction(receiveCoinsAction);
