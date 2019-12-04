@@ -1,5 +1,6 @@
 Copyright (c) 2009-2012 Bitcoin Developers
-Copyright (c) 2013 NovaCoin Developers
+Copyright (c) 2013-2019 NovaCoin Developers
+
 Distributed under the MIT/X11 software license, see the accompanying
 file license.txt or http://www.opensource.org/licenses/mit-license.php.
 This product includes software developed by the OpenSSL Project for use in
@@ -24,7 +25,7 @@ Dependencies
 Libraries you need to download separately and build:
 
                 default path               download
-OpenSSL         \openssl-1.0.1j-mgw        http://www.openssl.org/source/
+OpenSSL         \openssl-1.0.2t-mgw        http://www.openssl.org/source/
 Berkeley DB     \db-6.0.20.NC-mgw          http://www.oracle.com/technology/software/products/berkeley-db/index.html
 Boost           \boost-1.57.0-mgw          http://www.boost.org/users/download/
 
@@ -34,7 +35,7 @@ Berkeley DB    New BSD license with additional requirement that linked software 
 Boost          MIT-like license
 
 Versions used in this release:
-OpenSSL      1.0.1j
+OpenSSL      1.0.2t
 Berkeley DB  6.0.20.NC
 Boost        1.57.0
 
@@ -45,7 +46,7 @@ MSYS shell:
 un-tar sources with MSYS 'tar xfz' to avoid issue with symlinks (OpenSSL ticket 2377)
 change 'MAKE' env. variable from 'C:\MinGW32\bin\mingw32-make.exe' to '/c/MinGW32/bin/mingw32-make.exe'
 
-cd /c/openssl-1.0.1j-mgw
+cd /c/openssl-1.0.2t-mgw
 ./config
 make
 

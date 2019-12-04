@@ -1,47 +1,49 @@
-﻿ARMV7
+﻿ARMv7 (Собрано в Windows 7)
 1.1 Установка архиватора 7z: http://www.7-zip.org/ 
-(при написании инструкции использовался 7-Zip 9.20 64 bit X64, но скорее всего подойдёт любая версия)
+(при написании инструкции использовался 7-Zip 15.14 64 bit x64, но скорее всего подойдёт любая версия)
 
 1.2 Установка msys shell:
 -Скачайте http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
 -нажмите Install
 -директория для установки C:\MinGW
--поставить галочку напротив "...also install support for the graphical user interface."
+-оставить галочку напротив "...also install support for the graphical user interface."
 -убрать галочки напротив "..in the start menu, and/or .." "... on the desktop"
--нажмите continue
--нажмите continue
+-нажмите continue, continue
 -нажмите All Packages, затем MSYS
--поставте галочки напротив:
-msys-autoconf-bin
-msys-automake-bin
-msys-base-bin
-msys-libtool-bin
+-отметьте для установки:
+msys-autoconf bin
+msys-automake bin
+msys-base bin
+msys-libtool bin
 -нажмите Installation, Apply Changes, Apply. После завершения установки нажмите Close и закройте MinGW Installation Manager.
 
-1.3 Установка qt-5.4.0 для Android
--Скачайте http://master.qt.io/archive/qt/5.4/5.4.0/qt-opensource-windows-x86-android-5.4.0.exe
+1.3 Установка qt-5.6.0 для Android
+-Скачайте http://master.qt.io/archive/qt/5.6/5.6.0/qt-opensource-windows-x86-android-5.6.0.exe
 -Запустите установщик
--Укажите каталог для установки(я при написании инструкции устанавливал в папку C:\Qt\Qt5.4.0)
+-Каталог для установки оставьте по умолчанию (C:\Qt\Qt5.6.0)
 -Выберите среди компонентов MinGW 4.9.1, остальные компоненты оставьте по умолчанию
 (У меня окошко выглядит так: https://yadi.sk/i/e9W_pXTge43u5 )
 (можно так же выбрать Android X86, и Android armv5 если собираетесь собирать под эти CPU)
 
 1.4 Установка JAVA JDK
 -Зайдите на сайт http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
--Скачайте и установите JDK(при написании инструкции использовалась jdk-8u25-windows-i586.exe )
+-Скачайте и установите JDK (при написании инструкции использовалась jdk-8u172-windows-i586.exe )
 
 1.5 Установка Android SDK
 -Скачайте http://dl.google.com/android/installer_r24.0.2-windows.exe
 -Установите в папку C:\Android\sdk
 -Запустите SDK Manager.exe
--Установите Android SDK Tools 24.0.2, Android SDK Platform-tools 21, Android SDK Build-tools 21.1.2, Google USB driver, 
-SDK Platform 21, Google API 21, ARM EABI v7a System Image
+-Установите Android SDK Tools 24.4.1, Android SDK Platform-tools 23.0.1, Android SDK Build-tools 23.0.1, SDK Platform 22, Google APIs 22, ARM EABI v7a System Image 22, Google USB driver
+-по окончанию установки, перезапустите SDK Manager.exe для проверки наличия обновлений установленных компонентов
 
 1.6 Установка Android NDK
 -На сайте https://developer.android.com/tools/sdk/ndk/index.html#Downloads
--Скачайте https://dl.google.com/android/ndk/android-ndk-r10d-windows-x86_64.exe 
--Установите в папку C:\Android\android-ndk-r10d  (файл android-ndk-r10d-windows-x86_64.exe это самораспоковывающийся архив, который по двойному клику распаковывается в текущую папку, поэтому лучше открыть его 7-zip и выбрать папку для распаковки самостоятельно)
--Добавьте путь C:\Android\android-ndk-r10d\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin в системную переменную PATH
+-Скачайте https://dl.google.com/android/repository/android-ndk-r13b-windows-x86_64.zip
+
+-Распакуйте в папку C:\Android
+-Добавьте путь C:\Android\android-ndk-r13b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin в системную переменную PATH:
+ нажмите правой кнопкой мыши на "Компьютер", в открывшемся меню нажмите "Свойства", затем "Дополнительные параметры системы", потом "Переменные среды"
+https://yadi.sk/i/GnG9HiGme46oi
 Подробное описание как это сделать на Windows 8, Windows 7, Windows XP и Windows Vista
 https://www.java.com/ru/download/help/path.xml
 (только не нужно выполнять последний пункт из этой инструкции "Откройте заново окно командной строки и выполните код java." )
@@ -51,41 +53,38 @@ https://www.java.com/ru/download/help/path.xml
 -наберите arm-linux-androideabi-g++ -v
 В командной строке выведется текст. В конце текста должно быть написано:
 Thread model: posix
-gcc version 4.9 20140827 (prerelease) (GCC)
+gcc version 4.9 20150123 (prerelease) (GCC)
 
 1.7 Установка Apache Ant
 -Зайдите на сайт https://ant.apache.org/bindownload.cgi
--Скачайте архив с программой: http://apache-mirror.rbc.ru/pub/apache//ant/binaries/apache-ant-1.9.4-bin.zip 
--Распакуйте в папку C:\Android\apache-ant-1.9.4
+-Скачайте архив с программой: http://apache-mirror.rbc.ru/pub/apache//ant/binaries/apache-ant-1.10.3-bin.zip
+-Распакуйте в папку C:\Android\apache-ant-1.10.3
 
 1.8 Добавьте новые системные переменные(Они нужны только для пункта 2. Построение зависимостей, после этого их можно убрать)
--Нажмите правой кнопкой мыши на "Компьютер", в открывшемся меню нажмите "Свойства", затем "Дополнительные параметры системы", потом "Переменные среды"
-https://yadi.sk/i/GnG9HiGme46oi
 -В "Системные переменные" нажмите "Cоздать"(ниже будет идти список "переменная и её значение")
-ANDROID_DEV /c/Android/android-ndk-r10d/platforms/android-9/arch-arm/usr
-AR /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ar
-AS /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-as
-CC /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-gcc
-CFLAGS --sysroot=/c/Android/android-ndk-r10d/platforms/android-9/arch-arm/
-CPP /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-cpp
-CPPFLAGS --sysroot=/c/Android/android-ndk-r10d/platforms/android-9/arch-arm/
-CXX /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-g++
-CXXFLAGS --sysroot=/c/Android/android-ndk-r10d/platforms/android-9/arch-arm/ -I/c/Android/android-ndk-r10d/sources/cxx-stl/gnu-libstdc++/4.9/include -I/c/Android/android-ndk-r10d/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/include
-LD /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ld
-NDK_PROJECT_PATH C:\Android\android-ndk-r10d
-RANLIB /c/Android/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ranlib
+ANDROID_DEV /c/Android/android-ndk-r13b/platforms/android-9/arch-arm/usr
+AR /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ar
+AS /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-as
+CC /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-gcc
+CFLAGS --sysroot=/c/Android/android-ndk-r13b/platforms/android-9/arch-arm/
+CPP /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-cpp
+CPPFLAGS --sysroot=/c/Android/android-ndk-r13b/platforms/android-9/arch-arm/
+CXX /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-g++
+CXXFLAGS --sysroot=/c/Android/android-ndk-r13b/platforms/android-9/arch-arm/ -I/c/Android/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/include -I/c/Android/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/include
+LD /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ld
+NDK_PROJECT_PATH C:\Android\android-ndk-r13b
+RANLIB /c/Android/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ranlib
 
 2. Построение зависимостей.
 В инструкции все зависимости сохраняются в папку C:\Android\deps
 
 2.1 OpenSSL 
--Скачайте http://www.openssl.org/source/openssl-1.0.2.tar.gz
+-Скачайте http://www.openssl.org/source/openssl-1.0.2t.tar.gz
+-Распакуйте в папку C:\Android\deps\openssl-1.0.2
 -Перейдите в папку C:\MinGW\msys\1.0 и запустите msys.bat
 Из MinGw shell выполните следующий код:
 
-cd /c/deps/
-tar xvfz openssl-1.0.2.tar.gz
-cd openssl-1.0.2
+cd /c/Android/deps/openssl-1.0.2
 Configure no-shared no-dso android-armv7
 make
 
@@ -93,7 +92,7 @@ make
 -Скачайте http://download.oracle.com/berkeley-db/db-6.0.20.tar.gz
 -Из MinGw shell выполните следующий код:
 
-cd /c/deps/
+cd /c/Android/deps/
 tar xvfz db-6.0.20.tar.gz
 cd db-6.0.20/build_unix
 ../dist/configure --host=arm-none-linux --enable-cxx --disable-shared --disable-replication
@@ -119,7 +118,7 @@ option.set keep-going : false ;
 
 Вернитесь в командную строку и введите:
 
-b2 --build-type=complete --with-chrono --with-filesystem --with-program_options --with-system --with-thread toolset=gcc-arm variant=release link=static threading=multi threadapi=pthread target-os=android define=BOOST_MATH_DISABLE_FLOAT128 include=C:\Android\android-ndk-r10d\sources\cxx-stl\gnu-libstdc++\4.9\include include=C:\Android\android-ndk-r10d\sources\cxx-stl\gnu-libstdc++\4.9\libs\armeabi\include include=C:\Android\android-ndk-r10d\platforms\android-9\arch-arm\usr\include
+b2 --build-type=complete --with-chrono --with-filesystem --with-program_options --with-system --with-thread toolset=gcc-arm variant=release link=static threading=multi threadapi=pthread target-os=android define=BOOST_MATH_DISABLE_FLOAT128 include=C:\Android\android-ndk-r13b\sources\cxx-stl\gnu-libstdc++\4.9\include include=C:\Android\android-ndk-r13b\sources\cxx-stl\gnu-libstdc++\4.9\libs\armeabi\include include=C:\Android\android-ndk-r13b\platforms\android-9\arch-arm\usr\include
 
 После выполнения этой команды в папке C:\Android\deps\boost_1_57_0\stage\lib должны появиться следующие файлы:
 libboost_atomic-gcc-mt-s-1_57.a
@@ -202,7 +201,7 @@ src/mruset.h \
 
 После строки src/qt/transactiontablemodel.cpp \ вставьте  src/ifaddrs.c \
 
-Закоментируйте строку 434 LIBS += -lrt
+Закоментируйте строку  LIBS += -lrt
 (то есть чтобы стало выглядеть так:
 !windows:!macx {
     DEFINES += LINUX
@@ -215,49 +214,40 @@ LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -l
 на
 LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread_pthread$$BOOST_THREAD_LIB_SUFFIX
 
--Откройте файл C:\Qt\Qt5.4.0\Tools\QtCreator\bin\qtcreator.exe
--Нажмите "Инструменты"->"Параметры", затем выберите вкладку Android
--Вставьте в строку "Размещение JDK" C:\Program Files (x86)\Java\jdk1.8.0_25
+Сохраните изменения в файле novacoin-qt.pro.
+
+-Откройте файл C:\Qt\Qt5.6.0\Tools\QtCreator\bin\qtcreator.exe
+-Нажмите "Инструменты"->"Параметры"->"Устройства", затем выберите вкладку Android
+-Вставьте в строку "Размещение JDK" C:\Program Files (x86)\Java\jdk1.8.0_172
 -Вставьте в строку "Размещение SDK для Android" C:\Android\sdk
--Вставьте в строку "Размещение NDK для Android" C:\Android\android-ndk-r10d
--Вставьте в строку "Программа Ant" C:\Android\apache-ant-1.9.4\bin\ant.bat
+-Вставьте в строку "Размещение NDK для Android" C:\Android\android-ndk-r13b
+-Проверьте, чтоб в строке "Программа Ant" было C:\Android\apache-ant-1.10.3\bin\ant.bat
 -Нажмите "OK"
 -Нажмите "Файл"->"Открыть файл или проект..."
 -Найдите "novacoin-qt.pro" и нажмите "открыть"
--Поставьте галочку напротив Android для armeabi-v7a(GCC 4.9, Qt 5.4.0), остальные галочки уберите
+-Поставьте галочку напротив Android для armeabi-v7a(GCC 4.9, Qt 5.6.0), остальные галочки уберите
 -Нажмите "Настроить проект"
--Нажмите "Проекты"->"Сборка"->"Создать шаблоны"(картинка чтобы лучше понять https://yadi.sk/i/M8mhG2tce4cEy)
+-Нажмите "Проекты"->Изменить конфигурацию сборки: выберите "Выпуск"->Собрать Android APK "Подробнее"->"Создать шаблоны"(картинка чтобы лучше понять https://yadi.sk/i/M8mhG2tce4cEy)
 -Нажмите "Завершить"
--В проекте novacoin-qt выберете Другие файлы->android->AndroidManifest.xml и задайте имя пакета, имя приложения, иконки приложения(Иконки находятся в папке C:\Android\novacoin-master\src\qt\res\icons) (Для Google Play Market иконка должна быть не менее 512x512)(https://yadi.sk/i/oY-OmnrWe4cTY)
--Возьмите ваш Android телефон/планшет(версия должна быть от 2.3 и выше)
--Перейдите в "Настройки"->"Приложения".
--Поставьте галочку напротив "Неизвестные источники"
--Перейдите в "Разработка"
--Поставьте галочки напротив "Отладка по USB"
--Подключите через USB ваш телефон/планшет к компьютеру. Не выбирайте опцию в телефоне/планшете "Включить USB-накопитель"
--Должно найтись Android устройство. https://yadi.sk/i/wFWZLxtie4DrN
-Если Windows не может найти драйвер для устройства, то укажите самостоятельно в папке C:\Android\sdk\extras\google\usb_driver есть файл android_winusb.inf
--В QtCreator'е нажмите на зеленого робота и выберите Сборка: Выпуск
--Нажмите зеленую стрелку(Запустить)(https://yadi.sk/i/hKHKL_Phe4EFL)
--Выберите свой телефон/планшет, нажмите OK и ждите завершения компиляции.
--После завершения компиляции Novacoin-Qt будет установлен на ваш телефон/планшет и запущен. А в папке C:\Android\build-novacoin-qt-Android_armeabi_v7a_GCC_4_9_Qt_5_4_0-Release\android-build\bin будет файл QtApp-debug.apk. Переименуйте его в Novacoin-Qt-0.5.1-debug.apk и можно распростронять :)
+-Задайте имя пакета "org.fortytwo.coin", выберите иконки для приложения (находятся в папке C:\Android\novacoin-master\src\qt\res\icons, для Google Play Market иконка должна быть не менее 512x512), выберите "целевой SDK: API 21"(https://yadi.sk/i/oY-OmnrWe4cTY)
+-В QtCreator'е нажмите "Сборка"->"Собрать проект "novacoin-qt""->"Сохранить все" и ждите завершения компиляции.
+-После завершения компиляции в папке C:\Android\build-novacoin-qt-Android_armeabi_v7a_GCC_4_9_Qt_5_6_0-Release\android-build\bin будет файл QtApp-debug.apk. Переименуйте его в novacoin-qt.apk и можно распростронять.
 
 Изменения для Android X86
-1. Добавить путь C:\Android\android-ndk-r10d\toolchains\x86-4.9\prebuilt\windows-x86_64\bin в переменную PATH
+1. Добавить путь C:\Android\android-ndk-r13b\toolchains\x86-4.9\prebuilt\windows-x86_64\bin в системную переменную PATH
 2. Изменить системные переменные так:
 
-ANDROID_DEV /c/Android/android-ndk-r10d/platforms/android-9/arch-x86/usr
-AR /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-ar
-AS /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-as
-CC /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-gcc
-CFLAGS --sysroot=/c/Android/android-ndk-r10d/platforms/android-9/arch-x86/
-CPP /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-cpp
-CPPFLAGS --sysroot=/c/Android/android-ndk-r10d/platforms/android-9/arch-x86/
-CXX /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-g++
-CXXFLAGS --sysroot=/c/Android/android-ndk-r10d/platforms/android-9/arch-x86/ -I/c/Android/android-ndk-r10d/sources/cxx-stl/gnu-libstdc++/4.9/include -I/c/Android/android-ndk-r10d/sources/cxx-stl/gnu-libstdc++/4.9/libs/x86/include
-LD /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-ld
-NDK_PROJECT_PATH C:\Android\android-ndk-r10d
-RANLIB /c/Android/android-ndk-r10d/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-ranlib
+ANDROID_DEV /c/Android/android-ndk-r13b/platforms/android-9/arch-x86/usr
+AR /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-ar
+AS /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-as
+CC /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-gcc
+CFLAGS --sysroot=/c/Android/android-ndk-r13b/platforms/android-9/arch-x86/
+CPP /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-cpp
+CPPFLAGS --sysroot=/c/Android/android-ndk-r13b/platforms/android-9/arch-x86/
+CXX /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-g++
+CXXFLAGS --sysroot=/c/Android/android-ndk-r13b/platforms/android-9/arch-x86/ -I/c/Android/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/include -I/c/Android/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/libs/x86/include
+LD /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-ld
+RANLIB /c/Android/android-ndk-r13b/toolchains/x86-4.9/prebuilt/windows-x86_64/bin/i686-linux-android-ranlib
 
 3. При построении OpenSSL выполнить
 Configure no-shared no-dso android-x86
