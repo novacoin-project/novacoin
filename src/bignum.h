@@ -468,12 +468,8 @@ public:
         return ToString(16);
     }
 
-    const BIGNUM* get() const {
-        return bn;
-    }
-
-    BIGNUM* get() {
-        return bn;
+    BIGNUM* get() const {
+        return BN_dup(bn);
     }
 
     unsigned int GetSerializeSize(int nType=0, int nVersion=PROTOCOL_VERSION) const

@@ -367,20 +367,24 @@ bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
     if (sig==NULL)
         return false;
     const EC_GROUP *group = EC_KEY_get0_group(pkey);
-    CBigNum order, halforder;
-    EC_GROUP_get_order(group, order.get(), NULL);
-    BN_rshift1(halforder.get(), order.get());
+
+    BIGNUM* order = BN_new(), *halforder = BN_new();
+    EC_GROUP_get_order(group, order, NULL);
+    BN_rshift1(halforder, order);
 
     // Get internal R and S pointers
     const BIGNUM *current_s = ECDSA_SIG_get0_s(sig);
 
     // enforce low S values, by negating the value (modulo the order) if above order/2.
-    if (BN_cmp(current_s, halforder.get()) > 0) {
+    if (BN_cmp(current_s, halforder) > 0) {
         BIGNUM *updated_s = BN_new();
         BN_copy(updated_s, current_s);
-        BN_sub(updated_s, order.get(), updated_s);
+        BN_sub(updated_s, order, updated_s);
         ECDSA_SIG_set0(sig, NULL, updated_s);
     }
+
+    BN_free(order);
+    BN_free(halforder);
 
     unsigned int nSize = ECDSA_size(pkey);
     vchSig.resize(nSize); // Make sure it is big enough
@@ -407,20 +411,23 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
     if (sig==NULL)
         return false;
     const EC_GROUP *group = EC_KEY_get0_group(pkey);
-    CBigNum order, halforder;
-    EC_GROUP_get_order(group, order.get(), NULL);
-    BN_rshift1(halforder.get(), order.get());
+    BIGNUM* order = BN_new(), *halforder = BN_new();
+    EC_GROUP_get_order(group, order, NULL);
+    BN_rshift1(halforder, order);
 
     // Get internal R and S pointers
     const BIGNUM *current_s = ECDSA_SIG_get0_s(sig);
 
     // enforce low S values, by negating the value (modulo the order) if above order/2.
-    if (BN_cmp(current_s, halforder.get()) > 0) {
+    if (BN_cmp(current_s, halforder) > 0) {
         BIGNUM *updated_s = BN_new();
         BN_copy(updated_s, current_s);
-        BN_sub(updated_s, order.get(), updated_s);
+        BN_sub(updated_s, order, updated_s);
         ECDSA_SIG_set0(sig, NULL, updated_s);
     }
+
+    BN_free(order);
+    BN_free(halforder);
 
     vchSig.clear();
     vchSig.resize(65,0);
@@ -454,6 +461,7 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
         BN_bn2bin(ECDSA_SIG_get0_s(sig),&vchSig[65-(nBitsS+7)/8]);
         fOk = true;
     }
+
     ECDSA_SIG_free(sig);
     return fOk;
 }
@@ -642,23 +650,21 @@ bool CPoint::getBytes(std::vector<unsigned char> &vchBytes)
 // ECC multiplication by specified multiplier
 bool CPoint::ECMUL(const CBigNum &bnMultiplier)
 {
-    if (!EC_POINT_mul(group, point, NULL, point, bnMultiplier.get(), NULL)) {
-        printf("CPoint::ECMUL() : EC_POINT_mul failed");
-        return false;
-    }
-
-    return true;
+    BIGNUM* bnMul = bnMultiplier.get();
+    bool ok = EC_POINT_mul(group, point, NULL, point, bnMul, NULL);
+    if (!ok) printf("CPoint::ECMUL() : EC_POINT_mul failed");
+    BN_free(bnMul);
+    return ok;
 }
 
 // Calculate G*m + q
 bool CPoint::ECMULGEN(const CBigNum &bnMultiplier, const CPoint &qPoint)
 {
-    if (!EC_POINT_mul(group, point, bnMultiplier.get(), qPoint.point, BN_value_one(), NULL)) {
-        printf("CPoint::ECMULGEN() : EC_POINT_mul failed.");
-        return false;
-    }
-
-    return true;
+    BIGNUM* bnMul = bnMultiplier.get();
+    bool ok = EC_POINT_mul(group, point, bnMul, qPoint.point, BN_value_one(), NULL);
+    if (!ok) printf("CPoint::ECMULGEN() : EC_POINT_mul failed.");
+    BN_free(bnMul);
+    return ok;
 }
 
 // CMalleablePubKey
