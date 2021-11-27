@@ -59,21 +59,22 @@ public:
 
     CBigNum(const CBigNum& b)
     {
-        bn = BN_new();
-        if (!BN_copy(bn, b.bn))
+        BIGNUM *dup = BN_dup(b.bn);
+        if (!dup)
         {
-            BN_clear_free(bn);
-            throw bignum_error("CBigNum::CBigNum(const CBigNum&) : BN_copy failed");
+            throw bignum_error("CBigNum::CBigNum(const CBigNum&) : BN_dup failed");
         }
+        bn = dup;
     }
 
     CBigNum& operator=(const CBigNum& b)
     {
-        bn = BN_new();
-        if (!BN_copy(bn, b.bn)) {
-            BN_clear_free(bn);
-            throw bignum_error("CBigNum::operator= : BN_copy failed");
+        BIGNUM *dup = BN_dup(b.bn);
+        if (!dup)
+        {
+            throw bignum_error("CBigNum::operator= : BN_dup failed");
         }
+        bn = dup;
         return (*this);
     }
 
