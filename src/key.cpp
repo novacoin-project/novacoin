@@ -6,7 +6,6 @@
 
 #include <openssl/ecdsa.h>
 #include <openssl/evp.h>
-#include <openssl/obj_mac.h>
 
 #include "key.h"
 #include "base58.h"
@@ -329,17 +328,6 @@ CSecret CKey::GetSecret(bool &fCompressed) const
         throw key_error("CKey::GetSecret(): BN_bn2bin failed");
     fCompressed = IsCompressed();
     return vchRet;
-}
-
-bool CKey::WritePEM(BIO *streamObj, const SecureString &strPassKey) const // dumppem 4KJLA99FyqMMhjjDe7KnRXK4sjtv9cCtNS /tmp/test.pem 123
-{
-    EVP_PKEY *evpKey = EVP_PKEY_new();
-    if (!EVP_PKEY_assign_EC_KEY(evpKey, pkey))
-        return error("CKey::WritePEM() : Error initializing EVP_PKEY instance.");
-    if(!PEM_write_bio_PKCS8PrivateKey(streamObj, evpKey, EVP_aes_256_cbc(), (char *)&strPassKey[0], strPassKey.size(), NULL, NULL))
-        return error("CKey::WritePEM() : Error writing private key data to stream object");
-
-    return true;
 }
 
 CSecret CKey::GetSecret() const
@@ -1215,66 +1203,4 @@ std::vector<unsigned char> CMalleableKeyView::Raw() const
 bool CMalleableKeyView::IsValid() const
 {
     return vchSecretL.size() == 32 && GetMalleablePubKey().IsValid();
-}
-
-//// Asymmetric encryption
-
-void CPubKey::EncryptData(const std::vector<unsigned char>& data, std::vector<unsigned char>& encrypted)
-{
-    ies_ctx_t *ctx;
-    char error[1024] = "Unknown error";
-    cryptogram_t *cryptogram;
-
-    const unsigned char* pbegin = &vbytes[0];
-    EC_KEY *pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
-    if (!o2i_ECPublicKey(&pkey, &pbegin, size()))
-        throw key_error("Unable to parse EC key");
-
-    ctx = create_context(pkey);
-    if (!EC_KEY_get0_public_key(ctx->user_key))
-        throw key_error("Given EC key is not public key");
-
-    cryptogram = ecies_encrypt(ctx, (unsigned char*)&data[0], data.size(), error);
-    if (cryptogram == NULL) {
-        delete ctx;
-        ctx = NULL;
-        throw key_error(std::string("Error in encryption: %s") + error);
-    }
-
-    encrypted.resize(cryptogram_data_sum_length(cryptogram));
-    unsigned char *key_data = cryptogram_key_data(cryptogram);
-    memcpy(&encrypted[0], key_data, encrypted.size());
-    cryptogram_free(cryptogram);
-    delete ctx;
-}
-
-void CKey::DecryptData(const std::vector<unsigned char>& encrypted, std::vector<unsigned char>& data)
-{
-    ies_ctx_t *ctx;
-    char error[1024] = "Unknown error";
-    cryptogram_t *cryptogram;
-    size_t length;
-    unsigned char *decrypted;
-
-    ctx = create_context(pkey);
-    if (!EC_KEY_get0_private_key(ctx->user_key))
-        throw key_error("Given EC key is not private key");
-
-    size_t key_length = ctx->stored_key_length;
-    size_t mac_length = EVP_MD_size(ctx->md);
-    cryptogram = cryptogram_alloc(key_length, mac_length, encrypted.size() - key_length - mac_length);
-
-    memcpy(cryptogram_key_data(cryptogram), &encrypted[0], encrypted.size());
-
-    decrypted = ecies_decrypt(ctx, cryptogram, &length, error);
-    cryptogram_free(cryptogram);
-    delete ctx;
-
-    if (decrypted == NULL) {
-        throw key_error(std::string("Error in decryption: %s") + error);
-    }
-
-    data.resize(length);
-    memcpy(&data[0], decrypted, length);
-    free(decrypted);
 }

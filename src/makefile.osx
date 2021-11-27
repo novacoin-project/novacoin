@@ -6,15 +6,15 @@
 # Mac OS X makefile for bitcoin
 # Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-CC=llvm-gcc
-CXX=llvm-g++
-DEPSDIR=/opt/local
+CC=clang
+CXX=clang++
+DEPSDIR=/opt/homebrew
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"$(CURDIR)"/obj \
  -I"$(DEPSDIR)/include" \
- -I"$(DEPSDIR)/include/db48" \
+ -I"$(DEPSDIR)/Cellar/berkeley-db@4/4.8.30/include" \
  -I"$(CURDIR)/additional/stage/usr/include"
 
 LIBPATHS= \
@@ -30,7 +30,7 @@ LIBS= -dead_strip
 ifdef STATIC
 # Build STATIC if you are redistributing the bitcoind binary
 LIBS += \
- $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
+ $(DEPSDIR)/Cellar/berkeley-db@4/4.8.30/lib/libdb_cxx-4.8.a \
  $(DEPSDIR)/lib/libboost_system-mt.a \
  $(DEPSDIR)/lib/libboost_filesystem-mt.a \
  $(DEPSDIR)/lib/libboost_program_options-mt.a \
@@ -64,7 +64,7 @@ CFLAGS = -g -msse2
 endif
 
 # ppc doesn't work because we don't support big-endian
-CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-unused-parameter \
+CFLAGS += -std=c++17 -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-unused-parameter \
     $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
 OBJS= \
@@ -87,7 +87,6 @@ OBJS= \
     obj/stun.o \
     obj/protocol.o \
     obj/bitcoinrpc.o \
-    obj/rpccrypt.o \
     obj/rpcdump.o \
     obj/rpcnet.o \
     obj/rpcmining.o \
@@ -102,8 +101,6 @@ OBJS= \
     obj/noui.o \
     obj/kernel.o \
     obj/kernel_worker.o \
-    obj/ecies.o \
-    obj/cryptogram.o \
     obj/ipcollector.o
 
 ifneq (${USE_IPV6}, -)

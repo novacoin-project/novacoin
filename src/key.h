@@ -13,9 +13,9 @@
 #include "uint256.h"
 #include "hash.h"
 #include "bignum.h"
-#include "ies.h"
 
 #include <openssl/ec.h> // for EC_KEY definition
+#include <openssl/obj_mac.h>
 
 // secp160k1
 // const unsigned int PRIVATE_KEY_SIZE = 192;
@@ -206,9 +206,6 @@ public:
 
     // Reserialize to DER
     static bool ReserealizeSignature(std::vector<unsigned char>& vchSig);
-
-    // Encrypt data
-    void EncryptData(const std::vector<unsigned char>& data, std::vector<unsigned char>& encrypted);
 };
 
 // secure_allocator is defined in allocators.h
@@ -247,7 +244,6 @@ public:
     CSecret GetSecret() const;
     CPrivKey GetPrivKey() const;
     CPubKey GetPubKey() const;
-    bool WritePEM(BIO *streamObj, const SecureString &strPassKey) const;
 
     bool Sign(uint256 hash, std::vector<unsigned char>& vchSig);
 
@@ -261,9 +257,6 @@ public:
 
     // Check whether an element of a signature (r or s) is valid.
     static bool CheckSignatureElement(const unsigned char *vch, int len, bool half);
-
-    // Decrypt data
-    void DecryptData(const std::vector<unsigned char>& encrypted, std::vector<unsigned char>& data);
 };
 
 class CPoint

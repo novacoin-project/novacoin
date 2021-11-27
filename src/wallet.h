@@ -198,7 +198,6 @@ public:
     bool DecryptWallet(const SecureString& strWalletPassphrase);
 
     void GetAddresses(std::map<CBitcoinAddress, int64_t> &mapAddresses) const;
-    bool GetPEM(const CKeyID &keyID, const std::string &fileName, const SecureString &strPassPhrase) const;
 
 
     /** Increment the next transaction order id
