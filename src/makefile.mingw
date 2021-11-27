@@ -17,12 +17,14 @@ INCLUDEPATHS= \
  -I"/c/deps" \
  -I"/c/deps/db-6.0.20/build_unix" \
  -I"/c/deps/openssl-1.0.2/include"
- 
+ -I"c/deps/ixwebsocket/usr/include" \
+
 LIBPATHS= \
  -L"$(CURDIR)/leveldb" \
  -L"/c/deps/boost_1_57_0/stage/lib" \
  -L"/c/deps/db-6.0.20/build_unix" \
- -L"/c/deps/openssl-1.0.2"
+ -L"/c/deps/openssl-3.0.0" \
+ -I"c/deps/ixwebsocket/usr/include"
 
 LIBS= \
   -l leveldb \
@@ -43,7 +45,7 @@ endif
 
 DEFS=-DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 DEBUGFLAGS=-g
-CFLAGS=-mthreads $(xOPT_LEVEL) -msse2 -w -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
+CFLAGS=-mthreads $(xOPT_LEVEL) -msse2 -w -Wall -Wno-deprecated -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware -static
 
 ifneq (${USE_IPV6}, -)

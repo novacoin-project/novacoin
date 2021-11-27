@@ -13,11 +13,11 @@ DEPSDIR:=/usr/$(TARGET_PLATFORM)-w64-mingw32
 
 BOOST_LIB_PATH:=$(DEPSDIR)/boost_1_57_0/stage/lib
 BDB_LIB_PATH:=$(DEPSDIR)/db-6.0.20.NC/build_unix
-OPENSSL_LIB_PATH:=$(DEPSDIR)/openssl-1.0.2g
+OPENSSL_LIB_PATH:=$(DEPSDIR)/openssl-3.0.0
 
 BOOST_INCLUDE_PATH:=$(DEPSDIR)/boost_1_57_0
 BDB_INCLUDE_PATH:=$(DEPSDIR)/db-6.0.20.NC/build_unix
-OPENSSL_INCLUDE_PATH:=$(DEPSDIR)/openssl-1.0.2g/include
+OPENSSL_INCLUDE_PATH:=$(DEPSDIR)/openssl-3.0.0/include
 
 USE_LEVELDB:=0
 USE_IPV6:=1
@@ -27,12 +27,14 @@ INCLUDEPATHS= \
  -I"$(CURDIR)"/obj \
  -I"$(BOOST_INCLUDE_PATH)" \
  -I"$(BDB_INCLUDE_PATH)" \
- -I"$(OPENSSL_INCLUDE_PATH)"
+ -I"$(OPENSSL_INCLUDE_PATH)" \
+ -I"$(CURDIR)/additional/stage/usr/include"
 
 LIBPATHS= \
  -L"$(BOOST_LIB_PATH)" \
  -L"$(BDB_LIB_PATH)" \
- -L"$(OPENSSL_LIB_PATH)"
+ -L"$(OPENSSL_LIB_PATH)" \
+ -L"$(CURDIR)/additional/stage/usr/lib"
 
 LIBS= \
  -l boost_system-mt \
@@ -43,6 +45,7 @@ LIBS= \
  -l db_cxx \
  -l ssl \
  -l crypto \
+ -l ixwebsocket
  -Wl,-Bstatic -lpthread -Wl,-Bdynamic
 
 xOPT_LEVEL=-O2
@@ -53,7 +56,7 @@ endif
 DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 
 DEBUGFLAGS=-g
-CFLAGS=$(xOPT_LEVEL) -msse2 -w -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
+CFLAGS=$(xOPT_LEVEL) -msse2 -w -Wall -Wno-deprecated -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -static-libgcc -static-libstdc++
 
 ifneq (${USE_IPV6}, -)
