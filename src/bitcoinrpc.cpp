@@ -470,7 +470,7 @@ int ReadHTTP(std::basic_istream<char>& stream, map<string, string>& mapHeadersRe
     return nStatus;
 }
 
-bool HTTPAuthorized(map<string, string>& mapHeaders)
+bool HTTPAuthorized(ix::WebSocketHttpHeaders& mapHeaders)
 {
     string strAuth = mapHeaders["authorization"];
     if (strAuth.substr(0,6) != "Basic ")
@@ -605,6 +605,31 @@ static CCriticalSection cs_THREAD_RPCHANDLER;
 
 void StartRPCServer()
 {
+strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+    if (mapArgs["-rpcpassword"].empty())
+    {
+        unsigned char rand_pwd[32];
+        RAND_bytes(rand_pwd, 32);
+        string strWhatAmI = "To use novacoind";
+        if (mapArgs.count("-server"))
+            strWhatAmI = strprintf(_("To use the %s option"), "\"-server\"");
+        else if (mapArgs.count("-daemon"))
+            strWhatAmI = strprintf(_("To use the %s option"), "\"-daemon\"");
+        uiInterface.ThreadSafeMessageBox(strprintf(
+            _("%s, you must set a rpcpassword in the configuration file:\n %s\n"
+              "It is recommended you use the following random password:\n"
+              "rpcuser=novacoinrpc\n"
+              "rpcpassword=%s\n"
+              "(you do not need to remember this password)\n"
+              "If the file does not exist, create it with owner-readable-only file permissions.\n"),
+                strWhatAmI.c_str(),
+                GetConfigFile().string().c_str(),
+                EncodeBase58(&rand_pwd[0],&rand_pwd[0]+32).c_str()),
+            _("Error"), CClientUIInterface::OK | CClientUIInterface::MODAL);
+        StartShutdown();
+        return;
+    }
+
     string host = GetArg("-rpchost", "127.0.0.1");
     int port = GetArg("-rpcport", GetDefaultRPCPort());
 
@@ -615,8 +640,18 @@ void StartRPCServer()
     g_server->setOnConnectionCallback([](ix::HttpRequestPtr request, std::shared_ptr<ix::ConnectionState> connectionState) -> ix::HttpResponsePtr {
 
         ix::WebSocketHttpHeaders headers;
+        headers["Server"] = string("novacoin-json-rpc/") + FormatFullVersion();
+        headers["WWW-Authenticate"] = "Basic realm=\"jsonrpc\"";
+
+        if (!HTTPAuthorized(request->headers))
+        {
+            printf("ThreadRPCServer incorrect password attempt from %s\n", connectionState->getRemoteIp().c_str());
+            connectionState->setTerminated();
+            return std::make_shared<ix::HttpResponse>(401, "Unauthorized", ix::HttpErrorCode::Ok, headers, "Not authorized");
+        }
 
         if (request->method != "POST") {
+            connectionState->setTerminated();
             return std::make_shared<ix::HttpResponse>(400, "Bad request", ix::HttpErrorCode::Ok, headers, "Bad request");
         }
 
