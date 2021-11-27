@@ -39,8 +39,8 @@ win32-g++-cross: QMAKE_TARGET.arch = $$TARGET_PLATFORM
 #QRENCODE_INCLUDE_PATH=C:/deps/qrencode-3.4.4
 #QRENCODE_LIB_PATH=C:/deps/qrencode-3.4.4/.libs
 
-IXWEBSOCKET_INCLUDE_PATH=$$PWD/src/additional/usr/include
-IXWEBSOCKET_LIB_PATH=$$PWD/src/additional/usr/lib
+IXWEBSOCKET_INCLUDE_PATH=$$PWD/src/additional/stage/usr/include
+IXWEBSOCKET_LIB_PATH=$$PWD/src/additional/stage/usr/lib
 
 OBJECTS_DIR = build
 MOC_DIR = build
