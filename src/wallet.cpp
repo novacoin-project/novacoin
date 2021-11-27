@@ -13,7 +13,7 @@
 #include "coincontrol.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <openssl/bio.h>
-
+#include <random>
 #include "main.h"
 
 using namespace std;
@@ -1829,7 +1829,9 @@ bool CWallet::SelectCoinsMinConf(int64_t nTargetValue, unsigned int nSpendTime, 
     vector<pair<int64_t, pair<const CWalletTx*,unsigned int> > > vValue;
     int64_t nTotalLower = 0;
 
-    random_shuffle(vCoins.begin(), vCoins.end(), GetRandInt);
+    std::random_device rd;
+    std::mt19937 g(rd());
+    shuffle(vCoins.begin(), vCoins.end(), g);
 
     BOOST_FOREACH(const COutput &output, vCoins)
     {
