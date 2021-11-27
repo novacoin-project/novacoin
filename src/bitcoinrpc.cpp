@@ -614,16 +614,6 @@ void StartRPCServer()
 
     g_server->setOnConnectionCallback([](ix::HttpRequestPtr request, std::shared_ptr<ix::ConnectionState> connectionState) -> ix::HttpResponsePtr {
 
-        // Build a string for the response
-        std::stringstream ss;
-        ss << connectionState->getRemoteIp()
-           << " "
-           << request->method
-           << " "
-           << request->uri;
-
-        std::cout << ss.str() << std::endl;
-
         ix::WebSocketHttpHeaders headers;
 
         if (request->method != "POST") {
