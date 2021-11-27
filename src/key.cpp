@@ -470,7 +470,7 @@ bool CPubKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>
     if (nV<27 || nV>=35)
         return false;
     ECDSA_SIG *sig = ECDSA_SIG_new();
-    BIGNUM *sig_r, *sig_s;
+    BIGNUM *sig_r = BN_new(), *sig_s = BN_new();
     BN_bin2bn(&vchSig[1],32,sig_r);
     BN_bin2bn(&vchSig[33],32,sig_s);
     ECDSA_SIG_set0(sig, sig_r, sig_s);
