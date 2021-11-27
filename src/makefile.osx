@@ -14,11 +14,13 @@ INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"$(CURDIR)"/obj \
  -I"$(DEPSDIR)/include" \
- -I"$(DEPSDIR)/include/db48"
+ -I"$(DEPSDIR)/include/db48" \
+ -I"$(CURDIR)/additional/stage/usr/include"
 
 LIBPATHS= \
  -L"$(DEPSDIR)/lib" \
- -L"$(DEPSDIR)/lib/db48"
+ -L"$(DEPSDIR)/lib/db48" \
+ -L"$(CURDIR)/additional/stage/usr/lib"
 
 USE_LEVELDB:=0
 USE_IPV6:=1
@@ -35,6 +37,7 @@ LIBS += \
  $(DEPSDIR)/lib/libboost_thread-mt.a \
  $(DEPSDIR)/lib/libssl.a \
  $(DEPSDIR)/lib/libcrypto.a \
+ $(CURDIR)/additional/stage/usr/lib/libixwebsocket.a \
  -lz
 else
 LIBS += \
@@ -45,6 +48,7 @@ LIBS += \
  -lboost_thread-mt \
  -lssl \
  -lcrypto \
+ -lixwebsocket \
  -lz
 endif
 
