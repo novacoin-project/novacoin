@@ -8,21 +8,22 @@
 
 #include "main.h"
 #include "wallet.h"
+#include <memory>
 
 /* Generate a new block, without valid proof-of-work/with provided proof-of-stake */
-CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txAdd=NULL);
+std::shared_ptr<CBlock> CreateNewBlock(CWallet* pwallet, CTransaction *txAdd=NULL);
 
 /** Modify the extranonce in a block */
-void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
+void IncrementExtraNonce(std::shared_ptr<CBlock>& pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 
 /** Do mining precalculation */
-void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1);
+void FormatHashBuffers(const std::shared_ptr<CBlock>& pblock, char* pmidstate, char* pdata, char* phash1);
 
 /** Check mined proof-of-work block */
-bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
+bool CheckWork(const std::shared_ptr<CBlock>& pblock, CWallet& wallet, CReserveKey& reservekey);
 
 /** Check mined proof-of-stake block */
-bool CheckStake(CBlock* pblock, CWallet& wallet);
+bool CheckStake(const std::shared_ptr<CBlock>& pblock, CWallet& wallet);
 
 /** Base sha256 mining transform */
 void SHA256Transform(void* pstate, void* pinput, const void* pinit);
