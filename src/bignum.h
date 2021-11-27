@@ -70,8 +70,10 @@ public:
     CBigNum& operator=(const CBigNum& b)
     {
         bn = BN_new();
-        if (!BN_copy(bn, b.bn))
+        if (!BN_copy(bn, b.bn)) {
+            BN_clear_free(bn);
             throw bignum_error("CBigNum::operator= : BN_copy failed");
+        }
         return (*this);
     }
 
