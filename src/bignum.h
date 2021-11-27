@@ -468,7 +468,11 @@ public:
         return ToString(16);
     }
 
-    BIGNUM* get() const {
+    const BIGNUM* get() const {
+        return bn;
+    }
+
+    BIGNUM* get() {
         return bn;
     }
 
