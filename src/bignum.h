@@ -78,6 +78,15 @@ public:
         return (*this);
     }
 
+    CBigNum(const BIGNUM *bnp) {
+        BIGNUM *dup = BN_dup(bnp);
+        if (!dup)
+        {
+            throw bignum_error("CBigNum::CBigNum(const BIGNUM*) : BN_dup failed");
+        }
+        bn = dup;
+    }
+
     ~CBigNum()
     {
         BN_clear_free(bn);

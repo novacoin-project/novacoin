@@ -703,8 +703,7 @@ void CMalleablePubKey::GetVariant(CPubKey &R, CPubKey &vchPubKeyVariant)
     R = CPubKey(vchPubKey);
 
     // OpenSSL BIGNUM representation of r value
-    CBigNum bnr;
-    bnr = *(CBigNum*) EC_KEY_get0_private_key(eckey);
+    CBigNum bnr(EC_KEY_get0_private_key(eckey));
     EC_KEY_free(eckey);
 
     CPoint point;
