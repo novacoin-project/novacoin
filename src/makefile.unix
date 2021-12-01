@@ -123,7 +123,6 @@ OBJS= \
     obj/stun.o \
     obj/protocol.o \
     obj/bitcoinrpc.o \
-    obj/rpccrypt.o \
     obj/rpcdump.o \
     obj/rpcnet.o \
     obj/rpcmining.o \
@@ -138,8 +137,6 @@ OBJS= \
     obj/noui.o \
     obj/kernel.o \
     obj/kernel_worker.o \
-    obj/ecies.o \
-    obj/cryptogram.o \
     obj/ipcollector.o
 
 all: novacoind
