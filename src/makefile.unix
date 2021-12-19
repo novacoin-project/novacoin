@@ -145,13 +145,10 @@ all: novacoind
 # LevelDB support
 #
 ifeq (${USE_LEVELDB}, 1)
-LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
-DEFS += $(addprefix -I,$(CURDIR)/leveldb/include) -DUSE_LEVELDB
-DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
+LIBS += $(CURDIR)/additional/stage/usr/lib/libleveldb.a
+DEFS += -DUSE_LEVELDB
+DEFS += $(addprefix -I,$(CURDIR)/additional/leveldb/helpers)
 OBJS += obj/txdb-leveldb.o
-leveldb/libleveldb.a:
-	@echo "Building LevelDB ..."; cd leveldb; CC=$(CC) CXX=$(CXX) make libleveldb.a libmemenv.a; cd ..;
-obj/txdb-leveldb.o: leveldb/libleveldb.a
 endif
 ifneq (${USE_LEVELDB}, 1)
 OBJS += obj/txdb-bdb.o

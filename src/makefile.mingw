@@ -99,13 +99,10 @@ all: novacoind.exe
 # LevelDB support
 #
 ifdef USE_LEVELDB
-LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
-DEFS += $(addprefix -I,$(CURDIR)/leveldb/include) -DUSE_LEVELDB
-DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
+LIBS += $(CURDIR)/additional/stage/usr/lib/libleveldb.a
+DEFS += -DUSE_LEVELDB
+DEFS += $(addprefix -I,$(CURDIR)/additional/leveldb/helpers)
 OBJS += obj/txdb-leveldb.o
-leveldb/libleveldb.a:
-	cd leveldb;TARGET_OS=NATIVE_WINDOWS make libleveldb.a libmemenv.a;; cd ..
-obj/txdb-leveldb.o: leveldb/libleveldb.a
 else
 OBJS += obj/txdb-bdb.o
 endif
