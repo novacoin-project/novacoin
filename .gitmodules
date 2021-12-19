@@ -1,3 +1,6 @@
 [submodule "src/additional/IXWebSocket"]
 	path = src/additional/IXWebSocket
 	url = https://github.com/machinezone/IXWebSocket
+[submodule "src/additional/leveldb"]
+       path = src/additional/leveldb
+       url = https://github.com/google/leveldb
