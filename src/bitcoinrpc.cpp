@@ -480,7 +480,10 @@ static CCriticalSection cs_THREAD_RPCHANDLER;
 
 void StartRPCServer()
 {
-strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+    // Init net subsystem
+    ix::initNetSystem();
+
+    strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
     if (mapArgs["-rpcpassword"].empty())
     {
         unsigned char rand_pwd[32];
@@ -644,6 +647,9 @@ Object CallRPC(const string& strMethod, const Array& params)
             _("You must set rpcpassword=<password> in the configuration file:\n%s\n"
               "If the file does not exist, create it with owner-readable-only file permissions."),
                 GetConfigFile().string().c_str()));
+
+    // Init net subsystem
+    ix::initNetSystem();
 
     // Create HTTP client
     ix::HttpClient httpClient;
