@@ -20,6 +20,7 @@ endif(CCACHE_FOUND)
 
 set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fexceptions -frtti")
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(Boost_USE_STATIC_LIBS   ON)
 find_package(Boost REQUIRED COMPONENTS atomic chrono filesystem program_options system thread)
@@ -153,6 +154,7 @@ add_executable(novacoind ${ALL_SOURCES})
 target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoind ${ALL_LIBRARIES})
 
+target_compile_features(novacoind PUBLIC cxx_std_17)
 set_property(TARGET novacoind PROPERTY CXX_STANDARD 17)
 set_property(TARGET novacoind PROPERTY CXX_STANDARD_REQUIRED TRUE)
 set_property(TARGET novacoind PROPERTY COMPILE_DEFINITIONS ${ALL_DEFINITIONS})

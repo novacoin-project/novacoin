@@ -25,6 +25,7 @@ endif(CCACHE_FOUND)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt5 COMPONENTS LinguistTools Core Widgets Gui Network Qml REQUIRED)
 
@@ -240,6 +241,7 @@ add_executable(novacoin-qt ${ALL_SOURCES})
 target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
+target_compile_features(novacoin-qt PUBLIC cxx_std_17)
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD 17)
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD_REQUIRED TRUE)
 set_property(TARGET novacoin-qt PROPERTY COMPILE_DEFINITIONS ${ALL_DEFINITIONS})
