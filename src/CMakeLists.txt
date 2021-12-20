@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.4.1)
 ## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 ..
 ## cmake -DUSE_ASM=1 ..
 ## cmake -DUSE_SSE2 ..
+## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 -DUSE_SSE2 -DUSE_LEVELDB ..
 ##
 
 project(novacoind VERSION 0.5.9 LANGUAGES C CXX)
