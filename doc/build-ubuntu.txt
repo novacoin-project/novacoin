@@ -1,0 +1,49 @@
+# Building GUI and headless client for Ubuntu Linux
+
+## Preparations
+
+First step, install all dependencies:
+
+    ```sudo apt install build-essential libdb++-dev libssl-dev cmake qtdeclarative5-dev qttools5-dev libboost-all-dev libpng-dev git```
+
+Then, clone repository recursively:
+
+    ```git clone --recursive https://github.com/novacoin-project/novacoin```
+
+## Building GUI client
+
+Create build directory:
+
+    ```mkdir build_qt && cd build_qt```
+
+Configure build files:
+
+    ```cmake -DUSE_LEVELDB ../novacoin```
+
+You may specify BDB library path, if necessary:
+
+    ```cmake -DBerkeleyDB_LIBS=/usr/lib/aarch64-linux-gnu/ -DUSE_LEVELDB ../novacoin```
+
+Compile:
+
+    ```make -j 4```
+
+After everything will be done the resulting ```novacoin-qt``` executable will be created in your build directory.
+
+## Building headless client
+
+It's almost identical to steps for GUI client.
+
+Create build directory:
+
+    ```mkdir build_daemon && cd build_daemon```
+
+Configure build files:
+
+    ```cmake -DUSE_LEVELDB ../novacoin/src```
+
+Compile:
+
+    ```make -j 4```
+
+The resulting ```novacoind``` executable will be created in the build directory.
