@@ -40,6 +40,10 @@ if (NOT BerkeleyDB_INC)
 set(BerkeleyDB_INC ${BerkeleyDB_ROOT}/include)
 endif()
 
+if (NOT EXISTS ${BerkeleyDB_ROOT}/include/db_cxx.h)
+    message(FATAL_ERROR "Unable to find db_cxx.h header file in ${BerkeleyDB_ROOT}/include directory")
+endif()
+
 # Set default library path for berkeley db
 if (NOT BerkeleyDB_LIBS)
 set(BerkeleyDB_LIBS ${BerkeleyDB_ROOT}/lib)
@@ -84,9 +88,27 @@ set(generic_sources
 )
 
 list(APPEND ALL_SOURCES ${generic_sources})
-list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.a ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
+list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
+
+# Try various libdb library file extensions
+if (EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.a)
+    list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.a)
+elseif(EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.so)
+    list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.so)
+elseif(EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.dylib)
+    list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.dylib)
+elseif(EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.dll)
+    list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.dll)
+else()
+   message(FATAL_ERROR "Unable to find libdb_cxx library in ${BerkeleyDB_LIBS} directory")
+endif()
 
 if(USE_LEVELDB)
+    # Disable useless targets
+    option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" OFF)
+    option(LEVELDB_BUILD_BENCHMARKS "Build LevelDB's benchmarks" OFF)
+    option(LEVELDB_INSTALL "Install LevelDB's header and library" OFF)
+
     add_subdirectory(additional/leveldb)
     list(APPEND ALL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/txdb-leveldb.cpp)
     list(APPEND ALL_LIBRARIES leveldb)
