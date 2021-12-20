@@ -41,7 +41,7 @@ set(BerkeleyDB_INC ${BerkeleyDB_ROOT}/include)
 endif()
 
 if (NOT EXISTS ${BerkeleyDB_INC}/db_cxx.h)
-    message(FATAL_ERROR "Unable to find db_cxx.h header file in ${BerkeleyDB_INC} directory")
+    message(FATAL_ERROR "Unable to find db_cxx.h header file in ${BerkeleyDB_INC} directory. Try to specify either include directory path via BerkeleyDB_INC or berkeley db root path via BerkeleyDB_ROOT variable.")
 endif()
 
 # Set default library path for berkeley db
@@ -100,7 +100,7 @@ elseif(EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.dylib)
 elseif(EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.dll)
     list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.dll)
 else()
-   message(FATAL_ERROR "Unable to find libdb_cxx library in ${BerkeleyDB_LIBS} directory")
+   message(FATAL_ERROR "Unable to find libdb_cxx library in ${BerkeleyDB_LIBS} directory. Try to specify either library path via BerkeleyDB_LIBS or berkeley db root path via BerkeleyDB_ROOT variable.")
 endif()
 
 if(USE_LEVELDB)
