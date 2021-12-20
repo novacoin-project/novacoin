@@ -6,7 +6,7 @@
 #include "init.h"
 #include "util.h"
 #include "sync.h"
-#include "ui_interface.h"
+#include "interface.h"
 #include "base58.h"
 #include "bitcoinrpc.h"
 #include "db.h"

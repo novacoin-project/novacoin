@@ -9,7 +9,7 @@
 #include "init.h"
 #include "util.h"
 #include "ipcollector.h"
-#include "ui_interface.h"
+#include "interface.h"
 #include "checkpoints.h"
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>

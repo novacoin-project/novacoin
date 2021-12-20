@@ -9,7 +9,7 @@
 #include "guiconstants.h"
 
 #include "init.h"
-#include "ui_interface.h"
+#include "interface.h"
 #include "qtipcserver.h"
 #include "intro.h"
 

@@ -4,7 +4,7 @@
 
 #include "init.h" // for pwalletMain
 #include "bitcoinrpc.h"
-#include "ui_interface.h"
+#include "interface.h"
 #include "base58.h"
 
 #define printf OutputDebugStringF

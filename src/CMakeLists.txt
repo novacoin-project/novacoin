@@ -21,9 +21,6 @@ endif(CCACHE_FOUND)
 set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fexceptions -frtti")
 
-# Add path for custom modules
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/additional/cmake)
-
 set(Boost_USE_STATIC_LIBS   ON)
 find_package(Boost REQUIRED COMPONENTS atomic chrono filesystem program_options system thread)
 set(OPENSSL_USE_STATIC_LIBS ON)

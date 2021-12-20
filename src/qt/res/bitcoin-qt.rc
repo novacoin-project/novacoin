@@ -1,7 +1,7 @@
-IDI_ICON1 ICON DISCARDABLE "icons/novacoin.ico"
+IDI_ICON1 ICON DISCARDABLE "${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/novacoin.ico"
 
 #include <windows.h>             // needed for VERSIONINFO
-#include "../../clientversion.h" // holds the needed client version information
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/clientversion.h" // holds the needed client version information
 
 #define VER_PRODUCTVERSION     CLIENT_VERSION_MAJOR,CLIENT_VERSION_MINOR,CLIENT_VERSION_REVISION,CLIENT_VERSION_BUILD
 #define VER_PRODUCTVERSION_STR STRINGIZE(CLIENT_VERSION_MAJOR) "." STRINGIZE(CLIENT_VERSION_MINOR) "." STRINGIZE(CLIENT_VERSION_REVISION) "." STRINGIZE(CLIENT_VERSION_BUILD)

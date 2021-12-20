@@ -9,7 +9,7 @@
 #include "key.h"
 #include "net.h"
 #include "sync.h"
-#include "ui_interface.h"
+#include "interface.h"
 
 using namespace std;
 

@@ -8,7 +8,7 @@
 #include "db.h"
 #include "txdb.h"
 #include "init.h"
-#include "ui_interface.h"
+#include "interface.h"
 #include "checkqueue.h"
 #include "kernel.h"
 #include <boost/algorithm/string/replace.hpp>

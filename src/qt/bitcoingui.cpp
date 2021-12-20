@@ -26,7 +26,7 @@
 #include "askpassphrasedialog.h"
 #include "notificator.h"
 #include "guiutil.h"
-#include "ui_interface.h"
+#include "interface.h"
 #include "rpcconsole.h"
 #include "mintingview.h"
 
