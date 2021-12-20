@@ -40,8 +40,8 @@ if (NOT BerkeleyDB_INC)
 set(BerkeleyDB_INC ${BerkeleyDB_ROOT}/include)
 endif()
 
-if (NOT EXISTS ${BerkeleyDB_ROOT}/include/db_cxx.h)
-    message(FATAL_ERROR "Unable to find db_cxx.h header file in ${BerkeleyDB_ROOT}/include directory")
+if (NOT EXISTS ${BerkeleyDB_INC}/db_cxx.h)
+    message(FATAL_ERROR "Unable to find db_cxx.h header file in ${BerkeleyDB_INC} directory")
 endif()
 
 # Set default library path for berkeley db
