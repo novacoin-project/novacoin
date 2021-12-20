@@ -9,7 +9,12 @@ cmake_minimum_required(VERSION 3.4.1)
 ## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_SSE2 -DUSE_LEVELDB ..
 ##
 
-project(novacoin-qt VERSION 0.5.9 LANGUAGES C CXX OBJCXX ASM)
+
+project(novacoin-qt VERSION 0.5.9 LANGUAGES C CXX ASM)
+
+if (APPLE)
+enable_language(OBJCXX)
+endif()
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
