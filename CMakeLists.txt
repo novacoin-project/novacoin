@@ -192,6 +192,8 @@ else()
    message(FATAL_ERROR "Unable to find libdb_cxx library in ${BerkeleyDB_LIBS} directory. Try to specify either library path via BerkeleyDB_LIBS or berkeley db root path via BerkeleyDB_ROOT variable.")
 endif()
 
+list(APPEND ALL_DEFINITIONS QT_GUI USE_QRCODE)
+
 if(USE_LEVELDB)
     # Disable useless targets
     option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" OFF)
@@ -236,5 +238,5 @@ target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD 17)
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD_REQUIRED TRUE)
-set_property(TARGET novacoin-qt PROPERTY COMPILE_DEFINITIONS ${ALL_DEFINITIONS} USE_QRCODE)
+set_property(TARGET novacoin-qt PROPERTY COMPILE_DEFINITIONS ${ALL_DEFINITIONS})
 set_property(TARGET novacoin-qt PROPERTY CMAKE_WARN_DEPRECATED FALSE)
