@@ -318,6 +318,8 @@ public:
     CScript(const uint8_t* pbegin, const uint8_t* pend) : std::vector<uint8_t>(pbegin, pend) { }
 #endif
 
+    CScript& operator=(const CScript&) = default;
+
     CScript& operator+=(const CScript& b)
     {
         insert(end(), b.begin(), b.end());
