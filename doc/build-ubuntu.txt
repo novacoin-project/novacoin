@@ -14,15 +14,15 @@ Then, clone repository recursively:
 
 Create build directory:
 
-    ```mkdir build_qt && cd build_qt```
+    ```mkdir novacoin/build_qt && cd novacoin/build_qt```
 
 Configure build files:
 
-    ```cmake -DUSE_LEVELDB ../novacoin```
+    ```cmake -DUSE_LEVELDB=1 ..```
 
 You may specify BDB library path, if necessary:
 
-    ```cmake -DBerkeleyDB_LIBS=/usr/lib/aarch64-linux-gnu/ -DUSE_LEVELDB=1 ../novacoin```
+    ```cmake -DBerkeleyDB_LIBS=/usr/lib/aarch64-linux-gnu/ -DUSE_LEVELDB=1 ..```
 
 Compile:
 
@@ -36,11 +36,11 @@ It's almost identical to steps for GUI client.
 
 Create build directory:
 
-    ```mkdir build_daemon && cd build_daemon```
+    ```mkdir novacoin/build_daemon && cd novacoin/build_daemon```
 
 Configure build files:
 
-    ```cmake -DUSE_LEVELDB=1 ../novacoin/src```
+    ```cmake -DUSE_LEVELDB=1 ../src```
 
 Compile:
 
