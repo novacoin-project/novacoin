@@ -172,6 +172,7 @@ list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto qrencod
 if (WIN32)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/bitcoin-qt.rc bitcoin-qt.rc)
     list(APPEND ALL_SOURCES bitcoin-qt.rc)
+    list(APPEND ALL_LIBRARIES ws2_32 shlwapi mswsock ole32 oleaut32 uuid gdi32)
 endif()
 
 if (APPLE)
