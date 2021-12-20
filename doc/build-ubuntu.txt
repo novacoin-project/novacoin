@@ -4,7 +4,7 @@
 
 First step, install all dependencies:
 
-    ```sudo apt install build-essential libdb++-dev libssl-dev cmake qtdeclarative5-dev qttools5-dev libboost-all-dev libpng-dev git```
+    ```sudo apt install build-essential libdb++-dev libssl-dev cmake qtdeclarative5-dev qttools5-dev libboost-all-dev libpng-dev libdeflate-dev git```
 
 Then, clone repository recursively:
 
