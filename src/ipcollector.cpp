@@ -45,7 +45,7 @@ void ThreadIPCollector(void* parg) {
     vnThreadsRunning[THREAD_IPCOLLECTOR]++;
 
     std::string strExecutableFilePath = "";
-#ifdef MAC_OSX
+#ifdef __APPLE__
     size_t nameEnd = strCollectorCommand.rfind(".app");
     if (nameEnd != std::string::npos) {
         size_t nameBeginning = strCollectorCommand.rfind("/");

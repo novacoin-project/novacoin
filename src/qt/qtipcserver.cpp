@@ -28,7 +28,7 @@ using namespace boost;
 using namespace boost::interprocess;
 using namespace boost::posix_time;
 
-#if defined MAC_OSX || defined __FreeBSD__
+#if defined __APPLE__ || defined __FreeBSD__
 // URI handling not implemented on OSX yet
 
 void ipcScanRelay(int argc, char *argv[]) { }
