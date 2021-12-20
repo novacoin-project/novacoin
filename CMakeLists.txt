@@ -233,7 +233,7 @@ execute_process (
 list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO)
 
 add_executable(novacoin-qt ${ALL_SOURCES})
-target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
+target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD 17)
