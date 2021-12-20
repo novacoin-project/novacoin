@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.4.1)
 ## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 ..
 ## cmake -DUSE_ASM=1 ..
 ## cmake -DUSE_SSE2 ..
-## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 -DUSE_SSE2 -DUSE_LEVELDB ..
+## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_SSE2 -DUSE_LEVELDB ..
 ##
 
 project(novacoind VERSION 0.5.9 LANGUAGES C CXX)
@@ -28,8 +28,19 @@ find_package(Boost REQUIRED COMPONENTS atomic chrono filesystem program_options 
 find_package(OpenSSL REQUIRED)
 add_subdirectory(additional/IXWebSocket)
 
+# Set default root path for berkeley db
 if (NOT BerkeleyDB_ROOT)
 set(BerkeleyDB_ROOT /usr)
+endif()
+
+# Set default include path for berkeley db
+if (NOT BerkeleyDB_INC)
+set(BerkeleyDB_INC ${BerkeleyDB_ROOT}/include)
+endif()
+
+# Set default library path for berkeley db
+if (NOT BerkeleyDB_LIBS)
+set(BerkeleyDB_LIBS ${BerkeleyDB_ROOT}/lib)
 endif()
 
 set(generic_sources 
@@ -71,7 +82,7 @@ set(generic_sources
 )
 
 list(APPEND ALL_SOURCES ${generic_sources})
-list(APPEND ALL_LIBRARIES ${BerkeleyDB_ROOT}/lib/libdb_cxx.a ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
+list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.a ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
 
 if(USE_LEVELDB)
     add_subdirectory(additional/leveldb)
@@ -100,7 +111,7 @@ else()
 endif()
 
 add_executable(novacoind ${ALL_SOURCES})
-target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_ROOT}/include ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
+target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoind ${ALL_LIBRARIES})
 
 set_property(TARGET novacoind PROPERTY CXX_STANDARD 17)
