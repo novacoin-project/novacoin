@@ -14,6 +14,7 @@
 #include <QUrl>
 #include <QScrollBar>
 #include <QStringList>
+#include <QAbstractItemView>
 
 #include <openssl/crypto.h>
 #include <db_cxx.h>
@@ -247,7 +248,7 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent *event)
         case Qt::Key_Return:
         case Qt::Key_Enter:
             // forward these events to lineEdit
-            if(obj == autoCompleter->popup()) {
+            if(obj == (QObject*)autoCompleter->popup()) {
                 QApplication::postEvent(ui->lineEdit, new QKeyEvent(*keyevt));
                 return true;
             }
