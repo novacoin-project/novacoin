@@ -179,6 +179,11 @@ if (APPLE)
     list(APPEND ALL_LIBRARIES "-framework Foundation -framework ApplicationServices -framework AppKit")
 endif()
 
+# Some systems need rt library
+if (NOT WIN32 AND NOT APPLE)
+    list(APPEND ALL_LIBRARIES rt)
+endif()
+
 # Try various libdb library file extensions
 if (EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.a)
     list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.a)
