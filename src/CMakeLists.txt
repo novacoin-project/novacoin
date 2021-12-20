@@ -112,6 +112,13 @@ else()
     list( APPEND ALL_SOURCES ${generic_sources} ${CMAKE_CURRENT_SOURCE_DIR}/crypto/scrypt/generic/scrypt-generic.cpp )
 endif()
 
+# Generate build info header
+execute_process (
+    COMMAND sh -c "${CMAKE_CURRENT_SOURCE_DIR}/../share/genbuild.sh ${CMAKE_CURRENT_SOURCE_DIR}/build.h"
+    OUTPUT_VARIABLE outVar
+)
+list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO)
+
 add_executable(novacoind ${ALL_SOURCES})
 target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoind ${ALL_LIBRARIES})
