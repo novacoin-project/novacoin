@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.4.1)
 ## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_SSE2 -DUSE_LEVELDB ..
 ##
 
-project(novacoind VERSION 0.5.9 LANGUAGES C CXX)
+project(novacoind VERSION 0.5.9 LANGUAGES C CXX ASM)
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
