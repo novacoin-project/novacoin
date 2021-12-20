@@ -9,7 +9,6 @@ cmake_minimum_required(VERSION 3.4.1)
 ## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_SSE2 -DUSE_LEVELDB ..
 ##
 
-
 project(novacoin-qt VERSION 0.5.9 LANGUAGES C CXX ASM)
 
 if (APPLE)
@@ -27,7 +26,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS LinguistTools Core Widgets Gui Network Qml REQUIRED)
+find_package(Qt5 COMPONENTS LinguistTools Core Widgets Gui Network Qml REQUIRED)
 
 set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fexceptions -frtti")
@@ -160,14 +159,14 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/qrcodedialog.ui
 )
 
-qt6_create_translation(bitcoin_en_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_en.ts)
-qt6_create_translation(bitcoin_ru_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_ru.ts)
-qt6_create_translation(bitcoin_uk_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_uk.ts)
+qt5_create_translation(bitcoin_en_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_en.ts)
+qt5_create_translation(bitcoin_ru_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_ru.ts)
+qt5_create_translation(bitcoin_uk_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_uk.ts)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/bitcoin.qrc bitcoin.qrc)
 
 list(APPEND ALL_SOURCES ${generic_sources} bitcoin.qrc)
-list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto qrencode Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Network)
+list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto qrencode Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Network)
 
 if (WIN32)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/bitcoin-qt.rc bitcoin-qt.rc)
