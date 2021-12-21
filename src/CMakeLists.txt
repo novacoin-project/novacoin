@@ -96,6 +96,16 @@ set(generic_sources
 list(APPEND ALL_SOURCES ${generic_sources})
 list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
 
+# Windows-specific libraries
+if (WIN32)
+   list(APPEND ALL_LIBRARIES ws2_32 mswsock)
+endif()
+
+# Some systems need rt library
+if (NOT WIN32 AND NOT APPLE)
+    list(APPEND ALL_LIBRARIES rt)
+endif()
+
 # Try various libdb library file extensions
 if (EXISTS ${BerkeleyDB_LIBS}/libdb_cxx.a)
     list(APPEND ALL_LIBRARIES ${BerkeleyDB_LIBS}/libdb_cxx.a)
