@@ -4,12 +4,20 @@ cmake_minimum_required(VERSION 3.4.1)
 ## mkdir build && cd build
 ##
 ## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 ..
-## cmake -DUSE_ASM=1 ..
-## cmake -DUSE_SSE2 ..
-## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_SSE2 -DUSE_LEVELDB ..
+## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_LEVELDB=1 ..
 ##
 
-project(novacoin-qt VERSION 0.5.9 LANGUAGES C CXX ASM)
+project(novacoin-qt VERSION 0.5.9 LANGUAGES C CXX)
+
+# Enforce sizeof(size_t) == 8 by default
+if (NOT ALLOW_32BIT AND NOT CMAKE_SIZEOF_VOID_P MATCHES "8")
+    message(FATAL_ERROR "Only 64-bit processors (x86_64, AArch64) are supported")
+endif ()
+
+# Force generic scrypt on 32 bit platforms
+if (NOT CMAKE_SIZEOF_VOID_P MATCHES "8")
+    set(USE_GENERIC_SCRYPT True)
+endif()
 
 if (APPLE)
 enable_language(OBJCXX)
@@ -213,19 +221,9 @@ else()
     list(APPEND ALL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/txdb-bdb.cpp)
 endif()
 
-if (USE_ASM)
-    # Assembler implementation
-    set(asm_sources 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/crypto/scrypt/asm/scrypt-arm.S
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/crypto/scrypt/asm/scrypt-x86.S
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/crypto/scrypt/asm/scrypt-x86_64.S
-    )
-
-    list(APPEND ALL_SOURCES ${generic_sources} ${asm_sources})
-    list(APPEND ALL_DEFINITIONS USE_ASM)
-elseif (USE_SSE2)
-    list( APPEND ALL_SOURCES ${generic_sources} ${CMAKE_CURRENT_SOURCE_DIR}/src/crypto/scrypt/intrin/scrypt-sse2.cpp )
-    list(APPEND ALL_DEFINITIONS USE_SSE2)
+if (NOT USE_GENERIC_SCRYPT)
+    list( APPEND ALL_SOURCES ${generic_sources} ${CMAKE_CURRENT_SOURCE_DIR}/src/crypto/scrypt/intrin/scrypt-intrin.cpp )
+    list(APPEND ALL_DEFINITIONS USE_INTRIN)
 else()
     list( APPEND ALL_SOURCES ${generic_sources} ${CMAKE_CURRENT_SOURCE_DIR}/src/crypto/scrypt/generic/scrypt-generic.cpp )
 endif()
@@ -238,7 +236,7 @@ execute_process (
 list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO)
 
 add_executable(novacoin-qt ${ALL_SOURCES})
-target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
+target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/sse2neon ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
 target_compile_features(novacoin-qt PUBLIC cxx_std_17)
