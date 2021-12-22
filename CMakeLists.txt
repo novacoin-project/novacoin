@@ -206,7 +206,7 @@ else()
    message(FATAL_ERROR "Unable to find libdb_cxx library in ${BerkeleyDB_LIBS} directory. Try to specify either library path via BerkeleyDB_LIBS or berkeley db root path via BerkeleyDB_ROOT variable.")
 endif()
 
-list(APPEND ALL_DEFINITIONS QT_GUI USE_QRCODE)
+list(APPEND ALL_DEFINITIONS QT_GUI USE_QRCODE USE_IPV6)
 
 if(USE_LEVELDB)
     # Disable useless targets

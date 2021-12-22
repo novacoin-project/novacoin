@@ -156,7 +156,7 @@ execute_process (
     COMMAND sh -c "${CMAKE_CURRENT_SOURCE_DIR}/../share/genbuild.sh ${CMAKE_CURRENT_SOURCE_DIR}/build.h"
     OUTPUT_VARIABLE outVar
 )
-list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO)
+list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO USE_IPV6)
 
 add_executable(novacoind ${ALL_SOURCES})
 target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/additional/sse2neon ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
