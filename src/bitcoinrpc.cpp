@@ -480,9 +480,6 @@ static CCriticalSection cs_THREAD_RPCHANDLER;
 
 void StartRPCServer()
 {
-    // Init net subsystem
-    ix::initNetSystem();
-
     strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
     if (mapArgs["-rpcpassword"].empty())
     {
