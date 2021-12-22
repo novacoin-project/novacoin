@@ -98,7 +98,7 @@ list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
 
 # Windows-specific libraries
 if (WIN32)
-   list(APPEND ALL_LIBRARIES ws2_32 mswsock)
+   list(APPEND ALL_LIBRARIES kernel32 user32 gdi32 comdlg32 winspool winmm shell32 comctl32 ole32 oleaut32 uuid rpcrt4 advapi32 ws2_32 mswsock shlwapi)
 endif()
 
 # Some systems need rt library
