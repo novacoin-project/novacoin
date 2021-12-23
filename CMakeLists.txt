@@ -37,7 +37,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt5 COMPONENTS LinguistTools Core Widgets Gui Network Qml REQUIRED)
 
-set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wall -Wextra -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
+set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -fexceptions -frtti")
 
 set(Boost_USE_STATIC_LIBS   ON)
@@ -244,3 +244,4 @@ target_compile_features(novacoin-qt PUBLIC cxx_std_17)
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD 17)
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD_REQUIRED TRUE)
 set_property(TARGET novacoin-qt PROPERTY COMPILE_DEFINITIONS ${ALL_DEFINITIONS})
+set_property(TARGET novacoin-qt PROPERTY CMAKE_WARN_DEPRECATED FALSE)
