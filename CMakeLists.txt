@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.4.1)
 ##
 ## mkdir build && cd build
 ##
-## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 -DUSE_LEVELDB=1 -DQt5_DIR:STRING=/opt/homebrew/Cellar/qt@5/5.15.2_1//lib/cmake/Qt5 ..
+## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 -DUSE_LEVELDB=1 -DQt5_DIR:STRING=/opt/homebrew/Cellar/qt@5/5.15.2_1/lib/cmake/Qt5 ..
 ## cmake -DBerkeleyDB_INC:STRING=/usr/include -DBerkeleyDB_LIBS:STRING=/usr/lib/aarch64-linux-gnu -DUSE_LEVELDB=1 ..
 ##
 
