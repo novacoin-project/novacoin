@@ -44,7 +44,7 @@ set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wno-deprecated -fstack-protector-all -Wstac
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -fexceptions -frtti")
 else()
 set(CMAKE_C_FLAGS "/O2")
-set(CMAKE_CXX_FLAGS "/O2")
+set(CMAKE_CXX_FLAGS "/O2 /GR")
 endif()
 
 set(Boost_USE_STATIC_LIBS   ON)
