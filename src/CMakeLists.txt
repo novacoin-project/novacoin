@@ -25,8 +25,14 @@ if(CCACHE_FOUND)
     set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 endif(CCACHE_FOUND)
 
+if (NOT MSVC)
 set (CMAKE_C_FLAGS "-flto -O3 -fPIC -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fexceptions -frtti")
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -fexceptions -frtti")
+else()
+set(CMAKE_C_FLAGS "/O2")
+set(CMAKE_CXX_FLAGS "/O2")
+endif()
+
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(Boost_USE_STATIC_LIBS   ON)
