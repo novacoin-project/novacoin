@@ -10,7 +10,7 @@ You will also need to install CMake 3.20 or newer to compile Qt libraries. Simpl
     sudo apt install python3-pip
     pip3 install cmake
 
-Unpack compiler binaries to suitable directory and ensure that /bin directory is mentioned in your PATH. You will also need to add /home/user/.local/bin to PATH as well.
+Unpack compiler binaries to suitable directory (/opt is preferred) and ensure that its /bin subdirectory is mentioned in your PATH. You will also need to add /home/user/.local/bin to PATH as well.
 
 ## Setting up
 
