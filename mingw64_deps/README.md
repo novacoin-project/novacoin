@@ -3,6 +3,7 @@
 ## Requirements
 
 Please use llvm-mingw compiler which can be downloaded here:
+
     https://github.com/mstorsjo/llvm-mingw/releases
 
 You will also need to install CMake 3.20 or newer to compile Qt libraries. Simplest way to do this is to use python repositories:
@@ -14,9 +15,8 @@ Unpack compiler binaries to suitable directory and ensure that /bin directory is
 
 ## Setting up
 
-   Every subdirectory contains setup script which can be used to download source code and setup source trees.
+   Every subdirectory contains a setup.sh script which can be used to download source code and create source trees.
 
 ## Building
 
-   Just execute ./build.sh script for corresponding dependency using x86_64 or aarch64 as argument. It will build binaries automatically.
-
+   Just execute ./build.sh script for corresponding dependency using either x86_64 or aarch64 as argument. It will build binaries automatically.
