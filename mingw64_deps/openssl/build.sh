@@ -22,6 +22,10 @@ CC=${CROSS}-w64-mingw32-gcc CXX=${CROSS}-w64-mingw32-g++ ${ROOT}/openssl/Configu
 make -j 4 build_libs
 make install_dev
 
+# Create symlink for compatibility
+cd ${ROOT}/${CROSS}-w64-mingw32
+ln -s lib64 lib
+
 # Remove build directore
 cd ${ROOT}
 rm -rf ${ROOT}/${CROSS}-w64-mingw32-build
