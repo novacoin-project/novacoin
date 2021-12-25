@@ -13,6 +13,7 @@ fi
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build-qttools
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build-qttranslations
+mkdir ${ROOT}/${CROSS}-w64-mingw32-build-qtdeclarative
 
 # Stage directory
 mkdir ${ROOT}/${CROSS}-w64-mingw32
@@ -33,11 +34,18 @@ make DESTDIR=${ROOT}/${CROSS}-w64-mingw32 install
 
 # Compile translations
 
-cd cd ${ROOT}/${CROSS}-w64-mingw32-build-qttranslations
+cd ${ROOT}/${CROSS}-w64-mingw32-build-qttranslations
 ${ROOT}/${CROSS}-w64-mingw32/bin/qmake ${ROOT}/qttranslations
+make -j 4
+make DESTDIR=${ROOT}/${CROSS}-w64-mingw32 install
+
+# Compile qtdeclarative
+
+cd ${ROOT}/${CROSS}-w64-mingw32-build-qtdeclarative
+${ROOT}/${CROSS}-w64-mingw32/bin/qmake ${ROOT}/qtdeclarative
 make -j 4
 make DESTDIR=${ROOT}/${CROSS}-w64-mingw32 install
 
 # Remove build directories
 cd ${ROOT}
-rm -rf ${ROOT}/${CROSS}-w64-mingw32-build ${ROOT}/${CROSS}-w64-mingw32-build-qttools ${ROOT}/${CROSS}-w64-mingw32-build-qttranslations
+rm -rf ${ROOT}/${CROSS}-w64-mingw32-build ${ROOT}/${CROSS}-w64-mingw32-build-qttools ${ROOT}/${CROSS}-w64-mingw32-build-qttranslations ${ROOT}/${CROSS}-w64-mingw32-build-qtdeclarative
