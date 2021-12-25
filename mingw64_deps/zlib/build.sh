@@ -20,7 +20,7 @@ mkdir ${ROOT}/${CROSS}-w64-mingw32
 cd ${ROOT}/${CROSS}-w64-mingw32-build
 CC=${CROSS}-w64-mingw32-gcc CXX=${CROSS}-w64-mingw32-g++ ${ROOT}/zlib/configure --prefix=${ROOT}/${CROSS}-w64-mingw32
 #make -j 4
-make install-libs
+make install
 
 # Remove build directore
 cd ${ROOT}
