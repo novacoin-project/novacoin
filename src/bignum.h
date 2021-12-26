@@ -92,6 +92,8 @@ public:
         BN_clear_free(bn);
     }
 
+    CBigNum(bool n)     { bn = BN_new(); setuint32(n); }
+
     CBigNum(int8_t  n)  { bn = BN_new(); if (n >= 0) setuint32(n); else setint64(n); }
     CBigNum(int16_t n)  { bn = BN_new(); if (n >= 0) setuint32(n); else setint64(n); }
     CBigNum(int32_t n)  { bn = BN_new(); if (n >= 0) setuint32(n); else setint64(n); }
