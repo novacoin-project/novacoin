@@ -85,7 +85,7 @@ void RPCTypeCheck(const Object& o,
 int64_t AmountFromValue(const Value& value)
 {
     double dAmount = value.get_real();
-    if (dAmount <= 0.0 || dAmount > MAX_MONEY)
+    if (dAmount <= 0.0 || dAmount > (double) (MAX_MONEY / 100000000))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
     int64_t nAmount = roundint64(dAmount * COIN);
     if (!MoneyRange(nAmount))
