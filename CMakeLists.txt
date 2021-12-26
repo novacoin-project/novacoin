@@ -56,6 +56,8 @@ find_package(Boost REQUIRED COMPONENTS atomic chrono filesystem program_options 
 set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
 
+# Disable compiling qrencode executables
+option(WITH_TOOLS "Build utility tools"  NO)
 add_subdirectory(src/additional/libqrencode)
 add_subdirectory(src/additional/IXWebSocket)
 
