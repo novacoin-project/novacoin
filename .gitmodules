@@ -7,6 +7,3 @@
 [submodule "src/additional/libqrencode"]
 	path = src/additional/libqrencode
 	url = https://github.com/fukuchi/libqrencode
-[submodule "src/additional/sse2neon"]
-	path = src/additional/sse2neon
-	url = https://github.com/DLTcollab/sse2neon
