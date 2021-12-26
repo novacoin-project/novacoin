@@ -29,7 +29,7 @@ if (NOT MSVC)
 if (NOT WIN32)
 set(FPIC "-fPIC")
 endif()
-set (CMAKE_C_FLAGS "-flto -O3 ${FPIC} -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
+set (CMAKE_C_FLAGS "-flto -O3 ${FPIC} -Wno-deprecated")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -fexceptions -frtti")
 else()
 set(CMAKE_C_FLAGS "/O2")
@@ -167,6 +167,15 @@ execute_process (
 list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO USE_IPV6)
 
 add_executable(novacoind ${ALL_SOURCES})
+
+if (NOT MSVC)
+list(APPEND ALL_LIBRARIES ssp)
+list(APPEND ALL_DEFINITIONS _FORTIFY_SOURCE=2)
+if (WIN32)
+list(APPEND ALL_LIBRARIES mingw32)
+endif()
+endif()
+
 target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/additional/sse2neon ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoind ${ALL_LIBRARIES})
 

@@ -43,7 +43,7 @@ if (NOT MSVC)
 if (NOT WIN32)
 set(FPIC "-fPIC")
 endif()
-set (CMAKE_C_FLAGS "-flto -O3 ${FPIC} -Wno-deprecated -fstack-protector-all -Wstack-protector -D_FORTIFY_SOURCE=2")
+set (CMAKE_C_FLAGS "-flto -O3 ${FPIC} -Wno-deprecated")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -fexceptions -frtti")
 else()
 set(CMAKE_C_FLAGS "/O2")
@@ -258,10 +258,20 @@ execute_process (
 list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO)
 
 add_executable(novacoin-qt ${ALL_SOURCES})
+
+if (NOT MSVC)
+list(APPEND ALL_LIBRARIES ssp)
+list(APPEND ALL_DEFINITIONS _FORTIFY_SOURCE=2)
+if (WIN32)
+list(APPEND ALL_LIBRARIES mingw32)
+endif()
+endif()
+
 target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/sse2neon ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
 target_compile_features(novacoin-qt PUBLIC cxx_std_17)
+
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD 17)
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD_REQUIRED TRUE)
 set_property(TARGET novacoin-qt PROPERTY COMPILE_DEFINITIONS ${ALL_DEFINITIONS})
