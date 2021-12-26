@@ -6,7 +6,7 @@
 #include "alert.h"
 #include "checkpoints.h"
 #include "db.h"
-#include "txdb.h"
+#include "txdb-leveldb.h"
 #include "init.h"
 #include "interface.h"
 #include "checkqueue.h"
@@ -2860,10 +2860,6 @@ bool LoadBlockIndex(bool fAllowNew)
             if (!txdb.WriteModifierUpgradeTime(nModifierUpgradeTime))
                 return error("LoadBlockIndex() : failed to write upgrade info");
         }
-
-#ifndef USE_LEVELDB
-        txdb.Close();
-#endif
     }
 
     return true;

@@ -16,7 +16,7 @@
 
 #include "kernel.h"
 #include "checkpoints.h"
-#include "txdb.h"
+#include "txdb-leveldb.h"
 #include "util.h"
 #include "main.h"
 

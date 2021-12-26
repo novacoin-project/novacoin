@@ -3,7 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "txdb.h"
+#include "txdb-leveldb.h"
 #include "wallet.h"
 #include "walletdb.h"
 #include "crypter.h"

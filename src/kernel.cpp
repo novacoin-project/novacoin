@@ -9,7 +9,7 @@
 
 #include "kernel.h"
 #include "kernel_worker.h"
-#include "txdb.h"
+#include "txdb-leveldb.h"
 
 extern unsigned int nStakeMaxAge;
 extern unsigned int nStakeTargetSpacing;
@@ -491,10 +491,6 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
     CTxIndex txindex;
     if (!txPrev.ReadFromDisk(txdb, txin.prevout, txindex))
         return tx.DoS(1, error("CheckProofOfStake() : INFO: read txPrev failed"));  // previous transaction not in main chain, may occur during initial download
-
-#ifndef USE_LEVELDB
-    txdb.Close();
-#endif
 
     // Verify signature
     if (!VerifySignature(txPrev, tx, 0, MANDATORY_SCRIPT_VERIFY_FLAGS, 0))

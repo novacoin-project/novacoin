@@ -5,7 +5,7 @@
 
 #include "main.h"
 #include "db.h"
-#include "txdb.h"
+#include "txdb-leveldb.h"
 #include "init.h"
 #include "miner.h"
 #include "kernel.h"

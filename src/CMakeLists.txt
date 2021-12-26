@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.4.1)
 ##
 ## mkdir build && cd build
 ##
-## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 -DUSE_LEVELDB=1 ..
-## cmake -DUSE_LEVELDB=1 ..
+## cmake -DBerkeleyDB_ROOT:STRING=/opt/homebrew/Cellar/berkeley-db@4/4.8.30 ..
+## cmake ..
 ##
 
 project(novacoind VERSION 0.5.9 LANGUAGES C CXX)
@@ -144,19 +144,14 @@ if (NOT BDB_FOUND)
     message(FATAL_ERROR "Unable to find ${BerkeleyDB_LIB_name} library in ${BerkeleyDB_LIBS} directory. Try to specify either library path via BerkeleyDB_LIBS or berkeley db root path via BerkeleyDB_ROOT variable. You can also use BerkeleyDB_LIB_name variable to provide alternative file name search for.")
 endif()
 
-if(USE_LEVELDB)
-    # Disable useless targets
-    option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" OFF)
-    option(LEVELDB_BUILD_BENCHMARKS "Build LevelDB's benchmarks" OFF)
-    option(LEVELDB_INSTALL "Install LevelDB's header and library" OFF)
+# Disable useless targets
+option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" OFF)
+option(LEVELDB_BUILD_BENCHMARKS "Build LevelDB's benchmarks" OFF)
+option(LEVELDB_INSTALL "Install LevelDB's header and library" OFF)
 
-    add_subdirectory(additional/leveldb)
-    list(APPEND ALL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/txdb-leveldb.cpp)
-    list(APPEND ALL_LIBRARIES leveldb)
-    list(APPEND ALL_DEFINITIONS USE_LEVELDB)
-else()
-    list(APPEND ALL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/txdb-bdb.cpp)
-endif()
+add_subdirectory(additional/leveldb)
+list(APPEND ALL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/txdb-leveldb.cpp)
+list(APPEND ALL_LIBRARIES leveldb)
 
 if (NOT USE_GENERIC_SCRYPT)
     list( APPEND ALL_SOURCES ${generic_sources} ${CMAKE_CURRENT_SOURCE_DIR}/crypto/scrypt/intrin/scrypt-intrin.cpp )
