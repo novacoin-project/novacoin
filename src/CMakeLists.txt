@@ -39,7 +39,9 @@ endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(Boost_USE_STATIC_LIBS   ON)
+if(WIN32)
 set(Boost_USE_STATIC_RUNTIME ON)
+endif()
 find_package(Boost REQUIRED COMPONENTS atomic chrono filesystem program_options system thread)
 set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
@@ -168,15 +170,14 @@ execute_process (
     COMMAND sh -c "${CMAKE_CURRENT_SOURCE_DIR}/../share/genbuild.sh ${CMAKE_CURRENT_SOURCE_DIR}/build.h"
     OUTPUT_VARIABLE outVar
 )
-list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO USE_IPV6)
+list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO USE_IPV6 BOOST_SPIRIT_THREADSAFE)
 
 add_executable(novacoind ${ALL_SOURCES})
 
 if (NOT MSVC)
-list(APPEND ALL_LIBRARIES ssp)
 list(APPEND ALL_DEFINITIONS _FORTIFY_SOURCE=2)
 if (WIN32)
-list(APPEND ALL_LIBRARIES mingw32)
+list(APPEND ALL_LIBRARIES mingw32 ssp)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static")
 endif()
 endif()
