@@ -114,10 +114,14 @@ set(generic_sources
 list(APPEND ALL_SOURCES ${generic_sources})
 list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto)
 
-# Windows-specific libraries
 if (WIN32)
+    # Windows-specific libraries
     list(APPEND ALL_LIBRARIES kernel32 user32 gdi32 comdlg32 winspool winmm shell32 comctl32 ole32 oleaut32 uuid rpcrt4 advapi32 ws2_32 mswsock shlwapi pthread)
     list(APPEND ALL_DEFINITIONS WIN32)
+
+    # Resources
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bitcoin.rc bitcoin.rc)
+    list(APPEND ALL_SOURCES ${CMAKE_BINARY_DIR}/bitcoin.rc)
 endif()
 
 # Some systems need rt library
