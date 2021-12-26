@@ -18,7 +18,8 @@ mkdir ${ROOT}/${CROSS}-w64-mingw32
 # Compile BerkeleyDB
 
 cd ${ROOT}/${CROSS}-w64-mingw32-build
-CC=${CROSS}-w64-mingw32-gcc CXX=${CROSS}-w64-mingw32-g++ ${ROOT}/openssl/Configure --prefix=${ROOT}/${CROSS}-w64-mingw32 no-shared no-asm mingw64
+#CC=${CROSS}-w64-mingw32-gcc CXX=${CROSS}-w64-mingw32-g++ 
+${ROOT}/openssl/Configure --cross-compile-prefix=${CROSS}-w64-mingw32- --prefix=${ROOT}/${CROSS}-w64-mingw32 no-shared no-asm mingw64 --api=1.1.1
 make -j 4 build_libs
 make install_dev
 
