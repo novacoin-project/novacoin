@@ -2221,7 +2221,7 @@ bool CWallet::MergeCoins(const int64_t& nAmount, const int64_t& nMinValue, const
     if (wtxNew.vout[0].nValue > 0) {
         int64_t nBytes = ::GetSerializeSize(*(CTransaction*)&wtxNew, SER_NETWORK, PROTOCOL_VERSION) + wtxNew.vin.size() * 110;
 
-        double dFinalPriority = dWeight /= nBytes;
+        double dFinalPriority = dWeight / nBytes;
         bool fAllowFree = CTransaction::AllowFree(dFinalPriority);
 
         // Get actual transaction fee according to its size and priority
