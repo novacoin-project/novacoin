@@ -403,8 +403,10 @@ public:
             return;
         }
 
-        if (nHeaderStart < 0)
+        if (nHeaderStart < 0) {
+            LEAVE_CRITICAL_SECTION(cs_vSend);            
             return;
+        }
 
         // Set the size
         uint32_t nSize = (uint32_t) vSend.size() - nMessageStart;
