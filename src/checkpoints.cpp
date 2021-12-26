@@ -36,6 +36,7 @@ namespace Checkpoints
         ( 243100, std::make_pair(uint256("0x000000000006522d1ebc0734cb0e6b83f5d4da0c3cbc72bd91b82016f611c4f0"), 1458215793) )
         ( 532000, std::make_pair(uint256("0x0000000000018b7eba5e189c41605780c8a855f74144fa837fa05fa4c67b6ba9"), 1569359486) )
         ( 561108, std::make_pair(uint256("0x2f3cf523ae1022300b4f40073e506d15ef0d6e208f123aed5b93016f81a10e1e"), 1580943827) )
+        ( 712891, std::make_pair(uint256("0xaaafebcb23c1b8ab49f7517b7a34bcc420cc6f284d9ffc672c1f47b5af2b0088"), 1640557462) )
     ;
 
     static ListBannedBlocks listBanned =
