@@ -264,10 +264,11 @@ list(APPEND ALL_LIBRARIES ssp)
 list(APPEND ALL_DEFINITIONS _FORTIFY_SOURCE=2)
 if (WIN32)
 list(APPEND ALL_LIBRARIES mingw32)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static")
 endif()
 endif()
 
-target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/sse2neon ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
+target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
 target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
 target_compile_features(novacoin-qt PUBLIC cxx_std_17)

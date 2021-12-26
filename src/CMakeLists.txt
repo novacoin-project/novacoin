@@ -173,6 +173,7 @@ list(APPEND ALL_LIBRARIES ssp)
 list(APPEND ALL_DEFINITIONS _FORTIFY_SOURCE=2)
 if (WIN32)
 list(APPEND ALL_LIBRARIES mingw32)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static")
 endif()
 endif()
 
