@@ -64,7 +64,7 @@ void init_blockindex(leveldb::Options& options, bool fRemoveOld = false) {
 }
 
 // CDB subclasses are created and destroyed VERY OFTEN. That's why
-// we shouldn't treat this as a free operations.
+// we shouldn't treat this as free operations.
 CTxDB::CTxDB(const char* pszMode)
 {
     assert(pszMode);
