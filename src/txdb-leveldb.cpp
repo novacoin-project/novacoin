@@ -95,10 +95,10 @@ CTxDB::CTxDB(const char* pszMode)
             printf("Required index version is %d, removing old database\n", DATABASE_VERSION);
 
             // Leveldb instance destruction
-            delete txdb;
-            txdb = pdb = NULL;
             delete activeBatch;
             activeBatch = NULL;
+            delete txdb;
+            txdb = pdb = NULL;
 
             init_blockindex(options, true); // Remove directory and create new database
             pdb = txdb;
