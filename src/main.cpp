@@ -2600,10 +2600,17 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         uint256 hashProofOfStake = 0, targetProofOfStake = 0;
         if (!CheckProofOfStake(pblock->vtx[1], pblock->nBits, hashProofOfStake, targetProofOfStake))
         {
-            printf("WARNING: ProcessBlock(): check proof-of-stake failed for block %s\n", hash.ToString().c_str());
-            return false; // do not error here as we expect this during initial block download
+            // Having prev block in index should be enough for validation
+            if (mapBlockIndex.count(pblock->hashPrevBlock))
+                return error("ProcessBlock(): check proof-of-stake (%s, %d) failed for block %s\n", pblock->GetProofOfStake().first.ToString().c_str(), pblock->GetProofOfStake().second, hash.ToString().c_str());
+
+            // Orphan blocks should be validated later once all parents successfully added to local chain
+            printf("ProcessBlock(): delaying proof-of-stake validation for orphan block %s\n", hash.ToString().c_str());
+            return false; // do not error here as we expect this to happen here
         }
-        if (!mapProofOfStake.count(hash)) // add to mapProofOfStake
+
+        // Needed for AcceptBlock()
+        if (!mapProofOfStake.count(hash))
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
 
@@ -2611,7 +2618,7 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     if (!pblock->AcceptBlock())
         return error("ProcessBlock() : AcceptBlock FAILED");
 
-    // Recursively process any orphan blocks that depended on this one
+    // Process any orphan blocks that depended on this one
     vector<uint256> vWorkQueue;
     vWorkQueue.push_back(hash);
     for (unsigned int i = 0; i < vWorkQueue.size(); i++)
@@ -2622,12 +2629,36 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
              ++mi)
         {
             CBlock* pblockOrphan = (*mi).second;
-            if (pblockOrphan->AcceptBlock())
-                vWorkQueue.push_back(pblockOrphan->GetHash());
-            mapOrphanBlocks.erase(pblockOrphan->GetHash());
-            setStakeSeenOrphan.erase(pblockOrphan->GetProofOfStake());
+            uint256 hashOrphanBlock = pblockOrphan->GetHash();
+
+            if (pblockOrphan->IsProofOfStake()) {
+                // Check proof-of-stake and do other contextual
+                //  preparations before running AcceptBlock()
+                uint256 hashOrphanProofOfStake = 0;
+                uint256 targetOrphanProofOfStake = 0;
+
+                if (CheckProofOfStake(pblockOrphan->vtx[1], pblockOrphan->nBits, hashOrphanProofOfStake, targetOrphanProofOfStake))
+                {
+                    // Needed for AcceptBlock()
+                    if (!mapProofOfStake.count(hashOrphanBlock))
+                        mapProofOfStake.insert(make_pair(hashOrphanBlock, hashOrphanProofOfStake));
+
+                    // Finally, we're ready to run AcceptBlock()
+                    if (pblockOrphan->AcceptBlock())
+                       vWorkQueue.push_back(hashOrphanBlock);
+                    setStakeSeenOrphan.erase(pblockOrphan->GetProofOfStake());
+                }
+            } else {
+                // proof-of-work verification
+                //   is notoriously simpler
+                if (pblockOrphan->AcceptBlock())
+                    vWorkQueue.push_back(hashOrphanBlock);
+            }
+
+            mapOrphanBlocks.erase(hashOrphanBlock);
             delete pblockOrphan;
         }
+
         mapOrphanBlocksByPrev.erase(hashPrev);
     }
 
