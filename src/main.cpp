@@ -3851,7 +3851,7 @@ bool ProcessMessages(CNode* pfrom)
         if (!hdr.IsValid())
         {
             printf("\n\nPROCESSMESSAGE: ERRORS IN HEADER %s\n\n\n", hdr.GetCommand().c_str());
-            continue;
+            return false;
         }
         string strCommand = hdr.GetCommand();
 
@@ -3877,7 +3877,7 @@ bool ProcessMessages(CNode* pfrom)
         {
             printf("ProcessMessages(%s, %u bytes) : CHECKSUM ERROR nChecksum=%08x hdr.nChecksum=%08x\n",
                strCommand.c_str(), nMessageSize, nChecksum, hdr.nChecksum);
-            continue;
+            return false;
         }
 
         // Copy message to its own buffer
@@ -3918,8 +3918,10 @@ bool ProcessMessages(CNode* pfrom)
             PrintExceptionContinue(NULL, "ProcessMessages()");
         }
 
-        if (!fRet)
+        if (!fRet) {
             printf("ProcessMessage(%s, %u bytes) FAILED\n", strCommand.c_str(), nMessageSize);
+            return false;
+        }
     }
 
     vRecv.Compact();

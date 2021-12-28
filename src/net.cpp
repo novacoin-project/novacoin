@@ -1531,8 +1531,13 @@ void ThreadMessageHandler2(void* parg)
             // Receive messages
             {
                 TRY_LOCK(pnode->cs_vRecv, lockRecv);
-                if (lockRecv)
-                    ProcessMessages(pnode);
+                if (lockRecv) {
+                    if (!ProcessMessages(pnode)) {
+                        pnode->CloseSocketDisconnect();
+                        if (pnode == pnodeSync)
+                            fHaveSyncNode = false;
+                    }
+                }
             }
             if (fShutdown)
                 return;
