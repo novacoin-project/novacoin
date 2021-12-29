@@ -14,6 +14,11 @@ echo "llvm-mingw is not installed, please download it from https://github.com/ms
 exit 1
 fi
 
+if [[ ! $(which make) ]]; then
+echo "make is not installed, please install buld-essential package"
+exit 1
+fi
+
 # Create stage directory
 mkdir ${ROOT}/${CROSS}-w64-mingw32
 

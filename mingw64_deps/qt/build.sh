@@ -20,6 +20,11 @@ echo "cmake is not installed, please install CMake >= 3.20 (e.g. pip3 install cm
 exit 1
 fi
 
+if [[ ! $(which make) ]]; then
+echo "make is not installed, please install buld-essential package"
+exit 1
+fi
+
 # Make build directories
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build-qttools
