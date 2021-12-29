@@ -28,6 +28,8 @@ mkdir ${ROOT}/${CROSS}-w64-mingw32
 # Compile zlib
 cd ${ROOT}/${CROSS}-w64-mingw32-build-zlib
 perl -i -pe "s,(PREFIX =)\$,\$1 ${CROSS}-w64-mingw32-," win32/Makefile.gcc
+perl -i -pe "s,(CFLAGS =.*)\$,\$1 -fstack-protector-all -D_FORTIFY_SOURCE," win32/Makefile.gcc
+perl -i -pe "s,(LDFLAGS =.*)\$,\$1 -fstack-protector-all," win32/Makefile.gcc
 make -j 4 -f win32/Makefile.gcc
 
 # Install zlib to our cross-tools directory

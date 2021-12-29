@@ -33,7 +33,10 @@ mkdir ${ROOT}/${CROSS}-w64-mingw32
 # Compile BerkeleyDB
 
 cd ${ROOT}/${CROSS}-w64-mingw32-build
-CC=${CROSS}-w64-mingw32-gcc CXX=${CROSS}-w64-mingw32-g++ ${ROOT}/libdb/dist/configure --prefix=${ROOT}/${CROSS}-w64-mingw32 --enable-smallbuild --enable-cxx --disable-shared --disable-replication --with-mutex=${MUTEX} --enable-mingw --host=${CROSS}-w64-mingw32
+export CFLAGS="-fstack-protector-all -D_FORTIFY_SOURCE=2"
+export CXXFLAGS=${CFLAGS}
+export LDFLAGS="-fstack-protector-all"
+${ROOT}/libdb/dist/configure --prefix=${ROOT}/${CROSS}-w64-mingw32 --enable-smallbuild --enable-cxx --disable-shared --disable-replication --with-mutex=${MUTEX} --enable-mingw --host=${CROSS}-w64-mingw32
 make -j 4 library_build
 make library_install
 

@@ -28,7 +28,7 @@ cd ${ROOT}/boost
 echo "using gcc : : ${CROSS}-w64-mingw32-g++ ;" > user-config-${CROSS}.jam
 
 # Build boost
-./b2 --user-config=user-config-${CROSS}.jam --build-type=minimal --layout=system --with-chrono --with-filesystem --with-program_options --with-system --with-thread target-os=windows address-model=64 variant=release link=static threading=multi runtime-link=static stage --prefix=${ROOT}/${CROSS}-w64-mingw32 install
+./b2 --user-config=user-config-${CROSS}.jam cxxflags="-fstack-protector-strong -D_FORTIFY_SOURCE=2" linkflags=-fstack-protector-strong --build-type=minimal --layout=system --with-chrono --with-filesystem --with-program_options --with-system --with-thread target-os=windows address-model=64 variant=release link=static threading=multi runtime-link=static stage --prefix=${ROOT}/${CROSS}-w64-mingw32 install
 
 cd ${ROOT}
 
