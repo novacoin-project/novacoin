@@ -192,18 +192,24 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/qrcodedialog.ui
 )
 
-qt5_create_translation(bitcoin_en_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_en.ts)
-qt5_create_translation(bitcoin_ru_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_ru.ts)
-qt5_create_translation(bitcoin_uk_qm ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_uk.ts)
+# Copy translations as a workaround for `make clean`
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_en.ts ${CMAKE_BINARY_DIR}/bitcoin_en.ts COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_ru.ts ${CMAKE_BINARY_DIR}/bitcoin_ru.ts COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_uk.ts ${CMAKE_BINARY_DIR}/bitcoin_uk.ts COPYONLY)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/bitcoin.qrc bitcoin.qrc)
+# Create translations to be used in bitcoin.qrc
+qt5_create_translation(bitcoin_en_qm ${CMAKE_BINARY_DIR}/bitcoin_en.ts)
+qt5_create_translation(bitcoin_ru_qm ${CMAKE_BINARY_DIR}/bitcoin_ru.ts)
+qt5_create_translation(bitcoin_uk_qm ${CMAKE_BINARY_DIR}/bitcoin_uk.ts)
 
-list(APPEND ALL_SOURCES ${generic_sources} bitcoin.qrc)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/bitcoin.qrc ${CMAKE_BINARY_DIR}/bitcoin.qrc)
+
+list(APPEND ALL_SOURCES ${generic_sources} ${CMAKE_BINARY_DIR}/bitcoin.qrc)
 list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES} ixwebsocket OpenSSL::Crypto qrencode Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Network)
 
 if (WIN32)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/bitcoin-qt.rc bitcoin-qt.rc)
-    list(APPEND ALL_SOURCES bitcoin-qt.rc)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/bitcoin-qt.rc ${CMAKE_BINARY_DIR}/bitcoin-qt.rc)
+    list(APPEND ALL_SOURCES ${CMAKE_BINARY_DIR}/bitcoin-qt.rc)
     list(APPEND ALL_LIBRARIES ws2_32 shlwapi mswsock ole32 oleaut32 uuid gdi32 pthread)
     list(APPEND ALL_DEFINITIONS WIN32)
 endif()
