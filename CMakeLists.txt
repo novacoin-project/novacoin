@@ -63,6 +63,12 @@ option(WITH_TOOLS "Build utility tools"  NO)
 add_subdirectory(src/additional/libqrencode)
 add_subdirectory(src/additional/IXWebSocket)
 
+# Apply patch for IXWebSocket issue
+execute_process (
+    COMMAND sh -c "${CMAKE_CURRENT_SOURCE_DIR}/src/additional/fix_cerrno.sh"
+    OUTPUT_VARIABLE outIxVar
+)
+
 # Set default root path for berkeley db
 if (NOT BerkeleyDB_ROOT)
 set(BerkeleyDB_ROOT /usr)

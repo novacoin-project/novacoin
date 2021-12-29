@@ -1,0 +1,12 @@
+diff --git a/ixwebsocket/IXNetSystem.h b/ixwebsocket/IXNetSystem.h
+index 21131b4..7ca58f4 100644
+--- a/ixwebsocket/IXNetSystem.h
++++ b/ixwebsocket/IXNetSystem.h
+@@ -17,6 +17,7 @@
+ #include <basetsd.h>
+ #include <io.h>
+ #include <ws2def.h>
++#include <cerrno>
+ 
+ #undef EWOULDBLOCK
+ #undef EAGAIN
