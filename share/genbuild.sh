@@ -1,5 +1,9 @@
 #!/bin/sh
 
+PREVDIR=$(pwd)
+SCRIPT=$(readlink -f $0)
+SCRIPTPATH=`dirname $SCRIPT`
+
 if [ $# -gt 0 ]; then
     FILE="$1"
     shift
@@ -10,6 +14,8 @@ else
     echo "Usage: $0 <filename>"
     exit 1
 fi
+
+cd $SCRIPTPATH
 
 if [ -e "$(which git)" ]; then
     # clean 'dirty' status of touched files that haven't been modified
@@ -33,3 +39,5 @@ if [ "$INFO" != "$NEWINFO" ]; then
     echo "$NEWINFO" >"$FILE"
     echo "#define BUILD_DATE \"$TIME\"" >>"$FILE"
 fi
+
+cd $PREVDIR
