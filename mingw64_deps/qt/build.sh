@@ -9,6 +9,17 @@ echo "Expected either aarch64 or x86_64."
 exit 1
 fi
 
+if [[ ! $(which ${CROSS}-w64-mingw32-clang) ]]; then
+echo "llvm-mingw is not installed, please download it from https://github.com/mstorsjo/llvm-mingw/releases"
+echo "Untar downloaded archive and add its /bin directory to your PATH"
+exit 1
+fi
+
+if [[ ! $(which cmake) ]]; then
+echo "cmake is not installed, please install CMake >= 3.20 (e.g. pip3 install cmake)"
+exit 1
+fi
+
 # Make build directories
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build-qttools
