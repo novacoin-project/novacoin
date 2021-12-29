@@ -1,0 +1,25 @@
+diff --git a/mkspecs/win32-clang-g++/qmake.conf b/mkspecs/win32-clang-g++/qmake.conf
+index 59d42176f0..d9eaad4637 100644
+--- a/mkspecs/win32-clang-g++/qmake.conf
++++ b/mkspecs/win32-clang-g++/qmake.conf
+@@ -14,11 +14,11 @@ include(../common/g++-win32.conf)
+ QMAKE_COMPILER         += clang llvm   # clang pretends to be gcc
+ 
+ QMAKE_CC                = $${CROSS_COMPILE}clang
+-QMAKE_CFLAGS           +=
++QMAKE_CFLAGS           += -fstack-protector-all -D_FORTIFY_SOURCE=2
+ QMAKE_CFLAGS_WARN_ON   += -Wextra -Wno-ignored-attributes
+ 
+ QMAKE_CXX               = $${CROSS_COMPILE}clang++
+-QMAKE_CXXFLAGS         +=
++QMAKE_CXXFLAGS         += -fstack-protector-all -D_FORTIFY_SOURCE=2
+ QMAKE_CXXFLAGS_WARN_ON  = $$QMAKE_CFLAGS_WARN_ON
+ 
+ QMAKE_LINK              = $${CROSS_COMPILE}clang++
+@@ -32,4 +32,6 @@ QMAKE_LFLAGS_LTCG       = $$QMAKE_CFLAGS_LTCG
+ 
+ QMAKE_CFLAGS_OPTIMIZE_SIZE = -Oz
+ 
++QMAKE_LFLAGS += -fstack-protector-strong -lssp
++
+ load(qt_config)
