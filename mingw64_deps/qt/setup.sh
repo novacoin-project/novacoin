@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ ! $(which git) ]]; then
     echo "git is not installed"
