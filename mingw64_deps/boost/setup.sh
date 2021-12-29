@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ ! $(which wget) ]]; then
+    echo "wget is not installed"
+    exit -1
+fi
+
 ROOT=$(pwd)
 VER=1_78_0
 
