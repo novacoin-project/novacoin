@@ -140,11 +140,6 @@ bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, unsig
 
 
 
-
-
-
-bool GetWalletFile(CWallet* pwallet, std::string &strWalletFileOut);
-
 /** Position on disk for a particular transaction. */
 class CDiskTxPos
 {
