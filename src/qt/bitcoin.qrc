@@ -40,6 +40,7 @@
         <file alias="lock_open">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/lock_open.png</file>
         <file alias="key">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/key.png</file>
         <file alias="filesave">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/filesave.png</file>
+        <file alias="qr">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/qr.png</file>
         <file alias="qrcode">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/qrcode.png</file>
         <file alias="debugwindow">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/debugwindow.png</file>
         <file alias="dump">${CMAKE_CURRENT_SOURCE_DIR}/src/qt/res/icons/dump.png</file>

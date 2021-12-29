@@ -237,7 +237,7 @@ if (NOT BDB_FOUND)
     message(FATAL_ERROR "Unable to find ${BerkeleyDB_LIB_name} library in ${BerkeleyDB_LIBS} directory. Try to specify either library path via BerkeleyDB_LIBS or berkeley db root path via BerkeleyDB_ROOT variable. You can also use BerkeleyDB_LIB_name variable to provide alternative file name search for.")
 endif()
 
-list(APPEND ALL_DEFINITIONS QT_GUI USE_QRCODE USE_IPV6 BOOST_SPIRIT_THREADSAFE)
+list(APPEND ALL_DEFINITIONS QT_GUI USE_IPV6 BOOST_SPIRIT_THREADSAFE)
 
 # Disable useless targets
 option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" OFF)

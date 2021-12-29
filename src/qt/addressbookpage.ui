@@ -86,6 +86,17 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="showQRCode">
+       <property name="text">
+        <string>Show &amp;QR Code</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../bitcoin.qrc">
+         <normaloff>:/icons/qr</normaloff>:/icons/qr</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="signMessage">
        <property name="toolTip">
         <string>Sign a message to prove you own a NovaCoin address</string>
