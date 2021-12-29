@@ -9,6 +9,11 @@ echo "Expected either aarch64 or x86_64."
 exit 1
 fi
 
+if [[ ! $(which ${CROSS}-w64-mingw32-clang) ]]; then
+echo "llvm-mingw is not installed, please download it from https://github.com/mstorsjo/llvm-mingw/releases"
+exit 1
+fi
+
 # Make build directories
 mkdir ${ROOT}/${CROSS}-w64-mingw32-build
 
