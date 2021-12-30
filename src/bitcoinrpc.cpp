@@ -4,20 +4,21 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "init.h"
-#include "util.h"
-#include "sync.h"
-#include "interface.h"
 #include "base58.h"
 #include "bitcoinrpc.h"
 #include "db.h"
+#include "interface.h"
+#include "sync.h"
+#include "util.h"
 
 #undef printf
 
-#include <ixwebsocket/IXHttpServer.h>
-#include <ixwebsocket/IXHttpClient.h>
 #include <boost/algorithm/string.hpp>
+#include <ixwebsocket/IXHttpClient.h>
+#include <ixwebsocket/IXHttpServer.h>
 
 #include <list>
+#include <memory>
 
 #define printf OutputDebugStringF
 
@@ -113,7 +114,7 @@ std::string HexBits(unsigned int nBits)
 // Utilities: convert hex-encoded Values
 // (throws error if not hex).
 //
-uint256 ParseHashV(const Value& v, std::string strName)
+uint256 ParseHashV(const Value& v, const std::string& strName)
 {
     std::string strHex;
     if (v.type() == str_type)
@@ -125,12 +126,12 @@ uint256 ParseHashV(const Value& v, std::string strName)
     return result;
 }
 
-uint256 ParseHashO(const Object& o, std::string strKey)
+uint256 ParseHashO(const Object& o, const std::string& strKey)
 {
     return ParseHashV(find_value(o, strKey), strKey);
 }
 
-std::vector<unsigned char> ParseHexV(const Value& v, std::string strName)
+std::vector<unsigned char> ParseHexV(const Value& v, const std::string& strName)
 {
     std::string strHex;
     if (v.type() == str_type)
@@ -140,7 +141,7 @@ std::vector<unsigned char> ParseHexV(const Value& v, std::string strName)
     return ParseHex(strHex);
 }
 
-std::vector<unsigned char> ParseHexO(const Object& o, std::string strKey)
+std::vector<unsigned char> ParseHexO(const Object& o, const std::string& strKey)
 {
     return ParseHexV(find_value(o, strKey), strKey);
 }
@@ -150,14 +151,14 @@ std::vector<unsigned char> ParseHexO(const Object& o, std::string strKey)
 /// Note: This interface may still be subject to change.
 ///
 
-std::string CRPCTable::help(std::string strCommand) const
+std::string CRPCTable::help(const std::string& strCommand) const
 {
     std::string strRet;
     std::set<rpcfn_type> setDone;
-    for (std::map<std::string, const CRPCCommand*>::const_iterator mi = mapCommands.begin(); mi != mapCommands.end(); ++mi)
+    for (const auto & mapCommand : mapCommands)
     {
-        const CRPCCommand *pcmd = mi->second;
-        std::string strMethod = mi->first;
+        const CRPCCommand *pcmd = mapCommand.second;
+        std::string strMethod = mapCommand.first;
         // We already filter duplicates, but these deprecated screw up the sort order
         if (strMethod.find("label") != std::string::npos)
             continue;
@@ -170,7 +171,7 @@ std::string CRPCTable::help(std::string strCommand) const
             if (setDone.insert(pfn).second)
                 (*pfn)(params, true);
         }
-        catch (std::exception& e)
+        catch (const std::exception& e)
         {
             // Help text is returned in an exception
             std::string strHelp = std::string(e.what());
@@ -194,7 +195,7 @@ Value help(const Array& params, bool fHelp)
             "List commands, or get help for a command.");
 
     std::string strCommand;
-    if (params.size() > 0)
+    if (!params.empty())
         strCommand = params[0].get_str();
 
     return tableRPC.help(strCommand);
@@ -209,7 +210,7 @@ Value stop(const Array& params, bool fHelp)
             "<detach> is true or false to detach the database or not for this stop only\n"
             "Stop NovaCoin server (and possibly override the detachdb config value).");
     // Shutdown will take long enough that the response should get back
-    if (params.size() > 0)
+    if (!params.empty())
         bitdb.SetDetach(params[0].get_bool());
     StartShutdown();
     return "NovaCoin server stopping";
@@ -315,19 +316,18 @@ static const CRPCCommand vRPCCommands[] =
 
 CRPCTable::CRPCTable()
 {
-    unsigned int vcidx;
-    for (vcidx = 0; vcidx < (sizeof(vRPCCommands) / sizeof(vRPCCommands[0])); vcidx++)
+    for (const auto & vRPCCommand : vRPCCommands)
     {
         const CRPCCommand *pcmd;
 
-        pcmd = &vRPCCommands[vcidx];
+        pcmd = &vRPCCommand;
         mapCommands[pcmd->name] = pcmd;
     }
 }
 
-const CRPCCommand *CRPCTable::operator[](std::string name) const
+const CRPCCommand *CRPCTable::operator[](const std::string& name) const
 {
-    std::map<std::string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
+    auto it = mapCommands.find(name);
     if (it == mapCommands.end())
         return nullptr;
     return (*it).second;
@@ -446,7 +446,7 @@ static Object JSONRPCExecOne(const Value& req)
     {
         rpc_result = JSONRPCReplyObj(Value::null, objError, jreq.id);
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         rpc_result = JSONRPCReplyObj(Value::null,
                                      JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id);
@@ -458,8 +458,8 @@ static Object JSONRPCExecOne(const Value& req)
 static std::string JSONRPCExecBatch(const Array& vReq)
 {
     Array ret;
-    for (unsigned int reqIdx = 0; reqIdx < vReq.size(); reqIdx++)
-        ret.push_back(JSONRPCExecOne(vReq[reqIdx]));
+    for (const auto & reqIdx : vReq)
+        ret.push_back(JSONRPCExecOne(reqIdx));
 
     return write_string(Value(ret), false) + "\n";
 }
@@ -496,11 +496,11 @@ void StartRPCServer()
     std::string host = GetArg("-rpchost", "127.0.0.1");
     int port = GetArg("-rpcport", GetDefaultRPCPort());
 
-    g_server = std::unique_ptr<ix::HttpServer>(new ix::HttpServer(port, host));
+    g_server = std::make_unique<ix::HttpServer>(port, host);
 
     LOCK(cs_THREAD_RPCHANDLER);
 
-    g_server->setOnConnectionCallback([](ix::HttpRequestPtr request, std::shared_ptr<ix::ConnectionState> connectionState) -> ix::HttpResponsePtr {
+    g_server->setOnConnectionCallback([](const ix::HttpRequestPtr& request, const std::shared_ptr<ix::ConnectionState>& connectionState) -> ix::HttpResponsePtr {
 
         ix::WebSocketHttpHeaders headers;
         headers["Server"] = std::string("novacoin-json-rpc/") + FormatFullVersion();
@@ -510,12 +510,12 @@ void StartRPCServer()
         {
             printf("ThreadRPCServer incorrect password attempt from %s\n", connectionState->getRemoteIp().c_str());
             connectionState->setTerminated();
-            return std::make_shared<ix::HttpResponse>(401, "Unauthorized", ix::HttpErrorCode::Ok, headers, "Not authorized");
+            return std::make_shared<ix::HttpResponse>(HTTP_UNAUTHORIZED, "Unauthorized", ix::HttpErrorCode::Ok, headers, "Not authorized");
         }
 
         if (request->method != "POST") {
             connectionState->setTerminated();
-            return std::make_shared<ix::HttpResponse>(400, "Bad request", ix::HttpErrorCode::Ok, headers, "Bad request");
+            return std::make_shared<ix::HttpResponse>(HTTP_BAD_REQUEST, "Bad request", ix::HttpErrorCode::Ok, headers, "Bad request");
         }
 
         JSONRequest jreq;
@@ -552,11 +552,11 @@ void StartRPCServer()
         }
         catch(Object& objError)
         {
-            return std::make_shared<ix::HttpResponse>(500, "Internal Server Error", ix::HttpErrorCode::Ok, headers, ErrorReply(objError, jreq.id));
+            return std::make_shared<ix::HttpResponse>(HTTP_INTERNAL_SERVER_ERROR, "Internal Server Error", ix::HttpErrorCode::Ok, headers, ErrorReply(objError, jreq.id));
         }
-        catch(std::exception& e)
+        catch(const std::exception& e)
         {
-            return std::make_shared<ix::HttpResponse>(500, "Internal Server Error", ix::HttpErrorCode::Ok, headers, ErrorReply(JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id));
+            return std::make_shared<ix::HttpResponse>(HTTP_INTERNAL_SERVER_ERROR, "Internal Server Error", ix::HttpErrorCode::Ok, headers, ErrorReply(JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id));
         }
     });
 
@@ -581,7 +581,7 @@ void StopRPCServer()
     vnThreadsRunning[THREAD_RPCLISTENER]--;
 }
 
-json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_spirit::Array &params) const
+ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_spirit::Array &params) const
 {
     // Find method
     const CRPCCommand *pcmd = tableRPC[strMethod];
@@ -608,7 +608,7 @@ json_spirit::Value CRPCTable::execute(const std::string &strMethod, const json_s
         }
         return result;
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         throw JSONRPCError(RPC_MISC_ERROR, e.what());
     }
@@ -661,7 +661,7 @@ Object CallRPC(const std::string& strMethod, const Array& params)
     // Receive reply
     if (nStatus == HTTP_UNAUTHORIZED)
         throw std::runtime_error("incorrect rpcuser or rpcpassword (authorization failed)");
-    else if (nStatus >= 400 && nStatus != HTTP_BAD_REQUEST && nStatus != HTTP_NOT_FOUND && nStatus != HTTP_INTERNAL_SERVER_ERROR)
+    else if (nStatus >= HTTP_BAD_REQUEST && nStatus != HTTP_BAD_REQUEST && nStatus != HTTP_NOT_FOUND && nStatus != HTTP_INTERNAL_SERVER_ERROR)
         throw std::runtime_error(strprintf("server returned HTTP error %d", nStatus));
     else if (strReply.empty())
         throw std::runtime_error("no response from server");
