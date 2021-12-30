@@ -1,7 +1,11 @@
 #!/bin/sh
 
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 PREVDIR=$(pwd)
-SCRIPT=$(readlink -f $0)
+SCRIPT=$(realpath $0)
 SCRIPTPATH=`dirname $SCRIPT`
 
 if [ $# -gt 0 ]; then
