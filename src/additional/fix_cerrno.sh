@@ -1,7 +1,11 @@
 #!/bin/bash
 
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 PREVDIR=$(pwd)
-SCRIPT=$(readlink -f $0)
+SCRIPT=$(realpath $0)
 ROOT=`dirname $SCRIPT`
 
 cd $ROOT/IXWebSocket
