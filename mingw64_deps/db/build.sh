@@ -1,17 +1,32 @@
 #!/bin/bash
 
-CROSS=$1
+TARGET_CPU=$1
+TARGET_OS=$2
 ROOT=$(pwd)
 MUTEX="x86_64/gcc-assembly"
 
-if [[ ! "${CROSS}" =~ ^(aarch64|x86_64) ]]; then
-echo "Platform ${CROSS} is not supported"
+if [[ ! "${TARGET_CPU}" =~ ^(aarch64|x86_64) ]]; then
+echo "Platform ${TARGET_CPU} is not supported"
 echo "Expected either aarch64 or x86_64."
 exit 1
 fi
 
-if [[ ! $(which ${CROSS}-w64-mingw32-clang) ]]; then
-echo "llvm-mingw is not installed, please download it from https://github.com/mstorsjo/llvm-mingw/releases"
+if [[ ! "${TARGET_OS}" =~ ^(w64\-mingw32|linux\-gnu) ]]; then
+echo "Operation sysrem ${TARGET_OS} is not supported"
+echo "Expected either w64-mingw32 or linux-gnu."
+exit 1
+fi
+
+# Cross-building prefix
+CROSS=${TARGET_CPU}-${TARGET_OS}
+
+if [[ ! $(which ${CROSS}-gcc) ]]; then
+echo "Target C compiler ${CROSS}-gcc is not found"
+exit 1
+fi
+
+if [[ ! $(which ${CROSS}-g++) ]]; then
+echo "Target C++ compiler ${CROSS}-g++ is not found"
 exit 1
 fi
 
@@ -20,26 +35,30 @@ echo "make is not installed, please install buld-essential package"
 exit 1
 fi
 
-if [ "${CROSS}" == "aarch64" ]; then
+if [ "${TARGET_CPU}" == "aarch64" ]; then
 MUTEX="ARM64/gcc-assembly"
 fi
 
+if [ "${TARGET_OS}" == "w64-mingw32" ]; then
+MINGW32_PARAMS="--enable-mingw"
+fi
+
 # Make build directories
-mkdir ${ROOT}/${CROSS}-w64-mingw32-build
+mkdir ${ROOT}/${CROSS}-build
 
 # Stage directory
-mkdir ${ROOT}/${CROSS}-w64-mingw32
+mkdir ${ROOT}/${CROSS}
 
 # Compile BerkeleyDB
 
-cd ${ROOT}/${CROSS}-w64-mingw32-build
+cd ${ROOT}/${CROSS}-build
 export CFLAGS="-fstack-protector-all -D_FORTIFY_SOURCE=2"
 export CXXFLAGS=${CFLAGS}
 export LDFLAGS="-fstack-protector-all"
-${ROOT}/libdb/dist/configure --prefix=${ROOT}/${CROSS}-w64-mingw32 --enable-smallbuild --enable-cxx --disable-shared --disable-replication --with-mutex=${MUTEX} --enable-mingw --host=${CROSS}-w64-mingw32
+${ROOT}/libdb/dist/configure --prefix=${ROOT}/${CROSS} --enable-smallbuild --enable-cxx --disable-shared --disable-replication --with-mutex=${MUTEX} ${MINGW32_PARAMS} --host=${CROSS}
 make -j 4 library_build
 make library_install
 
 # Remove build directore
 cd ${ROOT}
-rm -rf ${ROOT}/${CROSS}-w64-mingw32-build
+rm -rf ${ROOT}/${CROSS}-build
