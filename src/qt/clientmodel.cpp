@@ -55,7 +55,7 @@ int ClientModel::getNumConnections(uint8_t flags) const
         return (int)(vNodes.size());
 
     int nNum = 0;
-    BOOST_FOREACH(CNode* pnode, vNodes)
+    for (CNode* pnode : vNodes)
     if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
         nNum++;
 

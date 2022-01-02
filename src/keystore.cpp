@@ -349,7 +349,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
             return false;
 
         fUseCrypto = true;
-        BOOST_FOREACH(KeyMap::value_type& mKey, mapKeys)
+        for (KeyMap::value_type& mKey : mapKeys)
         {
             CKey key;
             if (!key.SetSecret(mKey.second.first, mKey.second.second))
@@ -364,7 +364,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
         }
         mapKeys.clear();
 
-        BOOST_FOREACH(MalleableKeyMap::value_type& mKey, mapMalleableKeys)
+        for (MalleableKeyMap::value_type& mKey : mapMalleableKeys)
         {
             const CPubKey vchPubKeyH = mKey.first.GetMalleablePubKey().GetH();
             std::vector<unsigned char> vchCryptedSecretH;
