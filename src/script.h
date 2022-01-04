@@ -5,12 +5,12 @@
 #ifndef H_BITCOIN_SCRIPT
 #define H_BITCOIN_SCRIPT
 
+#include "keystore.h"
+#include "bignum.h"
+
 #include <string>
 #include <vector>
 
-#include "keystore.h"
-#include "bignum.h"
-#include "base58.h"
 
 typedef std::vector<uint8_t> valtype;
 

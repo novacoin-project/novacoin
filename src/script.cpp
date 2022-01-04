@@ -10,6 +10,7 @@
 #include "main.h"
 #include "sync.h"
 #include "util.h"
+#include "base58.h"
 
 bool CheckSig(std::vector<unsigned char> vchSig, const std::vector<unsigned char> &vchPubKey, const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, int flags);
 
