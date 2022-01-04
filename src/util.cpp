@@ -4,9 +4,9 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "util.h"
+#include "interface.h"
 #include "sync.h"
 #include "version.h"
-#include "interface.h"
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
@@ -177,18 +177,6 @@ int GetRandInt(int nMax)
 {
     return static_cast<int>(GetRand(nMax));
 }
-
-uint256 GetRandHash()
-{
-    uint256 hash;
-    RAND_bytes((unsigned char*)&hash, sizeof(hash));
-    return hash;
-}
-
-
-
-
-
 
 static FILE* fileout = NULL;
 

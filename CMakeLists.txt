@@ -135,6 +135,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/addrman.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/db.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/walletdb.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/uint256.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/clientmodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/guiutil.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/transactionrecord.cpp
