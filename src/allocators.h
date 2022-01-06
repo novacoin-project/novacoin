@@ -5,11 +5,13 @@
 #ifndef BITCOIN_ALLOCATORS_H
 #define BITCOIN_ALLOCATORS_H
 
-#include <string.h>
-#include <string>
-#include <boost/thread/mutex.hpp>
-#include <map>
 #include <openssl/crypto.h> // for OPENSSL_cleanse()
+
+#include <cstring>
+#include <string>
+#include <mutex>
+#include <cassert>
+#include <map>
 
 #ifdef WIN32
 #ifdef _WIN32_WINNT
@@ -27,7 +29,7 @@
 // the pagefile except in rare circumstances where memory is extremely low.
 #else
 #include <sys/mman.h>
-#include <limits.h> // for PAGESIZE
+#include <climits> // for PAGESIZE
 #include <unistd.h> // for sysconf
 #endif
 
@@ -56,7 +58,7 @@ public:
     // For all pages in affected range, increase lock count
     void LockRange(void *p, size_t size)
     {
-        boost::mutex::scoped_lock lock(mutex);
+        std::scoped_lock lock(mutex);
         if(!size) return;
         const size_t base_addr = reinterpret_cast<size_t>(p);
         const size_t start_page = base_addr & page_mask;
@@ -79,7 +81,7 @@ public:
     // For all pages in affected range, decrease lock count
     void UnlockRange(void *p, size_t size)
     {
-        boost::mutex::scoped_lock lock(mutex);
+        std::scoped_lock lock(mutex);
         if(!size) return;
         const size_t base_addr = reinterpret_cast<size_t>(p);
         const size_t start_page = base_addr & page_mask;
@@ -102,13 +104,13 @@ public:
     // Get number of locked pages for diagnostics
     int GetLockedPageCount()
     {
-        boost::mutex::scoped_lock lock(mutex);
+        std::scoped_lock lock(mutex);
         return histogram.size();
     }
 
 private:
     Locker locker;
-    boost::mutex mutex;
+    std::mutex mutex;
     size_t page_size, page_mask;
     // map of page base address to lock count
     typedef std::map<size_t,int> Histogram;

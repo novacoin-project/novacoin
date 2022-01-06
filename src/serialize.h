@@ -5,28 +5,21 @@
 #ifndef BITCOIN_SERIALIZE_H
 #define BITCOIN_SERIALIZE_H
 
-#include <string>
+#include "allocators.h"
+#include "version.h"
+
 #include <vector>
-#include <map>
 #include <set>
 #include <tuple>
 #include <type_traits>
-#include <cassert>
 #include <limits>
-#include <cstring>
 #include <cstdio>
-
-//#ifndef Q_MOC_RUN
-//#include <boost/type_traits/is_fundamental.hpp>
-//#endif
+#include <ios>
+#include <cinttypes>
 
 #if defined __USE_MINGW_ANSI_STDIO
 #undef __USE_MINGW_ANSI_STDIO // This constant forces MinGW to conduct stupid behavior
 #endif
-#include <inttypes.h>
-
-#include "allocators.h"
-#include "version.h"
 
 
 class CScript;

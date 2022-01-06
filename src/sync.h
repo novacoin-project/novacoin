@@ -5,19 +5,14 @@
 #ifndef BITCOIN_SYNC_H
 #define BITCOIN_SYNC_H
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/condition_variable.hpp>
-
-
-
+#include <mutex>
+#include <condition_variable>
 
 /** Wrapped boost mutex: supports recursive locking, but no waiting  */
-typedef boost::recursive_mutex CCriticalSection;
+typedef std::recursive_mutex CCriticalSection;
 
 /** Wrapped boost mutex: supports waiting but not recursive locking */
-typedef boost::mutex CWaitableCriticalSection;
+typedef std::mutex CWaitableCriticalSection;
 
 #ifdef DEBUG_LOCKORDER
 void EnterCritical(const char* pszName, const char* pszFile, int nLine, void* cs, bool fTry = false);
@@ -31,12 +26,12 @@ void static inline LeaveCritical() {}
 void PrintLockContention(const char* pszName, const char* pszFile, int nLine);
 #endif
 
-/** Wrapper around boost::unique_lock<Mutex> */
+/** Wrapper around std::unique_lock<Mutex> */
 template<typename Mutex>
 class CMutexLock
 {
 private:
-    boost::unique_lock<Mutex> lock;
+    std::unique_lock<Mutex> lock;
 public:
 
     void Enter(const char* pszName, const char* pszFile, int nLine)
@@ -77,7 +72,7 @@ public:
         return lock.owns_lock();
     }
 
-    CMutexLock(Mutex& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) : lock(mutexIn, boost::defer_lock)
+    CMutexLock(Mutex& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) : lock(mutexIn, std::defer_lock)
     {
         if (fTry)
             TryEnter(pszName, pszFile, nLine);
@@ -91,12 +86,12 @@ public:
             LeaveCritical();
     }
 
-    operator bool()
+    operator bool() const
     {
         return lock.owns_lock();
     }
 
-    boost::unique_lock<Mutex> &GetLock()
+    std::unique_lock<Mutex> &GetLock()
     {
         return lock;
     }
@@ -123,23 +118,26 @@ typedef CMutexLock<CCriticalSection> CCriticalBlock;
 class CSemaphore
 {
 private:
-    boost::condition_variable condition;
-    boost::mutex mutex;
+    std::condition_variable condition;
+    std::mutex mutex;
     int value;
 
 public:
-    CSemaphore(int init) : value(init) {}
+    explicit CSemaphore(int init) : value(init) {}
 
     void wait() {
-        boost::unique_lock<boost::mutex> lock(mutex);
-        while (value < 1) {
-            condition.wait(lock);
-        }
+        //std::unique_lock<std::mutex> lock(mutex);
+        //while (value < 1) {
+        //    condition.wait(lock);
+        //}
+        //value--;
+        std::unique_lock<std::mutex> lock(mutex);
+        condition.wait(lock, [&]() { return value >= 1; });
         value--;
     }
 
     bool try_wait() {
-        boost::unique_lock<boost::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
         if (value < 1)
             return false;
         value--;
@@ -148,7 +146,7 @@ public:
 
     void post() {
         {
-            boost::unique_lock<boost::mutex> lock(mutex);
+            std::unique_lock<std::mutex> lock(mutex);
             value++;
         }
         condition.notify_one();
@@ -164,17 +162,17 @@ private:
 
 public:
     void Acquire() {
-        if (fHaveGrant)
-            return;
-        sem->wait();
-        fHaveGrant = true;
+        if (!fHaveGrant) {
+            sem->wait();
+            fHaveGrant = true;
+        }
     }
 
     void Release() {
-        if (!fHaveGrant)
-            return;
-        sem->post();
-        fHaveGrant = false;
+        if (fHaveGrant) {
+            sem->post();
+            fHaveGrant = false;
+        }
     }
 
     bool TryAcquire() {
@@ -187,11 +185,11 @@ public:
         grant.Release();
         grant.sem = sem;
         grant.fHaveGrant = fHaveGrant;
-        sem = NULL;
+        sem = nullptr;
         fHaveGrant = false;
     }
 
-    CSemaphoreGrant() : sem(NULL), fHaveGrant(false) {}
+    CSemaphoreGrant() : sem(nullptr), fHaveGrant(false) {}
 
     CSemaphoreGrant(CSemaphore &sema, bool fTry = false) : sem(&sema), fHaveGrant(false) {
         if (fTry)
@@ -204,9 +202,8 @@ public:
         Release();
     }
 
-    operator bool() {
+    operator bool() const {
         return fHaveGrant;
     }
 };
 #endif
-
