@@ -11,11 +11,12 @@
 #include "interface.h"
 #include "checkqueue.h"
 #include "kernel.h"
-#include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
 #include "main.h"
+
+#include <regex>
 
 using namespace std;
 using namespace boost;
@@ -2047,10 +2048,8 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
     std::string strCmd = GetArg("-blocknotify", "");
 
     if (!fIsInitialDownload && !strCmd.empty())
-    {
-        boost::replace_all(strCmd, "%s", hashBestChain.GetHex());
-        boost::thread t(runCommand, strCmd); // thread runs free
-    }
+        // thread runs free
+        boost::thread t(runCommand, regex_replace(strCmd, static_cast<std::regex>("%s"), hashBestChain.GetHex()));
 
     return true;
 }

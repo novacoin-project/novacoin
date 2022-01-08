@@ -8,9 +8,6 @@
 #include "sync.h"
 #include "version.h"
 
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/case_conv.hpp> // for to_lower()
-#include <boost/algorithm/string/predicate.hpp> // for startswith() and endswith()
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
@@ -502,8 +499,8 @@ void ParseParameters(int argc, const char* const argv[])
             str = str.substr(0, is_index);
         }
 #ifdef WIN32
-        boost::to_lower(str);
-        if (boost::algorithm::starts_with(str, "/"))
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+        if (str.compare(0,1, "/") == 0)
             str = "-" + str.substr(1);
 #endif
         if (str[0] != '-')
@@ -1389,7 +1386,16 @@ std::string FormatSubVersion(const std::string& name, int nClientVersion, const 
     ss << "/";
     ss << name << ":" << FormatVersion(nClientVersion);
     if (!comments.empty())
-        ss << "(" << boost::algorithm::join(comments, "; ") << ")";
+    {
+        ss << "(";
+        for (const auto& st : comments)
+        {
+            ss << st;
+            if (st == comments.back()) break;
+            ss << "; ";
+        }
+        ss << ")";
+    }
     ss << "/";
     return ss.str();
 }

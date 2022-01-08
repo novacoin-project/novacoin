@@ -13,12 +13,12 @@
 
 #undef printf
 
-#include <boost/algorithm/string.hpp>
 #include <ixwebsocket/IXHttpClient.h>
 #include <ixwebsocket/IXHttpServer.h>
 
 #include <list>
 #include <memory>
+#include <regex>
 
 #define printf OutputDebugStringF
 
@@ -338,7 +338,7 @@ bool HTTPAuthorized(ix::WebSocketHttpHeaders& mapHeaders)
     std::string strAuth = mapHeaders["authorization"];
     if (strAuth.substr(0,6) != "Basic ")
         return false;
-    std::string strUserPass64 = strAuth.substr(6); boost::algorithm::trim(strUserPass64);
+    std::string strUserPass64 = std::regex_replace(strAuth.substr(6), static_cast<std::regex>("\\s+"), "");
     std::string strUserPass = DecodeBase64(strUserPass64);
     return TimingResistantEqual(strUserPass, strRPCUserColonPass);
 }

@@ -7,20 +7,13 @@
 #include "wallet.h"
 #include "base58.h"
 
+#include <boost/version.hpp>
+#include <boost/filesystem.hpp>
+
 #include <iostream>
 #include <fstream>
 
-#include <boost/version.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/variant/get.hpp>
-#include <boost/algorithm/string.hpp>
-
 using namespace std;
-using namespace boost;
 
 
 static uint64_t nAccountingEntryNumber = 0;
@@ -891,13 +884,13 @@ bool ImportWallet(CWallet *pwallet, const string& strLocation)
        std::string strLabel;
        bool fLabel = true;
        for (unsigned int nStr = 2; nStr < vstr.size(); nStr++) {
-           if (boost::algorithm::starts_with(vstr[nStr], "#"))
+           if (vstr[nStr].compare(0,1, "#") == 0)
                break;
            if (vstr[nStr] == "change=1")
                fLabel = false;
            if (vstr[nStr] == "reserve=1")
                fLabel = false;
-           if (boost::algorithm::starts_with(vstr[nStr], "label=")) {
+           if (vstr[nStr].compare(0,6, "label=") == 0) {
                strLabel = DecodeDumpString(vstr[nStr].substr(6));
                fLabel = true;
            }

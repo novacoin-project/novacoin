@@ -2,14 +2,13 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <boost/assign/list_of.hpp> // for 'map_list_of()'
+#include "checkpoints.h"
+#include "main.h"
+#include "txdb-leveldb.h"
+#include "uint256.h"
+
 #include <algorithm>
 
-#include "checkpoints.h"
-
-#include "txdb-leveldb.h"
-#include "main.h"
-#include "uint256.h"
 
 namespace Checkpoints
 {
@@ -24,31 +23,31 @@ namespace Checkpoints
     // + Contains no strange transactions
     //
     static MapCheckpoints mapCheckpoints =
-        boost::assign::map_list_of
-        ( 0,      std::make_pair(hashGenesisBlock, 1360105017) )
-        ( 13560,  std::make_pair(uint256("0xa1591a0fcbf11f282d671581edb9f0aadcd06fee69761081e0a3245914c13729"), 1364674052) )
-        ( 143990, std::make_pair(uint256("0x00000000001ff5c3940a9f73ad4a990f64955179bde0f743c76dbf0031429efc"), 1418953493) )
-        ( 149000, std::make_pair(uint256("0x7a24acfcadcf43054e7f7d9f273522c0dfc5791ba4006e0273e7521a8d36c525"), 1420872125) )
-        ( 160000, std::make_pair(uint256("0x000000000001cb1133043d38d077c0e93f66c8b2566779f10f182137d1e34a68"), 1425150237) )
-        ( 200000, std::make_pair(uint256("0x0000000000029f8bbf66e6ea6f3e5db55009404aae0fe395a53dd33142b2bff2"), 1441127233) )
-        ( 221047, std::make_pair(uint256("0xa28aef712e7aa0c285bfe29351ca21ed416689139e3063ef770fc826a8b9e9da"), 1449431646) )
-        ( 243100, std::make_pair(uint256("0x000000000006522d1ebc0734cb0e6b83f5d4da0c3cbc72bd91b82016f611c4f0"), 1458215793) )
-        ( 532000, std::make_pair(uint256("0x0000000000018b7eba5e189c41605780c8a855f74144fa837fa05fa4c67b6ba9"), 1569359486) )
-        ( 561108, std::make_pair(uint256("0x2f3cf523ae1022300b4f40073e506d15ef0d6e208f123aed5b93016f81a10e1e"), 1580943827) )
-        ( 712891, std::make_pair(uint256("0xaaafebcb23c1b8ab49f7517b7a34bcc420cc6f284d9ffc672c1f47b5af2b0088"), 1640557462) )
-    ;
+    {
+        { 0,      {hashGenesisBlock, 1360105017} },
+        { 13560,  {uint256("0xa1591a0fcbf11f282d671581edb9f0aadcd06fee69761081e0a3245914c13729"), 1364674052} },
+        { 143990, {uint256("0x00000000001ff5c3940a9f73ad4a990f64955179bde0f743c76dbf0031429efc"), 1418953493} },
+        { 149000, {uint256("0x7a24acfcadcf43054e7f7d9f273522c0dfc5791ba4006e0273e7521a8d36c525"), 1420872125} },
+        { 160000, {uint256("0x000000000001cb1133043d38d077c0e93f66c8b2566779f10f182137d1e34a68"), 1425150237} },
+        { 200000, {uint256("0x0000000000029f8bbf66e6ea6f3e5db55009404aae0fe395a53dd33142b2bff2"), 1441127233} },
+        { 221047, {uint256("0xa28aef712e7aa0c285bfe29351ca21ed416689139e3063ef770fc826a8b9e9da"), 1449431646} },
+        { 243100, {uint256("0x000000000006522d1ebc0734cb0e6b83f5d4da0c3cbc72bd91b82016f611c4f0"), 1458215793} },
+        { 532000, {uint256("0x0000000000018b7eba5e189c41605780c8a855f74144fa837fa05fa4c67b6ba9"), 1569359486} },
+        { 561108, {uint256("0x2f3cf523ae1022300b4f40073e506d15ef0d6e208f123aed5b93016f81a10e1e"), 1580943827} },
+        { 712891, {uint256("0xaaafebcb23c1b8ab49f7517b7a34bcc420cc6f284d9ffc672c1f47b5af2b0088"), 1640557462} }
+    };
 
     static ListBannedBlocks listBanned =
-        boost::assign::list_of
+    {
         // Invalid block #221047 with future timestamp of 2016/02/23 09:24:17 UTC
-        ( uint256("0x46223e5432ceffe650d5729b4bb8479dcdf0ca1e534fa8e69382dc87b42ea94b") )
-    ;
+        uint256("0x46223e5432ceffe650d5729b4bb8479dcdf0ca1e534fa8e69382dc87b42ea94b")
+    };
 
     // TestNet has no checkpoints
     static MapCheckpoints mapCheckpointsTestnet =
-        boost::assign::map_list_of
-        ( 0, std::make_pair(hashGenesisBlockTestNet, 1360105017) )
-        ;
+    {
+        { 0, { hashGenesisBlockTestNet, 1360105017 } }
+    };
 
     bool CheckHardened(int nHeight, const uint256& hash)
     {

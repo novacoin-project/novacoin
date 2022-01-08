@@ -11,10 +11,12 @@
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
-#include <boost/algorithm/string/replace.hpp>
-#include <openssl/bio.h>
-#include <random>
 #include "main.h"
+
+#include <openssl/bio.h>
+
+#include <random>
+#include <regex>
 
 using namespace std;
 extern int64_t nReserveBalance;
@@ -736,10 +738,8 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
         std::string strCmd = GetArg("-walletnotify", "");
 
         if ( !strCmd.empty())
-        {
-            boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
-            boost::thread t(runCommand, strCmd); // thread runs free
-        }
+            // thread runs free
+            boost::thread t(runCommand, regex_replace(strCmd, static_cast<std::regex>("%s"), wtxIn.GetHash().GetHex()));
 
     }
     return true;
