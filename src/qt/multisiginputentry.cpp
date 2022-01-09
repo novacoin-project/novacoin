@@ -158,7 +158,7 @@ void MultisigInputEntry::on_transactionOutput_currentIndexChanged(int index)
              CTxDestination dest;
             if(ExtractDestination(script, dest))
             {
-                CScriptID scriptID = boost::get<CScriptID>(dest);
+                CScriptID scriptID = std::get<CScriptID>(dest);
                 CScript redeemScript;
                 if(model->getWallet()->GetCScript(scriptID, redeemScript))
                     ui->redeemScript->setText(HexStr(redeemScript.begin(), redeemScript.end()).c_str());

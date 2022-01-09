@@ -274,7 +274,7 @@ bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRe
     }
 
     namespace {
-        class CBitcoinAddressVisitor : public boost::static_visitor<bool> {
+        class CBitcoinAddressVisitor {
         private:
             CBitcoinAddress *addr;
         public:
@@ -299,7 +299,7 @@ bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRe
 
     bool CBitcoinAddress::Set(const CTxDestination &dest)
     {
-        return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
+        return std::visit(CBitcoinAddressVisitor(this), dest);
     }
 
     bool CBitcoinAddress::Set(const CMalleablePubKey &mpk) {

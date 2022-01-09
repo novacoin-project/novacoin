@@ -1780,7 +1780,7 @@ public:
         int nRequired;
         if (ExtractDestinations(script, type, vDest, nRequired)) {
             for (const CTxDestination &dest : vDest)
-                boost::apply_visitor(*this, dest);
+                std::visit(*this, dest);
         }
     }
 
@@ -2161,7 +2161,7 @@ public:
 
 void CScript::SetDestination(const CTxDestination& dest)
 {
-    boost::apply_visitor(CScriptVisitor(this), dest);
+    std::visit(CScriptVisitor(this), dest);
 }
 
 void CScript::SetAddress(const CBitcoinAddress& dest)

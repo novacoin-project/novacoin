@@ -1758,7 +1758,7 @@ Value validateaddress(const Array& params, bool fHelp)
             ret.push_back(Pair("ismine", mine != MINE_NO));
             if (mine != MINE_NO) {
                 ret.push_back(Pair("watchonly", mine == MINE_WATCH_ONLY));
-                Object detail = boost::apply_visitor(DescribeAddressVisitor(mine), dest);
+                Object detail = std::visit(DescribeAddressVisitor(mine), dest);
                 ret.insert(ret.end(), detail.begin(), detail.end());
             }
             if (pwalletMain->mapAddressBook.count(address))
