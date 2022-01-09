@@ -15,12 +15,14 @@
 #ifndef BITCOIN_BASE58_H
 #define BITCOIN_BASE58_H
 
-#include <string>
-#include <vector>
-#include <openssl/crypto.h> // for OPENSSL_cleanse()
 #include "bignum.h"
 #include "key.h"
 #include "script.h"
+
+#include <openssl/crypto.h> // for OPENSSL_cleanse()
+
+#include <string>
+#include <vector>
 
 // Encode a byte sequence as a base58-encoded string
 std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend);
@@ -85,21 +87,7 @@ public:
  * Pubkey-pair-addresses have version 1 (or 6 testnet)
  * The data vector contains a serialized copy of two compressed ECDSA secp256k1 public keys.
  */
-class CBitcoinAddress;
-class CBitcoinAddressVisitor : public boost::static_visitor<bool>
-{
-private:
-    CBitcoinAddress *addr;
-public:
-    CBitcoinAddressVisitor(CBitcoinAddress *addrIn) : addr(addrIn) { }
-    bool operator()(const CKeyID &id) const;
-    bool operator()(const CScriptID &id) const;
-    bool operator()(const CMalleablePubKey &mpk) const;
-    bool operator()(const CNoDestination &no) const;
-};
-
-class CBitcoinAddress : public CBase58Data
-{
+class CBitcoinAddress : public CBase58Data {
 public:
     enum
     {
@@ -118,29 +106,11 @@ public:
     bool Set(const CBitcoinAddress &dest);
     bool IsValid() const;
 
-    CBitcoinAddress()
-    {
-    }
-
-    CBitcoinAddress(const CTxDestination &dest)
-    {
-        Set(dest);
-    }
-
-    CBitcoinAddress(const CMalleablePubKey &mpk)
-    {
-        Set(mpk);
-    }
-
-    CBitcoinAddress(const std::string& strAddress)
-    {
-        SetString(strAddress);
-    }
-
-    CBitcoinAddress(const char* pszAddress)
-    {
-        SetString(pszAddress);
-    }
+    CBitcoinAddress() {}
+    CBitcoinAddress(const CTxDestination &dest) { Set(dest); }
+    CBitcoinAddress(const CMalleablePubKey &mpk) { Set(mpk); }
+    CBitcoinAddress(const std::string& strAddress) { SetString(strAddress); }
+    CBitcoinAddress(const char* pszAddress) { SetString(pszAddress); }
 
     CTxDestination Get() const;
     bool GetKeyID(CKeyID &keyID) const;
@@ -149,27 +119,17 @@ public:
     bool IsPair() const;
 };
 
-bool inline CBitcoinAddressVisitor::operator()(const CKeyID &id) const            { return addr->Set(id); }
-bool inline CBitcoinAddressVisitor::operator()(const CScriptID &id) const         { return addr->Set(id); }
-bool inline CBitcoinAddressVisitor::operator()(const CMalleablePubKey &mpk) const { return addr->Set(mpk); }
-bool inline CBitcoinAddressVisitor::operator()(const CNoDestination &id) const    { return false; }
-
 /** A base58-encoded secret key */
-class CBitcoinSecret : public CBase58Data
-{
+class CBitcoinSecret : public CBase58Data {
 public:
     void SetSecret(const CSecret& vchSecret, bool fCompressed);
     CSecret GetSecret(bool &fCompressedOut);
-
     bool IsValid() const;
-
     bool SetString(const char* pszSecret);
     bool SetString(const std::string& strSecret);
 
     CBitcoinSecret(const CSecret& vchSecret, bool fCompressed);
-    CBitcoinSecret()
-    {
-    }
+    CBitcoinSecret() {}
 };
 
 #endif

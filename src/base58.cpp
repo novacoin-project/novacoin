@@ -13,11 +13,9 @@
 // - Double-clicking selects the whole number as one word if it's all alphanumeric.
 //
 
-#include <string>
-#include <vector>
+#include "base58.h"
 #include "key.h"
 #include "script.h"
-#include "base58.h"
 
 static const std::array<char, 58> digits = {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -275,6 +273,20 @@ bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRe
         return 0;
     }
 
+    namespace {
+        class CBitcoinAddressVisitor : public boost::static_visitor<bool> {
+        private:
+            CBitcoinAddress *addr;
+        public:
+            explicit CBitcoinAddressVisitor(CBitcoinAddress *addrIn) : addr(addrIn) { }
+
+            bool operator()(const CKeyID &id) const { return addr->Set(id); }
+            bool operator()(const CScriptID &id) const { return addr->Set(id); }
+            bool operator()(const CMalleablePubKey &mpk) const { return addr->Set(mpk); }
+            bool operator()([[maybe_unused]] const CNoDestination &no) const { return false; }
+        };
+    } // namespace
+
     bool CBitcoinAddress::Set(const CKeyID &id) {
         SetData(fTestNet ? PUBKEY_ADDRESS_TEST : PUBKEY_ADDRESS, &id, 20);
         return true;
@@ -347,7 +359,7 @@ bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRe
 
         if (fSeemsSane && !fSimple)
         {
-            // Perform dditional checking
+            // Perform additional checking
             //    for pubkey pair addresses
             CMalleablePubKey mpk;
             mpk.setvch(vchData);
@@ -485,5 +497,3 @@ bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRe
     {
         SetSecret(vchSecret, fCompressed);
     }
-
-
