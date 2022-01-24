@@ -12,6 +12,8 @@
 #include "util.h"
 #include "base58.h"
 
+#include <shared_mutex>
+
 bool CheckSig(std::vector<unsigned char> vchSig, const std::vector<unsigned char> &vchPubKey, const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, int flags);
 
 static const valtype vchFalse(0);
@@ -1227,15 +1229,15 @@ class CSignatureCache
 {
 private:
      // sigdata_type is (signature hash, signature, public key):
-    typedef std::tuple<uint256, std::vector<unsigned char>, CPubKey > sigdata_type;
-    std::set< sigdata_type> setValid;
-    boost::shared_mutex cs_sigcache;
+    using sigdata_type = std::tuple<uint256, std::vector<unsigned char>, CPubKey>;
+    std::set<sigdata_type> setValid;
+    std::shared_mutex cs_sigcache;
 
 public:
     bool
     Get(const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubKey)
     {
-        boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
+        std::shared_lock<std::shared_mutex> lock(cs_sigcache);
 
         sigdata_type k(hash, vchSig, pubKey);
         std::set<sigdata_type>::iterator mi = setValid.find(k);
@@ -1253,7 +1255,7 @@ public:
         int64_t nMaxCacheSize = GetArg("-maxsigcachesize", 50000);
         if (nMaxCacheSize <= 0) return;
 
-        boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
+        std::shared_lock<std::shared_mutex> lock(cs_sigcache);
 
         while (static_cast<int64_t>(setValid.size()) > nMaxCacheSize)
         {
@@ -1613,7 +1615,7 @@ unsigned int HaveKeys(const std::vector<valtype>& pubkeys, const CKeyStore& keys
 }
 
 
-class CKeyStoreIsMineVisitor : public boost::static_visitor<bool>
+class CKeyStoreIsMineVisitor
 {
 private:
     const CKeyStore *keystore;
@@ -1765,7 +1767,7 @@ bool ExtractAddress(const CKeyStore &keystore, const CScript& scriptPubKey, CBit
     return false;
 }
 
-class CAffectedKeysVisitor : public boost::static_visitor<void> {
+class CAffectedKeysVisitor {
 private:
     const CKeyStore &keystore;
     CAffectedKeysVisitor& operator=(CAffectedKeysVisitor const&);
@@ -2134,7 +2136,7 @@ bool CScript::HasCanonicalPushes() const
     return true;
 }
 
-class CScriptVisitor : public boost::static_visitor<bool>
+class CScriptVisitor
 {
 private:
     CScript *script;

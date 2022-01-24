@@ -1677,7 +1677,7 @@ Value encryptwallet(const Array& params, bool fHelp)
     return "wallet encrypted; NovaCoin server stopping, restart to run with encrypted wallet.  The keypool has been flushed, you need to make a new backup.";
 }
 
-class DescribeAddressVisitor : public boost::static_visitor<Object>
+class DescribeAddressVisitor
 {
 private:
     isminetype mine;
