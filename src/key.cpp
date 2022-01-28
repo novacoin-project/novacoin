@@ -363,24 +363,25 @@ CPubKey CKey::GetPubKey() const
 bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
 {
     vchSig.clear();
-    ECDSA_SIG *sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
-    if (sig==NULL)
+    ECDSA_SIG *sig = ECDSA_do_sign(hash.begin(), sizeof(hash), pkey);
+    if (sig==nullptr)
         return false;
     const EC_GROUP *group = EC_KEY_get0_group(pkey);
 
     BIGNUM* order = BN_new(), *halforder = BN_new();
-    EC_GROUP_get_order(group, order, NULL);
+    EC_GROUP_get_order(group, order, nullptr);
     BN_rshift1(halforder, order);
 
     // Get internal R and S pointers
     const BIGNUM *current_s = ECDSA_SIG_get0_s(sig);
+    BIGNUM *current_r = BN_dup(ECDSA_SIG_get0_r(sig));
 
     // enforce low S values, by negating the value (modulo the order) if above order/2.
     if (BN_cmp(current_s, halforder) > 0) {
         BIGNUM *updated_s = BN_new();
         BN_copy(updated_s, current_s);
         BN_sub(updated_s, order, updated_s);
-        ECDSA_SIG_set0(sig, NULL, updated_s);
+        ECDSA_SIG_set0(sig, current_r, updated_s);
     }
 
     BN_free(order);
@@ -393,7 +394,7 @@ bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
     ECDSA_SIG_free(sig);
     vchSig.resize(nSize); // Shrink to fit actual size
     // Testing our new signature
-    if (ECDSA_verify(0, (unsigned char*)&hash, sizeof(hash), &vchSig[0], vchSig.size(), pkey) != 1) {
+    if (ECDSA_verify(0, hash.begin(), sizeof(hash), &vchSig[0], vchSig.size(), pkey) != 1) {
         vchSig.clear();
         return false;
     }
@@ -407,23 +408,24 @@ bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
 bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
 {
     bool fOk = false;
-    ECDSA_SIG *sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
-    if (sig==NULL)
+    ECDSA_SIG *sig = ECDSA_do_sign(hash.begin(), sizeof(hash), pkey);
+    if (sig==nullptr)
         return false;
     const EC_GROUP *group = EC_KEY_get0_group(pkey);
     BIGNUM* order = BN_new(), *halforder = BN_new();
-    EC_GROUP_get_order(group, order, NULL);
+    EC_GROUP_get_order(group, order, nullptr);
     BN_rshift1(halforder, order);
 
     // Get internal R and S pointers
     const BIGNUM *current_s = ECDSA_SIG_get0_s(sig);
+    BIGNUM *current_r = BN_dup(ECDSA_SIG_get0_r(sig));
 
     // enforce low S values, by negating the value (modulo the order) if above order/2.
     if (BN_cmp(current_s, halforder) > 0) {
         BIGNUM *updated_s = BN_new();
         BN_copy(updated_s, current_s);
         BN_sub(updated_s, order, updated_s);
-        ECDSA_SIG_set0(sig, NULL, updated_s);
+        ECDSA_SIG_set0(sig, current_r, updated_s);
     }
 
     BN_free(order);
@@ -442,7 +444,7 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
             CKey keyRec;
             keyRec.fSet = true;
             keyRec.SetCompressedPubKey(fCompressedPubKey);
-            if (ECDSA_SIG_recover_key_GFp(keyRec.pkey, sig, (unsigned char*)&hash, sizeof(hash), i, 1) == 1)
+            if (ECDSA_SIG_recover_key_GFp(keyRec.pkey, sig, hash.begin(), sizeof(hash), i, 1) == 1)
                 if (keyRec.GetPubKey() == this->GetPubKey())
                 {
                     nRecId = i;
