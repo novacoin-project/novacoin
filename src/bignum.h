@@ -6,13 +6,14 @@
 #define BITCOIN_BIGNUM_H
 
 
-#include "util.h"
+#include "serialize.h"
 #include "uint256.h"
 
 #include <openssl/bn.h>
 
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 /** Errors thrown by the bignum class */
 class bignum_error : public std::runtime_error
@@ -114,40 +115,6 @@ public:
         bn = BN_new();
         setvch(vch);
     }
-
-    /** Generates a cryptographically secure random number between zero and range exclusive
-    * i.e. 0 < returned number < range
-    * @param range The upper bound on the number.
-    * @return
-    */
-    static CBigNum  randBignum(const CBigNum& range) {
-        CBigNum ret;
-        if(!BN_rand_range(ret.bn, range.bn)){
-            throw bignum_error("CBigNum:rand element : BN_rand_range failed");
-        }
-        return ret;
-    }
-
-    /** Generates a cryptographically secure random k-bit number
-    * @param k The bit length of the number.
-    * @return
-    */
-    static CBigNum RandKBitBigum(const uint32_t k){
-        CBigNum ret;
-        if(!BN_rand(ret.bn, k, -1, 0)){
-            throw bignum_error("CBigNum:rand element : BN_rand failed");
-        }
-        return ret;
-    }
-
-    /**Returns the size in bits of the underlying bignum.
-     *
-     * @return the size
-     */
-    int bitSize() const{
-        return  BN_num_bits(bn);
-    }
-
 
     void setuint32(uint32_t n)
     {
@@ -381,7 +348,7 @@ public:
         vch2[2] = (nSize >> 8) & 0xff;
         vch2[3] = (nSize >> 0) & 0xff;
         // swap data to big endian
-        reverse_copy(vch.begin(), vch.end(), vch2.begin() + 4);
+        std::reverse_copy(vch.begin(), vch.end(), vch2.begin() + 4);
         BN_mpi2bn(&vch2[0], (int) vch2.size(), bn);
     }
 
@@ -393,7 +360,7 @@ public:
         std::vector<uint8_t> vch(nSize);
         BN_bn2mpi(bn, &vch[0]);
         vch.erase(vch.begin(), vch.begin() + 4);
-        reverse(vch.begin(), vch.end());
+        std::reverse(vch.begin(), vch.end());
         return vch;
     }
 
@@ -474,7 +441,7 @@ public:
         }
         if (BN_is_negative(bn.bn))
             str += "-";
-        reverse(str.begin(), str.end());
+        std::reverse(str.begin(), str.end());
         return str;
     }
 
@@ -505,123 +472,6 @@ public:
         ::Unserialize(s, vch, nType, nVersion);
         setvch(vch);
     }
-
-    /**
-    * exponentiation with an int. this^e
-    * @param e the exponent as an int
-    * @return
-    */
-    CBigNum pow(const int e) const {
-        return this->pow(CBigNum(e));
-    }
-
-    /**
-     * exponentiation this^e
-     * @param e the exponent
-     * @return
-     */
-    CBigNum pow(const CBigNum& e) const {
-        CAutoBN_CTX pctx;
-        CBigNum ret;
-        if (!BN_exp(ret.bn, bn, e.bn, pctx))
-            throw bignum_error("CBigNum::pow : BN_exp failed");
-        return ret;
-    }
-
-    /**
-     * modular multiplication: (this * b) mod m
-     * @param b operand
-     * @param m modulus
-     */
-    CBigNum mul_mod(const CBigNum& b, const CBigNum& m) const {
-        CAutoBN_CTX pctx;
-        CBigNum ret;
-        if (!BN_mod_mul(ret.bn, bn, b.bn, m.bn, pctx))
-            throw bignum_error("CBigNum::mul_mod : BN_mod_mul failed");
-
-        return ret;
-    }
-
-    /**
-     * modular exponentiation: this^e mod n
-     * @param e exponent
-     * @param m modulus
-     */
-    CBigNum pow_mod(const CBigNum& e, const CBigNum& m) const {
-        CAutoBN_CTX pctx;
-        CBigNum ret;
-        if( e < 0){
-            // g^-x = (g^-1)^x
-            CBigNum inv = this->inverse(m);
-            CBigNum posE = e * -1;
-            if (!BN_mod_exp(ret.bn, inv.bn, posE.bn, m.bn, pctx))
-                throw bignum_error("CBigNum::pow_mod: BN_mod_exp failed on negative exponent");
-        }else
-            if (!BN_mod_exp(ret.bn, bn, e.bn, m.bn, pctx))
-                throw bignum_error("CBigNum::pow_mod : BN_mod_exp failed");
-
-        return ret;
-    }
-
-    /**
-    * Calculates the inverse of this element mod m.
-    * i.e. i such this*i = 1 mod m
-    * @param m the modu
-    * @return the inverse
-    */
-    CBigNum inverse(const CBigNum& m) const {
-        CAutoBN_CTX pctx;
-        CBigNum ret;
-        if (!BN_mod_inverse(ret.bn, bn, m.bn, pctx))
-            throw bignum_error("CBigNum::inverse*= :BN_mod_inverse");
-        return ret;
-    }
-
-    /**
-     * Generates a random (safe) prime of numBits bits
-     * @param numBits the number of bits
-     * @param safe true for a safe prime
-     * @return the prime
-     */
-    static CBigNum generatePrime(const unsigned int numBits, bool safe = false) {
-        CBigNum ret;
-        if(!BN_generate_prime_ex(ret.bn, numBits, (safe == true), NULL, NULL, NULL))
-            throw bignum_error("CBigNum::generatePrime*= :BN_generate_prime_ex");
-        return ret;
-    }
-
-    /**
-     * Calculates the greatest common divisor (GCD) of two numbers.
-     * @param m the second element
-     * @return the GCD
-     */
-    CBigNum gcd( const CBigNum& b) const{
-        CAutoBN_CTX pctx;
-        CBigNum ret;
-        if (!BN_gcd(ret.bn, bn, b.bn, pctx))
-            throw bignum_error("CBigNum::gcd*= :BN_gcd");
-        return ret;
-    }
-
-    /**
-    * Miller-Rabin primality test on this element
-    * @param checks: optional, the number of Miller-Rabin tests to run
-    * default causes error rate of 2^-80.
-    * @return true if prime
-    */
-    bool isPrime(const int checks=BN_prime_checks) const {
-        CAutoBN_CTX pctx;
-        int ret = BN_is_prime_ex(bn, checks, pctx, NULL);
-        if(ret < 0){
-            throw bignum_error("CBigNum::isPrime :BN_is_prime");
-        }
-        return ret != 0;
-    }
-
-    bool isOne() const {
-        return BN_is_one(bn);
-    }
-
 
     bool operator!() const
     {
@@ -685,7 +535,6 @@ public:
         return *this;
     }
 
-
     CBigNum& operator++()
     {
         // prefix operator
@@ -738,7 +587,6 @@ public:
     friend inline bool operator>(const CBigNum& a, const CBigNum& b);
     friend inline std::ostream& operator<<(std::ostream &strm, const CBigNum &b);
 };
-
 
 
 inline const CBigNum operator+(const CBigNum& a, const CBigNum& b)
@@ -814,7 +662,5 @@ inline bool operator<(const CBigNum& a, const CBigNum& b)  { return (BN_cmp(a.bn
 inline bool operator>(const CBigNum& a, const CBigNum& b)  { return (BN_cmp(a.bn, b.bn) > 0); }
 
 inline std::ostream& operator<<(std::ostream &strm, const CBigNum &b) { return strm << b.ToString(10); }
-
-typedef  CBigNum Bignum;
 
 #endif

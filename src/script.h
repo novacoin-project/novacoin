@@ -7,6 +7,7 @@
 
 #include "keystore.h"
 #include "bignum.h"
+#include "util.h"
 
 #include <string>
 #include <vector>
