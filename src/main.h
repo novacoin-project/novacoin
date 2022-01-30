@@ -8,7 +8,6 @@
 #include <algorithm>
 
 #include "timestamps.h"
-#include "bignum.h"
 #include "sync.h"
 #include "net.h"
 #include "script.h"

@@ -5,7 +5,6 @@
 
 #include "script.h"
 #include "keystore.h"
-#include "bignum.h"
 #include "key.h"
 #include "main.h"
 #include "sync.h"
