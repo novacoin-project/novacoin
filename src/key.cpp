@@ -13,27 +13,29 @@
 // Generate a private key from just the secret parameter
 int EC_KEY_regenerate_key(EC_KEY *eckey, BIGNUM *priv_key)
 {
-    int ok = 0;
-    BN_CTX *ctx = NULL;
-    EC_POINT *pub_key = NULL;
-
     if (!eckey) return 0;
+
+    int ok = 0;
+    BN_CTX *ctx = nullptr;
+    EC_POINT *pub_key = nullptr;
 
     const EC_GROUP *group = EC_KEY_get0_group(eckey);
 
-    if ((ctx = BN_CTX_new()) == NULL)
+    if ((ctx = BN_CTX_new()) == nullptr)
         goto err;
 
     pub_key = EC_POINT_new(group);
 
-    if (pub_key == NULL)
+    if (pub_key == nullptr)
         goto err;
 
-    if (!EC_POINT_mul(group, pub_key, priv_key, NULL, NULL, ctx))
+    if (!EC_POINT_mul(group, pub_key, priv_key, nullptr, nullptr, ctx))
         goto err;
 
-    EC_KEY_set_private_key(eckey,priv_key);
-    EC_KEY_set_public_key(eckey,pub_key);
+    if (!EC_KEY_set_private_key(eckey,priv_key))
+        goto err;
+    if (!EC_KEY_set_public_key(eckey,pub_key))
+        goto err;
 
     ok = 1;
 
@@ -41,7 +43,7 @@ err:
 
     if (pub_key)
         EC_POINT_free(pub_key);
-    if (ctx != NULL)
+    if (ctx != nullptr)
         BN_CTX_free(ctx);
 
     return(ok);
