@@ -85,6 +85,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/addrman.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/alert.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/base58.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/bignum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/bitcoinrpc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/checkpoints.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/crypter.cpp
