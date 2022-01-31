@@ -19,8 +19,6 @@
 #include <regex>
 
 using namespace std;
-using namespace boost;
-
 
 
 CCriticalSection cs_setpwalletRegistered;

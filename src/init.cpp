@@ -25,7 +25,7 @@
 
 
 using namespace std;
-using namespace boost;
+
 
 CWallet* pwalletMain;
 CClientUIInterface uiInterface;

@@ -21,7 +21,6 @@
 #include "main.h"
 
 using namespace std;
-using namespace boost;
 
 leveldb::DB *txdb; // global pointer for LevelDB object instance
 
