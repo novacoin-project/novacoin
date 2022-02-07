@@ -359,7 +359,7 @@ std::shared_ptr<CBlock> CreateNewBlock(CWallet* pwallet, CTransaction *txCoinSta
 
         if (!fProofOfStake)
         {
-            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits, nFees);
+            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits) + nFees;
 
             if (fDebug)
                 printf("CreateNewBlock(): PoW reward %" PRIu64 "\n", pblock->vtx[0].vout[0].nValue);

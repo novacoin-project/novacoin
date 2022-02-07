@@ -1009,7 +1009,7 @@ CBigNum inline GetProofOfStakeLimit(int nHeight, unsigned int nTime)
 }
 
 // miner's coin base reward based on nBits
-int64_t GetProofOfWorkReward(unsigned int nBits, int64_t nFees)
+int64_t GetProofOfWorkReward(unsigned int nBits)
 {
     CBigNum bnSubsidyLimit = MAX_MINT_PROOF_OF_WORK;
 
@@ -1044,7 +1044,7 @@ int64_t GetProofOfWorkReward(unsigned int nBits, int64_t nFees)
     if (fDebug && GetBoolArg("-printcreation"))
         printf("GetProofOfWorkReward() : create=%s nBits=0x%08x nSubsidy=%" PRId64 "\n", FormatMoney(nSubsidy).c_str(), nBits, nSubsidy);
 
-    return min(nSubsidy, MAX_MINT_PROOF_OF_WORK) + nFees;
+    return min(nSubsidy, MAX_MINT_PROOF_OF_WORK);
 }
 
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
@@ -1765,7 +1765,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
     if (IsProofOfWork())
     {
-        int64_t nBlockReward = GetProofOfWorkReward(nBits, nFees);
+        int64_t nBlockReward = GetProofOfWorkReward(nBits) + nFees;
 
         // Check coinbase reward
         if (vtx[0].GetValueOut() > nBlockReward)
