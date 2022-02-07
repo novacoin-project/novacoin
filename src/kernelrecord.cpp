@@ -32,8 +32,6 @@ vector<KernelRecord> KernelRecord::decomposeOutput(const CWallet *wallet, const 
     int64_t nTime = wtx.GetTxTime();
     uint256 hash = wtx.GetHash();
     std::map<std::string, std::string> mapValue = wtx.mapValue;
-    int64_t nDayWeight = (min((GetAdjustedTime() - nTime), (int64_t)(nStakeMaxAge+nStakeMinAge)) - nStakeMinAge); // DayWeight * 86400, чтобы был
-                                                                                                              // правильный расчёт CoinAge
     if (showTransaction(wtx))
     {
         for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++)
@@ -42,8 +40,6 @@ vector<KernelRecord> KernelRecord::decomposeOutput(const CWallet *wallet, const 
             if( wallet->IsMine(txOut) ) {
                 CTxDestination address;
                 std::string addrStr;
-
-                uint64_t coinAge = max( (txOut.nValue * nDayWeight) / (COIN * nOneDay), (int64_t)0);
 
                 if (ExtractDestination(txOut.scriptPubKey, address))
                 {
@@ -56,7 +52,7 @@ vector<KernelRecord> KernelRecord::decomposeOutput(const CWallet *wallet, const 
                     addrStr = mapValue["to"];
                 }
 
-                parts.push_back(KernelRecord(hash, nTime, addrStr, txOut.nValue, wtx.IsSpent(nOut), coinAge));
+                parts.push_back(KernelRecord(hash, nTime, addrStr, txOut.nValue, wtx.IsSpent(nOut)));
             }
         }
     }
