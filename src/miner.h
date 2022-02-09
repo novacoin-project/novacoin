@@ -6,12 +6,16 @@
 #ifndef NOVACOIN_MINER_H
 #define NOVACOIN_MINER_H
 
-#include "main.h"
-#include "wallet.h"
 #include <memory>
 
+class CBlock;
+class CBlockIndex;
+class CTransaction;
+class CReserveKey;
+class CWallet;
+
 /* Generate a new block, without valid proof-of-work/with provided proof-of-stake */
-std::shared_ptr<CBlock> CreateNewBlock(CWallet* pwallet, CTransaction *txAdd=NULL);
+std::shared_ptr<CBlock> CreateNewBlock(CWallet* pwallet, CTransaction *txAdd=nullptr);
 
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(std::shared_ptr<CBlock>& pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
