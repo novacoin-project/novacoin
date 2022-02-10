@@ -4,9 +4,11 @@
 #ifndef BITCOIN_CHECKPOINT_H
 #define  BITCOIN_CHECKPOINT_H
 
-#include <map>
 #include "util.h"
-#include "net.h"
+#include "sync.h"
+#include "uint256.h"
+
+#include <map>
 
 // max 1 hour before latest block
 static const int64_t CHECKPOINT_MAX_SPAN = nOneHour;
@@ -17,9 +19,9 @@ static const int64_t CHECKPOINT_MAX_SPAN = nOneHour;
 #undef ADVISORY
 #endif
 
-class uint256;
 class CBlockIndex;
 class CSyncCheckpoint;
+class CNode;
 
 /** Block-chain checkpoints are compiled-in sanity checks.
  * They are updated every release or three.
@@ -111,10 +113,7 @@ public:
     std::vector<unsigned char> vchMsg;
     std::vector<unsigned char> vchSig;
 
-    CSyncCheckpoint()
-    {
-        SetNull();
-    }
+    CSyncCheckpoint();
 
     IMPLEMENT_SERIALIZE
     (
@@ -122,35 +121,10 @@ public:
         READWRITE(vchSig);
     )
 
-    void SetNull()
-    {
-        CUnsignedSyncCheckpoint::SetNull();
-        vchMsg.clear();
-        vchSig.clear();
-    }
-
-    bool IsNull() const
-    {
-        return (hashCheckpoint == 0);
-    }
-
-    uint256 GetHash() const
-    {
-        return SerializeHash(*this);
-    }
-
-    bool RelayTo(CNode* pnode) const
-    {
-        // returns true if wasn't already sent
-        if (pnode->hashCheckpointKnown != hashCheckpoint)
-        {
-            pnode->hashCheckpointKnown = hashCheckpoint;
-            pnode->PushMessage("checkpoint", *this);
-            return true;
-        }
-        return false;
-    }
-
+    void SetNull();
+    bool IsNull() const;
+    uint256 GetHash() const;
+    bool RelayTo(CNode* pnode) const;
     bool CheckSignature();
     bool ProcessSyncCheckpoint(CNode* pfrom);
 };

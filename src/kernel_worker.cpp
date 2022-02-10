@@ -1,8 +1,5 @@
-#include <vector>
-#include <inttypes.h>
 
 #include "uint256.h"
-#include "bignum.h"
 #include "kernel.h"
 #include "kernel_worker.h"
 

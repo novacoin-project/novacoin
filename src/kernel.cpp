@@ -6,10 +6,10 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "kernel.h"
+#include "wallet.h"
 #include "kernel_worker.h"
 #include "txdb-leveldb.h"
 
-extern unsigned int nStakeMaxAge;
 extern unsigned int nStakeTargetSpacing;
 
 using namespace std;

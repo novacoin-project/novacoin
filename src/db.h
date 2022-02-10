@@ -5,7 +5,11 @@
 #ifndef BITCOIN_DB_H
 #define BITCOIN_DB_H
 
-#include "main.h"
+#include "sync.h"
+#include "serialize.h"
+#include "script.h"
+
+#include <boost/filesystem/path.hpp>
 
 #include <map>
 #include <string>

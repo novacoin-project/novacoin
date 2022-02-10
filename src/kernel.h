@@ -5,7 +5,8 @@
 #define PPCOIN_KERNEL_H
 
 #include "main.h"
-#include "wallet.h"
+
+extern unsigned int nStakeMaxAge;
 
 // ChainDB upgrade time
 extern unsigned int nModifierUpgradeTime;

@@ -5,14 +5,13 @@
 #ifndef BITCOIN_MAIN_H
 #define BITCOIN_MAIN_H
 
-#include <algorithm>
-
 #include "timestamps.h"
 #include "sync.h"
 #include "net.h"
 #include "script.h"
 #include "scrypt.h"
 
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <map>

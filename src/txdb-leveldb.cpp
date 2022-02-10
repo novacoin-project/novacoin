@@ -3,7 +3,9 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
-#include <map>
+#include "txdb-leveldb.h"
+#include "kernel.h"
+#include "checkpoints.h"
 
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>
@@ -13,12 +15,6 @@
 #include <leveldb/cache.h>
 #include <leveldb/filter_policy.h>
 #include <memenv/memenv.h>
-
-#include "kernel.h"
-#include "checkpoints.h"
-#include "txdb-leveldb.h"
-#include "util.h"
-#include "main.h"
 
 using namespace std;
 

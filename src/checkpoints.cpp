@@ -5,7 +5,6 @@
 #include "checkpoints.h"
 #include "main.h"
 #include "txdb-leveldb.h"
-#include "uint256.h"
 
 #include <algorithm>
 
@@ -383,6 +382,40 @@ const std::string CSyncCheckpoint::strMasterPubKey = "04a51b735f816de4ec3f891d5b
 std::string CSyncCheckpoint::strMasterPrivKey = "";
 
 // ppcoin: verify signature of sync-checkpoint message
+CSyncCheckpoint::CSyncCheckpoint()
+{
+    SetNull();
+}
+
+void CSyncCheckpoint::SetNull()
+{
+    CUnsignedSyncCheckpoint::SetNull();
+    vchMsg.clear();
+    vchSig.clear();
+}
+
+bool CSyncCheckpoint::IsNull() const
+{
+    return (hashCheckpoint == 0);
+}
+
+uint256 CSyncCheckpoint::GetHash() const
+{
+    return SerializeHash(*this);
+}
+
+bool CSyncCheckpoint::RelayTo(CNode *pnode) const
+{
+    // returns true if wasn't already sent
+    if (pnode->hashCheckpointKnown != hashCheckpoint)
+    {
+        pnode->hashCheckpointKnown = hashCheckpoint;
+        pnode->PushMessage("checkpoint", *this);
+        return true;
+    }
+    return false;
+}
+
 bool CSyncCheckpoint::CheckSignature()
 {
     CPubKey key(ParseHex(CSyncCheckpoint::strMasterPubKey));

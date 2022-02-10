@@ -3,6 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "main.h"
 #include "alert.h"
 #include "checkpoints.h"
 #include "db.h"
@@ -11,10 +12,9 @@
 #include "interface.h"
 #include "checkqueue.h"
 #include "kernel.h"
+
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-
-#include "main.h"
 
 #include <regex>
 
