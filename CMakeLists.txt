@@ -123,6 +123,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sync.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/timedata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/netbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ntp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/key.cpp

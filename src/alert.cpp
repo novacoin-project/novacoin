@@ -2,8 +2,6 @@
 // Alert system
 //
 
-#include <map>
-
 #include "alert.h"
 #include "key.h"
 #include "net.h"

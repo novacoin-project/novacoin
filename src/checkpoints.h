@@ -5,6 +5,7 @@
 #define  BITCOIN_CHECKPOINT_H
 
 #include "util.h"
+#include "serialize.h"
 #include "sync.h"
 #include "uint256.h"
 

@@ -6,11 +6,12 @@
 #ifndef _BITCOINALERT_H_
 #define _BITCOINALERT_H_ 1
 
-#include <set>
-#include <string>
-
+#include "serialize.h"
 #include "uint256.h"
 #include "util.h"
+
+#include <set>
+#include <string>
 
 class CNode;
 
