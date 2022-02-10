@@ -117,6 +117,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/mintingtablemodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/mintingview.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/bignum.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/kernelrecord.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/alert.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp

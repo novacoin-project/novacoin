@@ -88,6 +88,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/bignum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/bitcoinrpc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/checkpoints.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/coincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/crypter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/db.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/init.cpp
