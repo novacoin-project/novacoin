@@ -11,6 +11,7 @@
 #include "ipcollector.h"
 #include "interface.h"
 #include "checkpoints.h"
+#include "wallet.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

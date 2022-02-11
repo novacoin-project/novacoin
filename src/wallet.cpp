@@ -1374,6 +1374,32 @@ void CWalletTx::AddSupportingTransactions(CTxDB& txdb)
     reverse(vtxPrev.begin(), vtxPrev.end());
 }
 
+bool CWalletTx::AcceptWalletTransaction(CTxDB& txdb, bool fCheckInputs)
+{
+
+    {
+        LOCK(mempool.cs);
+        // Add previous supporting transactions first
+        for (CMerkleTx& tx : vtxPrev)
+        {
+            if (!(tx.IsCoinBase() || tx.IsCoinStake()))
+            {
+                uint256 hash = tx.GetHash();
+                if (!mempool.exists(hash) && !txdb.ContainsTx(hash))
+                    tx.AcceptToMemoryPool(txdb, fCheckInputs);
+            }
+        }
+        return AcceptToMemoryPool(txdb, fCheckInputs);
+    }
+    return false;
+}
+
+bool CWalletTx::AcceptWalletTransaction()
+{
+    CTxDB txdb("r");
+    return AcceptWalletTransaction(txdb);
+}
+
 bool CWalletTx::WriteToDisk()
 {
     return CWalletDB(pwallet->strWalletFile).WriteTx(GetHash(), *this);
@@ -1937,6 +1963,35 @@ bool CWallet::SelectCoins(int64_t nTargetValue, unsigned int nSpendTime, set<pai
     return (SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 6, vCoins, setCoinsRet, nValueRet) ||
             SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 1, vCoins, setCoinsRet, nValueRet) ||
             SelectCoinsMinConf(nTargetValue, nSpendTime, 0, 1, vCoins, setCoinsRet, nValueRet));
+}
+
+CWallet::CWallet()
+{
+    SetNull();
+}
+
+CWallet::CWallet(std::string strWalletFileIn)
+{
+    SetNull();
+
+    strWalletFile = strWalletFileIn;
+    fFileBacked = true;
+}
+
+void CWallet::SetNull()
+{
+    nWalletVersion = FEATURE_BASE;
+    nWalletMaxVersion = FEATURE_BASE;
+    fFileBacked = false;
+    nMasterKeyMaxID = 0;
+    pwalletdbEncryption = NULL;
+    pwalletdbDecryption = NULL;
+    nNextResend = 0;
+    nLastResend = 0;
+    nOrderPosNext = 0;
+    nKernelsTried = 0;
+    nCoinDaysTried = 0;
+    nTimeFirstKey = 0;
 }
 
 // Select some coins without random shuffle or best subset approximation
@@ -2628,6 +2683,21 @@ void CWallet::PrintWallet(const CBlock& block)
     printf("\n");
 }
 
+void CWallet::Inventory(const uint256 &hash)
+{
+    {
+        LOCK(cs_wallet);
+        std::map<uint256, int>::iterator mi = mapRequestCount.find(hash);
+        if (mi != mapRequestCount.end())
+            (*mi).second++;
+    }
+}
+
+unsigned int CWallet::GetKeyPoolSize()
+{
+    return (unsigned int)(setKeyPool.size());
+}
+
 bool CWallet::GetTransaction(const uint256 &hashTx, CWalletTx& wtx)
 {
     {
@@ -3066,6 +3136,18 @@ void CReserveKey::KeepKey()
     vchPubKey = CPubKey();
 }
 
+CReserveKey::CReserveKey(CWallet *pwalletIn)
+{
+    nIndex = -1;
+    pwallet = pwalletIn;
+}
+
+CReserveKey::~CReserveKey()
+{
+    if (!fShutdown)
+        ReturnKey();
+}
+
 void CReserveKey::ReturnKey()
 {
     if (nIndex != -1)
@@ -3164,3 +3246,88 @@ void CWallet::ClearOrphans()
         EraseFromWallet(*it);
 }
 
+
+void CWalletTx::Init(const CWallet *pwalletIn)
+{
+    pwallet = pwalletIn;
+    vtxPrev.clear();
+    mapValue.clear();
+    vOrderForm.clear();
+    fTimeReceivedIsTxTime = false;
+    nTimeReceived = 0;
+    nTimeSmart = 0;
+    fFromMe = false;
+    strFromAccount.clear();
+    vfSpent.clear();
+    fDebitCached = false;
+    fWatchDebitCached = false;
+    fCreditCached = false;
+    fWatchCreditCached = false;
+    fAvailableCreditCached = false;
+    fAvailableWatchCreditCached = false;
+    fImmatureCreditCached = false;
+    fImmatureWatchCreditCached = false;
+    fChangeCached = false;
+    nDebitCached = 0;
+    nWatchDebitCached = 0;
+    nCreditCached = 0;
+    nWatchCreditCached = 0;
+    nAvailableCreditCached = 0;
+    nAvailableWatchCreditCached = 0;
+    nImmatureCreditCached = 0;
+    nImmatureWatchCreditCached = 0;
+    nChangeCached = 0;
+    nOrderPos = -1;
+}
+
+COutput::COutput(const CWalletTx *txIn, int iIn, int nDepthIn, bool fSpendableIn)
+{
+    tx = txIn; i = iIn; nDepth = nDepthIn; fSpendable = fSpendableIn;
+}
+
+string COutput::ToString() const
+{
+    return strprintf("COutput(%s, %d, %d, %d) [%s]", tx->GetHash().ToString().substr(0,10).c_str(), i, fSpendable, nDepth, FormatMoney(tx->vout[i].nValue).c_str());
+}
+
+CAccount::CAccount()
+{
+    SetNull();
+}
+
+void CAccount::SetNull()
+{
+    vchPubKey = CPubKey();
+}
+
+CAccountingEntry::CAccountingEntry()
+{
+    SetNull();
+}
+
+void CAccountingEntry::SetNull()
+{
+    nCreditDebit = 0;
+    nTime = 0;
+    strAccount.clear();
+    strOtherAccount.clear();
+    strComment.clear();
+    nOrderPos = -1;
+}
+
+CWalletKey::CWalletKey(int64_t nExpires)
+{
+    nTimeCreated = (nExpires ? GetTime() : 0);
+    nTimeExpires = nExpires;
+}
+
+CKeyPool::CKeyPool()
+{
+    nTime = GetTime();
+}
+
+CKeyPool::CKeyPool(const CPubKey &vchPubKeyIn)
+{
+    nTime = GetTime();
+    vchPubKey = vchPubKeyIn;
+}

@@ -49,16 +49,9 @@ public:
     int64_t nTime;
     CPubKey vchPubKey;
 
-    CKeyPool()
-    {
-        nTime = GetTime();
-    }
+    CKeyPool();
 
-    CKeyPool(const CPubKey& vchPubKeyIn)
-    {
-        nTime = GetTime();
-        vchPubKey = vchPubKeyIn;
-    }
+    CKeyPool(const CPubKey& vchPubKeyIn);
 
     IMPLEMENT_SERIALIZE
     (
@@ -110,32 +103,9 @@ public:
     MasterKeyMap mapMasterKeys;
     unsigned int nMasterKeyMaxID;
 
-    CWallet()
-    {
-        SetNull();
-    }
-    CWallet(std::string strWalletFileIn)
-    {
-        SetNull();
-
-        strWalletFile = strWalletFileIn;
-        fFileBacked = true;
-    }
-    void SetNull()
-    {
-        nWalletVersion = FEATURE_BASE;
-        nWalletMaxVersion = FEATURE_BASE;
-        fFileBacked = false;
-        nMasterKeyMaxID = 0;
-        pwalletdbEncryption = NULL;
-        pwalletdbDecryption = NULL;
-        nNextResend = 0;
-        nLastResend = 0;
-        nOrderPosNext = 0;
-        nKernelsTried = 0;
-        nCoinDaysTried = 0;
-        nTimeFirstKey = 0;
-    }
+    CWallet();
+    CWallet(std::string strWalletFileIn);
+    void SetNull();
 
     std::map<uint256, CWalletTx> mapWallet;
     std::vector<uint256> vMintingWalletUpdated;
@@ -280,20 +250,9 @@ public:
     void UpdatedTransaction(const uint256 &hashTx);
     void PrintWallet(const CBlock& block);
 
-    void Inventory(const uint256 &hash)
-    {
-        {
-            LOCK(cs_wallet);
-            std::map<uint256, int>::iterator mi = mapRequestCount.find(hash);
-            if (mi != mapRequestCount.end())
-                (*mi).second++;
-        }
-    }
+    void Inventory(const uint256 &hash);
 
-    unsigned int GetKeyPoolSize()
-    {
-        return (unsigned int)(setKeyPool.size());
-    }
+    unsigned int GetKeyPoolSize();
 
     bool GetTransaction(const uint256 &hashTx, CWalletTx& wtx);
     bool SetDefaultKey(const CPubKey &vchPubKey);
@@ -332,17 +291,9 @@ protected:
     int64_t nIndex;
     CPubKey vchPubKey;
 public:
-    CReserveKey(CWallet* pwalletIn)
-    {
-        nIndex = -1;
-        pwallet = pwalletIn;
-    }
+    CReserveKey(CWallet* pwalletIn);
 
-    ~CReserveKey()
-    {
-        if (!fShutdown)
-            ReturnKey();
-    }
+    ~CReserveKey();
 
     void ReturnKey();
     CPubKey GetReservedKey();
@@ -432,38 +383,7 @@ public:
         Init(pwalletIn);
     }
 
-    void Init(const CWallet* pwalletIn)
-    {
-        pwallet = pwalletIn;
-        vtxPrev.clear();
-        mapValue.clear();
-        vOrderForm.clear();
-        fTimeReceivedIsTxTime = false;
-        nTimeReceived = 0;
-        nTimeSmart = 0;
-        fFromMe = false;
-        strFromAccount.clear();
-        vfSpent.clear();
-        fDebitCached = false;
-        fWatchDebitCached = false;
-        fCreditCached = false;
-        fWatchCreditCached = false;
-        fAvailableCreditCached = false;
-        fAvailableWatchCreditCached = false;
-        fImmatureCreditCached = false;
-        fImmatureWatchCreditCached = false;
-        fChangeCached = false;
-        nDebitCached = 0;
-        nWatchDebitCached = 0;
-        nCreditCached = 0;
-        nWatchCreditCached = 0;
-        nAvailableCreditCached = 0;
-        nAvailableWatchCreditCached = 0;
-        nImmatureCreditCached = 0;
-        nImmatureWatchCreditCached = 0;
-        nChangeCached = 0;
-        nOrderPos = -1;
-    }
+    void Init(const CWallet* pwalletIn);
 
     IMPLEMENT_SERIALIZE
     (
@@ -580,15 +500,9 @@ public:
     int nDepth;
     bool fSpendable;
 
-    COutput(const CWalletTx *txIn, int iIn, int nDepthIn, bool fSpendableIn)
-    {
-        tx = txIn; i = iIn; nDepth = nDepthIn; fSpendable = fSpendableIn;
-    }
+    COutput(const CWalletTx *txIn, int iIn, int nDepthIn, bool fSpendableIn);
 
-    std::string ToString() const
-    {
-        return strprintf("COutput(%s, %d, %d, %d) [%s]", tx->GetHash().ToString().substr(0,10).c_str(), i, fSpendable, nDepth, FormatMoney(tx->vout[i].nValue).c_str());
-    }
+    std::string ToString() const;
 };
 
 
@@ -605,11 +519,7 @@ public:
     //// todo: add something to note what created it (user, getnewaddress, change)
     ////   maybe should have a map<string, string> property map
 
-    CWalletKey(int64_t nExpires=0)
-    {
-        nTimeCreated = (nExpires ? GetTime() : 0);
-        nTimeExpires = nExpires;
-    }
+    CWalletKey(int64_t nExpires=0);
 
     IMPLEMENT_SERIALIZE
     (
@@ -635,15 +545,9 @@ class CAccount
 public:
     CPubKey vchPubKey;
 
-    CAccount()
-    {
-        SetNull();
-    }
+    CAccount();
 
-    void SetNull()
-    {
-        vchPubKey = CPubKey();
-    }
+    void SetNull();
 
     IMPLEMENT_SERIALIZE
     (
@@ -670,20 +574,9 @@ public:
     int64_t nOrderPos;  // position in ordered transaction list
     uint64_t nEntryNo;
 
-    CAccountingEntry()
-    {
-        SetNull();
-    }
+    CAccountingEntry();
 
-    void SetNull()
-    {
-        nCreditDebit = 0;
-        nTime = 0;
-        strAccount.clear();
-        strOtherAccount.clear();
-        strComment.clear();
-        nOrderPos = -1;
-    }
+    void SetNull();
 
     IMPLEMENT_SERIALIZE
     (

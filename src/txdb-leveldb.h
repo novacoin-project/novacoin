@@ -8,10 +8,7 @@
 
 #include "serialize.h"
 #include "streams.h"
-
-#include <map>
-#include <string>
-#include <vector>
+#include "version.h"
 
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>

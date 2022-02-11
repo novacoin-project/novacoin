@@ -5,8 +5,6 @@
 #ifndef BITCOIN_SERIALIZE_H
 #define BITCOIN_SERIALIZE_H
 
-#include "version.h"
-
 #include <cassert>
 #include <vector>
 #include <set>

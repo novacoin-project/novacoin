@@ -10,6 +10,7 @@
 #include "optionsmodel.h"
 #include "coincontrol.h"
 #include "dialogwindowflags.h"
+#include "wallet.h"
 
 #include <QApplication>
 #include <QCheckBox>

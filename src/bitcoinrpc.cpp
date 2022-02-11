@@ -10,6 +10,7 @@
 #include "interface.h"
 #include "sync.h"
 #include "util.h"
+#include "wallet.h"
 
 #undef printf
 

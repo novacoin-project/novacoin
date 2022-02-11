@@ -9,6 +9,7 @@
 #include "init.h"
 #include "addrman.h"
 #include "interface.h"
+#include "main.h"
 #include "miner.h"
 #include "ntp.h"
 
