@@ -47,12 +47,6 @@ set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
 add_subdirectory(additional/IXWebSocket)
 
-# Apply patch for IXWebSocket issue
-execute_process (
-    COMMAND sh -c "${CMAKE_CURRENT_SOURCE_DIR}/additional/fix_cerrno.sh"
-    OUTPUT_VARIABLE outIxVar
-)
-
 # Set default root path for berkeley db
 if (NOT BerkeleyDB_ROOT)
 set(BerkeleyDB_ROOT /usr)
