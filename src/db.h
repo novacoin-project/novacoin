@@ -8,6 +8,7 @@
 #include "sync.h"
 #include "serialize.h"
 #include "script.h"
+#include "streams.h"
 
 #include <boost/filesystem/path.hpp>
 

@@ -9,6 +9,7 @@
 #include "netbase.h"
 #include "addrman.h"
 #include "hash.h"
+#include "streams.h"
 
 #include <openssl/rand.h>
 

@@ -113,6 +113,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/rpcrawtransaction.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rpcwallet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/script.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/streams.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/stun.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sync.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/timedata.cpp

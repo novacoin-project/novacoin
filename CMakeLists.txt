@@ -128,6 +128,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ntp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/key.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/script.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/streams.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/miner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cpp

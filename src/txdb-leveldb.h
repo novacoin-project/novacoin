@@ -7,6 +7,7 @@
 #define BITCOIN_LEVELDB_H
 
 #include "serialize.h"
+#include "streams.h"
 
 #include <map>
 #include <string>

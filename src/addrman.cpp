@@ -4,6 +4,7 @@
 
 #include "addrman.h"
 #include "hash.h"
+#include "streams.h"
 
 using namespace std;
 
