@@ -5,19 +5,9 @@
 #ifndef BITCOIN_WALLET_H
 #define BITCOIN_WALLET_H
 
-#include <string>
-#include <vector>
-
-#include <stdlib.h>
-
 #include "main.h"
-#include "key.h"
-#include "keystore.h"
-#include "script.h"
 #include "interface.h"
-#include "util.h"
 #include "walletdb.h"
-#include "base58.h"
 
 extern unsigned int nStakeMaxAge;
 extern bool fWalletUnlockMintOnly;
@@ -143,16 +133,16 @@ public:
     bool LoadKeyMetadata(const CMalleableKeyView &keyView, const CKeyMetadata &metadata);
 
     // Load malleable key without saving it to disk (used by LoadWallet)
-    bool LoadKey(const CMalleableKeyView &keyView, const CSecret &vchSecretH) { return CCryptoKeyStore::AddMalleableKey(keyView, vchSecretH); }
-    bool LoadCryptedKey(const CMalleableKeyView &keyView, const std::vector<unsigned char> &vchCryptedSecretH) { return CCryptoKeyStore::AddCryptedMalleableKey(keyView, vchCryptedSecretH); }
+    bool LoadKey(const CMalleableKeyView &keyView, const CSecret &vchSecretH);
+    bool LoadCryptedKey(const CMalleableKeyView &keyView, const std::vector<unsigned char> &vchCryptedSecretH);
 
-    bool LoadMinVersion(int nVersion) { nWalletVersion = nVersion; nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion); return true; }
+    bool LoadMinVersion(int nVersion);
 
     // Adds an encrypted key to the store, and saves it to disk.
     bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
     bool AddCryptedMalleableKey(const CMalleableKeyView& keyView, const std::vector<unsigned char> &vchCryptedSecretH);
     // Adds an encrypted key to the store, without saving it to disk (used by LoadWallet)
-    bool LoadCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret) { SetMinVersion(FEATURE_WALLETCRYPT); return CCryptoKeyStore::AddCryptedKey(vchPubKey, vchCryptedSecret); }
+    bool LoadCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
     bool AddCScript(const CScript& redeemScript);
     bool LoadCScript(const CScript& redeemScript);
 
@@ -304,25 +294,6 @@ public:
 typedef std::map<std::string, std::string> mapValue_t;
 
 
-static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
-{
-    if (!mapValue.count("n"))
-    {
-        nOrderPos = -1; // TODO: calculate elsewhere
-        return;
-    }
-    nOrderPos = atoi64(mapValue["n"].c_str());
-}
-
-
-static void WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
-{
-    if (nOrderPos == -1)
-        return;
-    mapValue["n"] = i64tostr(nOrderPos);
-}
-
-
 /** A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
  */
@@ -363,25 +334,10 @@ public:
     mutable int64_t nAvailableWatchCreditCached;
     mutable int64_t nChangeCached;
 
-    CWalletTx()
-    {
-        Init(NULL);
-    }
-
-    CWalletTx(const CWallet* pwalletIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
+    CWalletTx();
+    CWalletTx(const CWallet* pwalletIn);
+    CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn);
+    CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn);
 
     void Init(const CWallet* pwalletIn);
 
@@ -405,7 +361,8 @@ public:
             }
             pthis->mapValue["spent"] = str;
 
-            WriteOrderPos(pthis->nOrderPos, pthis->mapValue);
+            if (pthis->nOrderPos != -1)
+                pthis->mapValue["n"] = i64tostr(pthis->nOrderPos);
 
             if (nTimeSmart)
                 pthis->mapValue["timesmart"] = strprintf("%u", nTimeSmart);
@@ -430,7 +387,8 @@ public:
             else
                 pthis->vfSpent.assign(vout.size(), fSpent);
 
-            ReadOrderPos(pthis->nOrderPos, pthis->mapValue);
+            const auto it_op = pthis->mapValue.find("n");
+            pthis->nOrderPos = (it_op != pthis->mapValue.end()) ? atoi64(it_op->second.c_str()) : -1;
 
             pthis->nTimeSmart = mapValue.count("timesmart") ? (unsigned int)atoi64(pthis->mapValue["timesmart"]) : 0;
         }
@@ -467,10 +425,7 @@ public:
     void GetAccountAmounts(const std::string& strAccount, int64_t& nGenerated, int64_t& nReceived,
                            int64_t& nSent, int64_t& nFee, const isminefilter& filter) const;
 
-    bool IsFromMe(const isminefilter& filter) const
-    {
-        return (GetDebit(filter) > 0);
-    }
+    bool IsFromMe(const isminefilter& filter) const;
 
     bool InMempool() const;
     bool IsTrusted() const;
@@ -590,7 +545,8 @@ public:
 
         if (!fRead)
         {
-            WriteOrderPos(nOrderPos, me.mapValue);
+            if (nOrderPos != -1)
+                me.mapValue["n"] = i64tostr(nOrderPos);
 
             if (!(mapValue.empty() && _ssExtra.empty()))
             {
@@ -614,7 +570,8 @@ public:
                 ss >> me.mapValue;
                 me._ssExtra = std::vector<char>(ss.begin(), ss.end());
             }
-            ReadOrderPos(me.nOrderPos, me.mapValue);
+            const auto it_op = me.mapValue.find("n");
+            me.nOrderPos = (it_op != me.mapValue.end()) ? atoi64(it_op->second.c_str()) : -1;
         }
         if (std::string::npos != nSepPos)
             me.strComment.erase(nSepPos);

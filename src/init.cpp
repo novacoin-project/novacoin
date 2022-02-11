@@ -2,16 +2,17 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+#include "init.h"
+#include "wallet.h"
+#include "base58.h"
 #include "txdb-leveldb.h"
 #include "walletdb.h"
 #include "bitcoinrpc.h"
 #include "net.h"
-#include "init.h"
 #include "util.h"
 #include "ipcollector.h"
 #include "interface.h"
 #include "checkpoints.h"
-#include "wallet.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

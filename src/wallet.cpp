@@ -3,15 +3,13 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "txdb-leveldb.h"
 #include "wallet.h"
-#include "walletdb.h"
-#include "crypter.h"
-#include "interface.h"
+#include "txdb-leveldb.h"
 #include "base58.h"
-#include "kernel.h"
 #include "coincontrol.h"
-#include "main.h"
+#include "crypter.h"
+#include "kernel.h"
+#include "walletdb.h"
 
 #include <openssl/bio.h>
 
@@ -136,6 +134,8 @@ bool CWallet::AddCryptedMalleableKey(const CMalleableKeyView& keyView, const std
     return true;
 }
 
+bool CWallet::LoadCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret) { SetMinVersion(FEATURE_WALLETCRYPT); return CCryptoKeyStore::AddCryptedKey(vchPubKey, vchCryptedSecret); }
+
 bool CWallet::AddCryptedKey(const CPubKey &vchPubKey, const vector<unsigned char> &vchCryptedSecret)
 {
     if (!CCryptoKeyStore::AddCryptedKey(vchPubKey, vchCryptedSecret))
@@ -177,6 +177,12 @@ bool CWallet::LoadKeyMetadata(const CMalleableKeyView &keyView, const CKeyMetada
     mapKeyMetadata[CBitcoinAddress(keyView.GetMalleablePubKey())] = metadata;
     return true;
 }
+
+bool CWallet::LoadKey(const CMalleableKeyView &keyView, const CSecret &vchSecretH) { return CCryptoKeyStore::AddMalleableKey(keyView, vchSecretH); }
+
+bool CWallet::LoadCryptedKey(const CMalleableKeyView &keyView, const std::vector<unsigned char> &vchCryptedSecretH) { return CCryptoKeyStore::AddCryptedMalleableKey(keyView, vchCryptedSecretH); }
+
+bool CWallet::LoadMinVersion(int nVersion) { nWalletVersion = nVersion; nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion); return true; }
 
 bool CWallet::AddCScript(const CScript& redeemScript)
 {
@@ -1312,6 +1318,11 @@ void CWalletTx::GetAccountAmounts(const string& strAccount, int64_t& nGenerated,
             }
         }
     }
+}
+
+bool CWalletTx::IsFromMe(const isminefilter &filter) const
+{
+    return (GetDebit(filter) > 0);
 }
 
 void CWalletTx::AddSupportingTransactions(CTxDB& txdb)
@@ -3246,6 +3257,26 @@ void CWallet::ClearOrphans()
         EraseFromWallet(*it);
 }
 
+
+CWalletTx::CWalletTx()
+{
+    Init(nullptr);
+}
+
+CWalletTx::CWalletTx(const CWallet *pwalletIn)
+{
+    Init(pwalletIn);
+}
+
+CWalletTx::CWalletTx(const CWallet *pwalletIn, const CMerkleTx &txIn) : CMerkleTx(txIn)
+{
+    Init(pwalletIn);
+}
+
+CWalletTx::CWalletTx(const CWallet *pwalletIn, const CTransaction &txIn) : CMerkleTx(txIn)
+{
+    Init(pwalletIn);
+}
 
 void CWalletTx::Init(const CWallet *pwalletIn)
 {
