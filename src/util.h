@@ -12,6 +12,10 @@
 #include <sys/resource.h>
 #endif
 
+#ifdef WIN32
+#include "compat.h"
+#endif
+
 #include <map>
 #include <vector>
 #include <string>
