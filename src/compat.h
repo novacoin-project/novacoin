@@ -6,7 +6,9 @@
 #define _BITCOIN_COMPAT_H 1
 
 #ifdef WIN32
-#define _WIN32_WINNT 0x0601
+#if (_WIN32_WINNT != _WIN_WINNT_WIN7)
+#define _WIN32_WINNT 0x601
+#endif
 #define WIN32_LEAN_AND_MEAN 1
 #ifndef NOMINMAX
 #define NOMINMAX
