@@ -473,7 +473,7 @@ void StartRPCServer()
     if (mapArgs["-rpcpassword"].empty())
     {
         unsigned char rand_pwd[32];
-        RAND_bytes(rand_pwd, 32);
+        GetRandBytes(rand_pwd, 32);
         std::string strWhatAmI = "To use novacoind";
         if (mapArgs.count("-server"))
             strWhatAmI = strprintf(_("To use the %s option"), "\"-server\"");

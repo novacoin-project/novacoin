@@ -584,6 +584,4 @@ inline const uint256 operator|(const uint256& a, const uint256& b)      { return
 inline const uint256 operator+(const uint256& a, const uint256& b)      { return (base_uint256)a +  (base_uint256)b; }
 inline const uint256 operator-(const uint256& a, const uint256& b)      { return (base_uint256)a -  (base_uint256)b; }
 
-uint256 GetRandHash();
-
 #endif

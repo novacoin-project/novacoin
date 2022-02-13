@@ -10,8 +10,7 @@
 #include "addrman.h"
 #include "hash.h"
 #include "streams.h"
-
-#include <openssl/rand.h>
+#include "random.h"
 
 #ifndef WIN32
 #include <arpa/inet.h>
@@ -477,7 +476,7 @@ public:
                      void (*fn)(void*, CDataStream&), void* param1)
     {
         uint256 hashReply;
-        RAND_bytes((unsigned char*)&hashReply, sizeof(hashReply));
+        GetRandBytes((unsigned char*)&hashReply, sizeof(hashReply));
 
         {
             LOCK(cs_mapRequests);
@@ -492,7 +491,7 @@ public:
                      void (*fn)(void*, CDataStream&), void* param1)
     {
         uint256 hashReply;
-        RAND_bytes((unsigned char*)&hashReply, sizeof(hashReply));
+        GetRandBytes((unsigned char*)&hashReply, sizeof(hashReply));
 
         {
             LOCK(cs_mapRequests);
@@ -507,7 +506,7 @@ public:
                      void (*fn)(void*, CDataStream&), void* param1)
     {
         uint256 hashReply;
-        RAND_bytes((unsigned char*)&hashReply, sizeof(hashReply));
+        GetRandBytes((unsigned char*)&hashReply, sizeof(hashReply));
 
         {
             LOCK(cs_mapRequests);

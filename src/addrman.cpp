@@ -4,6 +4,7 @@
 
 #include "addrman.h"
 #include "hash.h"
+#include "random.h"
 #include "streams.h"
 
 using namespace std;
@@ -537,4 +538,14 @@ void CAddrMan::Connected_(const CService &addr, int64_t nTime)
     int64_t nUpdateInterval = 20 * 60;
     if (nTime - info.nTime > nUpdateInterval)
         info.nTime = nTime;
+}
+
+CAddrMan::CAddrMan() : vRandom(0), vvTried(ADDRMAN_TRIED_BUCKET_COUNT, std::vector<int>(0)), vvNew(ADDRMAN_NEW_BUCKET_COUNT, std::set<int>())
+{
+    nKey.resize(32);
+    GetRandBytes(&nKey[0], 32);
+
+    nIdCount = 0;
+    nTried = 0;
+    nNew = 0;
 }

@@ -100,6 +100,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/noui.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ntp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/random.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rpcblockchain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rpcdump.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rpcmining.cpp

@@ -142,12 +142,6 @@ inline void Sleep(int64_t n)
 #endif
 
 
-
-
-
-
-
-
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
 extern bool fDebug;
@@ -165,8 +159,6 @@ extern bool fNoListen;
 extern bool fLogTimestamps;
 extern bool fReopenDebugLog;
 
-void RandAddSeed();
-void RandAddSeedPerfmon();
 int ATTR_WARN_PRINTF(1,2) OutputDebugStringF(const char* pszFormat, ...);
 
 /*
@@ -235,21 +227,12 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
 void ShrinkDebugFile();
-int GetRandInt(int nMax);
-uint64_t GetRand(uint64_t nMax);
 int64_t GetTime();
 int64_t GetTimeMillis();
 int64_t GetTimeMicros();
 std::string FormatFullVersion();
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments);
 void runCommand(std::string strCommand);
-
-
-
-
-
-
-
 
 
 inline std::string i64tostr(int64_t n)
@@ -363,19 +346,6 @@ void PrintHex(const T pbegin, const T pend, const char* pszFormat="%s", bool fSp
 inline void PrintHex(const std::vector<unsigned char>& vch, const char* pszFormat="%s", bool fSpaces=true)
 {
     printf(pszFormat, HexStr(vch, fSpaces).c_str());
-}
-
-inline int64_t GetPerformanceCounter()
-{
-    int64_t nCounter = 0;
-#ifdef WIN32
-    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
-#else
-    timeval t;
-    gettimeofday(&t, NULL);
-    nCounter = (int64_t) t.tv_sec * 1000000 + t.tv_usec;
-#endif
-    return nCounter;
 }
 
 inline int64_t GetTimeMillis()

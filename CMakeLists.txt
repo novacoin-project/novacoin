@@ -125,6 +125,7 @@ set(generic_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/streams.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/miner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/random.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/net.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/stun.cpp
