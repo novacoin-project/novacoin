@@ -9,6 +9,7 @@
 #include "coincontrol.h"
 #include "crypter.h"
 #include "kernel.h"
+#include "random.h"
 #include "walletdb.h"
 
 #include <openssl/bio.h>

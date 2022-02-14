@@ -9,6 +9,7 @@
 #include "walletdb.h"
 #include "bitcoinrpc.h"
 #include "net.h"
+#include "random.h"
 #include "util.h"
 #include "ipcollector.h"
 #include "interface.h"

@@ -12,6 +12,7 @@
 #include "main.h"
 #include "miner.h"
 #include "ntp.h"
+#include "random.h"
 
 #ifdef WIN32
 #include <string.h>
@@ -78,6 +79,16 @@ vector<std::string> vAddedNodes;
 CCriticalSection cs_vAddedNodes;
 
 static CSemaphore *semOutbound = NULL;
+
+inline void RelayInventory(const CInv& inv)
+{
+    // Put on lists to offer to the other nodes
+    {
+        LOCK(cs_vNodes);
+        for (CNode* pnode : vNodes)
+            pnode->PushInventory(inv);
+    }
+}
 
 void AddOneShot(string strDest)
 {
@@ -503,6 +514,39 @@ void CNode::Cleanup()
 {
 }
 
+void CNode::EndMessage()
+{
+    if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0)
+    {
+        printf("dropmessages DROPPING SEND MESSAGE\n");
+        AbortMessage();
+        return;
+    }
+
+    if (nHeaderStart < 0) {
+        LEAVE_CRITICAL_SECTION(cs_vSend);
+        return;
+    }
+
+    // Set the size
+    uint32_t nSize = (uint32_t) vSend.size() - nMessageStart;
+    memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::MESSAGE_SIZE_OFFSET, &nSize, sizeof(nSize));
+
+    // Set the checksum
+    uint256 hash = Hash(vSend.begin() + nMessageStart, vSend.end());
+    uint32_t nChecksum = 0;
+    memcpy(&nChecksum, &hash, sizeof(nChecksum));
+    assert(nMessageStart - nHeaderStart >= CMessageHeader::CHECKSUM_OFFSET + sizeof(nChecksum));
+    memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::CHECKSUM_OFFSET, &nChecksum, sizeof(nChecksum));
+
+    if (fDebug) {
+        printf("(%d bytes)\n", nSize);
+    }
+
+    nHeaderStart = -1;
+    nMessageStart = std::numeric_limits<uint32_t>::max();
+    LEAVE_CRITICAL_SECTION(cs_vSend);
+}
 
 void CNode::PushVersion()
 {

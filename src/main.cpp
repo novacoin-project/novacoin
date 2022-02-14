@@ -12,6 +12,7 @@
 #include "interface.h"
 #include "checkqueue.h"
 #include "kernel.h"
+#include "random.h"
 #include "wallet.h"
 
 #include <boost/filesystem.hpp>

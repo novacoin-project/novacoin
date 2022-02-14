@@ -6,6 +6,7 @@
 #include "db.h"
 #include "util.h"
 #include "main.h"
+#include "random.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

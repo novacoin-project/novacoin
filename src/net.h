@@ -10,7 +10,6 @@
 #include "addrman.h"
 #include "hash.h"
 #include "streams.h"
-#include "random.h"
 
 #ifndef WIN32
 #include <arpa/inet.h>
@@ -365,8 +364,6 @@ public:
         mapAskFor.insert(std::make_pair(nRequestTime, inv));
     }
 
-
-
     void BeginMessage(const char* pszCommand)
     {
         ENTER_CRITICAL_SECTION(cs_vSend);
@@ -392,39 +389,7 @@ public:
             printf("(aborted)\n");
     }
 
-    void EndMessage()
-    {
-        if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0)
-        {
-            printf("dropmessages DROPPING SEND MESSAGE\n");
-            AbortMessage();
-            return;
-        }
-
-        if (nHeaderStart < 0) {
-            LEAVE_CRITICAL_SECTION(cs_vSend);
-            return;
-        }
-
-        // Set the size
-        uint32_t nSize = (uint32_t) vSend.size() - nMessageStart;
-        memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::MESSAGE_SIZE_OFFSET, &nSize, sizeof(nSize));
-
-        // Set the checksum
-        uint256 hash = Hash(vSend.begin() + nMessageStart, vSend.end());
-        uint32_t nChecksum = 0;
-        memcpy(&nChecksum, &hash, sizeof(nChecksum));
-        assert(nMessageStart - nHeaderStart >= CMessageHeader::CHECKSUM_OFFSET + sizeof(nChecksum));
-        memcpy((char*)&vSend[nHeaderStart] + CMessageHeader::CHECKSUM_OFFSET, &nChecksum, sizeof(nChecksum));
-
-        if (fDebug) {
-            printf("(%d bytes)\n", nSize);
-        }
-
-        nHeaderStart = -1;
-        nMessageStart = std::numeric_limits<uint32_t>::max();
-        LEAVE_CRITICAL_SECTION(cs_vSend);
-    }
+    void EndMessage();
 
     void EndMessageAbortIfEmpty()
     {
@@ -437,24 +402,7 @@ public:
             AbortMessage();
     }
 
-
-
     void PushVersion();
-
-
-    void PushMessage(const char* pszCommand)
-    {
-        try
-        {
-            BeginMessage(pszCommand);
-            EndMessage();
-        }
-        catch (...)
-        {
-            AbortMessage();
-            throw;
-        }
-    }
 
     template<typename ...Args>
     void PushMessage(const char* pszCommand, const Args&... args)
@@ -462,7 +410,8 @@ public:
         try
         {
             BeginMessage(pszCommand);
-            (vSend << ... << args);
+            if constexpr (sizeof...(Args) > 0)
+                (vSend << ... << args);
             EndMessage();
         }
         catch (...)
@@ -471,52 +420,6 @@ public:
             throw;
         }
     }
-
-    void PushRequest(const char* pszCommand,
-                     void (*fn)(void*, CDataStream&), void* param1)
-    {
-        uint256 hashReply;
-        GetRandBytes((unsigned char*)&hashReply, sizeof(hashReply));
-
-        {
-            LOCK(cs_mapRequests);
-            mapRequests[hashReply] = CRequestTracker(fn, param1);
-        }
-
-        PushMessage(pszCommand, hashReply);
-    }
-
-    template<typename T1>
-    void PushRequest(const char* pszCommand, const T1& a1,
-                     void (*fn)(void*, CDataStream&), void* param1)
-    {
-        uint256 hashReply;
-        GetRandBytes((unsigned char*)&hashReply, sizeof(hashReply));
-
-        {
-            LOCK(cs_mapRequests);
-            mapRequests[hashReply] = CRequestTracker(fn, param1);
-        }
-
-        PushMessage(pszCommand, hashReply, a1);
-    }
-
-    template<typename T1, typename T2>
-    void PushRequest(const char* pszCommand, const T1& a1, const T2& a2,
-                     void (*fn)(void*, CDataStream&), void* param1)
-    {
-        uint256 hashReply;
-        GetRandBytes((unsigned char*)&hashReply, sizeof(hashReply));
-
-        {
-            LOCK(cs_mapRequests);
-            mapRequests[hashReply] = CRequestTracker(fn, param1);
-        }
-
-        PushMessage(pszCommand, hashReply, a1, a2);
-    }
-
-
 
     void PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd);
     bool IsSubscribed(unsigned int nChannel);
@@ -551,16 +454,6 @@ public:
     static uint64_t GetTotalBytesRecv();
     static uint64_t GetTotalBytesSent();
 };
-
-inline void RelayInventory(const CInv& inv)
-{
-    // Put on lists to offer to the other nodes
-    {
-        LOCK(cs_vNodes);
-        for (CNode* pnode : vNodes)
-            pnode->PushInventory(inv);
-    }
-}
 
 class CTransaction;
 void RelayTransaction(const CTransaction& tx, const uint256& hash);

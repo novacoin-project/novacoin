@@ -2,13 +2,14 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or https://opensource.org/licenses/mit-license.php.
 
+#include "net.h"
+#include "random.h"
+
 #ifdef WIN32
 #include <winsock2.h>
 #define popen    _popen
 #define pclose   _pclose
 #endif
-
-#include "net.h"
 
 std::string strCollectorCommand;
 
