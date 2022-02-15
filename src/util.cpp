@@ -19,6 +19,7 @@
 #ifdef WIN32
 #include <io.h> /* for _commit */
 #include "shlobj.h"
+#include <openssl/rand.h> // RAND_screen
 #elif defined(__linux__)
 #include <sys/prctl.h>
 #endif
