@@ -175,6 +175,44 @@ list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO USE_IPV6 BOOST_SPIRIT_THREADSAFE)
 
 add_executable(novacoind ${ALL_SOURCES})
 
+target_precompile_headers(novacoind
+  PRIVATE
+    <algorithm>
+    <cassert>
+    <cerrno>
+    <cinttypes>
+    <climits>
+    <condition_variable>
+    <csignal>
+    <cstdarg>
+    <cstdint>
+    <cstdio>
+    <cstring>
+    <ctime>
+    <deque>
+    <fstream>
+    <functional>
+    <iomanip>
+    <ios>
+    <iostream>
+    <limits>
+    <list>
+    <map>
+    <memory>
+    <mutex>
+    <ostream>
+    <regex>
+    <set>
+    <stdexcept>
+    <sstream>
+    <string>
+    <tuple>
+    <type_traits>
+    <variant>
+    <vector>
+    <utility>
+)
+
 if (NOT MSVC)
 list(APPEND ALL_DEFINITIONS _FORTIFY_SOURCE=2)
 set(ALL_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fstack-protector-all")
