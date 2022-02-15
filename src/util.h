@@ -16,25 +16,22 @@
 #include "compat.h"
 #endif
 
-#include <map>
-#include <vector>
-#include <string>
-
 #ifndef Q_MOC_RUN
 #include <boost/thread.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #endif
 
-#include <stdarg.h>
-
 #if defined(__USE_MINGW_ANSI_STDIO)
 #undef __USE_MINGW_ANSI_STDIO // This constant forces MinGW to conduct stupid behavior
 #endif
-#include <inttypes.h>
 
+#include <cinttypes>
+#include <map>
+#include <vector>
+#include <string>
+#include <cstdarg>
 
 static const int32_t nOneHour = 60 * 60;
 static const int32_t nOneDay = 24 * 60 * 60;
