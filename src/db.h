@@ -32,14 +32,12 @@ class CWalletTx;
 extern unsigned int nWalletDBUpdated;
 
 void ThreadFlushWalletDB(void* parg);
-bool BackupWallet(const CWallet& wallet, const std::string& strDest);
 bool DumpWallet(CWallet* pwallet, const std::string& strDest);
 bool ImportWallet(CWallet* pwallet, const std::string& strLocation);
 
 class CDBEnv
 {
 private:
-    bool fDetachDB;
     bool fDbEnvInit;
     bool fMockDb;
     boost::filesystem::path pathEnv;
@@ -80,8 +78,6 @@ public:
     void Close();
     void Flush(bool fShutdown);
     void CheckpointLSN(std::string strFile);
-    void SetDetach(bool fDetachDB_) { fDetachDB = fDetachDB_; }
-    bool GetDetach() { return fDetachDB; }
 
     void CloseDb(const std::string& strFile);
     bool RemoveDb(const std::string& strFile);
@@ -323,10 +319,12 @@ class CAddrDB
 {
 private:
     boost::filesystem::path pathAddr;
+    static unsigned char pchMessageStart[4];
 public:
     CAddrDB();
     bool Write(const CAddrMan& addr);
     bool Read(CAddrMan& addr);
+    static void SetMessageStart(unsigned char _pchMessageStart[]) { memcpy(CAddrDB::pchMessageStart, _pchMessageStart, sizeof(CAddrDB::pchMessageStart)); }
 };
 
 #endif // BITCOIN_DB_H

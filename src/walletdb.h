@@ -95,4 +95,6 @@ public:
     static bool Recover(CDBEnv& dbenv, std::string filename);
 };
 
+bool BackupWallet(const CWallet& wallet, const std::string& strDest);
+
 #endif // BITCOIN_WALLETDB_H

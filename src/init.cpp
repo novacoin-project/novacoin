@@ -266,7 +266,6 @@ std::string HelpMessage()
         "  -bantime=<n>           " + _("Number of seconds to keep misbehaving peers from reconnecting (default: 86400)") + "\n" +
         "  -maxreceivebuffer=<n>  " + _("Maximum per-connection receive buffer, <n>*1000 bytes (default: 5000)") + "\n" +
         "  -maxsendbuffer=<n>     " + _("Maximum per-connection send buffer, <n>*1000 bytes (default: 1000)") + "\n" +
-        "  -detachdb              " + _("Detach block and address databases. Increases shutdown time (default: 0)") + "\n" +
 
 #ifdef DB_LOG_IN_MEMORY
         "  -memorylog             " + _("Use in-memory logging for block index database (default: 1)") + "\n" +
@@ -456,8 +455,6 @@ bool AppInit2()
         fDebugNet = true;
     else
         fDebugNet = GetBoolArg("-debugnet");
-
-    bitdb.SetDetach(GetBoolArg("-detachdb", false));
 
 #if !defined(WIN32) && !defined(QT_GUI)
     fDaemon = GetBoolArg("-daemon");
@@ -966,6 +963,7 @@ bool AppInit2()
     nStart = GetTimeMillis();
 
     {
+        CAddrDB::SetMessageStart(pchMessageStart);
         CAddrDB adb;
         if (!adb.Read(addrman))
             printf("Invalid or missing peers.dat; recreating\n");

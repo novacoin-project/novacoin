@@ -33,11 +33,10 @@ public:
         DisplayUnit,       // BitcoinUnits::Unit
         DisplayAddresses,  // bool
         ThirdPartyTxUrls,  // QString
-        DetachDatabases,   // bool
         Language,          // QString
         CoinControlFeatures, // bool
         ExternalSeeder,    // QString
-        OptionIDRowCount,
+        OptionIDRowCount
     };
 
     void Init();

@@ -5,7 +5,7 @@
 
 #include "db.h"
 #include "util.h"
-#include "main.h"
+#include "addrman.h"
 #include "random.h"
 
 #include <boost/filesystem.hpp>
@@ -41,7 +41,7 @@ void CDBEnv::EnvShutdown()
         DbEnv(0u).remove(strPath.c_str(), 0);
 }
 
-CDBEnv::CDBEnv() : fDetachDB(false), fDbEnvInit(false), fMockDb(false), dbenv(DB_CXX_NO_EXCEPTIONS) { }
+CDBEnv::CDBEnv() : fDbEnvInit(false), fMockDb(false), dbenv(DB_CXX_NO_EXCEPTIONS) { }
 
 CDBEnv::~CDBEnv()
 {
@@ -279,14 +279,6 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
     }
 }
 
-static bool IsChainFile(std::string strFile)
-{
-    if (strFile == "blkindex.dat")
-        return true;
-
-    return false;
-}
-
 void CDB::Close()
 {
     if (!pdb)
@@ -300,10 +292,6 @@ void CDB::Close()
     unsigned int nMinutes = 0;
     if (fReadOnly)
         nMinutes = 1;
-    if (IsChainFile(strFile))
-        nMinutes = 2;
-    if (IsChainFile(strFile) && IsInitialBlockDownload())
-        nMinutes = 5;
 
     bitdb.dbenv.txn_checkpoint(nMinutes ? GetArgUInt("-dblogsize", 100)*1024 : 0, nMinutes, 0);
 
@@ -459,11 +447,9 @@ void CDBEnv::Flush(bool fShutdown)
                 CloseDb(strFile);
                 printf("%s checkpoint\n", strFile.c_str());
                 dbenv.txn_checkpoint(0, 0, 0);
-                if (!IsChainFile(strFile) || fDetachDB) {
-                    printf("%s detach\n", strFile.c_str());
-                    if (!fMockDb)
-                        dbenv.lsn_reset(strFile.c_str(), 0);
-                }
+                printf("%s detach\n", strFile.c_str());
+                if (!fMockDb)
+                    dbenv.lsn_reset(strFile.c_str(), 0);
                 printf("%s closed\n", strFile.c_str());
                 mapFileUseCount.erase(mi++);
             }
@@ -488,6 +474,7 @@ void CDBEnv::Flush(bool fShutdown)
 // CAddrDB
 //
 
+unsigned char CAddrDB::pchMessageStart[4] = {};
 
 CAddrDB::CAddrDB()
 {
@@ -503,7 +490,7 @@ bool CAddrDB::Write(const CAddrMan& addr)
 
     // serialize addresses, checksum data up to that point, then append csum
     CDataStream ssPeers(SER_DISK, CLIENT_VERSION);
-    ssPeers << FLATDATA(pchMessageStart);
+    ssPeers << FLATDATA(CAddrDB::pchMessageStart);
     ssPeers << addr;
     uint256 hash = Hash(ssPeers.begin(), ssPeers.end());
     ssPeers << hash;
@@ -568,11 +555,11 @@ bool CAddrDB::Read(CAddrMan& addr)
 
     unsigned char pchMsgTmp[4];
     try {
-        // de-serialize file header (pchMessageStart magic number) and
+        // de-serialize file header (CAddrDB::pchMessageStart magic number) and
         ssPeers >> FLATDATA(pchMsgTmp);
 
         // verify the network matches ours
-        if (memcmp(pchMsgTmp, pchMessageStart, sizeof(pchMsgTmp)))
+        if (memcmp(pchMsgTmp, CAddrDB::pchMessageStart, sizeof(pchMsgTmp)))
             return error("CAddrman::Read() : invalid network magic number");
 
         // de-serialize address data into one CAddrMan object

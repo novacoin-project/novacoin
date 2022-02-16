@@ -104,8 +104,6 @@ void OptionsModel::Init()
         SoftSetArg("-peercollector", settings.value("externalSeeder").toString().toStdString());
     }
 
-    if (settings.contains("detachDB"))
-        SoftSetBoolArg("-detachdb", settings.value("detachDB").toBool());
     if (!language.isEmpty())
         SoftSetArg("-lang", language.toStdString());
 }
@@ -176,8 +174,6 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return QVariant(bDisplayAddresses);
         case ThirdPartyTxUrls:
             return QVariant(strThirdPartyTxUrls);
-        case DetachDatabases:
-            return QVariant(bitdb.GetDetach());
         case Language:
             return settings.value("language", "");
         case CoinControlFeatures:
@@ -293,12 +289,6 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case DisplayAddresses:
             bDisplayAddresses = value.toBool();
             settings.setValue("bDisplayAddresses", bDisplayAddresses);
-            break;
-        case DetachDatabases: {
-            bool fDetachDB = value.toBool();
-            bitdb.SetDetach(fDetachDB);
-            settings.setValue("detachDB", fDetachDB);
-            }
             break;
         case ThirdPartyTxUrls:
             if (strThirdPartyTxUrls != value.toString()) {
