@@ -20,10 +20,6 @@ Configure build files:
 
     ```cmake ../novacoin```
 
-You may specify BDB library path, if necessary:
-
-    ```cmake ..```
-
 Compile:
 
     ```make -j 4```
