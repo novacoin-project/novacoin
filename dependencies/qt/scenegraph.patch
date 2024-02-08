@@ -1,0 +1,10 @@
+--- a/src/plugins/scenegraph/scenegraph.pro	2024-02-09 01:11:28.263528844 +0300
++++ b/src/plugins/scenegraph/scenegraph.pro	2024-02-09 01:34:10.617174164 +0300
+@@ -1,5 +1,6 @@
+ TEMPLATE = subdirs
+ QT_FOR_CONFIG += quick
+-qtConfig(d3d12): SUBDIRS += d3d12
++# I have no idea why there is no condition to exclude this for cross builds
++# qtConfig(d3d12): SUBDIRS += d3d12
+ qtConfig(openvg): SUBDIRS += openvg
+ 
