@@ -205,9 +205,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_ru.ts ${CMAKE_B
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/locale/bitcoin_uk.ts ${CMAKE_BINARY_DIR}/bitcoin_uk.ts COPYONLY)
 
 # Create translations to be used in bitcoin.qrc
-qt5_create_translation(bitcoin_en_qm ${CMAKE_BINARY_DIR}/bitcoin_en.ts)
-qt5_create_translation(bitcoin_ru_qm ${CMAKE_BINARY_DIR}/bitcoin_ru.ts)
-qt5_create_translation(bitcoin_uk_qm ${CMAKE_BINARY_DIR}/bitcoin_uk.ts)
+qt5_add_translation(bitcoin_en_qm ${CMAKE_BINARY_DIR}/bitcoin_en.ts)
+qt5_add_translation(bitcoin_ru_qm ${CMAKE_BINARY_DIR}/bitcoin_ru.ts)
+qt5_add_translation(bitcoin_uk_qm ${CMAKE_BINARY_DIR}/bitcoin_uk.ts)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/qt/bitcoin.qrc ${CMAKE_BINARY_DIR}/bitcoin.qrc)
 
