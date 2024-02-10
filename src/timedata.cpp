@@ -3,7 +3,6 @@
 #include "sync.h"
 #include "interface.h"
 
-#include <climits>
 
 static CCriticalSection cs_nTimeOffset;
 static uint32_t NOVACOIN_TIMEDATA_MAX_SAMPLES = 200;

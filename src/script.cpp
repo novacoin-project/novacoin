@@ -8,7 +8,6 @@
 #include "key.h"
 #include "main.h"
 #include "random.h"
-#include "sync.h"
 #include "util.h"
 #include "base58.h"
 

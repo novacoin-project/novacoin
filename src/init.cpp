@@ -15,7 +15,6 @@
 #include "interface.h"
 #include "checkpoints.h"
 
-#include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>

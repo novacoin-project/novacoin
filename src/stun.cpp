@@ -28,10 +28,8 @@
  * Of course all fields are in network format.
  */
 
-#include <stdio.h>
 #include <inttypes.h>
 #include <limits>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #ifdef WIN32
@@ -39,14 +37,9 @@
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <netdb.h>
 #endif
-#ifndef WIN32
-#include <unistd.h>
-#endif
 #include <time.h>
-#include <errno.h>
 
 #include "ministun.h"
 #include "netbase.h"

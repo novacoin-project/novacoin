@@ -8,7 +8,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/stream.hpp>
-#include <ostream>
 
 using namespace json_spirit;
 using namespace std;
@@ -77,7 +76,7 @@ double GetPoSKernelPS()
     double dStakeKernelsTriedAvg = 0;
     int nStakesHandled = 0, nStakesTime = 0;
 
-    CBlockIndex* pindex = pindexBest;;
+    CBlockIndex* pindex = pindexBest;
     CBlockIndex* pindexPrevStake = NULL;
 
     while (pindex && nStakesHandled < nPoSInterval)

@@ -266,7 +266,7 @@ bool CCryptoKeyStore::CreatePrivKey(const CPubKey &pubKeyVariant, const CPubKey 
                     return false;
 
                 CMalleableKey mKey = mi->first.GetMalleableKey(vchSecretH);
-                return mKey.CheckKeyVariant(R, pubKeyVariant, privKey);;
+                return mKey.CheckKeyVariant(R, pubKeyVariant, privKey);
             }
         }
 

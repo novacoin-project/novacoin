@@ -10,9 +10,6 @@
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 
-#include <iostream>
-#include <fstream>
-
 
 static uint64_t nAccountingEntryNumber = 0;
 extern bool fWalletUnlockMintOnly;

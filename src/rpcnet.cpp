@@ -6,7 +6,6 @@
 #include "alert.h"
 #include "wallet.h"
 #include "db.h"
-#include "walletdb.h"
 #include "net.h"
 #include "ntp.h"
 

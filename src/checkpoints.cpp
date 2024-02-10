@@ -6,8 +6,6 @@
 #include "main.h"
 #include "txdb-leveldb.h"
 
-#include <algorithm>
-
 
 namespace Checkpoints
 {

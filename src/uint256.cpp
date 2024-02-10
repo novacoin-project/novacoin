@@ -6,9 +6,7 @@
 #include "uint256.h"
 
 #include <cassert>
-#include <cstdio>
 #include <cstring>
-#include <stdexcept>
 
 
 //////////////////////////////////////////////////////////////////////////////

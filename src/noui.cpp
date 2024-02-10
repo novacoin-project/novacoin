@@ -5,8 +5,6 @@
 
 #include "interface.h"
 
-#include <string>
-
 static int noui_ThreadSafeMessageBox(const std::string& message, const std::string& caption, int style)
 {
     printf("%s: %s\n", caption.c_str(), message.c_str());

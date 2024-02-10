@@ -213,4 +213,4 @@ public:
 };
 
 
-#endif // BITCOIN_DB_H
+#endif // BITCOIN_LEVELDB_H
