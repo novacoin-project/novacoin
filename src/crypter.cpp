@@ -2,16 +2,12 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <vector>
 #include <string>
 
 #include "crypter.h"
 
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 bool CCrypter::SetKeyFromPassphrase(const SecureString& strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod)
 {
@@ -55,6 +51,7 @@ bool CCrypter::Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned
 
     // max ciphertext len for a n bytes of plaintext is
     // n + AES_BLOCK_SIZE - 1 bytes
+    constexpr int AES_BLOCK_SIZE = 16; // from openssl/aes.h
     int nLen = vchPlaintext.size();
     int nCLen = nLen + AES_BLOCK_SIZE, nFLen = 0;
     vchCiphertext = std::vector<unsigned char> (nCLen);
