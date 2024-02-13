@@ -14,6 +14,7 @@
 #include "kernel.h"
 #include "random.h"
 #include "wallet.h"
+#include "scrypt.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -1236,6 +1237,10 @@ void static InvalidChainFound(CBlockIndex* pindexNew)
       DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 }
 
+uint256 CBlock::GetHash() const
+{
+    return scrypt_blockhash((const uint8_t*)&nVersion);
+}
 
 void CBlock::UpdateTime(const CBlockIndex* pindexPrev)
 {

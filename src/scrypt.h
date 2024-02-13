@@ -2,7 +2,6 @@
 #define SCRYPT_H
 
 #include <stdint.h>
-#include <openssl/evp.h>
 #include "uint256.h"
 
 #define SCRYPT_BUFFER_SIZE (131072 + 63)

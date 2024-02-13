@@ -35,6 +35,8 @@
 
 #include "scrypt.h"
 
+#include <openssl/evp.h>
+
 static inline uint32_t le32dec(const void *pp)
 {
     const uint8_t *p = (uint8_t const *)pp;

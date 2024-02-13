@@ -9,7 +9,6 @@
 #include "sync.h"
 #include "net.h"
 #include "script.h"
-#include "scrypt.h"
 
 #include <algorithm>
 #include <limits>
@@ -935,10 +934,7 @@ public:
         return (nBits == 0);
     }
 
-    uint256 GetHash() const
-    {
-        return scrypt_blockhash((const uint8_t*)&nVersion);
-    }
+    uint256 GetHash() const;
 
     int64_t GetBlockTime() const
     {

@@ -29,6 +29,8 @@
 
 #include "scrypt.h"
 
+#include <openssl/evp.h>
+
 #ifdef _MSC_VER
 #define INLINE __inline
 #else
