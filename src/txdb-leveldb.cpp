@@ -6,6 +6,7 @@
 #include "txdb-leveldb.h"
 #include "kernel.h"
 #include "checkpoints.h"
+#include "main.h"
 
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>

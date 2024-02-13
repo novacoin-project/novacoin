@@ -8,6 +8,7 @@
 #include "kernel.h"
 #include "kernel_worker.h"
 #include "txdb-leveldb.h"
+#include "main.h"
 
 extern unsigned int nStakeTargetSpacing;
 
