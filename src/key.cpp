@@ -2,14 +2,14 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <map>
+#include "key.h"
+#include "base58.h"
+#include "streams.h"
+#include "hash.h"
 
 #include <openssl/ecdsa.h>
 #include <openssl/evp.h>
 
-#include "key.h"
-#include "base58.h"
-#include "streams.h"
 
 // Generate a private key from just the secret parameter
 int EC_KEY_regenerate_key(EC_KEY *eckey, BIGNUM *priv_key)
@@ -514,6 +514,16 @@ bool CPubKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>
     if (!fSuccessful)
         Invalidate();
     return fSuccessful;
+}
+
+CKeyID CPubKey::GetID() const
+{
+    return CKeyID(Hash160(vbytes, vbytes + size()));
+}
+
+uint256 CPubKey::GetHash() const
+{
+    return Hash(vbytes, vbytes + size());
 }
 
 bool CPubKey::Verify(const uint256 &hash, const std::vector<unsigned char>& vchSig) const
@@ -1175,6 +1185,8 @@ bool CMalleableKeyView::CheckKeyVariant(const CPubKey &R, const CPubKey &vchPubK
     return true;
 }
 
+bool CMalleableKeyView::operator <(const CMalleableKeyView &kv) const { return vchPubKeyH.GetID() < kv.vchPubKeyH.GetID(); }
+
 std::string CMalleableKeyView::ToString() const
 {
     CDataStream ssKey(SER_NETWORK, PROTOCOL_VERSION);
@@ -1214,3 +1226,11 @@ bool CMalleableKeyView::IsValid() const
 {
     return vchSecretL.size() == 32 && GetMalleablePubKey().IsValid();
 }
+
+CScriptID::CScriptID() : uint160(0) { }
+
+CScriptID::CScriptID(const uint160 &in) : uint160(in) { }
+
+CKeyID::CKeyID() : uint160(0) { }
+
+CKeyID::CKeyID(const uint160 &in) : uint160(in) { }

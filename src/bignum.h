@@ -7,7 +7,6 @@
 
 
 #include "serialize.h"
-#include "uint256.h"
 #include "version.h"
 
 #include <openssl/bn.h>
@@ -15,6 +14,9 @@
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
+
+class uint160;
+class uint256;
 
 /** Errors thrown by the bignum class */
 class bignum_error : public std::runtime_error
@@ -67,7 +69,7 @@ public:
     CBigNum(uint32_t n) { bn = BN_new(); setuint32(n); }
     CBigNum(uint64_t n) { bn = BN_new(); setuint64(n); }
 
-    explicit CBigNum(uint256 n) { bn = BN_new(); setuint256(n); }
+    explicit CBigNum(uint256 n);
     explicit CBigNum(const std::vector<uint8_t>& vch) { bn = BN_new(); setvch(vch); }
 
     void setuint32(uint32_t n);

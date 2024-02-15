@@ -1,4 +1,5 @@
 #include "bignum.h"
+#include "uint256.h"
 
 
 CAutoBN_CTX::CAutoBN_CTX() {
@@ -44,6 +45,8 @@ CBigNum::CBigNum(const BIGNUM *bnp) {
 CBigNum::~CBigNum() {
     BN_clear_free(bn);
 }
+
+CBigNum::CBigNum(uint256 n) { bn = BN_new(); setuint256(n); }
 
 void CBigNum::setuint32(uint32_t n) {
     if (!BN_set_word(bn, n))

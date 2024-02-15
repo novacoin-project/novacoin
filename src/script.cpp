@@ -2193,3 +2193,8 @@ void CScript::SetMultisig(int nRequired, const std::vector<CPubKey>& keys)
         *this << key;
     *this << EncodeOP_N((int)(keys.size())) << OP_CHECKMULTISIG;
 }
+
+CScriptID CScript::GetID() const
+{
+    return CScriptID(Hash160(*this));
+}

@@ -623,10 +623,7 @@ public:
         printf("%s\n", ToString().c_str());
     }
 
-    CScriptID GetID() const
-    {
-        return CScriptID(Hash160(*this));
-    }
+    CScriptID GetID() const;
 };
 
 bool IsCanonicalPubKey(const std::vector<unsigned char> &vchPubKey, unsigned int flags);

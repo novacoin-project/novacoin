@@ -7,6 +7,7 @@
 #include "util.h"
 #include "addrman.h"
 #include "random.h"
+#include "hash.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

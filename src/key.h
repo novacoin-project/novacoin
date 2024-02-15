@@ -11,11 +11,11 @@
 #include "allocators.h"
 #include "serialize.h"
 #include "uint256.h"
-#include "hash.h"
 #include "bignum.h"
 
 #include <openssl/ec.h> // for EC_KEY definition
 #include <openssl/obj_mac.h>
+
 
 // secp160k1
 // const unsigned int PRIVATE_KEY_SIZE = 192;
@@ -50,16 +50,16 @@ public:
 class CKeyID : public uint160
 {
 public:
-    CKeyID() : uint160(0) { }
-    CKeyID(const uint160 &in) : uint160(in) { }
+    CKeyID();
+    CKeyID(const uint160 &in);
 };
 
 /** A reference to a CScript: the Hash160 of its serialization (see script.h) */
 class CScriptID : public uint160
 {
 public:
-    CScriptID() : uint160(0) { }
-    CScriptID(const uint160 &in) : uint160(in) { }
+    CScriptID();
+    CScriptID(const uint160 &in);
 };
 
 /** An encapsulated OpenSSL Elliptic Curve key (public) */
@@ -160,15 +160,8 @@ public:
         }
     }
 
-    CKeyID GetID() const
-    {
-        return CKeyID(Hash160(vbytes, vbytes + size()));
-    }
-
-    uint256 GetHash() const
-    {
-        return Hash(vbytes, vbytes + size());
-    }
+    CKeyID GetID() const;
+    uint256 GetHash() const;
 
     /*
      * Check syntactic correctness.
@@ -423,7 +416,7 @@ public:
     CMalleableKey GetMalleableKey(const CSecret &vchSecretH) const { return CMalleableKey(vchSecretL, vchSecretH); }
     bool CheckKeyVariant(const CPubKey &R, const CPubKey &vchPubKeyVariant) const;
 
-    bool operator <(const CMalleableKeyView& kv) const { return vchPubKeyH.GetID() < kv.vchPubKeyH.GetID(); }
+    bool operator <(const CMalleableKeyView& kv) const;
 };
 
 #endif
