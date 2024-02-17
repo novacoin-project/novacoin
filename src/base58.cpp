@@ -258,7 +258,7 @@ bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRe
 
     std::string CBase58Data::ToString() const
     {
-        std::vector<unsigned char> vch(1, nVersion);
+        std::vector<unsigned char> vch{nVersion};
         vch.insert(vch.end(), vchData.begin(), vchData.end());
         return EncodeBase58Check(vch);
     }
