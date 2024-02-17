@@ -26,9 +26,6 @@
 #endif
 
 
-using namespace std;
-
-
 CWallet* pwalletMain;
 CClientUIInterface uiInterface;
 std::string strWalletFileName;
@@ -234,7 +231,7 @@ bool static Bind(const CService &addr, bool fError = true) {
 // Core-specific options shared between UI and daemon
 std::string HelpMessage()
 {
-    string strUsage = _("Options:") + "\n" +
+    std::string strUsage = _("Options:") + "\n" +
         "  -?                     " + _("This help message") + "\n" +
         "  -conf=<file>           " + _("Specify configuration file (default: novacoin.conf)") + "\n" +
         "  -pid=<file>            " + _("Specify pid file (default: novacoind.pid)") + "\n" +
@@ -376,7 +373,7 @@ bool AppInit2()
     fUseMemoryLog = GetBoolArg("-memorylog", true);
 
     // Ping and address broadcast intervals
-    nPingInterval = max<int64_t>(10 * 60, GetArg("-keepalive", 30 * 60));
+    nPingInterval = std::max<int64_t>(10 * 60, GetArg("-keepalive", 30 * 60));
 
     CheckpointsMode = Checkpoints::STRICT;
     std::string strCpMode = GetArg("-cppolicy", "strict");
@@ -567,7 +564,7 @@ bool AppInit2()
 
     if (!bitdb.Open(GetDataDir()))
     {
-        string msg = strprintf(_("Error initializing database environment %s!"
+        std::string msg = strprintf(_("Error initializing database environment %s!"
                                  " To recover, BACKUP THAT DIRECTORY, then remove"
                                  " everything from it except for wallet.dat."), strDataDir.c_str());
         return InitError(msg);
@@ -585,7 +582,7 @@ bool AppInit2()
         CDBEnv::VerifyResult r = bitdb.Verify(strWalletFileName, CWalletDB::Recover);
         if (r == CDBEnv::RECOVER_OK)
         {
-            string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
+            std::string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
                                      " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
                                      " your balance or transactions are incorrect you should"
                                      " restore from a backup."), strDataDir.c_str());
@@ -712,7 +709,7 @@ bool AppInit2()
 
     if (mapArgs.count("-externalip"))
     {
-        for (string strAddr : mapMultiArgs["-externalip"]) {
+        for (std::string strAddr : mapMultiArgs["-externalip"]) {
             CService addrLocal(strAddr, GetListenPort(), fNameLookup);
             if (!addrLocal.IsValid())
                 return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr.c_str()));
@@ -735,14 +732,14 @@ bool AppInit2()
             InitError(_("Unable to sign checkpoint, wrong checkpointkey?\n"));
     }
 
-    for (string strDest : mapMultiArgs["-seednode"])
+    for (std::string strDest : mapMultiArgs["-seednode"])
         AddOneShot(strDest);
 
     // ********************************************************* Step 7: load blockchain
 
     if (!bitdb.Open(GetDataDir()))
     {
-        string msg = strprintf(_("Error initializing database environment %s!"
+        std::string msg = strprintf(_("Error initializing database environment %s!"
                                  " To recover, BACKUP THAT DIRECTORY, then remove"
                                  " everything from it except for wallet.dat."), strDataDir.c_str());
         return InitError(msg);
@@ -804,9 +801,9 @@ bool AppInit2()
 
     if (mapArgs.count("-printblock"))
     {
-        string strMatch = mapArgs["-printblock"];
+        std::string strMatch = mapArgs["-printblock"];
         int nFound = 0;
-        for (map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.begin(); mi != mapBlockIndex.end(); ++mi)
+        for (auto mi = mapBlockIndex.begin(); mi != mapBlockIndex.end(); ++mi)
         {
             uint256 hash = (*mi).first;
             if (strncmp(hash.ToString().c_str(), strMatch.c_str(), strMatch.size()) == 0)
@@ -852,7 +849,7 @@ bool AppInit2()
             strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
         else if (nLoadWalletRet == DB_NONCRITICAL_ERROR)
         {
-            string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
+            std::string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
                          " or address book entries might be missing or incorrect."));
             uiInterface.ThreadSafeMessageBox(msg, _("NovaCoin"), CClientUIInterface::OK | CClientUIInterface::ICON_EXCLAMATION | CClientUIInterface::MODAL);
         }
@@ -934,7 +931,7 @@ bool AppInit2()
     {
         uiInterface.InitMessage(_("Importing blockchain data file."));
 
-        for (string strFile : mapMultiArgs["-loadblock"])
+        for (std::string strFile : mapMultiArgs["-loadblock"])
         {
             FILE *file = fopen(strFile.c_str(), "rb");
             if (file)

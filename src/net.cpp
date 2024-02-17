@@ -18,7 +18,6 @@
 #include <string.h>
 #endif
 
-using namespace std;
 
 static const int MAX_OUTBOUND_CONNECTIONS = 16;
 
@@ -51,7 +50,7 @@ bool fClient = false;
 bool fDiscover = true;
 uint64_t nLocalServices = (fClient ? 0 : NODE_NETWORK);
 static CCriticalSection cs_mapLocalHost;
-static map<CNetAddr, LocalServiceInfo> mapLocalHost;
+static std::map<CNetAddr, LocalServiceInfo> mapLocalHost;
 static bool vfReachable[NET_MAX] = {};
 static bool vfLimited[NET_MAX] = {};
 static CNode* pnodeLocalHost = NULL;
@@ -62,20 +61,20 @@ std::array<int, THREAD_MAX> vnThreadsRunning;
 static std::vector<SOCKET> vhListenSocket;
 CAddrMan addrman;
 
-vector<CNode*> vNodes;
+std::vector<CNode*> vNodes;
 CCriticalSection cs_vNodes;
-map<CInv, CDataStream> mapRelay;
-deque<pair<int64_t, CInv> > vRelayExpiration;
+std::map<CInv, CDataStream> mapRelay;
+std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
 CCriticalSection cs_mapRelay;
-map<CInv, int64_t> mapAlreadyAskedFor;
+std::map<CInv, int64_t> mapAlreadyAskedFor;
 
-static deque<string> vOneShots;
+static std::deque<std::string> vOneShots;
 CCriticalSection cs_vOneShots;
 
-set<CNetAddr> setservAddNodeAddresses;
+std::set<CNetAddr> setservAddNodeAddresses;
 CCriticalSection cs_setservAddNodeAddresses;
 
-vector<std::string> vAddedNodes;
+std::vector<std::string> vAddedNodes;
 CCriticalSection cs_vAddedNodes;
 
 static CSemaphore *semOutbound = NULL;
@@ -90,7 +89,7 @@ inline void RelayInventory(const CInv& inv)
     }
 }
 
-void AddOneShot(string strDest)
+void AddOneShot(std::string strDest)
 {
     LOCK(cs_vOneShots);
     vOneShots.push_back(strDest);
@@ -122,7 +121,7 @@ bool GetLocal(CService& addr, const CNetAddr *paddrPeer)
     int nBestReachability = -1;
     {
         LOCK(cs_mapLocalHost);
-        for (map<CNetAddr, LocalServiceInfo>::iterator it = mapLocalHost.begin(); it != mapLocalHost.end(); it++)
+        for (auto it = mapLocalHost.begin(); it != mapLocalHost.end(); it++)
         {
             int nScore = (*it).second.nScore;
             int nReachability = (*it).first.GetReachabilityFrom(paddrPeer);
@@ -151,7 +150,7 @@ CAddress GetLocalAddress(const CNetAddr *paddrPeer)
     return ret;
 }
 
-bool RecvLine(SOCKET hSocket, string& strLine)
+bool RecvLine(SOCKET hSocket, std::string& strLine)
 {
     strLine.clear();
     for ( ; ; )
@@ -575,7 +574,7 @@ void CNode::PushVersion()
     GetRandBytes((unsigned char*)&nLocalHostNonce, sizeof(nLocalHostNonce));
     printf("send version message: version %d, blocks=%d, us=%s, them=%s, peer=%s\n", PROTOCOL_VERSION, nBestHeight, addrMe.ToString().c_str(), addrYou.ToString().c_str(), addr.ToString().c_str());
     PushMessage("version", PROTOCOL_VERSION, nLocalServices, nTime, addrYou, addrMe,
-                nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight);
+                nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<std::string>()), nBestHeight);
 }
 
 
@@ -681,7 +680,7 @@ void ThreadSocketHandler(void* parg)
     printf("ThreadSocketHandler exited\n");
 }
 
-static list<CNode*> vNodesDisconnected;
+static std::list<CNode*> vNodesDisconnected;
 
 void ThreadSocketHandler2(void* parg)
 {
@@ -695,7 +694,7 @@ void ThreadSocketHandler2(void* parg)
         {
             LOCK(cs_vNodes);
             // Disconnect unused nodes
-            vector<CNode*> vNodesCopy = vNodes;
+            std::vector<CNode*> vNodesCopy = vNodes;
             for (CNode* pnode : vNodesCopy)
             {
                 if (pnode->fDisconnect ||
@@ -712,7 +711,7 @@ void ThreadSocketHandler2(void* parg)
                     pnode->Cleanup();
 
                     // hold in disconnected pool until all refs are released
-                    pnode->nReleaseTime = max(pnode->nReleaseTime, GetTime() + 15 * 60);
+                    pnode->nReleaseTime = std::max(pnode->nReleaseTime, GetTime() + 15 * 60);
                     if (pnode->fNetworkNode || pnode->fInbound)
                         pnode->Release();
                     vNodesDisconnected.push_back(pnode);
@@ -720,7 +719,7 @@ void ThreadSocketHandler2(void* parg)
             }
 
             // Delete disconnected nodes
-            list<CNode*> vNodesDisconnectedCopy = vNodesDisconnected;
+            std::list<CNode*> vNodesDisconnectedCopy = vNodesDisconnected;
             for (CNode* pnode : vNodesDisconnectedCopy)
             {
                 // wait until threads are done using it
@@ -773,7 +772,7 @@ void ThreadSocketHandler2(void* parg)
 
         for (SOCKET hListenSocket : vhListenSocket) {
             FD_SET(hListenSocket, &fdsetRecv);
-            hSocketMax = max(hSocketMax, hListenSocket);
+            hSocketMax = std::max(hSocketMax, hListenSocket);
             have_fds = true;
         }
         {
@@ -784,7 +783,7 @@ void ThreadSocketHandler2(void* parg)
                     continue;
                 FD_SET(pnode->hSocket, &fdsetRecv);
                 FD_SET(pnode->hSocket, &fdsetError);
-                hSocketMax = max(hSocketMax, pnode->hSocket);
+                hSocketMax = std::max(hSocketMax, pnode->hSocket);
                 have_fds = true;
                 {
                     TRY_LOCK(pnode->cs_vSend, lockSend);
@@ -877,7 +876,7 @@ void ThreadSocketHandler2(void* parg)
         //
         // Service each socket
         //
-        vector<CNode*> vNodesCopy;
+        std::vector<CNode*> vNodesCopy;
         {
             LOCK(cs_vNodes);
             vNodesCopy = vNodes;
@@ -1054,8 +1053,8 @@ void ThreadDNSAddressSeed2(void* parg)
             if (HaveNameProxy()) {
                 AddOneShot(strDNSSeed[seed_idx][1]);
             } else {
-                vector<CNetAddr> vaddr;
-                vector<CAddress> vAdd;
+                std::vector<CNetAddr> vaddr;
+                std::vector<CAddress> vAdd;
                 if (LookupHost(strDNSSeed[seed_idx][1], vaddr))
                 {
                     for (CNetAddr& ip : vaddr)
@@ -1196,7 +1195,7 @@ void ThreadOpenConnections(void* parg)
 
 void static ProcessOneShot()
 {
-    string strDest;
+    std::string strDest;
     {
         LOCK(cs_vOneShots);
         if (vOneShots.empty())
@@ -1222,7 +1221,7 @@ void ThreadOpenConnections2(void* parg)
         for (int64_t nLoop = 0;; nLoop++)
         {
             ProcessOneShot();
-            for (string strAddr : mapMultiArgs["-connect"])
+            for (std::string strAddr : mapMultiArgs["-connect"])
             {
                 CAddress addr;
                 OpenNetworkConnection(addr, NULL, strAddr.c_str());
@@ -1296,7 +1295,7 @@ void ThreadOpenConnections2(void* parg)
         // Only connect out to one peer per network group (/16 for IPv4).
         // Do this here so we don't have to critsect vNodes inside mapAddresses critsect.
         int nOutbound = 0;
-        set<vector<unsigned char> > setConnected;
+        std::set<std::vector<unsigned char> > setConnected;
         {
             LOCK(cs_vNodes);
             for (CNode* pnode : vNodes) {
@@ -1313,7 +1312,7 @@ void ThreadOpenConnections2(void* parg)
         for ( ; ; )
         {
             // use an nUnkBias between 10 (no outgoing connections) and 90 (8 outgoing connections)
-            CAddress addr = addrman.Select(10 + min(nOutbound,8)*10);
+            CAddress addr = addrman.Select(10 + std::min(nOutbound,8)*10);
 
             // if we selected an invalid address, restart
             if (!addr.IsValid() || setConnected.count(addr.GetGroup()) || IsLocal(addr))
@@ -1378,13 +1377,13 @@ void ThreadOpenAddedConnections2(void* parg)
 
     if (HaveNameProxy()) {
         while(!fShutdown) {
-            list<string> lAddresses(0);
+            std::list<std::string> lAddresses(0);
             {
                 LOCK(cs_vAddedNodes);
-                for (string& strAddNode : vAddedNodes)
+                for (std::string& strAddNode : vAddedNodes)
                     lAddresses.push_back(strAddNode);
             }
-            for (string& strAddNode : lAddresses) {
+            for (std::string& strAddNode : lAddresses) {
                 CAddress addr;
                 CSemaphoreGrant grant(*semOutbound);
                 OpenNetworkConnection(addr, &grant, strAddNode.c_str());
@@ -1399,17 +1398,17 @@ void ThreadOpenAddedConnections2(void* parg)
 
     for (uint32_t i = 0; true; i++)
     {
-        list<string> lAddresses(0);
+        std::list<std::string> lAddresses(0);
         {
             LOCK(cs_vAddedNodes);
-            for (string& strAddNode : vAddedNodes)
+            for (std::string& strAddNode : vAddedNodes)
                 lAddresses.push_back(strAddNode);
         }
 
-        list<vector<CService> > lservAddressesToAdd(0);
-        for (string& strAddNode : lAddresses)
+        std::list<std::vector<CService> > lservAddressesToAdd(0);
+        for (std::string& strAddNode : lAddresses)
         {
-            vector<CService> vservNode(0);
+            std::vector<CService> vservNode(0);
             if (Lookup(strAddNode.c_str(), vservNode, GetDefaultPort(), fNameLookup, 0))
             {
                 lservAddressesToAdd.push_back(vservNode);
@@ -1425,7 +1424,7 @@ void ThreadOpenAddedConnections2(void* parg)
         {
             LOCK(cs_vNodes);
             for (CNode* pnode : vNodes)
-                for (list<vector<CService> >::iterator it = lservAddressesToAdd.begin(); it != lservAddressesToAdd.end(); it++)
+                for (auto it = lservAddressesToAdd.begin(); it != lservAddressesToAdd.end(); it++)
                 {
                     for (CService& addrNode : *(it))
                         if (pnode->addr == addrNode)
@@ -1439,7 +1438,7 @@ void ThreadOpenAddedConnections2(void* parg)
                         break;
                 }
         }
-        for (vector<CService>& vserv : lservAddressesToAdd)
+        for (std::vector<CService>& vserv : lservAddressesToAdd)
         {
             if (vserv.size() == 0)
                 continue;
@@ -1497,7 +1496,7 @@ static int64_t NodeSyncScore(const CNode *pnode) {
     return pnode->nLastRecv;
 }
 
-void static StartSync(const vector<CNode*> &vNodes) {
+void static StartSync(const std::vector<CNode*> &vNodes) {
     CNode *pnodeNewSync = NULL;
     int64_t nBestScore = 0;
 
@@ -1551,7 +1550,7 @@ void ThreadMessageHandler2(void* parg)
     while (!fShutdown)
     {
         bool fHaveSyncNode = false;
-        vector<CNode*> vNodesCopy;
+        std::vector<CNode*> vNodesCopy;
         {
             LOCK(cs_vNodes);
             vNodesCopy = vNodes;
@@ -1615,7 +1614,7 @@ void ThreadMessageHandler2(void* parg)
 
 
 
-bool BindListenPort(const CService &addrBind, string& strError)
+bool BindListenPort(const CService &addrBind, std::string& strError)
 {
     strError.clear();
     int nOne = 1;
@@ -1722,7 +1721,7 @@ void static Discover()
     char pszHostName[1000] = "";
     if (gethostname(pszHostName, sizeof(pszHostName)) != SOCKET_ERROR)
     {
-        vector<CNetAddr> vaddr;
+        std::vector<CNetAddr> vaddr;
         if (LookupHost(pszHostName, vaddr))
         {
             for (const CNetAddr &addr : vaddr)
@@ -1775,7 +1774,7 @@ void StartNode(void* parg)
 
     if (semOutbound == NULL) {
         // initialize semaphore
-        int nMaxOutbound = min(MAX_OUTBOUND_CONNECTIONS, GetArgInt("-maxconnections", 125));
+        int nMaxOutbound = std::min(MAX_OUTBOUND_CONNECTIONS, GetArgInt("-maxconnections", 125));
         semOutbound = new CSemaphore(nMaxOutbound);
     }
 
