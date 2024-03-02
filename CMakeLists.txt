@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.5)
 
 ##
 ## mkdir build && cd build
@@ -80,10 +80,16 @@ endif()
 # Set default library path for berkeley db
 if (NOT BerkeleyDB_LIBS)
 set(BerkeleyDB_LIBS ${BerkeleyDB_ROOT}/lib)
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 # Workaround for linux distributions
-set(BerkeleyDB_LIBS ${BerkeleyDB_LIBS}/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
-endif()
+    execute_process (
+        COMMAND bash -c "test -d ${BerkeleyDB_LIBS}/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu && echo -n 'present' || echo -n 'absent'"
+        OUTPUT_VARIABLE dirPresent
+    )
+    if(dirPresent STREQUAL "present")
+        set(BerkeleyDB_LIBS ${BerkeleyDB_LIBS}/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
+    endif()
+endif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 # Set default library name for berkeley db
