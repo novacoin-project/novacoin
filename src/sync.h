@@ -65,11 +65,11 @@ public:
         if (!lock.owns_lock())
         {
             EnterCritical(pszName, pszFile, nLine, (void*)(lock.mutex()), true);
-            lock.try_lock();
-            if (!lock.owns_lock())
-                LeaveCritical();
+            if (lock.try_lock())
+                return true;
+            LeaveCritical();
         }
-        return lock.owns_lock();
+        return false;
     }
 
     CMutexLock(Mutex& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) : lock(mutexIn, std::defer_lock)
