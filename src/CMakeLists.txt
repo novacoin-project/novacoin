@@ -43,8 +43,14 @@ if(WIN32)
 set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 find_package(Boost REQUIRED COMPONENTS atomic chrono filesystem program_options system thread)
+
 set(OPENSSL_USE_STATIC_LIBS ON)
+find_package(OpenSSL)
+if (NOT OpenSSL_FOUND)
+set(OPENSSL_USE_STATIC_LIBS OFF)
 find_package(OpenSSL REQUIRED)
+endif()
+
 add_subdirectory(additional/IXWebSocket)
 
 # Set default root path for berkeley db
