@@ -19,12 +19,12 @@
 Copyright © 2011-2012 The PPCoin Developers
 Copyright © 2014 The Peerunity Developers
 Copyright © 2014 The EmerCoin Developers
-Copyright © 2012-2020 The NovaCoin developers</source>
+Copyright © 2012-2026 The NovaCoin developers</source>
         <translation>© 2009-2019 Розробники Bitcoin
 © 2011-2012 Розробники PPCoin
 © 2014 Розробники Peerunity
 © 2014 Розробники EmerCoin
-© 2012-2020 Розробники NovaCoin</translation>
+© 2012-2026 Розробники NovaCoin</translation>
     </message>
     <message>
         <location filename="../forms/aboutdialog.ui" line="114"/>
