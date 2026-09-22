@@ -455,6 +455,20 @@ public:
     {
         return GetOp2(pc, opcodeRet, NULL);
     }
+    
+    bool HasOp(opcodetype opcode) const
+    {
+        const_iterator pc = begin();
+        opcodetype op;
+        while (pc < end())
+        {
+            if (!GetOp(pc, op))
+                return false;   // broken script
+            if (op == opcode)
+                return true;
+        }
+        return false;
+    }
 
     bool GetOp2(const_iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>* pvchRet) const
     {
