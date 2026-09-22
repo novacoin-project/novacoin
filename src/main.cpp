@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) MMXXVI Silent58
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -724,7 +725,11 @@ bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
 
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
-        if (!tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1), pindexBest, false, false, true, STRICT_FLAGS))
+        unsigned int nFlags = STRICT_FLAGS;
+        if (nBestHeight + 1 >= GetDisableEcdsaHeight())
+            nFlags |= SCRIPT_VERIFY_DISABLE_ECDSA;
+
+        if (!tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1), pindexBest, false, false, true, nFlags))
         {
             return error("CTxMemPool::accept() : ConnectInputs failed %s", hash.ToString().substr(0,10).c_str());
         }
@@ -1727,6 +1732,10 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             if (tx.nTime >= CHECKSEQUENCEVERIFY_SWITCH_TIME) {
                 nFlags |= SCRIPT_VERIFY_CHECKSEQUENCEVERIFY;
             }
+            
+            // ECDSA killswitch
+            if (pindex->nHeight >= GetDisableEcdsaHeight())
+                nFlags |= SCRIPT_VERIFY_DISABLE_ECDSA;
 
             std::vector<CScriptCheck> vChecks;
             if (!tx.ConnectInputs(txdb, mapInputs, mapQueuedChanges, posThisTx, pindex, true, false, fScriptChecks, nFlags, nScriptCheckThreads ? &vChecks : NULL))

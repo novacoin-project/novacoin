@@ -1343,6 +1343,9 @@ public:
 bool CheckSig(std::vector<unsigned char> vchSig, const std::vector<unsigned char> &vchPubKey, const CScript &scriptCode,
               const CTransaction& txTo, unsigned int nIn, int nHashType, int flags)
 {
+    if (flags & SCRIPT_VERIFY_DISABLE_ECDSA)
+        return false;
+        
     static CSignatureCache signatureCache;
 
     CPubKey pubkey(vchPubKey);

@@ -72,7 +72,8 @@ enum
     SCRIPT_VERIFY_NOCACHE   = (1U << 3), // do not store results in signature cache (but do query it)
     SCRIPT_VERIFY_NULLDUMMY = (1U << 4), // verify dummy stack item consumed by CHECKMULTISIG is of zero-length
     SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 9),
-    SCRIPT_VERIFY_CHECKSEQUENCEVERIFY = (1U << 10)
+    SCRIPT_VERIFY_CHECKSEQUENCEVERIFY = (1U << 10),
+    SCRIPT_VERIFY_DISABLE_ECDSA = (1U << 11)
 };
 
 // Strict verification:
