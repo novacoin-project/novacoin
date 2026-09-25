@@ -188,6 +188,9 @@ list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO USE_IPV6 BOOST_SPIRIT_THREADSAFE)
 
 add_executable(novacoind ${ALL_SOURCES})
 
+set(liboqs_DIR "/usr/local/lib/cmake/liboqs")
+find_package(liboqs REQUIRED)
+
 target_precompile_headers(novacoind
   PRIVATE
     <algorithm>
@@ -237,7 +240,7 @@ set(CMAKE_EXE_LINKER_FLAGS ${ALL_LINKER_FLAGS} CACHE INTERNAL "")
 endif()
 
 target_include_directories(novacoind PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/additional/leveldb/helpers ${Boost_INCLUDE_DIRS})
-target_link_libraries(novacoind ${ALL_LIBRARIES})
+target_link_libraries(novacoind ${ALL_LIBRARIES} OQS::oqs)
 
 target_compile_features(novacoind PUBLIC cxx_std_17)
 set_property(TARGET novacoind PROPERTY CXX_STANDARD 17)
