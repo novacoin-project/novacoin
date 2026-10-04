@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) MMXXVI Silent58
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -369,6 +370,10 @@ bool CTransaction::AreInputsStandard(const MapPrevTx& mapInputs) const
     for (unsigned int i = 0; i < vin.size(); i++)
     {
         const CTxOut& prev = GetOutputFor(vin[i], mapInputs);
+        
+        // Falcon scripts are always standard
+        if (prev.scriptPubKey.HasOp(OP_FALCONVERIFY))
+            continue;
 
         std::vector<std::vector<unsigned char> > vSolutions;
         txnouttype whichType;
@@ -394,6 +399,10 @@ bool CTransaction::AreInputsStandard(const MapPrevTx& mapInputs) const
             if (stack.empty())
                 return false;
             CScript subscript(stack.back().begin(), stack.back().end());
+            
+            if (subscript.HasOp(OP_FALCONVERIFY))
+                continue;
+        
             std::vector<std::vector<unsigned char> > vSolutions2;
             txnouttype whichType2;
             if (!Solver(subscript, whichType2, vSolutions2))
@@ -724,7 +733,11 @@ bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
 
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
-        if (!tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1), pindexBest, false, false, true, STRICT_FLAGS))
+        unsigned int nFlags = STRICT_FLAGS;
+        if (nBestHeight + 1 >= GetDisableEcdsaHeight())
+            nFlags |= SCRIPT_VERIFY_DISABLE_ECDSA;
+
+        if (!tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1), pindexBest, false, false, true, nFlags))
         {
             return error("CTxMemPool::accept() : ConnectInputs failed %s", hash.ToString().substr(0,10).c_str());
         }
@@ -1727,10 +1740,17 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             if (tx.nTime >= CHECKSEQUENCEVERIFY_SWITCH_TIME) {
                 nFlags |= SCRIPT_VERIFY_CHECKSEQUENCEVERIFY;
             }
+            
+            // ECDSA killswitch
+            if (pindex->nHeight >= GetDisableEcdsaHeight())
+                nFlags |= SCRIPT_VERIFY_DISABLE_ECDSA;
 
             std::vector<CScriptCheck> vChecks;
             if (!tx.ConnectInputs(txdb, mapInputs, mapQueuedChanges, posThisTx, pindex, true, false, fScriptChecks, nFlags, nScriptCheckThreads ? &vChecks : NULL))
+            {
+                DoS(tx.nDoS, false);   // penalty for peer
                 return false;
+            }
             control.Add(vChecks);
         }
 
@@ -1993,6 +2013,44 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
     nBestChainTrust = pindexNew->nChainTrust;
     nTimeBestReceived = GetTime();
     nTransactionsUpdated++;
+    
+    // Remove transactions that became invalid after ECDSA killswitch activation
+    if (pindexBest->nHeight + 1 >= GetDisableEcdsaHeight())
+    {
+        LOCK(mempool.cs);
+        CTxDB txdb("r");
+        unsigned int nRemoved = 0;
+        for (auto it = mempool.mapTx.begin(); it != mempool.mapTx.end(); )
+        {
+            CTransaction& tx = it->second;
+
+            MapPrevTx mapInputs;
+            std::map<uint256, CTxIndex> mapUnused;
+            bool fInvalid = false;
+            bool fOk = tx.FetchInputs(txdb, mapUnused, false, false, mapInputs, fInvalid);
+
+            if (fOk)
+            {
+                fOk = tx.ConnectInputs(txdb, mapInputs, mapUnused, CDiskTxPos(1,1,1),
+                                       pindexBest, false, false, true,
+                                       STRICT_FLAGS | SCRIPT_VERIFY_DISABLE_ECDSA);
+            }
+
+            if (!fOk)
+            {
+                for (const CTxIn& txin : tx.vin)
+                    mempool.mapNextTx.erase(txin.prevout);
+                mempool.mapTx.erase(it++);
+                ++nRemoved;
+            }
+            else
+            {
+                ++it;
+            }
+        }
+        if (nRemoved > 0)
+            printf("SetBestChain: removed %u ECDSA transactions from mempool after killswitch\n", nRemoved);
+    }
 
     uint256 nBestBlockTrust = pindexBest->nHeight != 0 ? (pindexBest->nChainTrust - pindexBest->pprev->nChainTrust) : pindexBest->nChainTrust;
 

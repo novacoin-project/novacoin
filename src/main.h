@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) MMXXVI Silent58
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_MAIN_H
@@ -44,6 +45,23 @@ static const int64_t MAX_MINT_PROOF_OF_WORK = 100 * COIN;
 static const int64_t MAX_MINT_PROOF_OF_STAKE = 1 * COIN;
 static const int64_t MIN_TXOUT_AMOUNT = CENT/100;
 
+/* ECDSA validation bomb
+mainnet switch height was calculated as follows:
+let's take timestamp of block #1       - 1360426882
+let's take timestamp of block #1098544 - 1790025547
+exact time difference is 1790025547-1360426882 = 429598665s.
+approximative average interval is 429598665/1098544 = 391,06s.
+
+let's set switch time to september 2031 (5 years later)
+exact time in seconds is 60x60x24x365x5 = 157680000
+approximative time in blocks is 157680000/391.06 = 403212
+
+so actual height will be 1098544+403212 = 1501756
+*/
+static const int DISABLE_ECDSA_HEIGHT = 1501756;
+static const int DISABLE_ECDSA_HEIGHT_TESTNET = 10000;
+
+inline int GetDisableEcdsaHeight() { return fTestNet ? DISABLE_ECDSA_HEIGHT_TESTNET : DISABLE_ECDSA_HEIGHT; }
 
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.

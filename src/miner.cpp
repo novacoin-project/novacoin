@@ -9,6 +9,7 @@
 #include "kernel.h"
 #include "kernel_worker.h"
 #include "wallet.h"
+#include "main.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -318,7 +319,11 @@ std::shared_ptr<CBlock> CreateNewBlock(CWallet* pwallet, CTransaction *txCoinSta
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
 
-            if (!tx.ConnectInputs(txdb, mapInputs, mapTestPoolTmp, CDiskTxPos(1,1,1), pindexPrev, false, true, true, MANDATORY_SCRIPT_VERIFY_FLAGS))
+            unsigned int nFlags = MANDATORY_SCRIPT_VERIFY_FLAGS;
+            if (pindexPrev->nHeight + 1 >= GetDisableEcdsaHeight())
+                nFlags |= SCRIPT_VERIFY_DISABLE_ECDSA;
+
+            if (!tx.ConnectInputs(txdb, mapInputs, mapTestPoolTmp, CDiskTxPos(1,1,1), pindexPrev, false, true, true, nFlags))
                 continue;
             mapTestPoolTmp[tx.GetHash()] = CTxIndex(CDiskTxPos(1,1,1), tx.vout.size());
             swap(mapTestPool, mapTestPoolTmp);

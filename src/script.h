@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) MMXXVI Silent58
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef H_BITCOIN_SCRIPT
@@ -71,7 +72,8 @@ enum
     SCRIPT_VERIFY_NOCACHE   = (1U << 3), // do not store results in signature cache (but do query it)
     SCRIPT_VERIFY_NULLDUMMY = (1U << 4), // verify dummy stack item consumed by CHECKMULTISIG is of zero-length
     SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 9),
-    SCRIPT_VERIFY_CHECKSEQUENCEVERIFY = (1U << 10)
+    SCRIPT_VERIFY_CHECKSEQUENCEVERIFY = (1U << 10),
+    SCRIPT_VERIFY_DISABLE_ECDSA = (1U << 11)
 };
 
 // Strict verification:
@@ -233,6 +235,7 @@ enum opcodetype
     OP_CHECKSIGVERIFY = 0xad,
     OP_CHECKMULTISIG = 0xae,
     OP_CHECKMULTISIGVERIFY = 0xaf,
+    OP_FALCONVERIFY = 0xb9,
 
     // expansion
     OP_NOP1 = 0xb0,
@@ -242,7 +245,6 @@ enum opcodetype
     OP_NOP7 = 0xb6,
     OP_NOP8 = 0xb7,
     OP_NOP9 = 0xb8,
-    OP_NOP10 = 0xb9,
 
     // template matching params
     OP_SMALLDATA = 0xf9,
@@ -452,6 +454,20 @@ public:
     bool GetOp(const_iterator& pc, opcodetype& opcodeRet) const
     {
         return GetOp2(pc, opcodeRet, NULL);
+    }
+    
+    bool HasOp(opcodetype opcode) const
+    {
+        const_iterator pc = begin();
+        opcodetype op;
+        while (pc < end())
+        {
+            if (!GetOp(pc, op))
+                return false;   // broken script
+            if (op == opcode)
+                return true;
+        }
+        return false;
     }
 
     bool GetOp2(const_iterator& pc, opcodetype& opcodeRet, std::vector<uint8_t>* pvchRet) const

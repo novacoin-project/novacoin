@@ -282,6 +282,9 @@ list(APPEND ALL_DEFINITIONS HAVE_BUILD_INFO)
 
 add_executable(novacoin-qt WIN32 ${ALL_SOURCES})
 
+set(liboqs_DIR "/usr/local/lib/cmake/liboqs")
+find_package(liboqs REQUIRED)
+
 target_precompile_headers(novacoin-qt
   PRIVATE
     <algorithm>
@@ -430,8 +433,8 @@ set(CMAKE_EXE_LINKER_FLAGS ${ALL_LINKER_FLAGS} CACHE INTERNAL "")
 endif()
 
 target_include_directories(novacoin-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/json ${BerkeleyDB_INC} ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/leveldb/helpers ${CMAKE_CURRENT_SOURCE_DIR}/src/additional/libqrencode ${Boost_INCLUDE_DIRS})
-target_link_libraries(novacoin-qt ${ALL_LIBRARIES})
 
+target_link_libraries(novacoin-qt ${ALL_LIBRARIES} OQS::oqs)
 target_compile_features(novacoin-qt PUBLIC cxx_std_17)
 
 set_property(TARGET novacoin-qt PROPERTY CXX_STANDARD 17)
